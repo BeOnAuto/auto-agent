@@ -52,6 +52,8 @@ export { SliceType } from './narrative';
 export { getNarratives } from './getNarratives';
 export { modelToNarrative } from './transformers/model-to-narrative';
 
+export type { ExportSchemaEvents } from './commands/export-schema';
+
 // Testing helpers
 export { createNarrativeSpec, given, when } from './testing';
 
