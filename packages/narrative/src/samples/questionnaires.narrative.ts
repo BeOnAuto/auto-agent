@@ -95,16 +95,16 @@ type QuestionnaireProgress = State<
   }
 >;
 
-flow('Questionnaires', 'AUTO-Q9m2Kp4Lx', () => {
-  experience('Homepage', 'AUTO-H1a4Bn6Cy').client(() => {
+flow('Questionnaires', 'Q9m2Kp4Lx', () => {
+  experience('Homepage', 'H1a4Bn6Cy').client(() => {
     it('show a hero section with a welcome message');
     it('allow user to start the questionnaire');
   });
 
-  query('views the questionnaire', 'AUTO-V7n8Rq5M')
+  query('views the questionnaire', 'V7n8Rq5M')
     .server(() => {
       specs(() => {
-        rule('questionnaires show current progress', 'AUTO-r1A3Bp9W', () => {
+        rule('questionnaires show current progress', 'r1A3Bp9W', () => {
           example('a question has already been answered')
             .given<QuestionnaireLinkSent>({
               questionnaireId: 'q-001',
@@ -170,10 +170,10 @@ flow('Questionnaires', 'AUTO-Q9m2Kp4Lx', () => {
       });
     });
 
-  command('submits a questionnaire answer', 'AUTO-S4j6Nt8Z')
+  command('submits a questionnaire answer', 'S4j6Nt8Z')
     .server(() => {
       specs(() => {
-        rule('answers are allowed while the questionnaire has not been submitted', 'AUTO-r2D5Eq0Y', () => {
+        rule('answers are allowed while the questionnaire has not been submitted', 'r2D5Eq0Y', () => {
           example('no questions have been answered yet')
             .when<AnswerQuestion>({
               questionnaireId: 'q-001',
@@ -228,10 +228,10 @@ flow('Questionnaires', 'AUTO-Q9m2Kp4Lx', () => {
       });
     });
 
-  query('questionnaire ready for submission', 'AUTO-R3f7Hu1X')
+  query('questionnaire ready for submission', 'R3f7Hu1X')
     .server(() => {
       specs(() => {
-        rule('questionnaire is ready for submission when all questions are answered', 'AUTO-r3G8Iv2W', () => {
+        rule('questionnaire is ready for submission when all questions are answered', 'r3G8Iv2W', () => {
           example('all questions have been answered')
             .given<QuestionnaireConfig>({
               questionnaireId: 'q-001',
@@ -319,10 +319,10 @@ flow('Questionnaires', 'AUTO-Q9m2Kp4Lx', () => {
       });
     });
 
-  command('submits the questionnaire', 'AUTO-T5k9Jw3V')
+  command('submits the questionnaire', 'T5k9Jw3V')
     .server(() => {
       specs(() => {
-        rule('questionnaire allowed to be submitted when all questions are answered', 'AUTO-r4H0Lx4U', () => {
+        rule('questionnaire allowed to be submitted when all questions are answered', 'r4H0Lx4U', () => {
           example('submits the questionnaire successfully')
             .when<SubmitQuestionnaire>({
               questionnaireId: 'q-001',

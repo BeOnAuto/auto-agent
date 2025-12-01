@@ -73,7 +73,7 @@ describe('addAutoIds', () => {
     integrations: [],
   };
 
-  const AUTO_ID_REGEX = /^AUTO-[A-Za-z0-9_]{9}$/;
+  const AUTO_ID_REGEX = /^[A-Za-z0-9_]{9}$/;
 
   it('should assign IDs to entities that do not have them', () => {
     const result = addAutoIds(flows);

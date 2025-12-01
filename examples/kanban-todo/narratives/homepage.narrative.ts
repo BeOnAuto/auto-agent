@@ -1,6 +1,6 @@
 import { experience, narrative, it, describe } from '@auto-engineer/narrative';
-narrative('Todo Dashboard', 'AUTO-H6i9Rs2Gz', () => {
-  experience('Kanban Board View', 'AUTO-K7j0St3Hz').client(() => {
+narrative('Todo Dashboard', 'H6i9Rs2Gz', () => {
+  experience('Kanban Board View', 'K7j0St3Hz').client(() => {
     it('display three distinct columns: To Do, In Progress, and Done');
     it('show elegant column headers with gradient backgrounds');
     it('display count badges on each column showing number of tasks');
@@ -12,7 +12,7 @@ narrative('Todo Dashboard', 'AUTO-H6i9Rs2Gz', () => {
     it('show empty state with beautiful illustrations when columns are empty');
     it('maintain consistent card spacing and grid alignment');
   });
-  experience('Task Cards', 'AUTO-T8k1Uu4Iz').client(() => {
+  experience('Task Cards', 'T8k1Uu4Iz').client(() => {
     describe('Task Card Layout', () => {
       it('display task title with clear typography');
     });
@@ -25,7 +25,7 @@ narrative('Todo Dashboard', 'AUTO-H6i9Rs2Gz', () => {
     it('apply strike-through animation for completed tasks');
     it('use gradient borders matching task status');
   });
-  experience('View Toggle Controls', 'AUTO-V3p6Zz9Nz').client(() => {
+  experience('View Toggle Controls', 'V3p6Zz9Nz').client(() => {
     it('provide toggle between Kanban and List views');
     it('use segmented control or tab-style switcher');
     it('position in top toolbar for easy access');
@@ -34,7 +34,7 @@ narrative('Todo Dashboard', 'AUTO-H6i9Rs2Gz', () => {
     it('preserve scroll position when switching views');
     it('remember user preference in local storage');
   });
-  experience('Theme Toggle', 'AUTO-T4q7Aa0Oz').client(() => {
+  experience('Theme Toggle', 'T4q7Aa0Oz').client(() => {
     it('support light and dark theme modes');
     it('display sun/moon icon toggle in top bar');
     it('transition smoothly between themes with fade animation');
@@ -43,7 +43,7 @@ narrative('Todo Dashboard', 'AUTO-H6i9Rs2Gz', () => {
     it('remember user preference in local storage');
     it('use system preference as default');
   });
-  experience('Celebration Animations', 'AUTO-C5r8Bb1Pz').client(() => {
+  experience('Celebration Animations', 'C5r8Bb1Pz').client(() => {
     it('trigger confetti animation when task is completed');
     it('show satisfying check mark animation');
     it('play subtle success sound effect (optional, user configurable)');
@@ -52,7 +52,7 @@ narrative('Todo Dashboard', 'AUTO-H6i9Rs2Gz', () => {
     it('use particle effects that do not obstruct UI');
     it('respect reduced motion preferences for accessibility');
   });
-  experience('Column Management', 'AUTO-M6s9Cc2Qz').client(() => {
+  experience('Column Management', 'M6s9Cc2Qz').client(() => {
     it('allow reordering tasks within same column via drag-and-drop');
     it('auto-scroll columns when dragging near edges');
     it('show drop zones with visual indicators');
@@ -61,7 +61,7 @@ narrative('Todo Dashboard', 'AUTO-H6i9Rs2Gz', () => {
     it('show task count updates immediately on column changes');
     it('maintain smooth 60fps animations during all interactions');
   });
-  experience('Empty States', 'AUTO-E7t0Dd3Rz').client(() => {
+  experience('Empty States', 'E7t0Dd3Rz').client(() => {
     it('display welcoming illustration when no tasks exist');
     it('show encouraging message to add first task');
     it('provide quick-add button directly in empty state');
@@ -69,7 +69,7 @@ narrative('Todo Dashboard', 'AUTO-H6i9Rs2Gz', () => {
     it('use consistent visual style matching overall design system');
     it('include helpful tips for new users');
   });
-  experience('Completion Progress Ring', 'AUTO-P9l2Vv5Jz').client(() => {
+  experience('Completion Progress Ring', 'P9l2Vv5Jz').client(() => {
     it('display circular progress ring with gradient stroke');
     it('show completion percentage prominently in center');
     it('animate progress changes with smooth easing');
@@ -78,7 +78,7 @@ narrative('Todo Dashboard', 'AUTO-H6i9Rs2Gz', () => {
     it('show subtle pulse animation on milestone achievements');
     it('position prominently at top of dashboard or sidebar');
   });
-  experience('Quick Add Todo Widget', 'AUTO-Q0m3Ww6Kz').client(() => {
+  experience('Quick Add Todo Widget', 'Q0m3Ww6Kz').client(() => {
     it('display floating action button with plus icon');
     it('position fixed in bottom-right corner for easy access');
     it('expand into input form with smooth scale animation on click');
@@ -89,7 +89,7 @@ narrative('Todo Dashboard', 'AUTO-H6i9Rs2Gz', () => {
     it('clear and collapse after successful task addition');
     it('show loading state during task submission');
   });
-  experience('Statistics Dashboard', 'AUTO-S1n4Xx7Lz').client(() => {
+  experience('Statistics Dashboard', 'S1n4Xx7Lz').client(() => {
     it('show total tasks count with large prominent number');
     it('display tasks completed today with celebration icon');
     it('show breakdown: pending, in-progress, completed counts');
@@ -99,7 +99,7 @@ narrative('Todo Dashboard', 'AUTO-H6i9Rs2Gz', () => {
     it('update in real-time when tasks change status');
     it('animate number changes with counting effect');
   });
-  experience('Recent Activity Feed', 'AUTO-R2o5Yy8Mz').client(() => {
+  experience('Recent Activity Feed', 'R2o5Yy8Mz').client(() => {
     it('display recent task completions in chronological order');
     it('show completion timestamp in relative format');
     it('limit to last 5 completed tasks');

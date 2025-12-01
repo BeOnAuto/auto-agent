@@ -408,7 +408,7 @@ describe('getNarratives', (_mode) => {
 import { flow, experience, it, specs } from '@auto-engineer/narrative';
 
 flow('Test Experience Flow', () => {
-  experience('Homepage', 'AUTO-H1a4Bn6Cy').client(() => {
+  experience('Homepage', 'H1a4Bn6Cy').client(() => {
     specs(() => {
       it('show a hero section with a welcome message');
       it('allow user to start the questionnaire');
@@ -494,8 +494,8 @@ flow('Browser Test Flow', () => {
     const flowContent = `
 import { flow, experience } from '@auto-engineer/narrative';
 
-flow('Questionnaires', 'AUTO-Q9m2Kp4Lx', () => {
-  experience('Homepage', 'AUTO-H1a4Bn6Cy').client(() => {});
+flow('Questionnaires', 'Q9m2Kp4Lx', () => {
+  experience('Homepage', 'H1a4Bn6Cy').client(() => {});
 });
       `;
 
@@ -1035,11 +1035,11 @@ type SubmitQuestionnaire = Command<
   }
 >;
 
-flow('Questionnaires', 'AUTO-Q9m2Kp4Lx', () => {
-  command('sends the questionnaire link', 'AUTO-S2b5Cp7Dz')
+flow('Questionnaires', 'Q9m2Kp4Lx', () => {
+  command('sends the questionnaire link', 'S2b5Cp7Dz')
     .server(() => {
       specs(() => {
-        rule('questionnaire link is sent to participant', 'AUTO-r0A1Bo8X', () => {
+        rule('questionnaire link is sent to participant', 'r0A1Bo8X', () => {
           example('sends the questionnaire link successfully')
             .when<SendQuestionnaireLink>({
               questionnaireId: 'q-001',
@@ -1069,10 +1069,10 @@ flow('Questionnaires', 'AUTO-Q9m2Kp4Lx', () => {
       });
     });
 
-  command('submits the questionnaire', 'AUTO-T5k9Jw3V')
+  command('submits the questionnaire', 'T5k9Jw3V')
     .server(() => {
       specs(() => {
-        rule('questionnaire allowed to be submitted when all questions are answered', 'AUTO-r4H0Lx4U', () => {
+        rule('questionnaire allowed to be submitted when all questions are answered', 'r4H0Lx4U', () => {
           example('submits the questionnaire successfully')
             .when<SubmitQuestionnaire>({
               questionnaireId: 'q-001',

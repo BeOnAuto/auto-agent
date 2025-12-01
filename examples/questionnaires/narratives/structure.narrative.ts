@@ -1,6 +1,6 @@
 import { experience, narrative, it } from '@auto-engineer/narrative';
-narrative('App Structure', 'AUTO-vLkxrmhz6', () => {
-  experience('App Structure', 'AUTO-k6JkQZQnc').client(() => {
+narrative('App Structure', 'vLkxrmhz6', () => {
+  experience('App Structure', 'k6JkQZQnc').client(() => {
     it('display persistent sidebar on left for navigation');
     it(
       'sidebar includes links: Home, Create Survey, Analytics, Templates, Completion Tracker, Response Goals, Response History',

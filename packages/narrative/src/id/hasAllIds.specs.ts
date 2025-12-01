@@ -61,24 +61,24 @@ flow('Test Flow with IDs', 'FLOW-001', () => {
 import { flow, specs, it } from '../narrative';
 import { experience } from '../fluent-builder';
 
-flow('Home Screen', 'AUTO-aifPcU3hw', () => {
-  experience('Active Surveys Summary', 'AUTO-slice1').client(() => {
+flow('Home Screen', 'aifPcU3hw', () => {
+  experience('Active Surveys Summary', 'slice1').client(() => {
     specs(() => {
       it('show active surveys summary');
     });
   });
 });
 
-flow('Create Survey', 'AUTO-MPviTMrQC', () => {
-  experience('Create Survey Form', 'AUTO-slice2').client(() => {
+flow('Create Survey', 'MPviTMrQC', () => {
+  experience('Create Survey Form', 'slice2').client(() => {
     specs(() => {
       it('allow entering survey title');
     });
   });
 });
 
-flow('Response Analytics', 'AUTO-eME978Euk', () => {
-  experience('Response Rate Charts', 'AUTO-slice3').client(() => {
+flow('Response Analytics', 'eME978Euk', () => {
+  experience('Response Rate Charts', 'slice3').client(() => {
     specs(() => {
       it('show daily response rate charts');
     });
@@ -89,8 +89,8 @@ flow('Response Analytics', 'AUTO-eME978Euk', () => {
 import { flow, specs, it } from '../narrative';
 import { experience } from '../fluent-builder';
 
-flow('Home Screen', 'AUTO-aifPcU3hw', () => {
-  experience('Active Surveys Summary', 'AUTO-slice1').client(() => {
+flow('Home Screen', 'aifPcU3hw', () => {
+  experience('Active Surveys Summary', 'slice1').client(() => {
     specs(() => {
       it('show active surveys summary');
     });
@@ -98,15 +98,15 @@ flow('Home Screen', 'AUTO-aifPcU3hw', () => {
 });
 
 flow('Create Survey', () => {
-  experience('Create Survey Form', 'AUTO-slice2').client(() => {
+  experience('Create Survey Form', 'slice2').client(() => {
     specs(() => {
       it('allow entering survey title');
     });
   });
 });
 
-flow('Response Analytics', 'AUTO-eME978Euk', () => {
-  experience('Response Rate Charts', 'AUTO-slice3').client(() => {
+flow('Response Analytics', 'eME978Euk', () => {
+  experience('Response Rate Charts', 'slice3').client(() => {
     specs(() => {
       it('show daily response rate charts');
     });
@@ -117,15 +117,15 @@ flow('Response Analytics', 'AUTO-eME978Euk', () => {
 import { flow, specs, it } from '../narrative';
 import { experience } from '../fluent-builder';
 
-flow('Home Screen', 'AUTO-aifPcU3hw', () => {
-  experience('Active Surveys Summary', 'AUTO-slice1').client(() => {
+flow('Home Screen', 'aifPcU3hw', () => {
+  experience('Active Surveys Summary', 'slice1').client(() => {
     specs(() => {
       it('show active surveys summary');
     });
   });
 });
 
-flow('Create Survey', 'AUTO-MPviTMrQC', () => {
+flow('Create Survey', 'MPviTMrQC', () => {
   experience('Create Survey Form').client(() => {
     specs(() => {
       it('allow entering survey title');
@@ -133,8 +133,8 @@ flow('Create Survey', 'AUTO-MPviTMrQC', () => {
   });
 });
 
-flow('Response Analytics', 'AUTO-eME978Euk', () => {
-  experience('Response Rate Charts', 'AUTO-slice3').client(() => {
+flow('Response Analytics', 'eME978Euk', () => {
+  experience('Response Rate Charts', 'slice3').client(() => {
     specs(() => {
       it('show daily response rate charts');
     });

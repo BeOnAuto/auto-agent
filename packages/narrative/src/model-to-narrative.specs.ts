@@ -699,11 +699,11 @@ narrative('Questionnaire Flow', 'QUEST-001', () => {});
       narratives: [
         {
           name: 'Questionnaires',
-          id: 'AUTO-Q9m2Kp4Lx',
+          id: 'Q9m2Kp4Lx',
           slices: [
             {
               name: 'Homepage',
-              id: 'AUTO-H1a4Bn6Cy',
+              id: 'H1a4Bn6Cy',
               type: 'experience',
               client: {
                 specs: [
@@ -714,7 +714,7 @@ narrative('Questionnaire Flow', 'QUEST-001', () => {});
             },
             {
               name: 'views the questionnaire',
-              id: 'AUTO-V7n8Rq5M',
+              id: 'V7n8Rq5M',
               type: 'query',
               client: {
                 specs: [
@@ -751,7 +751,7 @@ narrative('Questionnaire Flow', 'QUEST-001', () => {});
                   name: '',
                   rules: [
                     {
-                      id: 'AUTO-r1A3Bp9W',
+                      id: 'r1A3Bp9W',
                       description: 'questionnaires show current progress',
                       examples: [
                         {
@@ -963,12 +963,12 @@ type QuestionnaireProgress = State<
     }[];
   }
 >;
-narrative('Questionnaires', 'AUTO-Q9m2Kp4Lx', () => {
-  experience('Homepage', 'AUTO-H1a4Bn6Cy').client(() => {
+narrative('Questionnaires', 'Q9m2Kp4Lx', () => {
+  experience('Homepage', 'H1a4Bn6Cy').client(() => {
     it('show a hero section with a welcome message');
     it('allow user to start the questionnaire');
   });
-  query('views the questionnaire', 'AUTO-V7n8Rq5M')
+  query('views the questionnaire', 'V7n8Rq5M')
     .client(() => {
       describe('Questionnaire Progress', () => {
         it('focus on the current question based on the progress state');
@@ -995,7 +995,7 @@ narrative('Questionnaires', 'AUTO-Q9m2Kp4Lx', () => {
     .server(() => {
       data([source().state('QuestionnaireProgress').fromProjection('Questionnaires', 'questionnaire-participantId')]);
       specs(() => {
-        rule('questionnaires show current progress', 'AUTO-r1A3Bp9W', () => {
+        rule('questionnaires show current progress', 'r1A3Bp9W', () => {
           example('a question has already been answered')
             .given<QuestionnaireLinkSent>({
               questionnaireId: 'q-001',
@@ -1046,7 +1046,7 @@ narrative('Questionnaires', 'AUTO-Q9m2Kp4Lx', () => {
                   name: 'Test Rules',
                   rules: [
                     {
-                      id: 'AUTO-r1A3Bp9W',
+                      id: 'r1A3Bp9W',
                       description: 'questionnaires show current progress',
                       examples: [
                         {
@@ -1176,7 +1176,7 @@ type QuestionnaireProgress = State<
 narrative('Test Flow', 'TEST-FLOW', () => {
   query('test slice', 'TEST-SLICE').server(() => {
     specs('Test Rules', () => {
-      rule('questionnaires show current progress', 'AUTO-r1A3Bp9W', () => {
+      rule('questionnaires show current progress', 'r1A3Bp9W', () => {
         example('a question has already been answered')
           .given<QuestionnaireLinkSent>({ questionnaireId: 'q-001', participantId: 'participant-abc' })
           .when<QuestionAnswered>({ questionnaireId: 'q-001', questionId: 'q1', answer: 'Yes' })
@@ -1213,7 +1213,7 @@ narrative('Test Flow', 'TEST-FLOW', () => {
                   name: 'Multi Given Rules',
                   rules: [
                     {
-                      id: 'AUTO-MultiGiven',
+                      id: 'MultiGiven',
                       description: 'all questions have been answered',
                       examples: [
                         {
@@ -1391,7 +1391,7 @@ type QuestionnaireProgress = State<
 narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
   query('multi given slice', 'MULTI-SLICE').server(() => {
     specs('Multi Given Rules', () => {
-      rule('all questions have been answered', 'AUTO-MultiGiven', () => {
+      rule('all questions have been answered', 'MultiGiven', () => {
         example('questionnaire with multiple events')
           .given<QuestionnaireConfig>({ questionnaireId: 'q-001', numberOfQuestions: 3 })
           .and<QuestionnaireLinkSent>({
@@ -1484,7 +1484,7 @@ narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
                   name: 'Database State Rules',
                   rules: [
                     {
-                      id: 'AUTO-RefState',
+                      id: 'RefState',
                       description: 'questionnaire config is available when referenced',
                       examples: [
                         {
@@ -1579,7 +1579,7 @@ narrative('Referenced States Flow', 'REF-STATES', () => {
       source().state('QuestionnaireConfig').fromDatabase('ConfigStore', { questionnaireId: '$questionnaireId' }),
     ]);
     specs('Database State Rules', () => {
-      rule('questionnaire config is available when referenced', 'AUTO-RefState', () => {
+      rule('questionnaire config is available when referenced', 'RefState', () => {
         example('config from database is accessible')
           .given<QuestionnaireConfig>({
             questionnaireId: 'q-001',
@@ -1621,7 +1621,7 @@ narrative('Referenced States Flow', 'REF-STATES', () => {
                   name: 'Date Field Rules',
                   rules: [
                     {
-                      id: 'AUTO-DateRule',
+                      id: 'DateRule',
                       description: 'handles Date fields correctly',
                       examples: [
                         {
@@ -1730,7 +1730,7 @@ type ProcessState = State<
 narrative('Date Handling Flow', 'DATE-FLOW', () => {
   query('date handling slice', 'DATE-SLICE').server(() => {
     specs('Date Field Rules', () => {
-      rule('handles Date fields correctly', 'AUTO-DateRule', () => {
+      rule('handles Date fields correctly', 'DateRule', () => {
         example('event with Date fields')
           .given<TimestampedEvent>({
             id: 'event-123',
@@ -1762,7 +1762,7 @@ narrative('Date Handling Flow', 'DATE-FLOW', () => {
           slices: [
             {
               name: 'Active Surveys Summary',
-              id: 'AUTO-aifPcU3hw',
+              id: 'aifPcU3hw',
               type: 'experience',
               client: {
                 specs: [{ type: 'it', title: 'show active surveys summary' }],
@@ -1776,7 +1776,7 @@ narrative('Date Handling Flow', 'DATE-FLOW', () => {
           slices: [
             {
               name: 'Create Survey Form',
-              id: 'AUTO-MPviTMrQC',
+              id: 'MPviTMrQC',
               type: 'experience',
               client: {
                 specs: [{ type: 'it', title: 'allow entering survey title' }],
@@ -1790,7 +1790,7 @@ narrative('Date Handling Flow', 'DATE-FLOW', () => {
           slices: [
             {
               name: 'Response Rate Charts',
-              id: 'AUTO-eME978Euk',
+              id: 'eME978Euk',
               type: 'experience',
               client: {
                 specs: [{ type: 'it', title: 'show daily response rate charts' }],
@@ -1807,17 +1807,17 @@ narrative('Date Handling Flow', 'DATE-FLOW', () => {
 
     expect(code).toEqual(`import { experience, it, narrative } from '@auto-engineer/narrative';
 narrative('Home Screen', () => {
-  experience('Active Surveys Summary', 'AUTO-aifPcU3hw').client(() => {
+  experience('Active Surveys Summary', 'aifPcU3hw').client(() => {
     it('show active surveys summary');
   });
 });
 narrative('Create Survey', () => {
-  experience('Create Survey Form', 'AUTO-MPviTMrQC').client(() => {
+  experience('Create Survey Form', 'MPviTMrQC').client(() => {
     it('allow entering survey title');
   });
 });
 narrative('Response Analytics', () => {
-  experience('Response Rate Charts', 'AUTO-eME978Euk').client(() => {
+  experience('Response Rate Charts', 'eME978Euk').client(() => {
     it('show daily response rate charts');
   });
 });

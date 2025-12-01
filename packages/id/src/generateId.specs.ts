@@ -9,8 +9,8 @@ describe('@auto-engineer/id', () => {
   });
 
   it('it should support a custom prefix', () => {
-    const id = generateId({ prefix: 'AUTO-' });
-    expect(id.startsWith('AUTO-')).toBe(true);
-    expect(id.length).toBe(5 + 9);
+    const id = generateId({ prefix: 'PRE-' });
+    expect(id.startsWith('PRE-')).toBe(true);
+    expect(id.length).toBe(4 + 9);
   });
 });

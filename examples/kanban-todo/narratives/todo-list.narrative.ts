@@ -75,8 +75,8 @@ type TodoListSummary = State<
     completionPercentage: number;
   }
 >;
-narrative('Todo List', 'AUTO-T8dL3k9Xw', () => {
-  command('adds a new todo', 'AUTO-A1c4Mn7Bz')
+narrative('Todo List', 'T8dL3k9Xw', () => {
+  command('adds a new todo', 'A1c4Mn7Bz')
     .client(() => {
       describe('Add Todo', () => {
         it('display a quick-add input field with floating action button');
@@ -100,7 +100,7 @@ narrative('Todo List', 'AUTO-T8dL3k9Xw', () => {
     .server(() => {
       data([sink().event('TodoAdded').toStream('todos')]);
       specs(() => {
-        rule('todos can be added to the list', 'AUTO-r1B2Cp8Y', () => {
+        rule('todos can be added to the list', 'r1B2Cp8Y', () => {
           example('adds a new todo successfully')
             .when<AddTodo>({ todoId: 'todo-001', description: 'Buy groceries' })
             .then<TodoAdded>({
@@ -112,7 +112,7 @@ narrative('Todo List', 'AUTO-T8dL3k9Xw', () => {
         });
       });
     });
-  command('moves todo to in progress', 'AUTO-M2d5No8Cz')
+  command('moves todo to in progress', 'M2d5No8Cz')
     .client(() => {
       describe('Move to In Progress', () => {
         it('support drag-and-drop from "To Do" to "In Progress" column');
@@ -135,7 +135,7 @@ narrative('Todo List', 'AUTO-T8dL3k9Xw', () => {
     .server(() => {
       data([sink().event('TodoMarkedInProgress').toStream('todos')]);
       specs(() => {
-        rule('todos can be moved to in progress', 'AUTO-r2C3Dq9Z', () => {
+        rule('todos can be moved to in progress', 'r2C3Dq9Z', () => {
           example('moves a pending todo to in progress')
             .given<TodoAdded>({
               todoId: 'todo-001',
@@ -148,7 +148,7 @@ narrative('Todo List', 'AUTO-T8dL3k9Xw', () => {
         });
       });
     });
-  command('marks todo as complete', 'AUTO-C3e6Op9Dz')
+  command('marks todo as complete', 'C3e6Op9Dz')
     .client(() => {
       describe('Complete Todo', () => {
         it('support drag-and-drop to "Done" column');
@@ -173,7 +173,7 @@ narrative('Todo List', 'AUTO-T8dL3k9Xw', () => {
     .server(() => {
       data([sink().event('TodoMarkedComplete').toStream('todos')]);
       specs(() => {
-        rule('todos can be marked as complete', 'AUTO-r3D4Eq0A', () => {
+        rule('todos can be marked as complete', 'r3D4Eq0A', () => {
           example('marks an in-progress todo as complete')
             .given<TodoAdded>({
               todoId: 'todo-001',
@@ -196,7 +196,7 @@ narrative('Todo List', 'AUTO-T8dL3k9Xw', () => {
         });
       });
     });
-  query('views all todos', 'AUTO-V4f7Pq0Ez')
+  query('views all todos', 'V4f7Pq0Ez')
     .client(() => {
       describe('Todo List View', () => {
         it('display todos organized in three columns: To Do, In Progress, Done');
@@ -222,7 +222,7 @@ narrative('Todo List', 'AUTO-T8dL3k9Xw', () => {
     .server(() => {
       data([source().state('TodoState').fromProjection('Todos', 'todoId')]);
       specs(() => {
-        rule('all todos are displayed with their current status', 'AUTO-r4E5Fr1B', () => {
+        rule('all todos are displayed with their current status', 'r4E5Fr1B', () => {
           example('shows multiple todos in different states')
             .given<TodoAdded>({
               todoId: 'todo-001',
@@ -248,7 +248,7 @@ narrative('Todo List', 'AUTO-T8dL3k9Xw', () => {
         });
       });
     });
-  query('views completion summary', 'AUTO-S5g8Qr1Fz')
+  query('views completion summary', 'S5g8Qr1Fz')
     .client(() => {
       describe('Completion Summary', () => {
         it('display circular progress ring showing completion percentage');
@@ -273,7 +273,7 @@ narrative('Todo List', 'AUTO-T8dL3k9Xw', () => {
     .server(() => {
       data([source().state('TodoListSummary').fromSingletonProjection('TodoSummary')]);
       specs(() => {
-        rule('summary shows overall todo list statistics', 'AUTO-r5F6Gs2C', () => {
+        rule('summary shows overall todo list statistics', 'r5F6Gs2C', () => {
           example('calculates summary from multiple todos')
             .given<TodoAdded>({
               todoId: 'todo-001',
