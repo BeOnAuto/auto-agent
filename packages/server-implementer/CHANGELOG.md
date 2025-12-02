@@ -1,5 +1,17 @@
 # @auto-engineer/server-implementer
 
+## 0.13.0
+
+### Minor Changes
+
+- Removes auto prefix from ids
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/ai-gateway@0.13.0
+  - @auto-engineer/message-bus@0.13.0
+
 ## 0.12.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @auto-engineer/message-bus
 
+## 0.13.0
+
+### Minor Changes
+
+- Removes auto prefix from ids
+
 ## 0.12.1
 
 ## 0.12.0
