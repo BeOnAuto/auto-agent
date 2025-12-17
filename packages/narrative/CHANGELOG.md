@@ -1,5 +1,16 @@
 # @auto-engineer/flow
 
+## 0.13.1
+
+### Patch Changes
+
+- refactor from a given/when/then based format to Gherkin steps array
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.13.1
+  - @auto-engineer/id@0.13.1
+  - @auto-engineer/message-bus@0.13.1
+
 ## 0.13.0
 
 ### Minor Changes
