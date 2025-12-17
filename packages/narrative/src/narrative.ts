@@ -14,11 +14,8 @@ import {
   setSliceData,
   recordRule,
   recordExample,
-  recordGivenData,
-  recordAndGivenData,
-  recordWhenData,
-  recordThenData,
-  recordAndThenData,
+  recordStep,
+  recordErrorStep,
 } from './narrative-context';
 import type { DataItem } from './types';
 import createDebug from 'debug';
@@ -26,7 +23,7 @@ import createDebug from 'debug';
 const debug = createDebug('auto:narrative:narrative');
 if ('color' in debug && typeof debug === 'object') {
   (debug as { color: string }).color = '6';
-} // cyan
+}
 
 export function narrative(name: string, fn: () => void): void;
 export function narrative(name: string, id: string, fn: () => void): void;
@@ -107,157 +104,110 @@ export function should(idOrTitle: string, title?: string): void {
   recordIt(hasId ? idOrTitle : undefined, hasId ? title : idOrTitle);
 }
 
-export function specs(description: string, fn: () => void): void;
+export function specs(feature: string, fn: () => void): void;
 export function specs(fn: () => void): void;
-export function specs(descriptionOrFn: string | (() => void), fn?: () => void): void {
-  const description = typeof descriptionOrFn === 'string' ? descriptionOrFn : '';
-  const callback = typeof descriptionOrFn === 'function' ? descriptionOrFn : fn!;
+export function specs(featureOrFn: string | (() => void), fn?: () => void): void {
+  const feature = typeof featureOrFn === 'string' ? featureOrFn : '';
+  const callback = typeof featureOrFn === 'function' ? featureOrFn : fn!;
 
-  pushSpec(description);
+  pushSpec(feature);
   callback();
 }
 
-export function rule(description: string, fn: () => void): void;
-export function rule(description: string, id: string, fn: () => void): void;
-export function rule(description: string, idOrFn: string | (() => void), fn?: () => void): void {
+export function rule(name: string, fn: () => void): void;
+export function rule(name: string, id: string, fn: () => void): void;
+export function rule(name: string, idOrFn: string | (() => void), fn?: () => void): void {
   const id = typeof idOrFn === 'string' ? idOrFn : undefined;
-  const callback = typeof idOrFn === 'function' ? idOrFn : fn;
-
-  if (!callback) {
-    throw new Error(`rule() requires a callback function. Got: ${typeof idOrFn}, ${typeof fn}`);
-  }
-
-  recordRule(description, id);
+  const callback = typeof idOrFn === 'function' ? idOrFn : fn!;
+  recordRule(name, id);
   callback();
 }
-
-export const example = (description: string): TypedExampleBuilder => {
-  recordExample(description);
-  return createExampleBuilder();
-};
 
 type ExtractData<T> = T extends { data: infer D } ? D : T;
-type ContextFor<T> = Partial<Record<keyof ExtractData<T>, string>>;
 
-function normalizeContext(context?: Partial<Record<string, string>>): Record<string, string> | undefined {
-  if (!context) return undefined;
-
-  const filtered: Record<string, string> = {};
-  for (const [key, value] of Object.entries(context)) {
-    if (value !== undefined) {
-      filtered[key] = value;
-    }
-  }
-
-  return Object.keys(filtered).length > 0 ? filtered : undefined;
+export interface ThenBuilder {
+  and<T>(data: ExtractData<T>): ThenBuilder;
 }
 
-interface TypedExampleBuilder {
-  given<T>(data: ExtractData<T> | ExtractData<T>[], context?: ContextFor<T>): TypedGivenBuilder<T>;
-  when<W>(data: ExtractData<W> | ExtractData<W>[], context?: ContextFor<W>): TypedWhenBuilder<W>;
+export interface WhenBuilder {
+  then<T>(data: ExtractData<T>): ThenBuilder;
+  and<T>(data: ExtractData<T>): WhenBuilder;
 }
 
-interface TypedGivenBuilder<G> {
-  and<U>(data: ExtractData<U> | ExtractData<U>[], context?: ContextFor<U>): TypedGivenBuilder<G | U>;
-  when<W>(data: ExtractData<W> | ExtractData<W>[], context?: ContextFor<W>): TypedGivenWhenBuilder<G, W>;
-  then<T>(data: ExtractData<T> | ExtractData<T>[], context?: ContextFor<T>): TypedGivenThenBuilder<G, never, T>;
+export interface GivenBuilder {
+  and<T>(data: ExtractData<T>): GivenBuilder;
+  when<W>(data: ExtractData<W>): WhenBuilder;
+  then<T>(data: ExtractData<T>): ThenBuilder;
 }
 
-interface TypedWhenBuilder<W> {
-  then<T>(data: ExtractData<T> | ExtractData<T>[], context?: ContextFor<T>): TypedThenBuilder<W, T>;
+export interface ExampleBuilder {
+  given<T>(data: ExtractData<T>): GivenBuilder;
+  when<W>(data: ExtractData<W>): WhenBuilder;
 }
 
-interface TypedGivenWhenBuilder<G, W> {
-  then<T>(data: ExtractData<T> | ExtractData<T>[], context?: ContextFor<T>): TypedGivenThenBuilder<G, W, T>;
-}
-
-interface TypedThenBuilder<W, T> {
-  and<A>(data: ExtractData<A> | ExtractData<A>[], context?: ContextFor<A>): TypedThenBuilder<W, T | A>;
-}
-
-interface TypedGivenThenBuilder<G, W, T> {
-  and<A>(data: ExtractData<A> | ExtractData<A>[], context?: ContextFor<A>): TypedGivenThenBuilder<G, W, T | A>;
-}
-
-function createThenBuilder<W, T>(): TypedThenBuilder<W, T> {
+function createThenBuilder(): ThenBuilder {
   return {
-    and<A>(data: ExtractData<A> | ExtractData<A>[], context?: ContextFor<A>): TypedThenBuilder<W, T | A> {
-      const andItems = Array.isArray(data) ? data : [data];
-      recordAndThenData(andItems, normalizeContext(context as Partial<Record<string, string>>));
-      return createThenBuilder<W, T | A>();
+    and<T>(data: ExtractData<T>): ThenBuilder {
+      recordStep('And', 'InferredType', data);
+      return createThenBuilder();
     },
   };
 }
 
-function createGivenBuilder<G>(): TypedGivenBuilder<G> {
+function createWhenBuilder(): WhenBuilder {
   return {
-    and<U>(data: ExtractData<U> | ExtractData<U>[], context?: ContextFor<U>): TypedGivenBuilder<G | U> {
-      const andItems = Array.isArray(data) ? data : [data];
-      recordAndGivenData(andItems, normalizeContext(context as Partial<Record<string, string>>));
-      return createGivenBuilder<G | U>();
+    then<T>(data: ExtractData<T>): ThenBuilder {
+      recordStep('Then', 'InferredType', data);
+      return createThenBuilder();
     },
-    when<W>(data: ExtractData<W> | ExtractData<W>[], context?: ContextFor<W>): TypedGivenWhenBuilder<G, W> {
-      const whenData = Array.isArray(data) ? data : [data];
-      recordWhenData(
-        whenData.length === 1 ? whenData[0] : whenData,
-        normalizeContext(context as Partial<Record<string, string>>),
-      );
-      return {
-        then<T>(data: ExtractData<T> | ExtractData<T>[], context?: ContextFor<T>): TypedGivenThenBuilder<G, W, T> {
-          const thenItems = Array.isArray(data) ? data : [data];
-          recordThenData(thenItems, normalizeContext(context as Partial<Record<string, string>>));
-          return {
-            and<A>(
-              data: ExtractData<A> | ExtractData<A>[],
-              context?: ContextFor<A>,
-            ): TypedGivenThenBuilder<G, W, T | A> {
-              const andItems = Array.isArray(data) ? data : [data];
-              recordAndThenData(andItems, normalizeContext(context as Partial<Record<string, string>>));
-              return createThenBuilder<W, T | A>() as TypedGivenThenBuilder<G, W, T | A>;
-            },
-          };
-        },
-      };
-    },
-    then<T>(data: ExtractData<T> | ExtractData<T>[], context?: ContextFor<T>): TypedGivenThenBuilder<G, never, T> {
-      const thenItems = Array.isArray(data) ? data : [data];
-      recordThenData(thenItems, normalizeContext(context as Partial<Record<string, string>>));
-      return {
-        and<A>(
-          data: ExtractData<A> | ExtractData<A>[],
-          context?: ContextFor<A>,
-        ): TypedGivenThenBuilder<G, never, T | A> {
-          const andItems = Array.isArray(data) ? data : [data];
-          recordAndThenData(andItems, normalizeContext(context as Partial<Record<string, string>>));
-          return createThenBuilder<never, T | A>() as TypedGivenThenBuilder<G, never, T | A>;
-        },
-      };
+    and<T>(data: ExtractData<T>): WhenBuilder {
+      recordStep('And', 'InferredType', data);
+      return createWhenBuilder();
     },
   };
 }
 
-function createExampleBuilder(): TypedExampleBuilder {
+function createGivenBuilder(): GivenBuilder {
   return {
-    given<T>(data: ExtractData<T> | ExtractData<T>[], context?: ContextFor<T>): TypedGivenBuilder<T> {
-      const items = Array.isArray(data) ? data : [data];
-      recordGivenData(items, normalizeContext(context as Partial<Record<string, string>>));
-      return createGivenBuilder<T>();
+    and<T>(data: ExtractData<T>): GivenBuilder {
+      recordStep('And', 'InferredType', data);
+      return createGivenBuilder();
     },
-    when<W>(data: ExtractData<W> | ExtractData<W>[], context?: ContextFor<W>): TypedWhenBuilder<W> {
-      const whenData = Array.isArray(data) ? data : [data];
-      recordWhenData(
-        whenData.length === 1 ? whenData[0] : whenData,
-        normalizeContext(context as Partial<Record<string, string>>),
-      );
-      return {
-        then<Z>(data: ExtractData<Z> | ExtractData<Z>[], context?: ContextFor<Z>): TypedThenBuilder<W, Z> {
-          const thenItems = Array.isArray(data) ? data : [data];
-          recordThenData(thenItems, normalizeContext(context as Partial<Record<string, string>>));
-          return createThenBuilder<W, Z>();
-        },
-      };
+    when<W>(data: ExtractData<W>): WhenBuilder {
+      recordStep('When', 'InferredType', data);
+      return createWhenBuilder();
+    },
+    then<T>(data: ExtractData<T>): ThenBuilder {
+      recordStep('Then', 'InferredType', data);
+      return createThenBuilder();
     },
   };
+}
+
+function createExampleBuilder(): ExampleBuilder {
+  return {
+    given<T>(data: ExtractData<T>): GivenBuilder {
+      recordStep('Given', 'InferredType', data);
+      return createGivenBuilder();
+    },
+    when<W>(data: ExtractData<W>): WhenBuilder {
+      recordStep('When', 'InferredType', data);
+      return createWhenBuilder();
+    },
+  };
+}
+
+export function example(name: string): ExampleBuilder;
+export function example(name: string, id: string): ExampleBuilder;
+export function example(name: string, id?: string): ExampleBuilder {
+  recordExample(name, id);
+  return createExampleBuilder();
+}
+
+type ErrorType = 'IllegalStateError' | 'ValidationError' | 'NotFoundError';
+
+export function thenError(errorType: ErrorType, message?: string): void {
+  recordErrorStep(errorType, message);
 }
 
 export const SliceType = {

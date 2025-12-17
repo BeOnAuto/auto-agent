@@ -1,4 +1,6 @@
-import { CommandExample, EventExample, StateExample } from '@auto-engineer/narrative';
+import type { CommandRef, EventRef, StateRef, ErrorRef } from './extract/step-types';
+
+export type { CommandRef, EventRef, StateRef, ErrorRef };
 
 export interface Message {
   type: string;
@@ -29,9 +31,9 @@ export interface MessageDefinition {
 }
 
 export interface GwtCondition {
-  given?: Array<EventExample | StateExample>;
-  when: CommandExample | EventExample[];
-  then: Array<EventExample | StateExample | CommandExample | { errorType: string; message?: string }>;
+  given?: EventRef[];
+  when: CommandRef | EventRef[];
+  then: Array<EventRef | StateRef | CommandRef | ErrorRef>;
   description?: string;
   ruleDescription?: string;
 }

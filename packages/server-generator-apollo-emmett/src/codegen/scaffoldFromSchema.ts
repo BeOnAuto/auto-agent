@@ -34,21 +34,8 @@ import {
   createFieldUsesFloat,
   createCollectEnumNames,
 } from './extract';
-
-function extractGwtSpecs(slice: Slice) {
-  if (!('server' in slice)) return [];
-  const specs = slice.server?.specs;
-  const rules = specs?.rules;
-  return Array.isArray(rules) && rules.length > 0
-    ? rules.flatMap((rule) =>
-        rule.examples.map((example) => ({
-          given: example.given,
-          when: example.when,
-          then: example.then,
-        })),
-      )
-    : [];
-}
+import { extractGwtSpecsFromSlice, type GwtResult } from './extract/step-converter';
+import { normalizeSliceForTemplate } from './extract/slice-normalizer';
 import { Message, MessageDefinition, GwtCondition } from './types';
 import { parseGraphQlRequest } from './extract/graphql';
 import { getStreamFromSink } from './extract/data-sink';
@@ -529,7 +516,7 @@ async function prepareTemplateData(
   return {
     flowName: flow.name,
     sliceName: slice.name,
-    slice,
+    slice: normalizeSliceForTemplate(slice),
     stream: { pattern: streamPattern, id: streamId },
     commands: filteredCommands,
     events,
@@ -571,13 +558,8 @@ function annotateEventSources(
   }
 }
 
-function hasEventInGwtSpecs(gwtSpecs: ReturnType<typeof extractGwtSpecs>, eventType: string): boolean {
-  return gwtSpecs.some((g) =>
-    g.then.some(
-      (t) =>
-        typeof t === 'object' && t !== null && 'eventRef' in t && (t as { eventRef: string }).eventRef === eventType,
-    ),
-  );
+function hasEventInGwtSpecs(gwtSpecs: GwtResult[], eventType: string): boolean {
+  return gwtSpecs.some((g) => g.then.some((t) => 'eventRef' in t && t.eventRef === eventType));
 }
 
 function canSliceProduceEvent(slice: Slice): boolean {
@@ -591,7 +573,7 @@ function findEventSource(flows: Narrative[], eventType: string): { flowName: str
     for (const slice of flow.slices) {
       if (!canSliceProduceEvent(slice)) continue;
 
-      const gwtSpecs = extractGwtSpecs(slice);
+      const gwtSpecs = extractGwtSpecsFromSlice(slice);
       if (hasEventInGwtSpecs(gwtSpecs, eventType)) {
         debugSlice('  Found event source in flow: %s, slice: %s', flow.name, slice.name);
         return { flowName: flow.name, sliceName: slice.name };
@@ -624,27 +606,8 @@ function findCommandSource(flows: Narrative[], commandType: string): { flowName:
     for (const slice of flow.slices) {
       if (slice.type !== 'command') continue;
 
-      const specs = slice.server?.specs;
-      const rules = specs?.rules;
-      const gwtSpecs =
-        Array.isArray(rules) && rules.length > 0
-          ? rules.flatMap((rule) =>
-              rule.examples.map((example) => ({
-                given: example.given,
-                when: example.when,
-                then: example.then,
-              })),
-            )
-          : [];
-      if (
-        gwtSpecs.some(
-          (g) =>
-            g.when !== undefined &&
-            !Array.isArray(g.when) &&
-            'commandRef' in g.when &&
-            g.when.commandRef === commandType,
-        )
-      ) {
+      const gwtSpecs = extractGwtSpecsFromSlice(slice);
+      if (gwtSpecs.some((g) => !Array.isArray(g.when) && 'commandRef' in g.when && g.when.commandRef === commandType)) {
         debugSlice('  Found command source in flow: %s, slice: %s', flow.name, slice.name);
         return { flowName: flow.name, sliceName: slice.name };
       }

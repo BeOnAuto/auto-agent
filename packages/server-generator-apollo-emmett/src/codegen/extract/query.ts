@@ -1,29 +1,31 @@
-import { EventExample, Slice } from '@auto-engineer/narrative';
+import type { Slice } from '@auto-engineer/narrative';
+import type { EventRef, StateRef } from '../types';
+import { extractGwtFromSpecs } from './step-converter';
 
 interface QueryGwtCondition {
   description: string;
-  given?: EventExample[];
-  when: EventExample[];
-  then: Array<{ stateRef: string; exampleData: Record<string, unknown> }>;
+  given?: EventRef[];
+  when: EventRef[];
+  then: Array<StateRef>;
 }
 
 export function buildQueryGwtMapping(slice: Slice): QueryGwtCondition[] {
   if (slice.type !== 'query') return [];
 
   const specs = slice.server?.specs;
-  const rules = specs?.rules;
+  if (!Array.isArray(specs) || specs.length === 0) return [];
 
-  const examples = Array.isArray(rules) && rules.length > 0 ? rules.flatMap((rule) => rule.examples) : [];
+  const gwtResults = extractGwtFromSpecs(specs, 'query');
 
-  return examples.map((ex) => {
-    const givenEvents = Array.isArray(ex.given) ? ex.given.filter((i): i is EventExample => 'eventRef' in i) : [];
-    const whenEvents = Array.isArray(ex.when) ? ex.when.filter((i): i is EventExample => 'eventRef' in i) : [];
+  return gwtResults.map((gwt) => {
+    const whenEvents: EventRef[] = Array.isArray(gwt.when) ? gwt.when : [];
+    const thenStates = gwt.then.filter((i): i is StateRef => 'stateRef' in i);
 
     return {
-      description: ex.description,
-      given: givenEvents.length > 0 ? givenEvents : undefined,
+      description: gwt.description,
+      given: gwt.given.length > 0 ? gwt.given : undefined,
       when: whenEvents,
-      then: ex.then.filter((i): i is { stateRef: string; exampleData: Record<string, unknown> } => 'stateRef' in i),
+      then: thenStates,
     };
   });
 }

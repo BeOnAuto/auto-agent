@@ -16,45 +16,50 @@ describe('spec.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                specs: {
-                  name: 'Create listing spec',
-                  rules: [
-                    {
-                      description: 'Should create listing successfully',
-                      examples: [
-                        {
-                          description: 'User creates listing with valid data',
-                          when: {
-                            commandRef: 'CreateListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                              title: 'blah',
-                              pricePerNight: 250,
-                              maxGuests: 4,
-                              amenities: ['wifi', 'kitchen'],
-                              available: true,
-                              tags: ['some tag'],
-                              rating: 4.8,
-                              metadata: { foo: 'bar' },
-                              listedAt: '2024-01-15T10:00:00Z',
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'ListingCreated',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                listedAt: '2024-01-15T10:00:00Z',
-                                rating: 4.8,
-                                metadata: { foo: 'bar' },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Create listing spec',
+                    rules: [
+                      {
+                        name: 'Should create listing successfully',
+                        examples: [
+                          {
+                            name: 'User creates listing with valid data',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'CreateListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'blah',
+                                  pricePerNight: 250,
+                                  maxGuests: 4,
+                                  amenities: ['wifi', 'kitchen'],
+                                  available: true,
+                                  tags: ['some tag'],
+                                  rating: 4.8,
+                                  metadata: { foo: 'bar' },
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'ListingCreated',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                  rating: 4.8,
+                                  metadata: { foo: 'bar' },
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -160,45 +165,49 @@ describe('spec.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                specs: {
-                  name: 'Remove listing spec',
-                  rules: [
-                    {
-                      description: 'Should remove existing listing',
-                      examples: [
-                        {
-                          description: 'Existing listing can be removed',
-                          given: [
-                            {
-                              eventRef: 'ListingCreated',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                listedAt: '2024-01-15T10:00:00Z',
-                                rating: 4.8,
-                                metadata: { foo: 'bar' },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Remove listing spec',
+                    rules: [
+                      {
+                        name: 'Should remove existing listing',
+                        examples: [
+                          {
+                            name: 'Existing listing can be removed',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'ListingCreated',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                  rating: 4.8,
+                                  metadata: { foo: 'bar' },
+                                },
                               },
-                            },
-                          ],
-                          when: {
-                            commandRef: 'RemoveListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                            },
+                              {
+                                keyword: 'When',
+                                text: 'RemoveListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'ListingRemoved',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  removedAt: '2024-01-16T10:00:00Z',
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              eventRef: 'ListingRemoved',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                removedAt: '2024-01-16T10:00:00Z',
-                              },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -302,73 +311,79 @@ describe('spec.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                specs: {
-                  name: 'Answer question spec',
-                  rules: [
-                    {
-                      description: 'answers are allowed while the questionnaire has not been submitted',
-                      examples: [
-                        {
-                          description: 'no questions have been answered yet',
-                          when: {
-                            commandRef: 'AnswerQuestion',
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              participantId: 'participant-abc',
-                              questionId: 'q1',
-                              answer: 'Yes',
-                            },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Answer question spec',
+                    rules: [
+                      {
+                        name: 'answers are allowed while the questionnaire has not been submitted',
+                        examples: [
+                          {
+                            name: 'no questions have been answered yet',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'AnswerQuestion',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                  savedAt: '2030-01-01T09:05:00.000Z',
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              eventRef: 'QuestionAnswered',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                questionId: 'q1',
-                                answer: 'Yes',
-                                savedAt: '2030-01-01T09:05:00.000Z',
+                          {
+                            name: 'all questions have already been answered and submitted',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'QuestionnaireSubmitted',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  submittedAt: '2030-01-01T09:00:00.000Z',
+                                },
                               },
-                            },
-                          ],
-                        },
-                        {
-                          description: 'all questions have already been answered and submitted',
-                          given: [
-                            {
-                              eventRef: 'QuestionnaireSubmitted',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                submittedAt: '2030-01-01T09:00:00.000Z',
+                              {
+                                keyword: 'When',
+                                text: 'AnswerQuestion',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                },
                               },
-                            },
-                          ],
-                          when: {
-                            commandRef: 'AnswerQuestion',
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              participantId: 'participant-abc',
-                              questionId: 'q1',
-                              answer: 'Yes',
-                            },
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionnaireEditRejected',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  reason: 'Questionnaire already submitted',
+                                  attemptedAt: '2030-01-01T09:05:00.000Z',
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              eventRef: 'QuestionnaireEditRejected',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                reason: 'Questionnaire already submitted',
-                                attemptedAt: '2030-01-01T09:05:00.000Z',
-                              },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],

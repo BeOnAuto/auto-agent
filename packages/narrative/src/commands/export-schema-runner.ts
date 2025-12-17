@@ -21,7 +21,9 @@ const main = async () => {
   try {
     // Import from the installed package in the target directory
     // This ensures we use the same module instance as the flow files
-    const narrative = await import('@auto-engineer/narrative');
+    const narrative = (await import('@auto-engineer/narrative')) as {
+      getNarratives: typeof import('../getNarratives').getNarratives;
+    };
     const { getNarratives } = narrative;
 
     if (typeof getNarratives !== 'function') {

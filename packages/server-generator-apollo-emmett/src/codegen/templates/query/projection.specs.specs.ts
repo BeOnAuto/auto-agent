@@ -17,56 +17,63 @@ describe('projection.specs.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                specs: {
-                  name: 'CreateListing command',
-                  rules: [
-                    {
-                      description: 'Should handle listing operations',
-                      examples: [
-                        {
-                          description: 'User creates listing successfully',
-                          when: {
-                            commandRef: 'CreateListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                              title: 'Sea View Flat',
-                              pricePerNight: 120,
-                              location: 'Brighton',
-                              maxGuests: 4,
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'ListingCreated',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                title: 'Sea View Flat',
-                                pricePerNight: 120,
-                                location: 'Brighton',
-                                maxGuests: 4,
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'CreateListing command',
+                    rules: [
+                      {
+                        name: 'Should handle listing operations',
+                        examples: [
+                          {
+                            name: 'User creates listing successfully',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'CreateListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Sea View Flat',
+                                  pricePerNight: 120,
+                                  location: 'Brighton',
+                                  maxGuests: 4,
+                                },
                               },
-                            },
-                          ],
-                        },
-                        {
-                          description: 'User removes listing successfully',
-                          when: {
-                            commandRef: 'RemoveListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                            },
+                              {
+                                keyword: 'Then',
+                                text: 'ListingCreated',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Sea View Flat',
+                                  pricePerNight: 120,
+                                  location: 'Brighton',
+                                  maxGuests: 4,
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              eventRef: 'ListingRemoved',
-                              exampleData: {},
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                          {
+                            name: 'User removes listing successfully',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'RemoveListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'ListingRemoved',
+                                docString: {},
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
             {
@@ -89,43 +96,46 @@ describe('projection.specs.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: {
-                  name: 'Search listings query',
-                  rules: [
-                    {
-                      description: 'Should project listings correctly',
-                      examples: [
-                        {
-                          description: 'Listing created shows in search results',
-                          when: [
-                            {
-                              eventRef: 'ListingCreated',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                title: 'Sea View Flat',
-                                pricePerNight: 120,
-                                location: 'Brighton',
-                                maxGuests: 4,
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Search listings query',
+                    rules: [
+                      {
+                        name: 'Should project listings correctly',
+                        examples: [
+                          {
+                            name: 'Listing created shows in search results',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'ListingCreated',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Sea View Flat',
+                                  pricePerNight: 120,
+                                  location: 'Brighton',
+                                  maxGuests: 4,
+                                },
                               },
-                            },
-                          ],
-                          then: [
-                            {
-                              stateRef: 'AvailableListings',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                title: 'Sea View Flat',
-                                pricePerNight: 120,
-                                location: 'Brighton',
-                                maxGuests: 4,
+                              {
+                                keyword: 'Then',
+                                text: 'AvailableListings',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Sea View Flat',
+                                  pricePerNight: 120,
+                                  location: 'Brighton',
+                                  maxGuests: 4,
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -264,60 +274,62 @@ describe('projection.specs.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: {
-                  name: '',
-                  rules: [
-                    {
-                      description: 'questionnaires show current progress',
-                      examples: [
-                        {
-                          description: 'a question has already been answered',
-                          given: [
-                            {
-                              eventRef: 'QuestionnaireLinkSent',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                link: 'https://app.example.com/q/q-001?participant=participant-abc',
-                                sentAt: '2030-01-01T09:00:00.000Z',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: '',
+                    rules: [
+                      {
+                        name: 'questionnaires show current progress',
+                        examples: [
+                          {
+                            name: 'a question has already been answered',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'QuestionnaireLinkSent',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  link: 'https://app.example.com/q/q-001?participant=participant-abc',
+                                  sentAt: '2030-01-01T09:00:00.000Z',
+                                },
                               },
-                            },
-                          ],
-                          when: [
-                            {
-                              eventRef: 'QuestionAnswered',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                questionId: 'q1',
-                                answer: 'Yes',
-                                savedAt: '2030-01-01T09:05:00.000Z',
+                              {
+                                keyword: 'When',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                  savedAt: '2030-01-01T09:05:00.000Z',
+                                },
                               },
-                            },
-                          ],
-                          then: [
-                            {
-                              stateRef: 'QuestionnaireProgress',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                status: 'in_progress',
-                                currentQuestionId: 'q2',
-                                remainingQuestions: ['q2', 'q3'],
-                                answers: [
-                                  {
-                                    questionId: 'q1',
-                                    value: 'Yes',
-                                  },
-                                ],
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionnaireProgress',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  status: 'in_progress',
+                                  currentQuestionId: 'q2',
+                                  remainingQuestions: ['q2', 'q3'],
+                                  answers: [
+                                    {
+                                      questionId: 'q1',
+                                      value: 'Yes',
+                                    },
+                                  ],
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -390,37 +402,42 @@ describe('projection.specs.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                specs: {
-                  name: 'Sends questionnaire link',
-                  rules: [
-                    {
-                      description: 'sends questionnaire link to participant',
-                      examples: [
-                        {
-                          description: 'sends link successfully',
-                          when: {
-                            commandRef: 'SendQuestionnaireLink',
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              participantId: 'participant-abc',
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'QuestionnaireLinkSent', // This event is produced here
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                link: 'https://app.example.com/q/q-001?participant=participant-abc',
-                                sentAt: new Date('2030-01-01T09:00:00Z'),
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Sends questionnaire link',
+                    rules: [
+                      {
+                        name: 'sends questionnaire link to participant',
+                        examples: [
+                          {
+                            name: 'sends link successfully',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'SendQuestionnaireLink',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionnaireLinkSent',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  link: 'https://app.example.com/q/q-001?participant=participant-abc',
+                                  sentAt: new Date('2030-01-01T09:00:00Z'),
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
             {
@@ -429,40 +446,45 @@ describe('projection.specs.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                specs: {
-                  name: 'Submits questionnaire answer',
-                  rules: [
-                    {
-                      description: 'submits answer successfully',
-                      examples: [
-                        {
-                          description: 'answers question',
-                          when: {
-                            commandRef: 'AnswerQuestion',
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              participantId: 'participant-abc',
-                              questionId: 'q1',
-                              answer: 'Yes',
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'QuestionAnswered', // This event is produced here
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                questionId: 'q1',
-                                answer: 'Yes',
-                                savedAt: new Date('2030-01-01T09:05:00Z'),
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Submits questionnaire answer',
+                    rules: [
+                      {
+                        name: 'submits answer successfully',
+                        examples: [
+                          {
+                            name: 'answers question',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'AnswerQuestion',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                  savedAt: new Date('2030-01-01T09:05:00Z'),
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
             {
@@ -471,55 +493,57 @@ describe('projection.specs.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                specs: {
-                  name: 'Views the questionnaire',
-                  rules: [
-                    {
-                      description: 'questionnaires show current progress',
-                      examples: [
-                        {
-                          description: 'a question has already been answered',
-                          given: [
-                            {
-                              eventRef: 'QuestionnaireLinkSent',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                link: 'https://app.example.com/q/q-001?participant=participant-abc',
-                                sentAt: new Date('2030-01-01T09:00:00Z'),
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Views the questionnaire',
+                    rules: [
+                      {
+                        name: 'questionnaires show current progress',
+                        examples: [
+                          {
+                            name: 'a question has already been answered',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'QuestionnaireLinkSent',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  link: 'https://app.example.com/q/q-001?participant=participant-abc',
+                                  sentAt: new Date('2030-01-01T09:00:00Z'),
+                                },
                               },
-                            },
-                          ],
-                          when: [
-                            {
-                              eventRef: 'QuestionAnswered', // This should be included in imports!
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                questionId: 'q1',
-                                answer: 'Yes',
-                                savedAt: new Date('2030-01-01T09:05:00Z'),
+                              {
+                                keyword: 'When',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                  savedAt: new Date('2030-01-01T09:05:00Z'),
+                                },
                               },
-                            },
-                          ],
-                          then: [
-                            {
-                              stateRef: 'QuestionnaireProgress',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                status: 'in_progress',
-                                currentQuestionId: 'q2',
-                                remainingQuestions: ['q2'],
-                                answers: [{ questionId: 'q1', value: 'Yes' }],
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionnaireProgress',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  status: 'in_progress',
+                                  currentQuestionId: 'q2',
+                                  remainingQuestions: ['q2'],
+                                  answers: [{ questionId: 'q1', value: 'Yes' }],
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
                 data: [
                   {
                     origin: { name: 'Questionnaires', idField: 'questionnaireId-participantId' },
@@ -635,35 +659,40 @@ describe('projection.specs.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                specs: {
-                  name: 'Manage todo command',
-                  rules: [
-                    {
-                      description: 'Should handle todo operations',
-                      examples: [
-                        {
-                          description: 'User adds todo',
-                          when: {
-                            commandRef: 'AddTodo',
-                            exampleData: {
-                              todoId: 'todo_123',
-                              title: 'Buy milk',
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'TodoAdded',
-                              exampleData: {
-                                todoId: 'todo_123',
-                                title: 'Buy milk',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Manage todo command',
+                    rules: [
+                      {
+                        name: 'Should handle todo operations',
+                        examples: [
+                          {
+                            name: 'User adds todo',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'AddTodo',
+                                docString: {
+                                  todoId: 'todo_123',
+                                  title: 'Buy milk',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'TodoAdded',
+                                docString: {
+                                  todoId: 'todo_123',
+                                  title: 'Buy milk',
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
             {
@@ -686,36 +715,39 @@ describe('projection.specs.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: {
-                  name: 'View summary query',
-                  rules: [
-                    {
-                      description: 'Should aggregate todo counts',
-                      examples: [
-                        {
-                          description: 'Todo added updates count',
-                          when: [
-                            {
-                              eventRef: 'TodoAdded',
-                              exampleData: {
-                                todoId: 'todo_123',
-                                title: 'Buy milk',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'View summary query',
+                    rules: [
+                      {
+                        name: 'Should aggregate todo counts',
+                        examples: [
+                          {
+                            name: 'Todo added updates count',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'TodoAdded',
+                                docString: {
+                                  todoId: 'todo_123',
+                                  title: 'Buy milk',
+                                },
                               },
-                            },
-                          ],
-                          then: [
-                            {
-                              stateRef: 'TodoSummary',
-                              exampleData: {
-                                totalCount: 1,
+                              {
+                                keyword: 'Then',
+                                text: 'TodoSummary',
+                                docString: {
+                                  totalCount: 1,
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -810,37 +842,42 @@ describe('projection.specs.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                specs: {
-                  name: 'Manage user project command',
-                  rules: [
-                    {
-                      description: 'Should handle user project operations',
-                      examples: [
-                        {
-                          description: 'User joins project',
-                          when: {
-                            commandRef: 'JoinProject',
-                            exampleData: {
-                              userId: 'user_123',
-                              projectId: 'proj_456',
-                              role: 'developer',
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'UserJoinedProject',
-                              exampleData: {
-                                userId: 'user_123',
-                                projectId: 'proj_456',
-                                role: 'developer',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Manage user project command',
+                    rules: [
+                      {
+                        name: 'Should handle user project operations',
+                        examples: [
+                          {
+                            name: 'User joins project',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'JoinProject',
+                                docString: {
+                                  userId: 'user_123',
+                                  projectId: 'proj_456',
+                                  role: 'developer',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'UserJoinedProject',
+                                docString: {
+                                  userId: 'user_123',
+                                  projectId: 'proj_456',
+                                  role: 'developer',
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
             {
@@ -863,39 +900,42 @@ describe('projection.specs.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: {
-                  name: 'View user projects query',
-                  rules: [
-                    {
-                      description: 'Should track user project memberships',
-                      examples: [
-                        {
-                          description: 'User joins project',
-                          when: [
-                            {
-                              eventRef: 'UserJoinedProject',
-                              exampleData: {
-                                userId: 'user_123',
-                                projectId: 'proj_456',
-                                role: 'developer',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'View user projects query',
+                    rules: [
+                      {
+                        name: 'Should track user project memberships',
+                        examples: [
+                          {
+                            name: 'User joins project',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'UserJoinedProject',
+                                docString: {
+                                  userId: 'user_123',
+                                  projectId: 'proj_456',
+                                  role: 'developer',
+                                },
                               },
-                            },
-                          ],
-                          then: [
-                            {
-                              stateRef: 'UserProject',
-                              exampleData: {
-                                userId: 'user_123',
-                                projectId: 'proj_456',
-                                role: 'developer',
+                              {
+                                keyword: 'Then',
+                                text: 'UserProject',
+                                docString: {
+                                  userId: 'user_123',
+                                  projectId: 'proj_456',
+                                  role: 'developer',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],

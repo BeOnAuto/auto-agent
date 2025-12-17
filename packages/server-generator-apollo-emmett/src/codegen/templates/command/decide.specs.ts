@@ -18,40 +18,45 @@ describe('decide.ts.ejs', () => {
               },
               server: {
                 description: 'test',
-                specs: {
-                  name: 'Create listing command',
-                  rules: [
-                    {
-                      description: 'Should create listing with valid data',
-                      examples: [
-                        {
-                          description: 'User creates listing successfully',
-                          when: {
-                            commandRef: 'CreateListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                              title: 'Some apartment',
-                              listedAt: '2024-01-15T10:00:00Z',
-                              rating: 4.8,
-                              metadata: { foo: 'bar' },
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'ListingCreated',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                listedAt: '2024-01-15T10:00:00Z',
-                                rating: 4.8,
-                                metadata: { foo: 'bar' },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Create listing command',
+                    rules: [
+                      {
+                        name: 'Should create listing with valid data',
+                        examples: [
+                          {
+                            name: 'User creates listing successfully',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'CreateListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Some apartment',
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                  rating: 4.8,
+                                  metadata: { foo: 'bar' },
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'ListingCreated',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                  rating: 4.8,
+                                  metadata: { foo: 'bar' },
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -129,43 +134,47 @@ describe('decide.ts.ejs', () => {
               },
               server: {
                 description: 'test',
-                specs: {
-                  name: 'Remove listing command',
-                  rules: [
-                    {
-                      description: 'Should remove existing listing',
-                      examples: [
-                        {
-                          description: 'Existing listing can be removed',
-                          given: [
-                            {
-                              eventRef: 'ListingCreated',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                listedAt: '2024-01-15T10:00:00Z',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Remove listing command',
+                    rules: [
+                      {
+                        name: 'Should remove existing listing',
+                        examples: [
+                          {
+                            name: 'Existing listing can be removed',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'ListingCreated',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                },
                               },
-                            },
-                          ],
-                          when: {
-                            commandRef: 'RemoveListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                            },
+                              {
+                                keyword: 'When',
+                                text: 'RemoveListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'ListingRemoved',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  removedAt: '2024-01-16T12:00:00Z',
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              eventRef: 'ListingRemoved',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                removedAt: '2024-01-16T12:00:00Z',
-                              },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -255,59 +264,68 @@ describe('decide.ts.ejs', () => {
               },
               server: {
                 description: 'test',
-                specs: {
-                  name: 'Create listing command',
-                  rules: [
-                    {
-                      description: 'Should handle multiple scenarios including errors',
-                      examples: [
-                        {
-                          description: 'User creates listing successfully',
-                          when: {
-                            commandRef: 'CreateListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                              title: 'Some Apartment',
-                              listedAt: '2024-01-15T10:00:00Z',
-                              rating: 4.8,
-                              metadata: { foo: 'bar' },
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'ListingCreated',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                listedAt: '2024-01-15T10:00:00Z',
-                                rating: 4.8,
-                                metadata: { foo: 'bar' },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Create listing command',
+                    rules: [
+                      {
+                        name: 'Should handle multiple scenarios including errors',
+                        examples: [
+                          {
+                            name: 'User creates listing successfully',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'CreateListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Some Apartment',
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                  rating: 4.8,
+                                  metadata: { foo: 'bar' },
+                                },
                               },
-                            },
-                          ],
-                        },
-                        {
-                          description: 'User creates listing with empty title should fail',
-                          when: {
-                            commandRef: 'CreateListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                              title: '',
-                              listedAt: '2024-01-15T10:00:00Z',
-                              rating: 4.8,
-                              metadata: {},
-                            },
+                              {
+                                keyword: 'Then',
+                                text: 'ListingCreated',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                  rating: 4.8,
+                                  metadata: { foo: 'bar' },
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              errorType: 'ValidationError',
-                              message: 'Title must not be empty',
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                          {
+                            name: 'User creates listing with empty title should fail',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'CreateListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: '',
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                  rating: 4.8,
+                                  metadata: {},
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                error: {
+                                  type: 'ValidationError',
+                                  message: 'Title must not be empty',
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -438,35 +456,40 @@ describe('decide.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: {
-                  name: 'Suggest items command',
-                  rules: [
-                    {
-                      description: 'Should suggest items successfully',
-                      examples: [
-                        {
-                          description: 'User requests item suggestions',
-                          when: {
-                            commandRef: 'SuggestItems',
-                            exampleData: {
-                              sessionId: 'session-123',
-                              prompt: 'What should I buy?',
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'ItemsSuggested',
-                              exampleData: {
-                                sessionId: 'session-123',
-                                items: [],
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Suggest items command',
+                    rules: [
+                      {
+                        name: 'Should suggest items successfully',
+                        examples: [
+                          {
+                            name: 'User requests item suggestions',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'SuggestItems',
+                                docString: {
+                                  sessionId: 'session-123',
+                                  prompt: 'What should I buy?',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'ItemsSuggested',
+                                docString: {
+                                  sessionId: 'session-123',
+                                  items: [],
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],

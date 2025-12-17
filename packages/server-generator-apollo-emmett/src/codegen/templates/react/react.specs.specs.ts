@@ -16,50 +16,55 @@ describe('react.specs.ts.ejs (react slice)', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                specs: {
-                  name: 'Guest submits booking request command',
-                  rules: [
-                    {
-                      description: 'Should handle booking request successfully',
-                      examples: [
-                        {
-                          description: 'User submits booking request successfully',
-                          when: {
-                            commandRef: 'RequestBooking',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                              hostId: 'host_123',
-                              guestId: 'guest_456',
-                              checkIn: '2025-07-15',
-                              checkOut: '2025-07-18',
-                              guests: 2,
-                              message: 'Looking forward to my stay!',
-                              metadata: { now: 'bar', bookingId: '123' },
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'BookingRequested',
-                              exampleData: {
-                                bookingId: 'book_xyz789',
-                                hostId: 'host_123',
-                                propertyId: 'prop_789',
-                                guestId: 'guest_456',
-                                checkIn: '2025-07-15',
-                                checkOut: '2025-07-18',
-                                guests: 2,
-                                message: 'Hey',
-                                status: 'pending_host_approval',
-                                requestedAt: '2025-06-10T16:30:00.000Z',
-                                expiresAt: '2025-06-11T16:30:00.000Z',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Guest submits booking request command',
+                    rules: [
+                      {
+                        name: 'Should handle booking request successfully',
+                        examples: [
+                          {
+                            name: 'User submits booking request successfully',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'RequestBooking',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  hostId: 'host_123',
+                                  guestId: 'guest_456',
+                                  checkIn: '2025-07-15',
+                                  checkOut: '2025-07-18',
+                                  guests: 2,
+                                  message: 'Looking forward to my stay!',
+                                  metadata: { now: 'bar', bookingId: '123' },
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'BookingRequested',
+                                docString: {
+                                  bookingId: 'book_xyz789',
+                                  hostId: 'host_123',
+                                  propertyId: 'prop_789',
+                                  guestId: 'guest_456',
+                                  checkIn: '2025-07-15',
+                                  checkOut: '2025-07-18',
+                                  guests: 2,
+                                  message: 'Hey',
+                                  status: 'pending_host_approval',
+                                  requestedAt: '2025-06-10T16:30:00.000Z',
+                                  expiresAt: '2025-06-11T16:30:00.000Z',
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
             {
@@ -73,50 +78,53 @@ describe('react.specs.ts.ejs (react slice)', () => {
                     destination: { type: 'stream', pattern: 'booking-${hostId}' },
                   },
                 ],
-                specs: {
-                  name: 'Send notification to host reaction',
-                  rules: [
-                    {
-                      description: 'Should send host notification on booking request',
-                      examples: [
-                        {
-                          description: 'Booking request triggers host notification',
-                          when: [
-                            {
-                              eventRef: 'BookingRequested',
-                              exampleData: {
-                                bookingId: 'book_xyz789',
-                                hostId: 'host_123',
-                                propertyId: 'prop_789',
-                                guestId: 'guest_456',
-                                checkIn: '2025-07-15',
-                                checkOut: '2025-07-18',
-                                guests: 2,
-                                message: 'Hey',
-                                status: 'pending_host_approval',
-                                requestedAt: '2025-06-10T16:30:00.000Z',
-                                expiresAt: '2025-06-11T16:30:00.000Z',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Send notification to host reaction',
+                    rules: [
+                      {
+                        name: 'Should send host notification on booking request',
+                        examples: [
+                          {
+                            name: 'Booking request triggers host notification',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'BookingRequested',
+                                docString: {
+                                  bookingId: 'book_xyz789',
+                                  hostId: 'host_123',
+                                  propertyId: 'prop_789',
+                                  guestId: 'guest_456',
+                                  checkIn: '2025-07-15',
+                                  checkOut: '2025-07-18',
+                                  guests: 2,
+                                  message: 'Hey',
+                                  status: 'pending_host_approval',
+                                  requestedAt: '2025-06-10T16:30:00.000Z',
+                                  expiresAt: '2025-06-11T16:30:00.000Z',
+                                },
                               },
-                            },
-                          ],
-                          then: [
-                            {
-                              commandRef: 'NotifyHost',
-                              exampleData: {
-                                hostId: 'host_123',
-                                notificationType: 'booking_request',
-                                priority: 'high',
-                                channels: ['email', 'push'],
-                                message: 'A guest has requested to book your place.',
-                                actionRequired: true,
+                              {
+                                keyword: 'Then',
+                                text: 'NotifyHost',
+                                docString: {
+                                  hostId: 'host_123',
+                                  notificationType: 'booking_request',
+                                  priority: 'high',
+                                  channels: ['email', 'push'],
+                                  message: 'A guest has requested to book your place.',
+                                  actionRequired: true,
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],

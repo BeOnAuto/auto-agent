@@ -136,39 +136,100 @@ function getServerSpecs(slice: Slice) {
   return undefined;
 }
 
+interface StepWithDocString {
+  keyword: 'Given' | 'When' | 'Then' | 'And';
+  text: string;
+  docString?: Record<string, unknown>;
+}
+
+interface StepWithError {
+  keyword: 'Then';
+  error: { type: string; message?: string };
+}
+
+type Step = StepWithDocString | StepWithError;
+
+function isStepWithError(step: Step): step is StepWithError {
+  return 'error' in step;
+}
+
+function processSteps(
+  steps: Step[],
+  slice: Slice,
+  resolveTypeAndInfo: TypeResolver,
+  messages: Map<string, Message>,
+  exampleShapeHints: ExampleShapeHints,
+): void {
+  let effectiveKeyword: 'Given' | 'When' | 'Then' = 'Given';
+
+  for (const step of steps) {
+    if (isStepWithError(step)) {
+      continue;
+    }
+
+    const keyword = step.keyword;
+    if (keyword !== 'And') {
+      effectiveKeyword = keyword;
+    }
+
+    const refItem = {
+      eventRef: step.text,
+      commandRef: step.text,
+      stateRef: step.text,
+      exampleData: step.docString,
+    };
+
+    if (effectiveKeyword === 'Given') {
+      processGiven([refItem], resolveTypeAndInfo, messages, exampleShapeHints);
+    } else if (effectiveKeyword === 'When') {
+      processWhen([refItem], slice, resolveTypeAndInfo, messages, exampleShapeHints);
+    } else if (effectiveKeyword === 'Then') {
+      processThen([refItem], resolveTypeAndInfo, messages, exampleShapeHints);
+    }
+  }
+}
+
+interface SpecWithRules {
+  rules: Array<{ examples: Array<{ steps?: Step[] }> }>;
+}
+
+function isSpecWithRules(spec: unknown): spec is SpecWithRules {
+  return (
+    typeof spec === 'object' && spec !== null && 'rules' in spec && Array.isArray((spec as { rules: unknown[] }).rules)
+  );
+}
+
+function processRuleExamples(
+  rule: { examples: Array<{ steps?: Step[] }> },
+  slice: Slice,
+  resolveTypeAndInfo: TypeResolver,
+  messages: Map<string, Message>,
+  exampleShapeHints: ExampleShapeHints,
+): void {
+  if (!Array.isArray(rule.examples)) return;
+  for (const example of rule.examples) {
+    if (Array.isArray(example.steps)) {
+      processSteps(example.steps, slice, resolveTypeAndInfo, messages, exampleShapeHints);
+    }
+  }
+}
+
 function processSliceSpecs(
   slice: Slice,
   resolveTypeAndInfo: TypeResolver,
   messages: Map<string, Message>,
   exampleShapeHints: ExampleShapeHints,
 ): void {
-  const serverSpec = getServerSpecs(slice);
+  const serverSpecs = getServerSpecs(slice);
 
-  if (serverSpec !== undefined && Array.isArray(serverSpec.rules)) {
-    serverSpec.rules.forEach((rule: unknown) => {
-      if (
-        typeof rule === 'object' &&
-        rule !== null &&
-        'examples' in rule &&
-        Array.isArray((rule as { examples: unknown[] }).examples)
-      ) {
-        const ruleObj = rule as { examples: { given?: unknown; when?: unknown; then?: unknown }[] };
-        ruleObj.examples.forEach((example) => {
-          if (example.given !== undefined && example.given !== null) {
-            const givenArray = Array.isArray(example.given) ? example.given : [example.given];
-            processGiven(givenArray, resolveTypeAndInfo, messages, exampleShapeHints);
-          }
-          if (example.when !== undefined && example.when !== null) {
-            const whenArray = Array.isArray(example.when) ? example.when : [example.when];
-            processWhen(whenArray, slice, resolveTypeAndInfo, messages, exampleShapeHints);
-          }
-          if (example.then !== undefined && example.then !== null) {
-            const thenArray = Array.isArray(example.then) ? example.then : [example.then];
-            processThen(thenArray, resolveTypeAndInfo, messages, exampleShapeHints);
-          }
-        });
+  if (serverSpecs === undefined || !Array.isArray(serverSpecs)) return;
+
+  for (const spec of serverSpecs) {
+    if (isSpecWithRules(spec)) {
+      for (const rule of spec.rules) {
+        processRuleExamples(rule, slice, resolveTypeAndInfo, messages, exampleShapeHints);
       }
-    });
+    }
   }
 }
 

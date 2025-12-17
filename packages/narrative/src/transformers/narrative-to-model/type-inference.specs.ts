@@ -16,43 +16,46 @@ describe('Type inference in narrative-to-model transformer', () => {
             client: { specs: [] },
             server: {
               description: 'Submit answer server',
-              specs: {
-                name: 'Submit Answer Specs',
-                rules: [
-                  {
-                    id: 'RULE-001',
-                    description: 'Should accept answer submission',
-                    examples: [
-                      {
-                        description: 'Valid answer submission',
-                        when: [
-                          {
-                            commandRef: 'AnswerQuestion',
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              participantId: 'participant-abc',
-                              questionId: 'q1',
-                              answer: 'Yes',
+              specs: [
+                {
+                  type: 'gherkin',
+                  feature: 'Submit Answer Specs',
+                  rules: [
+                    {
+                      id: 'RULE-001',
+                      name: 'Should accept answer submission',
+                      examples: [
+                        {
+                          name: 'Valid answer submission',
+                          steps: [
+                            {
+                              keyword: 'When',
+                              text: 'AnswerQuestion',
+                              docString: {
+                                questionnaireId: 'q-001',
+                                participantId: 'participant-abc',
+                                questionId: 'q1',
+                                answer: 'Yes',
+                              },
                             },
-                          },
-                        ],
-                        then: [
-                          {
-                            eventRef: 'QuestionAnswered',
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              participantId: 'participant-abc',
-                              questionId: 'q1',
-                              answer: 'Yes',
-                              savedAt: new Date(),
+                            {
+                              keyword: 'Then',
+                              text: 'QuestionAnswered',
+                              docString: {
+                                questionnaireId: 'q-001',
+                                participantId: 'participant-abc',
+                                questionId: 'q1',
+                                answer: 'Yes',
+                                savedAt: new Date(),
+                              },
                             },
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
           },
           {
@@ -62,39 +65,42 @@ describe('Type inference in narrative-to-model transformer', () => {
             client: { specs: [] },
             server: {
               description: 'Submit questionnaire server',
-              specs: {
-                name: 'Submit Questionnaire Specs',
-                rules: [
-                  {
-                    id: 'RULE-002',
-                    description: 'Should submit questionnaire',
-                    examples: [
-                      {
-                        description: 'Valid questionnaire submission',
-                        when: [
-                          {
-                            commandRef: 'SubmitQuestionnaire',
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              participantId: 'participant-abc',
+              specs: [
+                {
+                  type: 'gherkin',
+                  feature: 'Submit Questionnaire Specs',
+                  rules: [
+                    {
+                      id: 'RULE-002',
+                      name: 'Should submit questionnaire',
+                      examples: [
+                        {
+                          name: 'Valid questionnaire submission',
+                          steps: [
+                            {
+                              keyword: 'When',
+                              text: 'SubmitQuestionnaire',
+                              docString: {
+                                questionnaireId: 'q-001',
+                                participantId: 'participant-abc',
+                              },
                             },
-                          },
-                        ],
-                        then: [
-                          {
-                            eventRef: 'QuestionnaireSubmitted',
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              participantId: 'participant-abc',
-                              submittedAt: new Date(),
+                            {
+                              keyword: 'Then',
+                              text: 'QuestionnaireSubmitted',
+                              docString: {
+                                questionnaireId: 'q-001',
+                                participantId: 'participant-abc',
+                                submittedAt: new Date(),
+                              },
                             },
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
           },
         ],
@@ -135,31 +141,35 @@ describe('Type inference in narrative-to-model transformer', () => {
             client: { specs: [] },
             server: {
               description: 'Single object server',
-              specs: {
-                name: 'Single Object Specs',
-                rules: [
-                  {
-                    id: 'RULE-001',
-                    description: 'Should handle single object',
-                    examples: [
-                      {
-                        description: 'Single object example',
-                        // Single object, not array - this is what broke
-                        when: {
-                          commandRef: 'TestCommand',
-                          exampleData: { test: 'value' },
+              specs: [
+                {
+                  type: 'gherkin',
+                  feature: 'Single Object Specs',
+                  rules: [
+                    {
+                      id: 'RULE-001',
+                      name: 'Should handle single object',
+                      examples: [
+                        {
+                          name: 'Single object example',
+                          steps: [
+                            {
+                              keyword: 'When',
+                              text: 'TestCommand',
+                              docString: { test: 'value' },
+                            },
+                            {
+                              keyword: 'Then',
+                              text: 'TestEvent',
+                              docString: { result: 'success' },
+                            },
+                          ],
                         },
-                        then: [
-                          {
-                            eventRef: 'TestEvent',
-                            exampleData: { result: 'success' },
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
           },
         ],

@@ -48,7 +48,7 @@ export const createSliceBuilder = (config: SliceConfig = {}): SliceBuilder => ({
       type: 'command',
       name,
       client: { specs: [] },
-      server: { description: '', specs: { name: '', rules: [] }, data: undefined },
+      server: { description: '', specs: [], data: undefined },
       // Optional fields
       ...(config.eventStream != null && { stream: config.eventStream }),
       ...(config.integration && { via: [config.integration.name] }),
@@ -67,7 +67,7 @@ export const createSliceBuilder = (config: SliceConfig = {}): SliceBuilder => ({
       type: 'query',
       name,
       client: { specs: [] },
-      server: { description: '', specs: { name: '', rules: [] }, data: undefined },
+      server: { description: '', specs: [], data: undefined },
       // Optional fields
       ...(config.eventStream != null && { stream: config.eventStream }),
       ...(config.integration && { via: [config.integration.name] }),
@@ -88,7 +88,7 @@ export const createSliceBuilder = (config: SliceConfig = {}): SliceBuilder => ({
     const slice: ReactSlice = {
       type: 'react',
       name,
-      server: { specs: { name: '', rules: [] }, data: undefined },
+      server: { specs: [], data: undefined },
       // Optional fields
       ...(config.eventStream != null && { stream: config.eventStream }),
       ...(config.integration && { via: [config.integration.name] }),

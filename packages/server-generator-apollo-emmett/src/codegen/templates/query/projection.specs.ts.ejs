@@ -6,20 +6,46 @@ const idField = projectionIdField ?? 'id';
 const uniqueEventTypes = allEventTypesArray;
 
 const ruleGroups = new Map();
-const rules = slice?.server?.specs?.rules || [];
-for (const rule of rules) {
-    const ruleDescription = rule.description || `${flowName} | ${sliceName}`;
-    if (!ruleGroups.has(ruleDescription)) {
-        ruleGroups.set(ruleDescription, []);
-    }
 
-    for (const example of rule.examples || []) {
-        ruleGroups.get(ruleDescription).push({
-            description: example.description || 'should handle events correctly',
-            given: example.given || [],
-            when: example.when || [],
-            then: example.then || []
-        });
+if (Array.isArray(slice?.server?.specs)) {
+    for (const spec of slice.server.specs) {
+        const rules = spec.rules || [];
+        for (const rule of rules) {
+            const ruleDescription = rule.name || `${flowName} | ${sliceName}`;
+            if (!ruleGroups.has(ruleDescription)) {
+                ruleGroups.set(ruleDescription, []);
+            }
+
+            for (const example of rule.examples || []) {
+                const givenSteps = example.steps?.filter(step => step.keyword === 'Given') || [];
+                const whenSteps = example.steps?.filter(step => step.keyword === 'When') || [];
+                const thenSteps = example.steps?.filter(step => step.keyword === 'Then') || [];
+
+                ruleGroups.get(ruleDescription).push({
+                    description: example.name || 'should handle events correctly',
+                    given: givenSteps.map(step => ({ eventRef: step.text, exampleData: step.docString || {} })),
+                    when: whenSteps.map(step => ({ eventRef: step.text, exampleData: step.docString || {} })),
+                    then: thenSteps.map(step => ({ stateRef: step.text, exampleData: step.docString || {} }))
+                });
+            }
+        }
+    }
+} else {
+    const rules = slice?.server?.specs?.rules || [];
+    for (const rule of rules) {
+        const ruleDescription = rule.description || `${flowName} | ${sliceName}`;
+        if (!ruleGroups.has(ruleDescription)) {
+            ruleGroups.set(ruleDescription, []);
+        }
+
+        for (const example of rule.examples || []) {
+            ruleGroups.get(ruleDescription).push({
+                description: example.description || 'should handle events correctly',
+                given: example.given || [],
+                when: example.when || [],
+                then: example.then || []
+            });
+        }
     }
 }
 _%>

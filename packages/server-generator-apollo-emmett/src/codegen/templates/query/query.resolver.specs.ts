@@ -42,7 +42,7 @@ describe('query.resolver.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: { name: '', rules: [] },
+                specs: [],
               },
             },
           ],
@@ -165,7 +165,7 @@ describe('query.resolver.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: { name: '', rules: [] },
+                specs: [],
               },
             },
           ],
@@ -274,54 +274,62 @@ describe('query.resolver.ts.ejs', () => {
                     origin: { type: 'projection', name: 'Questionnaires', idField: 'questionnaire-participantId' },
                   },
                 ],
-                specs: {
-                  name: '',
-                  rules: [
-                    {
-                      description: 'questionnaires show current progress',
-                      examples: [
-                        {
-                          description: 'a question has already been answered',
-                          given: [
-                            {
-                              eventRef: 'QuestionAnswered',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                link: 'https://app.example.com/q/q-001?participant=participant-abc',
-                                sentAt: '2030-01-01T09:00:00.000Z',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: '',
+                    rules: [
+                      {
+                        name: 'questionnaires show current progress',
+                        examples: [
+                          {
+                            name: 'a question has already been answered',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  link: 'https://app.example.com/q/q-001?participant=participant-abc',
+                                  sentAt: '2030-01-01T09:00:00.000Z',
+                                },
                               },
-                            },
-                            {
-                              eventRef: 'QuestionAnswered',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                questionId: 'q1',
-                                answer: 'Yes',
-                                savedAt: '2030-01-01T09:05:00.000Z',
+                              {
+                                keyword: 'Given',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                  savedAt: '2030-01-01T09:05:00.000Z',
+                                },
                               },
-                            },
-                          ],
-                          when: { exampleData: {}, eventRef: 'QuestionnaireLinkSent' },
-                          then: [
-                            {
-                              stateRef: 'QuestionnaireProgress',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                status: 'in_progress',
-                                currentQuestionId: 'q2',
-                                remainingQuestions: ['q2', 'q3'],
-                                answers: [{ questionId: 'q1', value: 'Yes' }],
+                              {
+                                keyword: 'When',
+                                text: 'QuestionnaireLinkSent',
+                                docString: {},
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionnaireProgress',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  status: 'in_progress',
+                                  currentQuestionId: 'q2',
+                                  remainingQuestions: ['q2', 'q3'],
+                                  answers: [{ questionId: 'q1', value: 'Yes' }],
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -454,7 +462,7 @@ describe('query.resolver.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: { name: '', rules: [] },
+                specs: [],
               },
             },
           ],
@@ -517,7 +525,7 @@ describe('query.resolver.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: { name: '', rules: [] },
+                specs: [],
               },
             },
           ],
@@ -577,7 +585,7 @@ describe('query.resolver.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: { name: '', rules: [] },
+                specs: [],
               },
             },
           ],
@@ -641,7 +649,7 @@ describe('query.resolver.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: { name: '', rules: [] },
+                specs: [],
               },
             },
           ],

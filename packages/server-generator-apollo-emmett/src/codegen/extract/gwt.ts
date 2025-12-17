@@ -1,52 +1,35 @@
-import { Slice, CommandExample, EventExample, StateExample, Example } from '@auto-engineer/narrative';
-import { GwtCondition } from '../types';
+import type { Slice } from '@auto-engineer/narrative';
+import type { GwtCondition, CommandRef, EventRef } from '../types';
+import { extractGwtSpecsFromSlice, type GwtConditionWithRule } from './step-converter';
 
 export function buildCommandGwtMapping(slice: Slice): Record<string, (GwtCondition & { failingFields?: string[] })[]> {
   if (slice.type !== 'command') {
     return {};
   }
 
-  const gwtSpecs = extractGwtSpecs(slice);
+  const gwtSpecs = extractGwtSpecsFromSlice(slice);
   const mapping = buildCommandMapping(gwtSpecs);
   return enhanceMapping(mapping);
 }
 
-function extractGwtSpecs(slice: Slice) {
-  if (!('server' in slice)) return [];
-  const specs = slice.server?.specs;
-  const rules = specs?.rules;
-  return Array.isArray(rules) && rules.length > 0
-    ? rules.flatMap((rule) =>
-        rule.examples.map((example: Example) => ({
-          given: example.given,
-          when: example.when,
-          then: example.then,
-          description: example.description,
-          ruleDescription: rule.description,
-        })),
-      )
-    : [];
+function isCommandRef(when: CommandRef | EventRef[]): when is CommandRef {
+  return !Array.isArray(when) && 'commandRef' in when;
 }
 
-function buildCommandMapping(
-  gwtSpecs: Array<{ given: unknown; when: unknown; then: unknown; description?: string; ruleDescription?: string }>,
-) {
+function buildCommandMapping(gwtSpecs: GwtConditionWithRule[]) {
   const mapping: Record<string, GwtCondition[]> = {};
 
   for (const gwt of gwtSpecs) {
-    let command: string | undefined;
-    if (Array.isArray(gwt.when)) {
+    if (!isCommandRef(gwt.when)) {
       continue;
-    } else {
-      const whenCmd = gwt.when as { commandRef?: string } | undefined;
-      command = whenCmd?.commandRef;
     }
+    const command = gwt.when.commandRef;
     if (typeof command === 'string' && command.length > 0) {
       mapping[command] = mapping[command] ?? [];
       mapping[command].push({
-        given: gwt.given as Array<EventExample | StateExample> | undefined,
-        when: gwt.when as CommandExample | EventExample[],
-        then: gwt.then as Array<EventExample | StateExample | CommandExample | { errorType: string; message?: string }>,
+        given: gwt.given,
+        when: gwt.when,
+        then: gwt.then,
         description: gwt.description,
         ruleDescription: gwt.ruleDescription,
       });

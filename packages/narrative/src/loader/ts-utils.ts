@@ -660,14 +660,13 @@ export function parseWhenTypeArguments(
   const whenTypes: GivenTypeInfo[] = [];
 
   const visit = (node: import('typescript').Node): void => {
-    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
-      const method = node.expression.name.getText();
-      if (method === 'when') {
+    if (ts.isCallExpression(node)) {
+      if (ts.isIdentifier(node.expression) && node.expression.text === 'when') {
         if (node.typeArguments && node.typeArguments.length > 0) {
           const typeArg = node.typeArguments[0];
           const typeArgText = typeArg.getText(sourceFile);
           debug(
-            '[when-types] found .when<%s> at line %d, will process as ordinal %d',
+            '[when-types] found when<%s> at line %d, will process as ordinal %d',
             typeArgText,
             sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1,
             whenTypes.length,
@@ -676,7 +675,7 @@ export function parseWhenTypeArguments(
         } else {
           const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
           debug(
-            '[when-types] found .when() without type argument at line %d, adding placeholder at ordinal %d',
+            '[when-types] found when() without type argument at line %d, adding placeholder at ordinal %d',
             line + 1,
             whenTypes.length,
           );
@@ -690,6 +689,38 @@ export function parseWhenTypeArguments(
           });
         }
       }
+      // Handle property access (fluent API): .when<T>({...})
+      else if (ts.isPropertyAccessExpression(node.expression)) {
+        const method = node.expression.name.getText();
+        if (method === 'when') {
+          if (node.typeArguments && node.typeArguments.length > 0) {
+            const typeArg = node.typeArguments[0];
+            const typeArgText = typeArg.getText(sourceFile);
+            debug(
+              '[when-types] found .when<%s> at line %d, will process as ordinal %d',
+              typeArgText,
+              sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1,
+              whenTypes.length,
+            );
+            processWhenCallExpression(ts, node, checker, sourceFile, typeMap, typesByFile, whenTypes, whenTypes.length);
+          } else {
+            const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+            debug(
+              '[when-types] found .when() without type argument at line %d, adding placeholder at ordinal %d',
+              line + 1,
+              whenTypes.length,
+            );
+            whenTypes.push({
+              fileName: sourceFile.fileName,
+              line: line + 1,
+              column: character + 1,
+              ordinal: whenTypes.length,
+              typeName: '',
+              classification: 'command',
+            });
+          }
+        }
+      }
     }
     ts.forEachChild(node, visit);
   };
@@ -697,6 +728,43 @@ export function parseWhenTypeArguments(
   visit(sourceFile);
   debug('[when-types] total when types extracted: %d', whenTypes.length);
   return whenTypes;
+}
+
+function processStandaloneGivenCall(
+  ts: typeof import('typescript'),
+  node: import('typescript').CallExpression,
+  checker: import('typescript').TypeChecker,
+  sourceFile: import('typescript').SourceFile,
+  typeMap: Map<string, TypeInfo>,
+  typesByFile: Map<string, Map<string, TypeInfo>>,
+  givenTypes: GivenTypeInfo[],
+  processedNodes: Set<import('typescript').CallExpression>,
+): void {
+  if (node.typeArguments !== undefined && node.typeArguments.length > 0) {
+    processGivenOrAndCallExpression(ts, node, checker, sourceFile, typeMap, typesByFile, givenTypes, givenTypes.length);
+    processedNodes.add(node);
+  }
+}
+
+function processFluentGivenChain(
+  ts: typeof import('typescript'),
+  node: import('typescript').CallExpression,
+  checker: import('typescript').TypeChecker,
+  sourceFile: import('typescript').SourceFile,
+  typeMap: Map<string, TypeInfo>,
+  typesByFile: Map<string, Map<string, TypeInfo>>,
+  givenTypes: GivenTypeInfo[],
+  processedNodes: Set<import('typescript').CallExpression>,
+): void {
+  const chain = collectChainFromStart(ts, node);
+  let ordinal = givenTypes.length;
+
+  for (const chainNode of chain) {
+    if (chainNode.typeArguments !== undefined && chainNode.typeArguments.length > 0) {
+      processGivenOrAndCallExpression(ts, chainNode, checker, sourceFile, typeMap, typesByFile, givenTypes, ordinal++);
+      processedNodes.add(chainNode);
+    }
+  }
 }
 
 export function parseGivenTypeArguments(
@@ -709,31 +777,14 @@ export function parseGivenTypeArguments(
   const givenTypes: GivenTypeInfo[] = [];
   const processedNodes = new Set<import('typescript').CallExpression>();
 
-  // First pass: find all given/and chain starts
   const visit = (node: import('typescript').Node): void => {
     if (ts.isCallExpression(node) && !processedNodes.has(node)) {
-      if (ts.isPropertyAccessExpression(node.expression)) {
+      if (ts.isIdentifier(node.expression) && node.expression.text === 'given') {
+        processStandaloneGivenCall(ts, node, checker, sourceFile, typeMap, typesByFile, givenTypes, processedNodes);
+      } else if (ts.isPropertyAccessExpression(node.expression)) {
         const method = node.expression.name.getText();
         if (method === 'given' && isChainStart(ts, node)) {
-          // Found a chain start, collect the entire chain
-          const chain = collectChainFromStart(ts, node);
-          let ordinal = givenTypes.length;
-
-          for (const chainNode of chain) {
-            if (chainNode.typeArguments !== undefined && chainNode.typeArguments.length > 0) {
-              processGivenOrAndCallExpression(
-                ts,
-                chainNode,
-                checker,
-                sourceFile,
-                typeMap,
-                typesByFile,
-                givenTypes,
-                ordinal++,
-              );
-              processedNodes.add(chainNode);
-            }
-          }
+          processFluentGivenChain(ts, node, checker, sourceFile, typeMap, typesByFile, givenTypes, processedNodes);
         }
       }
     }
@@ -742,6 +793,98 @@ export function parseGivenTypeArguments(
 
   visit(sourceFile);
   return givenTypes;
+}
+
+function processThenCallWithTypeArg(
+  ts: typeof import('typescript'),
+  node: import('typescript').CallExpression,
+  checker: import('typescript').TypeChecker,
+  sourceFile: import('typescript').SourceFile,
+  typeMap: Map<string, TypeInfo>,
+  typesByFile: Map<string, Map<string, TypeInfo>>,
+  thenTypes: GivenTypeInfo[],
+  debugPrefix: string,
+): void {
+  const typeArg = node.typeArguments![0];
+  const typeArgText = typeArg.getText(sourceFile);
+  debug(
+    '[then-types] found %s<%s> at line %d, will process as ordinal %d',
+    debugPrefix,
+    typeArgText,
+    sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1,
+    thenTypes.length,
+  );
+  const genericResult = tryUnwrapGeneric(ts, typeArg, checker, typeMap, typesByFile);
+  if (genericResult !== undefined && genericResult !== null) {
+    thenTypes.push(
+      createGivenTypeInfo(sourceFile, node, thenTypes.length, genericResult.typeName, genericResult.classification),
+    );
+  }
+}
+
+function processThenCallWithoutTypeArg(
+  sourceFile: import('typescript').SourceFile,
+  node: import('typescript').CallExpression,
+  thenTypes: GivenTypeInfo[],
+  debugPrefix: string,
+): void {
+  const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+  debug(
+    '[then-types] found %s without type argument at line %d, adding placeholder at ordinal %d',
+    debugPrefix,
+    line + 1,
+    thenTypes.length,
+  );
+  thenTypes.push({
+    fileName: sourceFile.fileName,
+    line: line + 1,
+    column: character + 1,
+    ordinal: thenTypes.length,
+    typeName: '',
+    classification: 'event',
+  });
+}
+
+function processThenCall(
+  ts: typeof import('typescript'),
+  node: import('typescript').CallExpression,
+  checker: import('typescript').TypeChecker,
+  sourceFile: import('typescript').SourceFile,
+  typeMap: Map<string, TypeInfo>,
+  typesByFile: Map<string, Map<string, TypeInfo>>,
+  thenTypes: GivenTypeInfo[],
+  debugPrefix: string,
+): void {
+  if (node.typeArguments !== undefined && node.typeArguments.length > 0) {
+    processThenCallWithTypeArg(ts, node, checker, sourceFile, typeMap, typesByFile, thenTypes, debugPrefix);
+  } else {
+    processThenCallWithoutTypeArg(sourceFile, node, thenTypes, debugPrefix);
+  }
+}
+
+export function parseThenTypeArguments(
+  ts: typeof import('typescript'),
+  checker: import('typescript').TypeChecker,
+  sourceFile: import('typescript').SourceFile,
+  typeMap: Map<string, TypeInfo>,
+  typesByFile: Map<string, Map<string, TypeInfo>>,
+): GivenTypeInfo[] {
+  const thenTypes: GivenTypeInfo[] = [];
+
+  const visit = (node: import('typescript').Node): void => {
+    if (ts.isCallExpression(node)) {
+      if (ts.isIdentifier(node.expression) && node.expression.text === 'then') {
+        processThenCall(ts, node, checker, sourceFile, typeMap, typesByFile, thenTypes, 'then');
+      } else if (ts.isPropertyAccessExpression(node.expression) && node.expression.name.getText() === 'then') {
+        processThenCall(ts, node, checker, sourceFile, typeMap, typesByFile, thenTypes, '.then');
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+
+  visit(sourceFile);
+  debug('[then-types] total then types extracted: %d', thenTypes.length);
+  return thenTypes;
 }
 
 export function transpileToCjs(ts: typeof import('typescript'), fileName: string, source: string): string {

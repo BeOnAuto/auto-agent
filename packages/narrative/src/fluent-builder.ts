@@ -73,7 +73,7 @@ class CommandSliceBuilderImpl implements FluentCommandSliceBuilder {
       name,
       id,
       client: { specs: [] },
-      server: { description: '', specs: { name: '', rules: [] }, data: undefined },
+      server: { description: '', specs: [], data: undefined },
     };
     addSlice(this.slice);
     debugCommand('Command slice added to flow: %s', name);
@@ -179,7 +179,7 @@ class QuerySliceBuilderImpl implements FluentQuerySliceBuilder {
       name,
       id,
       client: { specs: [] },
-      server: { description: '', specs: { name: '', rules: [] }, data: undefined },
+      server: { description: '', specs: [], data: undefined },
     };
     addSlice(this.slice);
     debugQuery('Query slice added to flow: %s', name);
@@ -264,7 +264,7 @@ class ReactionSliceBuilderImpl implements FluentReactionSliceBuilder {
       type: 'react',
       name,
       id,
-      server: { specs: { name: '', rules: [] }, data: undefined },
+      server: { specs: [], data: undefined },
     };
     addSlice(this.slice);
     debugReact('Reaction slice added to flow: %s', name);

@@ -1,37 +1,26 @@
-import { CommandExample, Slice, type Example } from '@auto-engineer/narrative';
+import type { Slice } from '@auto-engineer/narrative';
+import type { CommandRef, ErrorRef } from '../types';
+import { extractGwtSpecsFromSlice, type GwtResult } from './step-converter';
 
 function resolveStreamId(stream: string, exampleData: Record<string, unknown>): string {
   return stream.replace(/\$\{([^}]+)\}/g, (_, key: string) => String(exampleData?.[key] ?? 'unknown'));
 }
 
-function extractExampleDataFromReact(firstSpec: { when: unknown }): Record<string, unknown> {
+function extractExampleDataFromEventWhen(firstSpec: GwtResult): Record<string, unknown> {
   if (Array.isArray(firstSpec.when)) {
-    const firstWhen = firstSpec.when[0] as { exampleData?: Record<string, unknown> } | undefined;
-    return typeof firstWhen?.exampleData === 'object' && firstWhen.exampleData !== null ? firstWhen.exampleData : {};
+    const firstWhen = firstSpec.when[0];
+    return firstWhen?.exampleData ?? {};
   }
   return {};
 }
 
-function extractExampleDataFromCommand(firstSpec: { then: unknown }): Record<string, unknown> {
-  const then = firstSpec.then as (CommandExample | { errorType: string })[];
-  const firstExample = then.find((t): t is CommandExample => 'exampleData' in t);
-  return typeof firstExample?.exampleData === 'object' && firstExample.exampleData !== null
-    ? firstExample.exampleData
-    : {};
+function extractExampleDataFromCommand(firstSpec: GwtResult): Record<string, unknown> {
+  const then = firstSpec.then as (CommandRef | ErrorRef)[];
+  const firstExample = then.find((t): t is CommandRef => 'exampleData' in t);
+  return firstExample?.exampleData ?? {};
 }
 
-function extractExampleDataFromQuery(firstSpec: { when: unknown }): Record<string, unknown> {
-  if (Array.isArray(firstSpec.when)) {
-    const firstWhen = firstSpec.when[0] as { exampleData?: Record<string, unknown> } | undefined;
-    return typeof firstWhen?.exampleData === 'object' && firstWhen.exampleData !== null ? firstWhen.exampleData : {};
-  }
-  return {};
-}
-
-function extractExampleDataFromSpecs(
-  slice: Slice,
-  gwtSpecs: Array<{ given?: unknown; when: unknown; then: unknown }>,
-): Record<string, unknown> {
+function extractExampleDataFromSpecs(slice: Slice, gwtSpecs: GwtResult[]): Record<string, unknown> {
   if (gwtSpecs.length === 0) {
     return {};
   }
@@ -39,29 +28,13 @@ function extractExampleDataFromSpecs(
   const firstSpec = gwtSpecs[0];
   switch (slice.type) {
     case 'react':
-      return extractExampleDataFromReact(firstSpec);
+    case 'query':
+      return extractExampleDataFromEventWhen(firstSpec);
     case 'command':
       return extractExampleDataFromCommand(firstSpec);
-    case 'query':
-      return extractExampleDataFromQuery(firstSpec);
     default:
       return {};
   }
-}
-
-function extractGwtSpecs(slice: Slice) {
-  if (!('server' in slice)) return [];
-  const specs = slice.server?.specs;
-  const rules = specs?.rules;
-  return Array.isArray(rules) && rules.length > 0
-    ? rules.flatMap((rule) =>
-        rule.examples.map((example: Example) => ({
-          given: example.given,
-          when: example.when,
-          then: example.then,
-        })),
-      )
-    : [];
 }
 
 function isValidStreamSink(item: unknown): item is { destination: { pattern: string } } {
@@ -91,11 +64,11 @@ function processStreamSink(item: unknown, exampleData: Record<string, unknown>) 
 
 export function getStreamFromSink(slice: Slice): { streamPattern?: string; streamId?: string } {
   if (!('server' in slice)) return {};
-  const gwtSpecs = extractGwtSpecs(slice);
-  const exampleData = extractExampleDataFromSpecs(slice, gwtSpecs);
-  if (!('server' in slice) || slice.server == null || !('data' in slice.server) || !Array.isArray(slice.server.data)) {
+  if (slice.server == null || !('data' in slice.server) || !Array.isArray(slice.server.data)) {
     return {};
   }
+  const gwtSpecs = extractGwtSpecsFromSlice(slice);
+  const exampleData = extractExampleDataFromSpecs(slice, gwtSpecs);
   const serverData = slice.server.data;
 
   for (const item of serverData) {

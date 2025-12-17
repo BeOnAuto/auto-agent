@@ -1,56 +1,59 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { flow, example, rule, specs } from './narrative';
 import { command } from './fluent-builder';
+import { type Event, type State } from './types';
 
-interface QuestionnaireLinkSent {
-  questionnaireId: string;
-  participantId: string;
-  link: string;
-  sentAt: Date;
-}
+type QuestionnaireLinkSent = Event<
+  'QuestionnaireLinkSent',
+  {
+    questionnaireId: string;
+    participantId: string;
+    link: string;
+    sentAt: Date;
+  }
+>;
 
-interface QuestionAnswered {
-  questionnaireId: string;
-  participantId: string;
-  questionId: string;
-  answer: string;
-  savedAt: Date;
-}
+type QuestionAnswered = Event<
+  'QuestionAnswered',
+  {
+    questionnaireId: string;
+    participantId: string;
+    questionId: string;
+    answer: string;
+    savedAt: Date;
+  }
+>;
 
-interface QuestionnaireProgress {
-  questionnaireId: string;
-  participantId: string;
-  status: string;
-  currentQuestionId: string;
-  remainingQuestions: string[];
-  answers: { questionId: string; value: string }[];
-}
+type QuestionnaireProgress = State<
+  'QuestionnaireProgress',
+  {
+    questionnaireId: string;
+    participantId: string;
+    status: string;
+    currentQuestionId: string;
+    remainingQuestions: string[];
+    answers: { questionId: string; value: string }[];
+  }
+>;
 
-describe('Context Parameter Support', () => {
+describe('Narrative DSL', () => {
   beforeEach(async () => {
     // Clean test state before each test
   });
 
-  it('should support context parameter in given() method', () => {
+  it('should support given() method in builder', () => {
     expect(() => {
-      flow('test flow with context', () => {
+      flow('test flow with given', () => {
         command('test command').server(() => {
           specs(() => {
-            rule('test rule with context', () => {
-              example('given with context')
-                .given<QuestionnaireLinkSent>(
-                  {
-                    questionnaireId: 'q-001',
-                    participantId: 'participant-abc',
-                    link: 'https://app.example.com/q/q-001?participant=participant-abc',
-                    sentAt: new Date('2030-01-01T09:00:00Z'),
-                  },
-                  {
-                    sentAt: 'comes from the system clock',
-                    questionnaireId: 'must be a valid questionnaire ID',
-                    link: 'generated based on questionnaire and participant',
-                  },
-                )
+            rule('test rule with given', () => {
+              example('given test')
+                .given<QuestionnaireLinkSent>({
+                  questionnaireId: 'q-001',
+                  participantId: 'participant-abc',
+                  link: 'https://app.example.com/q/q-001?participant=participant-abc',
+                  sentAt: new Date('2030-01-01T09:00:00Z'),
+                })
                 .when<QuestionAnswered>({
                   questionnaireId: 'q-001',
                   participantId: 'participant-abc',
@@ -73,32 +76,26 @@ describe('Context Parameter Support', () => {
     }).not.toThrow();
   });
 
-  it('should support context parameter in when() method', () => {
+  it('should support when() method in builder', () => {
     expect(() => {
-      flow('test flow with when context', () => {
+      flow('test flow with when', () => {
         command('test command').server(() => {
           specs(() => {
             rule('test rule', () => {
-              example('when with context')
+              example('when test')
                 .given<QuestionnaireLinkSent>({
                   questionnaireId: 'q-001',
                   participantId: 'participant-abc',
                   link: 'https://app.example.com/q/q-001?participant=participant-abc',
                   sentAt: new Date('2030-01-01T09:00:00Z'),
                 })
-                .when<QuestionAnswered>(
-                  {
-                    questionnaireId: 'q-001',
-                    participantId: 'participant-abc',
-                    questionId: 'q1',
-                    answer: 'Yes',
-                    savedAt: new Date('2030-01-01T09:05:00Z'),
-                  },
-                  {
-                    answer: 'must be validated according to the question type',
-                    savedAt: 'timestamp when the answer was saved',
-                  },
-                )
+                .when<QuestionAnswered>({
+                  questionnaireId: 'q-001',
+                  participantId: 'participant-abc',
+                  questionId: 'q1',
+                  answer: 'Yes',
+                  savedAt: new Date('2030-01-01T09:05:00Z'),
+                })
                 .then<QuestionnaireProgress>({
                   questionnaireId: 'q-001',
                   participantId: 'participant-abc',
@@ -114,13 +111,13 @@ describe('Context Parameter Support', () => {
     }).not.toThrow();
   });
 
-  it('should support context parameter in then() method', () => {
+  it('should support then() method in builder', () => {
     expect(() => {
-      flow('test flow with then context', () => {
+      flow('test flow with then', () => {
         command('test command').server(() => {
           specs(() => {
             rule('test rule', () => {
-              example('then with context')
+              example('then test')
                 .given<QuestionnaireLinkSent>({
                   questionnaireId: 'q-001',
                   participantId: 'participant-abc',
@@ -134,21 +131,14 @@ describe('Context Parameter Support', () => {
                   answer: 'Yes',
                   savedAt: new Date('2030-01-01T09:05:00Z'),
                 })
-                .then<QuestionnaireProgress>(
-                  {
-                    questionnaireId: 'q-001',
-                    participantId: 'participant-abc',
-                    status: 'in_progress',
-                    currentQuestionId: 'q2',
-                    remainingQuestions: ['q2'],
-                    answers: [{ questionId: 'q1', value: 'Yes' }],
-                  },
-                  {
-                    answers: 'computed from the answered questions',
-                    status: 'calculated based on completed questions',
-                    currentQuestionId: 'next question to be answered',
-                  },
-                );
+                .then<QuestionnaireProgress>({
+                  questionnaireId: 'q-001',
+                  participantId: 'participant-abc',
+                  status: 'in_progress',
+                  currentQuestionId: 'q2',
+                  remainingQuestions: ['q2'],
+                  answers: [{ questionId: 'q1', value: 'Yes' }],
+                });
             });
           });
         });
@@ -156,27 +146,19 @@ describe('Context Parameter Support', () => {
     }).not.toThrow();
   });
 
-  it('should preserve context data in schema output', async () => {
-    // This test would require a proper file system setup to work with getNarratives
-    // For now, we'll just test that the methods accept context parameters
+  it('should support full narrative DSL flow', () => {
     expect(() => {
-      flow('test context preservation', () => {
+      flow('test full DSL flow', () => {
         command('test preservation').server(() => {
           specs(() => {
-            rule('context preservation rule', () => {
-              example('context should be preserved')
-                .given<QuestionnaireLinkSent>(
-                  {
-                    questionnaireId: 'q-001',
-                    participantId: 'participant-abc',
-                    link: 'https://app.example.com/q/q-001?participant=participant-abc',
-                    sentAt: new Date('2030-01-01T09:00:00Z'),
-                  },
-                  {
-                    sentAt: 'comes from the system clock',
-                    questionnaireId: 'validated questionnaire identifier',
-                  },
-                )
+            rule('full flow rule', () => {
+              example('full flow test')
+                .given<QuestionnaireLinkSent>({
+                  questionnaireId: 'q-001',
+                  participantId: 'participant-abc',
+                  link: 'https://app.example.com/q/q-001?participant=participant-abc',
+                  sentAt: new Date('2030-01-01T09:00:00Z'),
+                })
                 .when<QuestionAnswered>({
                   questionnaireId: 'q-001',
                   participantId: 'participant-abc',
@@ -198,29 +180,4 @@ describe('Context Parameter Support', () => {
       });
     }).not.toThrow();
   });
-
-  // These tests should fail with TypeScript compilation errors
-  // Commenting out for now - they will be used to verify strict typing works
-  /*
-  it('should reject invalid context fields (compilation test)', () => {
-    // This should cause a TypeScript error - invalidField is not in QuestionnaireLinkSent
-    flow('invalid context test', () => {
-      command('test').server(() => {
-        specs(() => {
-          rule('test rule', () => {
-            example('invalid context')
-              .given<QuestionnaireLinkSent>({
-                questionnaireId: 'q-001',
-                participantId: 'participant-abc',
-                link: 'https://app.example.com',
-                sentAt: new Date(),
-              }, {
-                invalidField: 'this should cause a type error'  // TypeScript error expected
-              });
-          });
-        });
-      });
-    });
-  });
-  */
 });

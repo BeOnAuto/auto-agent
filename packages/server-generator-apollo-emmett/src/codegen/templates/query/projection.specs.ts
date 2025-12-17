@@ -19,56 +19,63 @@ describe('projection.ts.ejs', () => {
               },
               server: {
                 description: 'handles create/remove listing',
-                specs: {
-                  name: 'Create/remove listing command',
-                  rules: [
-                    {
-                      description: 'Should handle listing operations',
-                      examples: [
-                        {
-                          description: 'User creates listing successfully',
-                          when: {
-                            commandRef: 'CreateListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                              title: 'Sea View Flat',
-                              pricePerNight: 120,
-                              location: 'Brighton',
-                              maxGuests: 4,
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'ListingCreated',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                title: 'Sea View Flat',
-                                pricePerNight: 120,
-                                location: 'Brighton',
-                                maxGuests: 4,
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Create/remove listing command',
+                    rules: [
+                      {
+                        name: 'Should handle listing operations',
+                        examples: [
+                          {
+                            name: 'User creates listing successfully',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'CreateListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Sea View Flat',
+                                  pricePerNight: 120,
+                                  location: 'Brighton',
+                                  maxGuests: 4,
+                                },
                               },
-                            },
-                          ],
-                        },
-                        {
-                          description: 'User removes listing successfully',
-                          when: {
-                            commandRef: 'RemoveListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                            },
+                              {
+                                keyword: 'Then',
+                                text: 'ListingCreated',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Sea View Flat',
+                                  pricePerNight: 120,
+                                  location: 'Brighton',
+                                  maxGuests: 4,
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              eventRef: 'ListingRemoved',
-                              exampleData: {},
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                          {
+                            name: 'User removes listing successfully',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'RemoveListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'ListingRemoved',
+                                docString: {},
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
             {
@@ -93,60 +100,63 @@ describe('projection.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: {
-                  name: 'Search listings query',
-                  rules: [
-                    {
-                      description: 'Should project listings correctly',
-                      examples: [
-                        {
-                          description: 'Listing created shows in search results',
-                          when: [
-                            {
-                              eventRef: 'ListingCreated',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                title: 'Sea View Flat',
-                                pricePerNight: 120,
-                                location: 'Brighton',
-                                maxGuests: 4,
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Search listings query',
+                    rules: [
+                      {
+                        name: 'Should project listings correctly',
+                        examples: [
+                          {
+                            name: 'Listing created shows in search results',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'ListingCreated',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Sea View Flat',
+                                  pricePerNight: 120,
+                                  location: 'Brighton',
+                                  maxGuests: 4,
+                                },
                               },
-                            },
-                          ],
-                          then: [
-                            {
-                              stateRef: 'AvailableListings',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                title: 'Sea View Flat',
-                                pricePerNight: 120,
-                                location: 'Brighton',
-                                maxGuests: 4,
+                              {
+                                keyword: 'Then',
+                                text: 'AvailableListings',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Sea View Flat',
+                                  pricePerNight: 120,
+                                  location: 'Brighton',
+                                  maxGuests: 4,
+                                },
                               },
-                            },
-                          ],
-                        },
-                        {
-                          description: 'Listing removed disappears from search results',
-                          when: [
-                            {
-                              eventRef: 'ListingRemoved',
-                              exampleData: {
-                                propertyId: 'listing_123',
+                            ],
+                          },
+                          {
+                            name: 'Listing removed disappears from search results',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'ListingRemoved',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                },
                               },
-                            },
-                          ],
-                          then: [
-                            {
-                              stateRef: 'AvailableListings',
-                              exampleData: {},
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'AvailableListings',
+                                docString: {},
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -312,7 +322,7 @@ describe('projection.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: { name: '', rules: [] },
+                specs: [],
               },
             },
           ],
@@ -395,35 +405,40 @@ describe('projection.ts.ejs', () => {
               },
               server: {
                 description: 'handles todo operations',
-                specs: {
-                  name: 'Manage todo command',
-                  rules: [
-                    {
-                      description: 'Should handle todo operations',
-                      examples: [
-                        {
-                          description: 'User adds todo',
-                          when: {
-                            commandRef: 'AddTodo',
-                            exampleData: {
-                              todoId: 'todo_123',
-                              title: 'Buy milk',
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'TodoAdded',
-                              exampleData: {
-                                todoId: 'todo_123',
-                                title: 'Buy milk',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Manage todo command',
+                    rules: [
+                      {
+                        name: 'Should handle todo operations',
+                        examples: [
+                          {
+                            name: 'User adds todo',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'AddTodo',
+                                docString: {
+                                  todoId: 'todo_123',
+                                  title: 'Buy milk',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'TodoAdded',
+                                docString: {
+                                  todoId: 'todo_123',
+                                  title: 'Buy milk',
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
             {
@@ -448,36 +463,39 @@ describe('projection.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: {
-                  name: 'View summary query',
-                  rules: [
-                    {
-                      description: 'Should aggregate todo counts',
-                      examples: [
-                        {
-                          description: 'Todo added updates count',
-                          when: [
-                            {
-                              eventRef: 'TodoAdded',
-                              exampleData: {
-                                todoId: 'todo_123',
-                                title: 'Buy milk',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'View summary query',
+                    rules: [
+                      {
+                        name: 'Should aggregate todo counts',
+                        examples: [
+                          {
+                            name: 'Todo added updates count',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'TodoAdded',
+                                docString: {
+                                  todoId: 'todo_123',
+                                  title: 'Buy milk',
+                                },
                               },
-                            },
-                          ],
-                          then: [
-                            {
-                              stateRef: 'TodoSummary',
-                              exampleData: {
-                                totalCount: 1,
+                              {
+                                keyword: 'Then',
+                                text: 'TodoSummary',
+                                docString: {
+                                  totalCount: 1,
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -600,37 +618,42 @@ describe('projection.ts.ejs', () => {
               },
               server: {
                 description: 'handles user project operations',
-                specs: {
-                  name: 'Manage user project command',
-                  rules: [
-                    {
-                      description: 'Should handle user project operations',
-                      examples: [
-                        {
-                          description: 'User joins project',
-                          when: {
-                            commandRef: 'JoinProject',
-                            exampleData: {
-                              userId: 'user_123',
-                              projectId: 'proj_456',
-                              role: 'developer',
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'UserJoinedProject',
-                              exampleData: {
-                                userId: 'user_123',
-                                projectId: 'proj_456',
-                                role: 'developer',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Manage user project command',
+                    rules: [
+                      {
+                        name: 'Should handle user project operations',
+                        examples: [
+                          {
+                            name: 'User joins project',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'JoinProject',
+                                docString: {
+                                  userId: 'user_123',
+                                  projectId: 'proj_456',
+                                  role: 'developer',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'UserJoinedProject',
+                                docString: {
+                                  userId: 'user_123',
+                                  projectId: 'proj_456',
+                                  role: 'developer',
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
             {
@@ -655,39 +678,42 @@ describe('projection.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: {
-                  name: 'View user projects query',
-                  rules: [
-                    {
-                      description: 'Should track user project memberships',
-                      examples: [
-                        {
-                          description: 'User joins project',
-                          when: [
-                            {
-                              eventRef: 'UserJoinedProject',
-                              exampleData: {
-                                userId: 'user_123',
-                                projectId: 'proj_456',
-                                role: 'developer',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'View user projects query',
+                    rules: [
+                      {
+                        name: 'Should track user project memberships',
+                        examples: [
+                          {
+                            name: 'User joins project',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'UserJoinedProject',
+                                docString: {
+                                  userId: 'user_123',
+                                  projectId: 'proj_456',
+                                  role: 'developer',
+                                },
                               },
-                            },
-                          ],
-                          then: [
-                            {
-                              stateRef: 'UserProject',
-                              exampleData: {
-                                userId: 'user_123',
-                                projectId: 'proj_456',
-                                role: 'developer',
+                              {
+                                keyword: 'Then',
+                                text: 'UserProject',
+                                docString: {
+                                  userId: 'user_123',
+                                  projectId: 'proj_456',
+                                  role: 'developer',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],

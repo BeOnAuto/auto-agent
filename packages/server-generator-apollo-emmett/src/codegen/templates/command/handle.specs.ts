@@ -19,40 +19,45 @@ describe('generateScaffoldFilePlans', () => {
               },
               server: {
                 description: 'test',
-                specs: {
-                  name: 'Create listing command',
-                  rules: [
-                    {
-                      description: 'Should create listing successfully',
-                      examples: [
-                        {
-                          description: 'User creates listing with valid data',
-                          when: {
-                            commandRef: 'CreateListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                              title: 'Modern Downtown Apartment',
-                              listedAt: '2024-01-15T10:00:00Z',
-                              rating: 4.8,
-                              metadata: { foo: 'bar' },
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'ListingCreated',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                listedAt: '2024-01-15T10:00:00Z',
-                                rating: 4.8,
-                                metadata: { foo: 'bar' },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Create listing command',
+                    rules: [
+                      {
+                        name: 'Should create listing successfully',
+                        examples: [
+                          {
+                            name: 'User creates listing with valid data',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'CreateListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Modern Downtown Apartment',
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                  rating: 4.8,
+                                  metadata: { foo: 'bar' },
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'ListingCreated',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                  rating: 4.8,
+                                  metadata: { foo: 'bar' },
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
                 data: [
                   {
                     target: {
@@ -181,35 +186,40 @@ describe('generateScaffoldFilePlans', () => {
                     },
                   },
                 ],
-                specs: {
-                  name: 'Suggest items command',
-                  rules: [
-                    {
-                      description: 'Should suggest items successfully',
-                      examples: [
-                        {
-                          description: 'User requests item suggestions',
-                          when: {
-                            commandRef: 'SuggestItems',
-                            exampleData: {
-                              sessionId: 'session-123',
-                              prompt: 'What should I buy?',
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'ItemsSuggested',
-                              exampleData: {
-                                sessionId: 'session-123',
-                                items: [],
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Suggest items command',
+                    rules: [
+                      {
+                        name: 'Should suggest items successfully',
+                        examples: [
+                          {
+                            name: 'User requests item suggestions',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'SuggestItems',
+                                docString: {
+                                  sessionId: 'session-123',
+                                  prompt: 'What should I buy?',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'ItemsSuggested',
+                                docString: {
+                                  sessionId: 'session-123',
+                                  items: [],
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],

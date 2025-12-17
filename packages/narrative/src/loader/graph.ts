@@ -8,6 +8,7 @@ import {
   parseIntegrationImports,
   parseGivenTypeArguments,
   parseWhenTypeArguments,
+  parseThenTypeArguments,
   patchImportMeta,
   transpileToCjs,
   TypeInfo,
@@ -312,8 +313,12 @@ export async function buildGraph(
   function extractTypeInfoFromProgram(
     program: import('typescript').Program,
     checker: import('typescript').TypeChecker,
-  ): Map<string, import('./ts-utils').GivenTypeInfo[]> {
+  ): {
+    whenTypes: Map<string, import('./ts-utils').GivenTypeInfo[]>;
+    thenTypes: Map<string, import('./ts-utils').GivenTypeInfo[]>;
+  } {
     const whenTypesByFile: Map<string, import('./ts-utils').GivenTypeInfo[]> = new Map();
+    const thenTypesByFile: Map<string, import('./ts-utils').GivenTypeInfo[]> = new Map();
 
     for (const sourceFile of program.getSourceFiles()) {
       const posixPath = toPosix(sourceFile.fileName);
@@ -322,24 +327,35 @@ export async function buildGraph(
       const fileTypeMap = typesByFile.get(posixPath) || new Map();
       const extractedGivenTypes = parseGivenTypeArguments(ts, checker, sourceFile, fileTypeMap, typesByFile);
       const extractedWhenTypes = parseWhenTypeArguments(ts, checker, sourceFile, fileTypeMap, typesByFile);
+      const extractedThenTypes = parseThenTypeArguments(ts, checker, sourceFile, fileTypeMap, typesByFile);
 
       if (extractedGivenTypes.length > 0) {
         givenTypesByFile.set(posixPath, extractedGivenTypes);
-        debug('[given-types] extracted %d .given<T>() calls from %s', extractedGivenTypes.length, posixPath);
+        debug('[given-types] extracted %d given<T>() calls from %s', extractedGivenTypes.length, posixPath);
       }
 
       if (extractedWhenTypes.length > 0) {
         whenTypesByFile.set(posixPath, extractedWhenTypes);
         debug(
-          '[when-types] extracted %d .when<T>() calls from %s: %o',
+          '[when-types] extracted %d when<T>() calls from %s: %o',
           extractedWhenTypes.length,
           posixPath,
           extractedWhenTypes.map((t) => ({ typeName: t.typeName, classification: t.classification })),
         );
       }
+
+      if (extractedThenTypes.length > 0) {
+        thenTypesByFile.set(posixPath, extractedThenTypes);
+        debug(
+          '[then-types] extracted %d then<T>() calls from %s: %o',
+          extractedThenTypes.length,
+          posixPath,
+          extractedThenTypes.map((t) => ({ typeName: t.typeName, classification: t.classification })),
+        );
+      }
     }
 
-    return whenTypesByFile;
+    return { whenTypes: whenTypesByFile, thenTypes: thenTypesByFile };
   }
 
   for (const entry of entryFiles) {
@@ -352,9 +368,10 @@ export async function buildGraph(
   const program = ts.createProgram([...sourceFiles.keys()], compilerOptions, host);
   const checker = program.getTypeChecker();
 
-  const whenTypesByFile = extractTypeInfoFromProgram(program, checker);
+  const { whenTypes, thenTypes } = extractTypeInfoFromProgram(program, checker);
 
-  givenTypesByFile.set('__whenTypes', whenTypesByFile as unknown as import('./ts-utils').GivenTypeInfo[]);
+  givenTypesByFile.set('__whenTypes', whenTypes as unknown as import('./ts-utils').GivenTypeInfo[]);
+  givenTypesByFile.set('__thenTypes', thenTypes as unknown as import('./ts-utils').GivenTypeInfo[]);
 
   const result: BuildGraphResult = {
     graph,

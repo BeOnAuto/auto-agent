@@ -64,32 +64,36 @@ describe('getNarratives', (_mode) => {
           expect(createItemSlice.client.specs[0].children).toHaveLength(1);
         }
         expect(createItemSlice.server.specs).toBeDefined();
-        const spec = createItemSlice.server.specs;
-        expect(spec.name).toBeDefined();
+        expect(Array.isArray(createItemSlice.server.specs)).toBe(true);
+        expect(createItemSlice.server.specs).toHaveLength(1);
+        const spec = createItemSlice.server.specs[0];
+        expect(spec.feature).toBeDefined();
         expect(spec.rules).toHaveLength(1);
         const rule = spec.rules[0];
-        expect(rule.description).toBeDefined();
+        expect(rule.name).toBeDefined();
         expect(rule.examples).toHaveLength(1);
         const example = rule.examples[0];
-        expect(typeof example.when === 'object' && !Array.isArray(example.when)).toBe(true);
-        if (typeof example.when === 'object' && !Array.isArray(example.when)) {
-          if ('commandRef' in example.when) {
-            expect(example.when.commandRef).toBe('CreateItem');
-          }
-          expect(example.when.exampleData).toMatchObject({
+        expect(example.steps).toBeDefined();
+        expect(example.steps.length).toBeGreaterThanOrEqual(2);
+        const whenStep = example.steps.find((s) => s.keyword === 'When');
+        const thenStep = example.steps.find((s) => s.keyword === 'Then');
+        expect(whenStep).toBeDefined();
+        expect(thenStep).toBeDefined();
+        if (whenStep && 'text' in whenStep) {
+          expect(whenStep.text).toBe('CreateItem');
+          expect(whenStep.docString).toMatchObject({
             itemId: 'item_123',
             description: 'A new item',
           });
         }
-        expect(example.then).toHaveLength(1);
-        expect(example.then[0]).toMatchObject({
-          eventRef: 'ItemCreated',
-          exampleData: {
+        if (thenStep && 'text' in thenStep) {
+          expect(thenStep.text).toBe('ItemCreated');
+          expect(thenStep.docString).toMatchObject({
             id: 'item_123',
             description: 'A new item',
             addedAt: new Date('2024-01-15T10:00:00.000Z'),
-          },
-        });
+          });
+        }
       }
 
       const viewItemSlice = items.slices[1] as QuerySlice;
@@ -116,7 +120,8 @@ describe('getNarratives', (_mode) => {
       expect(data[0].origin).toMatchObject({ name: 'ItemsProjection', type: 'projection' });
 
       const specs = viewItemSlice?.server?.specs;
-      if (specs == null || specs.name === '') throw new Error('No specs found in view items slice');
+      if (specs == null || specs.length === 0 || specs[0].feature === '')
+        throw new Error('No specs found in view items slice');
       expect(specs).toBeDefined();
     }
 
@@ -137,28 +142,32 @@ describe('getNarratives', (_mode) => {
           expect(submitOrderSlice.client.specs[0].children).toHaveLength(2);
         }
         expect(submitOrderSlice.server.specs).toBeDefined();
-        const spec = submitOrderSlice.server.specs;
+        expect(Array.isArray(submitOrderSlice.server.specs)).toBe(true);
+        expect(submitOrderSlice.server.specs).toHaveLength(1);
+        const spec = submitOrderSlice.server.specs[0];
         expect(spec.rules).toHaveLength(1);
         const rule = spec.rules[0];
         expect(rule.examples).toHaveLength(1);
         const example = rule.examples[0];
-        expect(typeof example.when === 'object' && !Array.isArray(example.when)).toBe(true);
-        if (typeof example.when === 'object' && !Array.isArray(example.when)) {
-          if ('commandRef' in example.when) {
-            expect(example.when.commandRef).toBe('PlaceOrder');
-          }
-          expect(example.when.exampleData).toMatchObject({ productId: 'product_789', quantity: 3 });
+        expect(example.steps).toBeDefined();
+        expect(example.steps.length).toBeGreaterThanOrEqual(2);
+        const whenStep = example.steps.find((s) => s.keyword === 'When');
+        const thenStep = example.steps.find((s) => s.keyword === 'Then');
+        expect(whenStep).toBeDefined();
+        expect(thenStep).toBeDefined();
+        if (whenStep && 'text' in whenStep) {
+          expect(whenStep.text).toBe('PlaceOrder');
+          expect(whenStep.docString).toMatchObject({ productId: 'product_789', quantity: 3 });
         }
-        expect(example.then).toHaveLength(1);
-        expect(example.then[0]).toMatchObject({
-          eventRef: 'OrderPlaced',
-          exampleData: {
+        if (thenStep && 'text' in thenStep) {
+          expect(thenStep.text).toBe('OrderPlaced');
+          expect(thenStep.docString).toMatchObject({
             orderId: 'order_001',
             productId: 'product_789',
             quantity: 3,
             placedAt: new Date('2024-01-20T10:00:00.000Z'),
-          },
-        });
+          });
+        }
       }
     }
 
@@ -240,16 +249,15 @@ describe('getNarratives', (_mode) => {
       if (slice.type === 'react') {
         expect(slice.server).toBeDefined();
         expect(slice.server.specs).toBeDefined();
-        expect(typeof slice.server.specs === 'object' && !Array.isArray(slice.server.specs)).toBe(true);
-        const spec = slice.server.specs;
+        expect(Array.isArray(slice.server.specs)).toBe(true);
+        expect(slice.server.specs.length).toBeGreaterThanOrEqual(1);
+        const spec = slice.server.specs[0];
         expect(spec.rules).toBeDefined();
         expect(Array.isArray(spec.rules)).toBe(true);
         spec.rules.forEach((rule) => {
           rule.examples.forEach((example) => {
-            expect(example.when).toBeDefined();
-            expect(Array.isArray(example.when)).toBe(true);
-            expect(example.then).toBeDefined();
-            expect(Array.isArray(example.then)).toBe(true);
+            expect(example.steps).toBeDefined();
+            expect(Array.isArray(example.steps)).toBe(true);
           });
         });
       }
@@ -311,16 +319,14 @@ describe('getNarratives', (_mode) => {
     const commandSlice = testFlowWithIds.slices.find((s) => s.name === 'Create test item');
     if (commandSlice?.type !== 'command') return;
 
-    expect(commandSlice.server.specs.rules).toHaveLength(2);
+    expect(commandSlice.server.specs[0].rules).toHaveLength(2);
 
-    const rule1 = commandSlice.server.specs.rules.find(
-      (r) => r.description === 'Valid test items should be created successfully',
+    const rule1 = commandSlice.server.specs[0].rules.find(
+      (r) => r.name === 'Valid test items should be created successfully',
     );
     expect(rule1?.id).toBe('RULE-001');
 
-    const rule2 = commandSlice.server.specs.rules.find(
-      (r) => r.description === 'Invalid test items should be rejected',
-    );
+    const rule2 = commandSlice.server.specs[0].rules.find((r) => r.name === 'Invalid test items should be rejected');
     expect(rule2?.id).toBe('RULE-002');
   });
 
@@ -334,11 +340,9 @@ describe('getNarratives', (_mode) => {
     const querySlice = testFlowWithIds.slices.find((s) => s.name === 'Get test items');
     if (querySlice?.type !== 'query') return;
 
-    expect(querySlice.server.specs.rules).toHaveLength(1);
+    expect(querySlice.server.specs[0].rules).toHaveLength(1);
 
-    const rule3 = querySlice.server.specs.rules.find(
-      (r) => r.description === 'Items should be retrievable after creation',
-    );
+    const rule3 = querySlice.server.specs[0].rules.find((r) => r.name === 'Items should be retrievable after creation');
     expect(rule3?.id).toBe('RULE-003');
   });
 
@@ -352,11 +356,9 @@ describe('getNarratives', (_mode) => {
     const reactSlice = testFlowWithIds.slices.find((s) => s.name === 'React to test event');
     if (reactSlice?.type !== 'react') return;
 
-    expect(reactSlice.server.specs.rules).toHaveLength(1);
+    expect(reactSlice.server.specs[0].rules).toHaveLength(1);
 
-    const rule4 = reactSlice.server.specs.rules.find(
-      (r) => r.description === 'System should react to test item creation',
-    );
+    const rule4 = reactSlice.server.specs[0].rules.find((r) => r.name === 'System should react to test item creation');
     expect(rule4?.id).toBe('RULE-004');
   });
 
@@ -376,16 +378,10 @@ describe('getNarratives', (_mode) => {
       expect(submitSlice?.type).toBe('command');
 
       if (submitSlice?.type === 'command') {
-        const example = submitSlice.server?.specs?.rules[0]?.examples[0];
-        if (
-          example !== null &&
-          example !== undefined &&
-          typeof example.when === 'object' &&
-          example.when !== null &&
-          !Array.isArray(example.when) &&
-          'commandRef' in example.when
-        ) {
-          expect(example.when.commandRef).toBe('SubmitQuestionnaire');
+        const example = submitSlice.server?.specs?.[0]?.rules[0]?.examples[0];
+        const whenStep = example?.steps?.find((s) => s.keyword === 'When');
+        if (whenStep && 'text' in whenStep) {
+          expect(whenStep.text).toBe('SubmitQuestionnaire');
         }
       }
     }
@@ -644,7 +640,7 @@ flow('questionnaires-test', () => {
 
     if (querySlice?.type !== 'query') return;
 
-    const example = querySlice.server.specs.rules[0]?.examples[0];
+    const example = querySlice.server.specs[0].rules[0]?.examples[0];
     expect(example).toBeDefined();
 
     if (example !== null && example !== undefined) {
@@ -797,44 +793,42 @@ flow('Todo List', () => {
 
     if (summarySlice?.type !== 'query') return;
 
-    const example = summarySlice.server.specs.rules[0]?.examples[0];
+    const example = summarySlice.server.specs[0].rules[0]?.examples[0];
     expect(example).toBeDefined();
-    expect(example.given).toBeDefined();
-    expect(Array.isArray(example.given)).toBe(true);
-    expect(example.given).toHaveLength(5);
+    expect(example.steps).toBeDefined();
+    expect(Array.isArray(example.steps)).toBe(true);
 
-    if (!example.given) {
-      throw new Error('expected example.given to be defined');
-    }
+    const givenAndSteps = example.steps.filter((s) => s.keyword === 'Given' || s.keyword === 'And');
+    expect(givenAndSteps).toHaveLength(5);
 
-    validateGivenItemsHaveEventRef(example.given);
-    validateTodoEventRefs(example.given);
+    validateGivenItemsHaveEventRef(givenAndSteps);
+    validateTodoEventRefs(givenAndSteps);
     validateTodoMessages(model);
   });
 });
 
-function validateGivenItemsHaveEventRef(given: unknown[]): void {
-  for (let i = 0; i < given.length; i++) {
-    const givenItem = given[i];
-    if (typeof givenItem === 'object' && givenItem !== null) {
-      expect('eventRef' in givenItem).toBe(true);
-      expect('stateRef' in givenItem).toBe(false);
+function validateGivenItemsHaveEventRef(givenSteps: unknown[]): void {
+  for (let i = 0; i < givenSteps.length; i++) {
+    const step = givenSteps[i] as { keyword?: string; text?: string };
+    if (typeof step === 'object' && step !== null) {
+      expect(step.keyword === 'Given' || step.keyword === 'And').toBe(true);
+      expect('text' in step).toBe(true);
     }
   }
 }
 
-function expectEventRef(item: unknown, expectedType: string): void {
-  if (item !== null && item !== undefined && typeof item === 'object' && 'eventRef' in item) {
-    expect(item.eventRef).toBe(expectedType);
+function expectStepText(step: unknown, expectedType: string): void {
+  if (step !== null && step !== undefined && typeof step === 'object' && 'text' in step) {
+    expect((step as { text: string }).text).toBe(expectedType);
   }
 }
 
-function validateTodoEventRefs(given: unknown[]): void {
-  expectEventRef(given[0], 'TodoAdded');
-  expectEventRef(given[1], 'TodoAdded');
-  expectEventRef(given[2], 'TodoAdded');
-  expectEventRef(given[3], 'TodoMarkedInProgress');
-  expectEventRef(given[4], 'TodoMarkedComplete');
+function validateTodoEventRefs(givenSteps: unknown[]): void {
+  expectStepText(givenSteps[0], 'TodoAdded');
+  expectStepText(givenSteps[1], 'TodoAdded');
+  expectStepText(givenSteps[2], 'TodoAdded');
+  expectStepText(givenSteps[3], 'TodoMarkedInProgress');
+  expectStepText(givenSteps[4], 'TodoMarkedComplete');
 }
 
 function validateTodoMessages(model: Model): void {
@@ -859,16 +853,10 @@ function validateSubmitQuestionnaireCommand(questionnaireFlow: Narrative): void 
   const submitSlice = questionnaireFlow.slices.find((s) => s.name === 'submits questionnaire');
   expect(submitSlice?.type).toBe('command');
   if (submitSlice?.type === 'command') {
-    const example = submitSlice.server?.specs?.rules[0]?.examples[0];
-    if (
-      example !== null &&
-      example !== undefined &&
-      typeof example.when === 'object' &&
-      example.when !== null &&
-      !Array.isArray(example.when) &&
-      'commandRef' in example.when
-    ) {
-      expect(example.when.commandRef).toBe('SubmitQuestionnaire');
+    const example = submitSlice.server?.specs?.[0]?.rules[0]?.examples[0];
+    const whenStep = example?.steps?.find((s) => s.keyword === 'When');
+    if (whenStep && 'text' in whenStep) {
+      expect(whenStep.text).toBe('SubmitQuestionnaire');
     }
   }
 }
@@ -881,15 +869,11 @@ function validateQuestionAnsweredEvent(model: Model): void {
 function validateGivenSectionEventRefs(questionnaireFlow: Narrative): void {
   const viewsSlice = questionnaireFlow.slices.find((s) => s.name === 'views progress');
   if (viewsSlice?.type === 'query') {
-    const example = viewsSlice.server?.specs?.rules[0]?.examples[0];
-    if (example?.given && Array.isArray(example.given) && example.given.length > 0) {
-      const givenItem = example.given[0];
-      if (typeof givenItem === 'object' && givenItem !== null) {
-        expect('eventRef' in givenItem).toBe(true);
-        expect('stateRef' in givenItem).toBe(false);
-        if ('eventRef' in givenItem) {
-          expect(givenItem.eventRef).toBe('QuestionAnswered');
-        }
+    const example = viewsSlice.server?.specs?.[0]?.rules[0]?.examples[0];
+    if (example?.steps !== undefined && Array.isArray(example.steps)) {
+      const givenStep = example.steps.find((s) => s.keyword === 'Given');
+      if (givenStep && 'text' in givenStep) {
+        expect(givenStep.text).toBe('QuestionAnswered');
       }
     }
   }
@@ -903,53 +887,51 @@ function validateCurrentQuestionIdType(model: Model): void {
 }
 
 function validateMixedGivenTypes(example: Example): void {
-  expect(example.description).toBe('system with 2 items reaches max of 2');
-  expect(example.given).toBeDefined();
-  expect(Array.isArray(example.given)).toBe(true);
+  expect(example.name).toBe('system with 2 items reaches max of 2');
+  expect(example.steps).toBeDefined();
+  expect(Array.isArray(example.steps)).toBe(true);
 
-  if (!example.given) return;
+  const givenSteps = example.steps.filter((s) => s.keyword === 'Given' || s.keyword === 'And');
+  expect(givenSteps).toHaveLength(4);
 
-  expect(example.given).toHaveLength(4);
-
-  const firstGiven = example.given[0];
-  expect('stateRef' in firstGiven).toBe(true);
-  expect('eventRef' in firstGiven).toBe(false);
-  if ('stateRef' in firstGiven) {
-    expect(firstGiven.stateRef).toBe('ConfigState');
+  const firstGiven = givenSteps[0];
+  expect('text' in firstGiven).toBe(true);
+  if ('text' in firstGiven) {
+    expect(firstGiven.text).toBe('ConfigState');
   }
 
-  const secondGiven = example.given[1];
-  expect('eventRef' in secondGiven).toBe(true);
-  if ('eventRef' in secondGiven) {
-    expect(secondGiven.eventRef).toBe('SystemInitialized');
+  const secondGiven = givenSteps[1];
+  expect('text' in secondGiven).toBe(true);
+  if ('text' in secondGiven) {
+    expect(secondGiven.text).toBe('SystemInitialized');
   }
 
-  const thirdGiven = example.given[2];
-  expect('eventRef' in thirdGiven).toBe(true);
-  if ('eventRef' in thirdGiven) {
-    expect(thirdGiven.eventRef).toBe('ItemAdded');
+  const thirdGiven = givenSteps[2];
+  expect('text' in thirdGiven).toBe(true);
+  if ('text' in thirdGiven) {
+    expect(thirdGiven.text).toBe('ItemAdded');
   }
 
-  const fourthGiven = example.given[3];
-  expect('eventRef' in fourthGiven).toBe(true);
-  if ('eventRef' in fourthGiven) {
-    expect(fourthGiven.eventRef).toBe('ItemAdded');
+  const fourthGiven = givenSteps[3];
+  expect('text' in fourthGiven).toBe(true);
+  if ('text' in fourthGiven) {
+    expect(fourthGiven.text).toBe('ItemAdded');
   }
 }
 
 function validateEmptyWhenClause(example: Example): void {
-  expect(example.when).toBeUndefined();
+  const whenStep = example.steps.find((s) => s.keyword === 'When');
+  expect(whenStep).toBeUndefined();
 }
 
 function validateThenClause(example: Example): void {
-  expect(example.then).toBeDefined();
-  expect(Array.isArray(example.then)).toBe(true);
-  expect(example.then).toHaveLength(1);
+  const thenSteps = example.steps.filter((s) => s.keyword === 'Then');
+  expect(thenSteps).toHaveLength(1);
 
-  const thenOutcome = example.then[0];
-  expect('stateRef' in thenOutcome).toBe(true);
-  if ('stateRef' in thenOutcome) {
-    expect(thenOutcome.stateRef).toBe('SystemStatus');
+  const thenOutcome = thenSteps[0];
+  expect('text' in thenOutcome).toBe(true);
+  if ('text' in thenOutcome) {
+    expect(thenOutcome.text).toBe('SystemStatus');
   }
 }
 
@@ -1122,7 +1104,7 @@ function getQuestionnaireFlowFromModel(model: Model): Narrative {
 
 function getSubmitSlice(questionnaireFlow: Narrative): {
   type: 'command';
-  server: { specs: { rules: { examples: unknown[] }[] } };
+  server: { specs: { type: 'gherkin'; feature: string; rules: { examples: unknown[] }[] }[] };
 } {
   const submitSlice = questionnaireFlow.slices.find((s) => s.name === 'submits the questionnaire');
   expect(submitSlice).toBeDefined();
@@ -1130,26 +1112,32 @@ function getSubmitSlice(questionnaireFlow: Narrative): {
   if (submitSlice?.type !== 'command') {
     throw new Error('Submit slice is not a command');
   }
-  return submitSlice as { type: 'command'; server: { specs: { rules: { examples: unknown[] }[] } } };
+  return submitSlice as {
+    type: 'command';
+    server: { specs: { type: 'gherkin'; feature: string; rules: { examples: unknown[] }[] }[] };
+  };
 }
 
-function getSubmitExample(submitSlice: { server: { specs: { rules: { examples: unknown[] }[] } } }): unknown {
-  const rule = submitSlice.server?.specs?.rules[0];
+function getSubmitExample(submitSlice: {
+  server: { specs: { type: 'gherkin'; feature: string; rules: { examples: unknown[] }[] }[] };
+}): unknown {
+  const rule = submitSlice.server?.specs?.[0]?.rules[0];
   expect(rule).toBeDefined();
   expect(rule?.examples).toHaveLength(1);
   const example = rule?.examples[0];
-  expect((example as { description?: string })?.description).toBe('submits the questionnaire successfully');
+  expect((example as { name?: string })?.name).toBe('submits the questionnaire successfully');
   return example;
 }
 
 function validateSubmitCommandRef(example: unknown): void {
-  const ex = example as { when?: { commandRef?: string } };
-  expect(ex?.when).toBeDefined();
-  if (typeof ex?.when === 'object' && ex.when !== null && !Array.isArray(ex.when) && 'commandRef' in ex.when) {
-    expect(ex.when.commandRef).toBe('SubmitQuestionnaire');
-    expect(ex.when.commandRef).not.toBe('SendQuestionnaireLink');
+  const ex = example as { steps?: { keyword: string; text?: string }[] };
+  expect(ex?.steps).toBeDefined();
+  const whenStep = ex?.steps?.find((s) => s.keyword === 'When');
+  if (whenStep && 'text' in whenStep) {
+    expect(whenStep.text).toBe('SubmitQuestionnaire');
+    expect(whenStep.text).not.toBe('SendQuestionnaireLink');
   } else {
-    throw new Error('Expected when to have commandRef property');
+    throw new Error('Expected steps to have a When step with text property');
   }
 }
 
@@ -1157,10 +1145,11 @@ function validateLinkSliceCommandRef(questionnaireFlow: Narrative): void {
   const linkSlice = questionnaireFlow.slices.find((s) => s.name === 'sends the questionnaire link');
   expect(linkSlice?.type).toBe('command');
   if (linkSlice?.type === 'command') {
-    const linkExample = linkSlice.server?.specs?.rules[0]?.examples[0];
-    const ex = linkExample as { when?: { commandRef?: string } };
-    if (typeof ex?.when === 'object' && ex.when !== null && !Array.isArray(ex.when) && 'commandRef' in ex.when) {
-      expect(ex.when.commandRef).toBe('SendQuestionnaireLink');
+    const linkExample = linkSlice.server?.specs?.[0]?.rules[0]?.examples[0];
+    const ex = linkExample as { steps?: { keyword: string; text?: string }[] };
+    const whenStep = ex?.steps?.find((s) => s.keyword === 'When');
+    if (whenStep && 'text' in whenStep) {
+      expect(whenStep.text).toBe('SendQuestionnaireLink');
     }
   }
 }
@@ -1187,21 +1176,23 @@ function getSubmitSliceFromFlow(questionnaireFlow: Narrative): unknown {
 }
 
 function getServerSpecsFromSlice(submitSlice: unknown): unknown {
-  const slice = submitSlice as { server?: { specs?: unknown } };
+  const slice = submitSlice as { server?: { specs?: unknown[] } };
   const serverSpecs = slice.server?.specs;
   expect(serverSpecs).toBeDefined();
-  const specs = serverSpecs as { rules?: unknown[] };
-  expect(specs?.rules).toBeDefined();
-  expect(specs?.rules).toHaveLength(1);
-  return serverSpecs;
+  expect(Array.isArray(serverSpecs)).toBe(true);
+  expect(serverSpecs).toHaveLength(1);
+  const firstSpec = (serverSpecs as unknown[])[0] as { rules?: unknown[] };
+  expect(firstSpec?.rules).toBeDefined();
+  expect(firstSpec?.rules).toHaveLength(1);
+  return firstSpec;
 }
 
 function getFirstRuleFromSpecs(serverSpecs: unknown): unknown {
   const specs = serverSpecs as { rules?: unknown[] };
   const rule = specs?.rules?.[0];
   expect(rule).toBeDefined();
-  const r = rule as { description?: string; examples?: unknown[] };
-  expect(r?.description).toBe('questionnaire allowed to be submitted when all questions are answered');
+  const r = rule as { name?: string; examples?: unknown[] };
+  expect(r?.name).toBe('questionnaire allowed to be submitted when all questions are answered');
   expect(r?.examples).toBeDefined();
   expect(r?.examples).toHaveLength(1);
   return rule;
@@ -1211,37 +1202,38 @@ function getFirstExampleFromRule(rule: unknown): unknown {
   const r = rule as { examples?: unknown[] };
   const example = r?.examples?.[0];
   expect(example).toBeDefined();
-  const ex = example as { description?: string };
-  expect(ex?.description).toBe('submits the questionnaire successfully');
+  const ex = example as { name?: string };
+  expect(ex?.name).toBe('submits the questionnaire successfully');
   return example;
 }
 
 function validateExampleCommandRef(example: unknown): void {
-  const ex = example as { when?: { commandRef?: string; exampleData?: unknown } };
-  expect(ex?.when).toBeDefined();
-  if (typeof ex?.when === 'object' && ex.when !== null && !Array.isArray(ex.when) && 'commandRef' in ex.when) {
-    expect(ex.when.commandRef).toBe('SubmitQuestionnaire');
-    expect(ex.when.commandRef).not.toBe('SendQuestionnaireLink');
-    expect(ex.when.exampleData).toEqual({
+  const ex = example as { steps?: Array<{ keyword: string; text?: string; docString?: unknown }> };
+  expect(ex?.steps).toBeDefined();
+  const whenStep = ex?.steps?.find((s) => s.keyword === 'When');
+  expect(whenStep).toBeDefined();
+  if (whenStep && 'text' in whenStep) {
+    expect(whenStep.text).toBe('SubmitQuestionnaire');
+    expect(whenStep.text).not.toBe('SendQuestionnaireLink');
+    expect(whenStep.docString).toEqual({
       questionnaireId: 'q-001',
       participantId: 'participant-abc',
     });
   } else {
-    throw new Error('Expected when to have commandRef property');
+    throw new Error('Expected when step to have text property');
   }
 }
 
 function validateThenEvents(example: unknown): void {
-  const ex = example as { then?: unknown[] };
-  expect(ex?.then).toBeDefined();
-  expect(Array.isArray(ex?.then)).toBe(true);
-  expect(ex?.then).toHaveLength(1);
+  const ex = example as { steps?: Array<{ keyword: string; text?: string; docString?: unknown }> };
+  expect(ex?.steps).toBeDefined();
+  const thenSteps = ex?.steps?.filter((s) => s.keyword === 'Then');
+  expect(thenSteps).toHaveLength(1);
 
-  const thenEvent = ex?.then?.[0];
-  if (thenEvent !== null && thenEvent !== undefined && 'eventRef' in (thenEvent as object)) {
-    const event = thenEvent as { eventRef?: string; exampleData?: unknown };
-    expect(event.eventRef).toBe('QuestionnaireSubmitted');
-    expect(event.exampleData).toEqual({
+  const thenStep = thenSteps?.[0];
+  if (thenStep && 'text' in thenStep) {
+    expect(thenStep.text).toBe('QuestionnaireSubmitted');
+    expect(thenStep.docString).toEqual({
       questionnaireId: 'q-001',
       participantId: 'participant-abc',
       submittedAt: new Date('2030-01-01T09:00:00.000Z'),

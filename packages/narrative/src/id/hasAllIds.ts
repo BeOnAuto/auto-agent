@@ -1,16 +1,23 @@
-import { Model, Slice } from '../index';
+import { Model, Slice, Spec, Rule } from '../index';
 
 function hasValidId(item: { id?: string }): boolean {
   return item.id !== undefined && item.id !== '';
 }
 
+function hasRuleIds(rules: Rule[]): boolean {
+  return rules.every((rule) => hasValidId(rule));
+}
+
+function hasSpecIds(specs: Spec[]): boolean {
+  return specs.every((spec) => hasRuleIds(spec.rules));
+}
+
 function hasServerSpecIds(slice: Slice): boolean {
-  if (!('server' in slice) || slice.server?.specs?.rules === undefined) return true;
-  return slice.server.specs.rules.every(hasValidId);
+  if (!('server' in slice) || slice.server?.specs === undefined || !Array.isArray(slice.server.specs)) return true;
+  return hasSpecIds(slice.server.specs);
 }
 
 function hasClientSpecIds(_slice: Slice): boolean {
-  // Client specs use string rules (no IDs needed), so always valid
   return true;
 }
 

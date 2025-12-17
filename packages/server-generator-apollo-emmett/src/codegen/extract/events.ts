@@ -1,7 +1,6 @@
-import { EventExample } from '@auto-engineer/narrative';
-import { Message, MessageDefinition } from '../types';
+import type { Message, MessageDefinition, EventRef, ErrorRef } from '../types';
 import { extractFieldsFromMessage } from './fields';
-import { ReactGwtSpec } from './messages';
+import type { ReactGwtSpec } from './messages';
 
 function createEventMessage(
   eventRef: string | undefined,
@@ -27,7 +26,7 @@ function createEventMessage(
 }
 
 export function extractEventsFromThen(
-  thenItems: Array<EventExample | { errorType: string; message?: string }>,
+  thenItems: Array<EventRef | ErrorRef>,
   allMessages: MessageDefinition[],
   currentSliceName?: string,
   currentFlowName?: string,
@@ -41,7 +40,7 @@ export function extractEventsFromThen(
 }
 
 export function extractEventsFromGiven(
-  givenEvents: EventExample[] | undefined,
+  givenEvents: EventRef[] | undefined,
   allMessages: MessageDefinition[],
   currentSliceName?: string,
   currentFlowName?: string,

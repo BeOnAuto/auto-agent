@@ -31,7 +31,7 @@ describe('state.ts.ejs', () => {
                     },
                   },
                 ],
-                specs: { name: '', rules: [] },
+                specs: [],
               },
             },
           ],

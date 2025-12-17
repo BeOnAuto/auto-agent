@@ -24,36 +24,41 @@ const specVariant1: SpecsSchema = {
 
           server: {
             description: 'Handles creation logic',
-            specs: {
-              name: 'User can create an item',
-              rules: [
-                {
-                  description: 'Valid item data should create item successfully',
-                  examples: [
-                    {
-                      description: 'User creates a new item with valid data',
-                      when: {
-                        commandRef: 'CreateItem',
-                        exampleData: {
-                          itemId: 'item_123',
-                          description: 'A new item',
-                        },
-                      },
-                      then: [
-                        {
-                          eventRef: 'ItemCreated',
-                          exampleData: {
-                            id: 'item_123',
-                            description: 'A new item',
-                            addedAt: '2024-01-15T10:00:00.000Z',
+            specs: [
+              {
+                type: 'gherkin',
+                feature: 'User can create an item',
+                rules: [
+                  {
+                    name: 'Valid item data should create item successfully',
+                    examples: [
+                      {
+                        name: 'User creates a new item with valid data',
+                        steps: [
+                          {
+                            keyword: 'When',
+                            text: 'CreateItem',
+                            docString: {
+                              itemId: 'item_123',
+                              description: 'A new item',
+                            },
                           },
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
+                          {
+                            keyword: 'Then',
+                            text: 'ItemCreated',
+                            docString: {
+                              id: 'item_123',
+                              description: 'A new item',
+                              addedAt: '2024-01-15T10:00:00.000Z',
+                            },
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
         },
         {
@@ -83,39 +88,42 @@ const specVariant1: SpecsSchema = {
                 },
               },
             ],
-            specs: {
-              name: 'Items are available for viewing',
-              rules: [
-                {
-                  description: 'Item becomes available after creation event',
-                  examples: [
-                    {
-                      description: 'ItemCreated event makes item available',
-                      when: [
-                        {
-                          eventRef: 'ItemCreated',
-                          exampleData: {
-                            id: 'item_123',
-                            description: 'A new item',
-                            addedAt: '2024-01-15T10:00:00.000Z',
+            specs: [
+              {
+                type: 'gherkin',
+                feature: 'Items are available for viewing',
+                rules: [
+                  {
+                    name: 'Item becomes available after creation event',
+                    examples: [
+                      {
+                        name: 'ItemCreated event makes item available',
+                        steps: [
+                          {
+                            keyword: 'When',
+                            text: 'ItemCreated',
+                            docString: {
+                              id: 'item_123',
+                              description: 'A new item',
+                              addedAt: '2024-01-15T10:00:00.000Z',
+                            },
                           },
-                        },
-                      ],
-                      then: [
-                        {
-                          stateRef: 'AvailableItems',
-                          exampleData: {
-                            id: 'item_123',
-                            description: 'A new item',
-                            addedAt: '2024-01-15T10:00:00.000Z',
+                          {
+                            keyword: 'Then',
+                            text: 'AvailableItems',
+                            docString: {
+                              id: 'item_123',
+                              description: 'A new item',
+                              addedAt: '2024-01-15T10:00:00.000Z',
+                            },
                           },
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
         },
         {
@@ -124,38 +132,41 @@ const specVariant1: SpecsSchema = {
           description: 'Sends a notification command when a new item is created',
           server: {
             description: 'Triggers NotifyNewItem command in response to ItemCreated',
-            specs: {
-              name: 'Notify on new item creation',
-              rules: [
-                {
-                  description: 'Should send notification when item is created',
-                  examples: [
-                    {
-                      description: 'ItemCreated event triggers notification command',
-                      when: [
-                        {
-                          eventRef: 'ItemCreated',
-                          exampleData: {
-                            id: 'item_123',
-                            description: 'A new item',
-                            addedAt: '2024-01-15T10:00:00.000Z',
+            specs: [
+              {
+                type: 'gherkin',
+                feature: 'Notify on new item creation',
+                rules: [
+                  {
+                    name: 'Should send notification when item is created',
+                    examples: [
+                      {
+                        name: 'ItemCreated event triggers notification command',
+                        steps: [
+                          {
+                            keyword: 'When',
+                            text: 'ItemCreated',
+                            docString: {
+                              id: 'item_123',
+                              description: 'A new item',
+                              addedAt: '2024-01-15T10:00:00.000Z',
+                            },
                           },
-                        },
-                      ],
-                      then: [
-                        {
-                          commandRef: 'NotifyNewItem',
-                          exampleData: {
-                            itemId: 'item_123',
-                            message: 'A new item was added to the system.',
+                          {
+                            keyword: 'Then',
+                            text: 'NotifyNewItem',
+                            docString: {
+                              itemId: 'item_123',
+                              message: 'A new item was added to the system.',
+                            },
                           },
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
         },
       ],

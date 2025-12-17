@@ -1,4 +1,4 @@
-import { flow, specs, rule, example } from '../narrative';
+import { flow, specs, rule, example, thenError } from '../narrative';
 import { command, query, react } from '../fluent-builder';
 import { type Event, type Command, type State } from '../types';
 
@@ -27,6 +27,14 @@ type TestItemState = State<
   }
 >;
 
+type SendNotification = Event<
+  'SendNotification',
+  {
+    message: string;
+    recipientId: string;
+  }
+>;
+
 flow('Test Flow with IDs', 'FLOW-001', () => {
   command('Create test item', 'SLICE-001')
     .client(() => {})
@@ -46,17 +54,11 @@ flow('Test Flow with IDs', 'FLOW-001', () => {
         });
 
         rule('Invalid test items should be rejected', 'RULE-002', () => {
-          example('User tries to create item with empty name')
-            .when<CreateTestItem>({
-              itemId: 'test_456',
-              name: '',
-            })
-            .then([
-              {
-                errorType: 'ValidationError' as const,
-                message: 'Item name cannot be empty',
-              },
-            ]);
+          example('User tries to create item with empty name').when<CreateTestItem>({
+            itemId: 'test_456',
+            name: '',
+          });
+          thenError('ValidationError', 'Item name cannot be empty');
         });
       });
     });
@@ -84,25 +86,15 @@ flow('Test Flow with IDs', 'FLOW-001', () => {
     specs('Test event reaction specs', () => {
       rule('System should react to test item creation', 'RULE-004', () => {
         example('Notification sent when test item is created')
-          .when([
-            {
-              eventRef: 'TestItemCreated',
-              exampleData: {
-                id: 'test_789',
-                name: 'Another Test Item',
-                createdAt: new Date('2024-01-16T10:00:00Z'),
-              },
-            },
-          ])
-          .then([
-            {
-              commandRef: 'SendNotification',
-              exampleData: {
-                message: 'New test item created: Another Test Item',
-                recipientId: 'admin',
-              },
-            },
-          ]);
+          .when<TestItemCreated>({
+            id: 'test_789',
+            name: 'Another Test Item',
+            createdAt: new Date('2024-01-16T10:00:00Z'),
+          })
+          .then<SendNotification>({
+            message: 'New test item created: Another Test Item',
+            recipientId: 'admin',
+          });
       });
     });
   });

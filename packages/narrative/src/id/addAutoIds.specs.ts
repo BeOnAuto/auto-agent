@@ -15,20 +15,23 @@ describe('addAutoIds', () => {
             client: { specs: [] },
             server: {
               description: 'Test server',
-              specs: {
-                name: 'Test Specs',
-                rules: [
-                  {
-                    description: 'Test rule without ID',
-                    examples: [],
-                  },
-                  {
-                    id: 'EXISTING-RULE-001',
-                    description: 'Test rule with existing ID',
-                    examples: [],
-                  },
-                ],
-              },
+              specs: [
+                {
+                  type: 'gherkin',
+                  feature: 'Test Specs',
+                  rules: [
+                    {
+                      name: 'Test rule without ID',
+                      examples: [],
+                    },
+                    {
+                      id: 'EXISTING-RULE-001',
+                      name: 'Test rule with existing ID',
+                      examples: [],
+                    },
+                  ],
+                },
+              ],
             },
           },
           {
@@ -38,10 +41,13 @@ describe('addAutoIds', () => {
             client: { specs: [] },
             server: {
               description: 'Test server',
-              specs: {
-                name: 'Test Specs',
-                rules: [],
-              },
+              specs: [
+                {
+                  type: 'gherkin',
+                  feature: 'Test Specs',
+                  rules: [],
+                },
+              ],
             },
           },
         ],
@@ -54,16 +60,18 @@ describe('addAutoIds', () => {
             type: 'react',
             name: 'React Slice',
             server: {
-              description: 'React server',
-              specs: {
-                name: 'React Specs',
-                rules: [
-                  {
-                    description: 'React rule',
-                    examples: [],
-                  },
-                ],
-              },
+              specs: [
+                {
+                  type: 'gherkin',
+                  feature: 'React Specs',
+                  rules: [
+                    {
+                      name: 'React rule',
+                      examples: [],
+                    },
+                  ],
+                },
+              ],
             },
           },
         ],
@@ -86,13 +94,13 @@ describe('addAutoIds', () => {
     const slice0 = result.narratives[0].slices[0];
     const slice1 = result.narratives[1].slices[0];
 
-    if ('server' in slice0 && slice0.server?.specs?.rules != null) {
-      expect(slice0.server.specs.rules[0].id).toMatch(AUTO_ID_REGEX);
-      expect(slice0.server.specs.rules[1].id).toBe('EXISTING-RULE-001');
+    if ('server' in slice0 && slice0.server?.specs != null && Array.isArray(slice0.server.specs)) {
+      expect(slice0.server.specs[0].rules[0].id).toMatch(AUTO_ID_REGEX);
+      expect(slice0.server.specs[0].rules[1].id).toBe('EXISTING-RULE-001');
     }
 
-    if ('server' in slice1 && slice1.server?.specs?.rules != null) {
-      expect(slice1.server.specs.rules[0].id).toMatch(AUTO_ID_REGEX);
+    if ('server' in slice1 && slice1.server?.specs != null && Array.isArray(slice1.server.specs)) {
+      expect(slice1.server.specs[0].rules[0].id).toMatch(AUTO_ID_REGEX);
     }
   });
 
@@ -106,10 +114,11 @@ describe('addAutoIds', () => {
     expect(originalSlice.id).toBeUndefined();
     if (
       'server' in originalSlice &&
-      originalSlice.server?.specs?.rules !== undefined &&
-      originalSlice.server.specs.rules.length > 0
+      originalSlice.server?.specs !== undefined &&
+      Array.isArray(originalSlice.server.specs) &&
+      originalSlice.server.specs.length > 0
     ) {
-      expect(originalSlice.server.specs.rules[0].id).toBeUndefined();
+      expect(originalSlice.server.specs[0].rules[0].id).toBeUndefined();
     }
   });
 
@@ -120,8 +129,8 @@ describe('addAutoIds', () => {
     expect(result.narratives[0].slices[1].id).toBe('EXISTING-SLICE-001');
 
     const testSlice = result.narratives[0].slices[0];
-    if ('server' in testSlice && testSlice.server?.specs?.rules != null) {
-      expect(testSlice.server.specs.rules[1].id).toBe('EXISTING-RULE-001');
+    if ('server' in testSlice && testSlice.server?.specs != null && Array.isArray(testSlice.server.specs)) {
+      expect(testSlice.server.specs[0].rules[1].id).toBe('EXISTING-RULE-001');
     }
   });
 
@@ -138,10 +147,13 @@ describe('addAutoIds', () => {
               client: { specs: [] },
               server: {
                 description: 'Simple server',
-                specs: {
-                  name: 'Simple specs',
-                  rules: [],
-                },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Simple specs',
+                    rules: [],
+                  },
+                ],
               },
             },
           ],
@@ -199,14 +211,9 @@ describe('addAutoIds', () => {
 
     const result = addAutoIds(modelWithExperienceSlice);
 
-    // Flow should get an auto ID
     expect(result.narratives[0].id).toMatch(AUTO_ID_REGEX);
-
-    // Experience slices should get auto IDs where missing
     expect(result.narratives[0].slices[0].id).toMatch(AUTO_ID_REGEX);
     expect(result.narratives[0].slices[1].id).toBe('EXISTING-EXPERIENCE-SLICE-001');
-
-    // Experience slices only have client specs (no server specs to test)
   });
 
   it('should assign unique IDs to multiple flows with same sourceFile', () => {

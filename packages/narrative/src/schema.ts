@@ -141,30 +141,6 @@ const StateSchema = BaseMessageSchema.extend({
 
 const MessageSchema = z.discriminatedUnion('type', [CommandSchema, EventSchema, StateSchema]);
 
-export const EventExampleSchema = z
-  .object({
-    eventRef: z.string().describe('Reference to event message by name'),
-    exampleData: z.record(z.unknown()).describe('Example data matching the event schema'),
-    context: z.record(z.string()).optional().describe('Optional field descriptions and context'),
-  })
-  .describe('Event example with reference and data');
-
-export const CommandExampleSchema = z
-  .object({
-    commandRef: z.string().describe('Reference to command message by name'),
-    exampleData: z.record(z.unknown()).describe('Example data matching the command schema'),
-    context: z.record(z.string()).optional().describe('Optional field descriptions and context'),
-  })
-  .describe('Command example with reference and data');
-
-const StateExampleSchema = z
-  .object({
-    stateRef: z.string().describe('Reference to state message by name'),
-    exampleData: z.record(z.unknown()).describe('Example data matching the state schema'),
-    context: z.record(z.string()).optional().describe('Optional field descriptions and context'),
-  })
-  .describe('State example with reference and data');
-
 const BaseSliceSchema = z
   .object({
     name: z.string(),
@@ -176,44 +152,47 @@ const BaseSliceSchema = z
   })
   .describe('Base properties shared by all slice types');
 
-const ErrorExampleSchema = z
-  .object({
-    errorType: z.enum(['IllegalStateError', 'ValidationError', 'NotFoundError']).describe('Expected error'),
-    message: z.string().optional().describe('Optional error message'),
-  })
-  .describe('Error outcome');
+const StepErrorSchema = z.object({
+  type: z.enum(['IllegalStateError', 'ValidationError', 'NotFoundError']).describe('Error type'),
+  message: z.string().optional().describe('Optional error message'),
+});
+
+const StepWithDocStringSchema = z.object({
+  keyword: z.enum(['Given', 'When', 'Then', 'And']).describe('Gherkin keyword'),
+  text: z.string().describe('The type name (e.g., AddTodo, TodoAdded)'),
+  docString: z.record(z.unknown()).optional().describe('The example data'),
+});
+
+const StepWithErrorSchema = z.object({
+  keyword: z.literal('Then').describe('Error steps use Then keyword'),
+  error: StepErrorSchema.describe('Error details'),
+});
+
+const StepSchema = z.union([StepWithDocStringSchema, StepWithErrorSchema]).describe('A Gherkin step');
 
 const ExampleSchema = z
   .object({
-    description: z.string().describe('Example description'),
-    given: z
-      .array(z.union([EventExampleSchema, StateExampleSchema]))
-      .optional()
-      .describe('Given conditions'),
-    when: z
-      .union([CommandExampleSchema, EventExampleSchema, z.array(CommandExampleSchema), z.array(EventExampleSchema)])
-      .optional()
-      .describe('When action or events occur'),
-    then: z
-      .array(z.union([EventExampleSchema, StateExampleSchema, CommandExampleSchema, ErrorExampleSchema]))
-      .describe('Then expected outcomes'),
+    id: z.string().optional().describe('Unique example identifier'),
+    name: z.string().describe('Example name'),
+    steps: z.array(StepSchema).describe('Gherkin steps for this example'),
   })
-  .describe('BDD example with given-when-then structure');
+  .describe('BDD example with Gherkin steps');
 
 const RuleSchema = z
   .object({
-    id: z.string().optional().describe('Optional rule identifier'),
-    description: z.string().describe('Rule description'),
+    id: z.string().optional().describe('Unique rule identifier'),
+    name: z.string().describe('Rule name'),
     examples: z.array(ExampleSchema).describe('Examples demonstrating the rule'),
   })
   .describe('Business rule with examples');
 
 const SpecSchema = z
   .object({
-    name: z.string().describe('Spec name/feature name'),
+    type: z.literal('gherkin').describe('Specification type'),
+    feature: z.string().describe('Feature name'),
     rules: z.array(RuleSchema).describe('Business rules for this spec'),
   })
-  .describe('Specification with business rules');
+  .describe('Gherkin specification with business rules');
 
 const ItNode = z
   .object({
@@ -252,7 +231,7 @@ const CommandSliceSchema = BaseSliceSchema.extend({
   server: z.object({
     description: z.string(),
     data: z.array(DataSinkSchema).optional().describe('Data sinks for command slices'),
-    specs: SpecSchema.describe('Server-side specifications with rules and examples'),
+    specs: z.array(SpecSchema).describe('Server-side specifications with rules and examples'),
   }),
 }).describe('Command slice handling user actions and business logic');
 
@@ -265,7 +244,7 @@ const QuerySliceSchema = BaseSliceSchema.extend({
   server: z.object({
     description: z.string(),
     data: z.array(DataSourceSchema).optional().describe('Data sources for query slices'),
-    specs: SpecSchema.describe('Server-side specifications with rules and examples'),
+    specs: z.array(SpecSchema).describe('Server-side specifications with rules and examples'),
   }),
 }).describe('Query slice for reading data and maintaining projections');
 
@@ -277,7 +256,7 @@ const ReactSliceSchema = BaseSliceSchema.extend({
       .array(z.union([DataSinkSchema, DataSourceSchema]))
       .optional()
       .describe('Data items for react slices (mix of sinks and sources)'),
-    specs: SpecSchema.describe('Server-side specifications with rules and examples'),
+    specs: z.array(SpecSchema).describe('Server-side specifications with rules and examples'),
   }),
 }).describe('React slice for automated responses to events');
 
@@ -397,9 +376,7 @@ export const modelSchema = z
 export type { ClientSpecNode };
 
 export {
-  StateExampleSchema,
   MessageFieldSchema,
-  ErrorExampleSchema,
   MessageSchema,
   CommandSchema,
   EventSchema,
@@ -416,4 +393,8 @@ export {
   SpecSchema,
   DataSinkSchema,
   DataSourceSchema,
+  StepSchema,
+  StepErrorSchema,
+  StepWithDocStringSchema,
+  StepWithErrorSchema,
 };

@@ -406,85 +406,150 @@ function addRequestToChain(
   return chain;
 }
 
-/**
- * Convert schema example structure to GWT format expected by buildGwtSpecBlock
- */
-function convertExampleToGWT(example: Example, _sliceType: 'command' | 'query' | 'react' | 'experience'): GWTBlock {
-  const gwtBlock: GWTBlock = {
-    then: [],
-  };
+interface StepWithDocString {
+  keyword: 'Given' | 'When' | 'Then' | 'And';
+  text: string;
+  docString?: Record<string, unknown>;
+}
 
-  // Add description metadata
-  (gwtBlock as { description?: string }).description = example.description;
+interface StepWithError {
+  keyword: 'Then';
+  error: { type: string; message?: string };
+}
 
-  // Convert given
-  if (example.given) {
-    gwtBlock.given = example.given.map((given) => {
-      if ('stateRef' in given) {
-        return { eventRef: given.stateRef, exampleData: given.exampleData };
-      } else if ('eventRef' in given) {
-        return { eventRef: given.eventRef, exampleData: given.exampleData };
-      }
-      return given;
-    });
-  }
+type Step = StepWithDocString | StepWithError;
 
-  // Convert when
-  if (example.when !== null && example.when !== undefined) {
-    if (Array.isArray(example.when)) {
-      // Array of events for react slices
-      gwtBlock.when = example.when.map((when) => {
-        if ('eventRef' in when) {
-          return { eventRef: when.eventRef, exampleData: when.exampleData };
-        } else if ('commandRef' in when) {
-          return { commandRef: when.commandRef, exampleData: when.exampleData };
-        }
-        return when;
-      });
-    } else {
-      // Single object - could be command (command slices) or event (query slices)
-      if ('commandRef' in example.when) {
-        // Command for command slices
-        gwtBlock.when = {
-          commandRef: example.when.commandRef,
-          exampleData: example.when.exampleData,
-        };
-      } else if ('eventRef' in example.when) {
-        // Event for query slices
-        gwtBlock.when = {
-          eventRef: example.when.eventRef,
-          exampleData: example.when.exampleData,
-        };
-      }
-    }
-  }
+function isStepWithError(step: Step): step is StepWithError {
+  return 'error' in step;
+}
 
-  // Convert then
-  gwtBlock.then = example.then.map((then) => {
-    if ('eventRef' in then) {
-      return { eventRef: then.eventRef, exampleData: then.exampleData };
-    } else if ('commandRef' in then) {
-      return { commandRef: then.commandRef, exampleData: then.exampleData };
-    } else if ('stateRef' in then) {
-      return { stateRef: then.stateRef, exampleData: then.exampleData };
-    } else {
-      // Error case - return as-is
-      return then;
-    }
+interface OldFormatThenItem {
+  eventRef?: string;
+  stateRef?: string;
+  commandRef?: string;
+  exampleData: Record<string, unknown>;
+}
+
+interface OldFormatExample {
+  description?: string;
+  name?: string;
+  given?: Array<{ eventRef?: string; stateRef?: string; exampleData: Record<string, unknown> }>;
+  when?:
+    | { commandRef?: string; eventRef?: string; exampleData: Record<string, unknown> }
+    | Array<{ eventRef: string; exampleData: Record<string, unknown> }>;
+  then?: OldFormatThenItem[];
+  steps?: Step[];
+}
+
+function processErrorStep(step: StepWithError, gwtBlock: GWTBlock): void {
+  gwtBlock.then.push({
+    errorType: step.error.type as 'IllegalStateError' | 'ValidationError' | 'NotFoundError',
+    message: step.error.message,
   });
+}
+
+function processGivenStep(step: StepWithDocString, gwtBlock: GWTBlock): void {
+  if (!gwtBlock.given) gwtBlock.given = [];
+  gwtBlock.given.push({ eventRef: step.text, exampleData: step.docString ?? {} });
+}
+
+function processWhenStep(
+  step: StepWithDocString,
+  sliceType: 'command' | 'query' | 'react' | 'experience',
+  gwtBlock: GWTBlock,
+): void {
+  if (sliceType === 'command') {
+    gwtBlock.when = { commandRef: step.text, exampleData: step.docString ?? {} };
+  } else if (sliceType === 'react' || sliceType === 'query') {
+    const eventData = { eventRef: step.text, exampleData: step.docString ?? {} };
+    if (!gwtBlock.when) {
+      gwtBlock.when = [eventData];
+    } else if (Array.isArray(gwtBlock.when)) {
+      gwtBlock.when.push(eventData);
+    }
+  }
+}
+
+function processThenStep(step: StepWithDocString, gwtBlock: GWTBlock): void {
+  gwtBlock.then.push({ eventRef: step.text, exampleData: step.docString ?? {} });
+}
+
+function processStepsFormat(
+  steps: Step[],
+  sliceType: 'command' | 'query' | 'react' | 'experience',
+  gwtBlock: GWTBlock,
+): void {
+  let effectiveKeyword: 'Given' | 'When' | 'Then' = 'Given';
+
+  for (const step of steps) {
+    if (isStepWithError(step)) {
+      processErrorStep(step, gwtBlock);
+      continue;
+    }
+
+    if (step.keyword !== 'And') {
+      effectiveKeyword = step.keyword;
+    }
+
+    if (effectiveKeyword === 'Given') {
+      processGivenStep(step, gwtBlock);
+    } else if (effectiveKeyword === 'When') {
+      processWhenStep(step, sliceType, gwtBlock);
+    } else if (effectiveKeyword === 'Then') {
+      processThenStep(step, gwtBlock);
+    }
+  }
+}
+
+function mapThenItem(t: OldFormatThenItem): GWTBlock['then'][0] {
+  if (t.eventRef !== undefined && t.eventRef !== '') return { eventRef: t.eventRef, exampleData: t.exampleData };
+  if (t.commandRef !== undefined && t.commandRef !== '')
+    return { commandRef: t.commandRef, exampleData: t.exampleData };
+  if (t.stateRef !== undefined && t.stateRef !== '') return { stateRef: t.stateRef, exampleData: t.exampleData };
+  return { eventRef: '', exampleData: t.exampleData };
+}
+
+function processOldFormat(oldExample: OldFormatExample, gwtBlock: GWTBlock): void {
+  if (oldExample.given !== undefined && oldExample.given.length > 0) {
+    gwtBlock.given = oldExample.given.map((g) => ({
+      eventRef: g.eventRef ?? g.stateRef ?? '',
+      exampleData: g.exampleData,
+    }));
+  }
+
+  if (oldExample.when !== undefined) {
+    gwtBlock.when = oldExample.when as GWTBlock['when'];
+  }
+
+  if (oldExample.then !== undefined && oldExample.then.length > 0) {
+    gwtBlock.then = oldExample.then.map(mapThenItem);
+  }
+}
+
+function convertExampleToGWT(example: Example, sliceType: 'command' | 'query' | 'react' | 'experience'): GWTBlock {
+  const gwtBlock: GWTBlock = { then: [] };
+  const oldExample = example as OldFormatExample;
+  (gwtBlock as { name?: string }).name = oldExample.name ?? oldExample.description;
+
+  if (oldExample.steps !== undefined && oldExample.steps.length > 0) {
+    processStepsFormat(oldExample.steps, sliceType, gwtBlock);
+  } else {
+    processOldFormat(oldExample, gwtBlock);
+  }
 
   return gwtBlock;
 }
 
-type RuleType = { id?: string; description: string; examples: Example[] };
+type RuleType = { id?: string; name: string; examples: Example[] };
 type RuleGroup = { rule: RuleType; examples: Example[] };
+type SpecType = { type: 'gherkin'; feature: string; rules: RuleType[] };
 
 function buildRuleGroups(rules: RuleType[]): Map<string, RuleGroup> {
   const ruleGroups = new Map<string, RuleGroup>();
 
   for (const rule of rules) {
     const ruleId = rule.id ?? 'no-id';
-    const ruleKey = `${ruleId}:${rule.description}`;
+    const ruleKey = `${ruleId}:${rule.name}`;
 
     if (ruleGroups.has(ruleKey)) {
       const existingGroup = ruleGroups.get(ruleKey)!;
@@ -513,19 +578,72 @@ function buildConsolidatedRules(
         ruleDescription?: string;
         exampleDescription?: string;
         ruleId?: string;
+        exampleId?: string;
       };
 
-      extendedGwtBlock.ruleDescription = rule.description;
-      extendedGwtBlock.exampleDescription = example.description;
+      extendedGwtBlock.ruleDescription = rule.name;
+      const oldFormatExample = example as { name?: string; description?: string };
+      extendedGwtBlock.exampleDescription = oldFormatExample.name ?? oldFormatExample.description;
       extendedGwtBlock.ruleId = rule.id;
+      extendedGwtBlock.exampleId = example.id;
 
       return extendedGwtBlock;
     });
 
-    allRuleStatements.push(buildConsolidatedGwtSpecBlock(ts, f, rule, gwtBlocks, sliceType, messages));
+    allRuleStatements.push(
+      buildConsolidatedGwtSpecBlock(ts, f, { id: rule.id, description: rule.name }, gwtBlocks, sliceType, messages),
+    );
   }
 
   return allRuleStatements;
+}
+
+function buildSingleSpecStatements(
+  ts: typeof import('typescript'),
+  f: tsNS.NodeFactory,
+  spec: SpecType,
+  sliceType: 'command' | 'query' | 'react' | 'experience',
+  messages?: Array<{ type: string; name: string; fields: Array<{ name: string; type: string; required: boolean }> }>,
+): tsNS.Statement {
+  const ruleGroups = buildRuleGroups(spec.rules);
+  const allRuleStatements = buildConsolidatedRules(ts, f, ruleGroups, sliceType, messages);
+
+  const arrowFunction = f.createArrowFunction(
+    undefined,
+    undefined,
+    [],
+    undefined,
+    f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+    f.createBlock(allRuleStatements, true),
+  );
+
+  const args: tsNS.Expression[] = [];
+  if (spec.feature && spec.feature.trim() !== '') {
+    args.push(f.createStringLiteral(spec.feature));
+  }
+  args.push(arrowFunction);
+
+  return f.createExpressionStatement(f.createCallExpression(f.createIdentifier('specs'), undefined, args));
+}
+
+interface OldSpecFormat {
+  name?: string;
+  rules?: Array<{ description?: string; id?: string; examples?: Example[] }>;
+}
+
+function convertOldSpecToNewFormat(oldSpec: OldSpecFormat): SpecType | null {
+  if (oldSpec.rules === undefined || oldSpec.rules.length === 0) {
+    return null;
+  }
+  return {
+    type: 'gherkin',
+    feature: oldSpec.name ?? '',
+    rules: oldSpec.rules.map((r) => ({
+      id: r.id,
+      name: r.description ?? '',
+      examples: r.examples ?? [],
+    })),
+  };
 }
 
 function buildServerStatements(
@@ -542,28 +660,16 @@ function buildServerStatements(
   }
 
   if (server.specs !== null && server.specs !== undefined) {
-    const ruleGroups = buildRuleGroups(server.specs.rules as RuleType[]);
-    const allRuleStatements = buildConsolidatedRules(ts, f, ruleGroups, sliceType, messages);
-
-    const arrowFunction = f.createArrowFunction(
-      undefined,
-      undefined,
-      [],
-      undefined,
-      f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-      f.createBlock(allRuleStatements, true),
-    );
-
-    const args: tsNS.Expression[] = [];
-    if (server.specs.name && server.specs.name.trim() !== '') {
-      args.push(f.createStringLiteral(server.specs.name));
+    if (Array.isArray(server.specs)) {
+      for (const spec of server.specs as SpecType[]) {
+        statements.push(buildSingleSpecStatements(ts, f, spec, sliceType, messages));
+      }
+    } else {
+      const convertedSpec = convertOldSpecToNewFormat(server.specs as OldSpecFormat);
+      if (convertedSpec !== null) {
+        statements.push(buildSingleSpecStatements(ts, f, convertedSpec, sliceType, messages));
+      }
     }
-    args.push(arrowFunction);
-
-    const specsStatement = f.createExpressionStatement(
-      f.createCallExpression(f.createIdentifier('specs'), undefined, args),
-    );
-    statements.push(specsStatement);
   }
 
   return statements;

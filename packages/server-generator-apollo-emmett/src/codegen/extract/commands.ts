@@ -1,5 +1,4 @@
-import { CommandExample, EventExample } from '@auto-engineer/narrative';
-import { Message, MessageDefinition } from '../types';
+import type { Message, MessageDefinition, EventRef, CommandRef, ErrorRef } from '../types';
 import { extractFieldsFromMessage } from './fields';
 
 function createCommandMessage(
@@ -22,9 +21,9 @@ function createCommandMessage(
 
 export function extractCommandsFromGwt(
   gwtSpecs: Array<{
-    given?: Array<EventExample | unknown>;
-    when?: CommandExample | EventExample | unknown[];
-    then: Array<EventExample | unknown | { errorType: string; message?: string }>;
+    given?: Array<EventRef | unknown>;
+    when?: CommandRef | EventRef | unknown[];
+    then: Array<EventRef | unknown | ErrorRef>;
   }>,
   allMessages: MessageDefinition[],
 ): { commands: Message[]; commandSchemasByName: Record<string, Message> } {
@@ -85,9 +84,9 @@ function processCommandExample(
 
 export function extractCommandsFromThen(
   gwtSpecs: Array<{
-    given?: Array<EventExample | unknown>;
-    when?: CommandExample | EventExample | unknown[];
-    then: Array<EventExample | unknown | { errorType: string; message?: string }>;
+    given?: Array<EventRef | unknown>;
+    when?: CommandRef | EventRef | unknown[];
+    then: Array<EventRef | unknown | ErrorRef>;
   }>,
   allMessages: MessageDefinition[],
 ): { commands: Message[]; commandSchemasByName: Record<string, Message> } {

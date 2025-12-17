@@ -44,7 +44,8 @@ export type { FieldSelector } from './data-narrative-builders';
 
 // Narrative language functions
 export { narrative, narrative as flow } from './narrative';
-export { client, server, specs, describe, it, should, request, data, rule, example } from './narrative';
+export { client, server, specs, describe, it, should, request, data, rule, example, thenError } from './narrative';
+export type { ExampleBuilder, GivenBuilder, WhenBuilder, ThenBuilder } from './narrative';
 export type { SliceTypeValueInterface } from './narrative';
 export { SliceType } from './narrative';
 
@@ -55,7 +56,7 @@ export { modelToNarrative } from './transformers/model-to-narrative';
 export type { ExportSchemaEvents } from './commands/export-schema';
 
 // Testing helpers
-export { createNarrativeSpec, given, when } from './testing';
+export { createNarrativeSpec, given as testGiven, when as testWhen } from './testing';
 
 // Schema definitions for progressive narrative creation
 export {
@@ -76,21 +77,19 @@ export {
   SliceSchema,
   NarrativeSchema,
   modelSchema,
-  EventExampleSchema,
-  CommandExampleSchema,
   ExampleSchema,
   RuleSchema,
   SpecSchema,
+  StepSchema,
+  StepErrorSchema,
+  StepWithDocStringSchema,
+  StepWithErrorSchema,
 } from './schema';
 
 import {
-  CommandExampleSchema,
-  ErrorExampleSchema,
-  EventExampleSchema,
   NarrativeSchema,
   SliceSchema,
   modelSchema,
-  StateExampleSchema,
   QuerySliceSchema,
   ReactSliceSchema,
   ExperienceSliceSchema,
@@ -100,14 +99,11 @@ import {
   ExampleSchema,
   RuleSchema,
   SpecSchema,
+  StepSchema,
 } from './schema';
 export type Model = z.infer<typeof modelSchema>;
 export type Narrative = z.infer<typeof NarrativeSchema>;
-export type CommandExample = z.infer<typeof CommandExampleSchema>;
-export type EventExample = z.infer<typeof EventExampleSchema>;
 export type Slice = z.infer<typeof SliceSchema>;
-export type StateExample = z.infer<typeof StateExampleSchema>;
-export type ErrorExample = z.infer<typeof ErrorExampleSchema>;
 export type QuerySlice = z.infer<typeof QuerySliceSchema>;
 export type ReactSlice = z.infer<typeof ReactSliceSchema>;
 export type CommandSlice = z.infer<typeof CommandSliceSchema>;
@@ -117,6 +113,7 @@ export type Example = z.infer<typeof ExampleSchema>;
 export type MessageField = z.infer<typeof MessageFieldSchema>;
 export type Rule = z.infer<typeof RuleSchema>;
 export type Spec = z.infer<typeof SpecSchema>;
+export type Step = z.infer<typeof StepSchema>;
 export type { ClientSpecNode } from './schema';
 
 // ID assignment utilities

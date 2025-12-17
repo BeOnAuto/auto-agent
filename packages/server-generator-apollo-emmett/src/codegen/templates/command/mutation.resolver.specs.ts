@@ -18,35 +18,40 @@ describe('mutation.resolver.ts.ejs', () => {
               },
               server: {
                 description: 'Handles listing creation',
-                specs: {
-                  name: 'Create listing command',
-                  rules: [
-                    {
-                      description: 'Should create listing successfully',
-                      examples: [
-                        {
-                          description: 'User creates listing with valid data',
-                          when: {
-                            commandRef: 'CreateListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                              title: 'Modern Downtown Apartment',
-                              pricePerNight: 250,
-                              maxGuests: 4,
-                              amenities: ['wifi', 'kitchen'],
-                              available: true,
-                              tags: ['sea view', 'balcony'],
-                              rating: 4.8,
-                              metadata: { petsAllowed: true },
-                              listedAt: '2024-01-15T10:00:00Z',
-                            },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Create listing command',
+                    rules: [
+                      {
+                        name: 'Should create listing successfully',
+                        examples: [
+                          {
+                            name: 'User creates listing with valid data',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'CreateListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'Modern Downtown Apartment',
+                                  pricePerNight: 250,
+                                  maxGuests: 4,
+                                  amenities: ['wifi', 'kitchen'],
+                                  available: true,
+                                  tags: ['sea view', 'balcony'],
+                                  rating: 4.8,
+                                  metadata: { petsAllowed: true },
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                },
+                              },
+                            ],
                           },
-                          then: [],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -158,40 +163,45 @@ describe('mutation.resolver.ts.ejs', () => {
                     destination: { type: 'stream', pattern: 'questionnaire-participantId' },
                   },
                 ],
-                specs: {
-                  name: '',
-                  rules: [
-                    {
-                      description: 'answers are allowed while the questionnaire has not been submitted',
-                      examples: [
-                        {
-                          description: 'no questions have been answered yet',
-                          when: {
-                            commandRef: 'AnswerQuestion',
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              participantId: 'participant-abc',
-                              questionId: 'q1',
-                              answer: 'Yes',
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'QuestionAnswered',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                questionId: 'q1',
-                                answer: 'Yes',
-                                savedAt: '2030-01-01T09:05:00.000Z',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: '',
+                    rules: [
+                      {
+                        name: 'answers are allowed while the questionnaire has not been submitted',
+                        examples: [
+                          {
+                            name: 'no questions have been answered yet',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'AnswerQuestion',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                  savedAt: '2030-01-01T09:05:00.000Z',
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -270,27 +280,32 @@ describe('mutation.resolver.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                specs: {
-                  name: '',
-                  rules: [
-                    {
-                      description: 'add items',
-                      examples: [
-                        {
-                          description: 'happy path',
-                          when: {
-                            commandRef: 'AddItemsToCart',
-                            exampleData: {
-                              sessionId: 's-1',
-                              items: [{ productId: 'p1', quantity: 2 }],
-                            },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: '',
+                    rules: [
+                      {
+                        name: 'add items',
+                        examples: [
+                          {
+                            name: 'happy path',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'AddItemsToCart',
+                                docString: {
+                                  sessionId: 's-1',
+                                  items: [{ productId: 'p1', quantity: 2 }],
+                                },
+                              },
+                            ],
                           },
-                          then: [],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -370,28 +385,33 @@ export class AddItemsToCartResolver {
               },
               server: {
                 description: '',
-                specs: {
-                  name: '',
-                  rules: [
-                    {
-                      description: 'update price',
-                      examples: [
-                        {
-                          description: 'happy path',
-                          when: {
-                            commandRef: 'UpdateProductPrice',
-                            exampleData: {
-                              productId: 'p-1',
-                              price: 99.99,
-                              discount: 10.5,
-                            },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: '',
+                    rules: [
+                      {
+                        name: 'update price',
+                        examples: [
+                          {
+                            name: 'happy path',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'UpdateProductPrice',
+                                docString: {
+                                  productId: 'p-1',
+                                  price: 99.99,
+                                  discount: 10.5,
+                                },
+                              },
+                            ],
                           },
-                          then: [],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],

@@ -1,5 +1,5 @@
 import { generateAutoId } from './generators';
-import { Model, Slice } from '../index';
+import { Model, Slice, Spec, Rule, Example } from '../index';
 
 function ensureId(item: { id?: string }): void {
   if (item.id === undefined || item.id === '') {
@@ -7,23 +7,40 @@ function ensureId(item: { id?: string }): void {
   }
 }
 
-function addRuleIds(rules: Array<unknown>): Array<unknown> {
-  return rules.map((rule) => {
-    if (typeof rule === 'object' && rule !== null && 'description' in rule) {
-      const ruleCopy = { ...rule } as { id?: string };
-      ensureId(ruleCopy);
-      return ruleCopy;
-    }
-    return rule;
+function processExamples(examples: Example[]): Example[] {
+  return examples.map((example) => {
+    const exampleCopy = { ...example };
+    ensureId(exampleCopy);
+    return exampleCopy;
   });
 }
 
+function processRules(rules: Rule[]): Rule[] {
+  return rules.map((rule) => {
+    const ruleCopy = { ...rule };
+    ensureId(ruleCopy);
+    ruleCopy.examples = processExamples(rule.examples);
+    return ruleCopy;
+  });
+}
+
+function processSpecs(specs: Spec[]): Spec[] {
+  return specs.map((spec) => ({
+    ...spec,
+    rules: processRules(spec.rules),
+  }));
+}
+
 function processServerSpecs(slice: Slice): Slice {
-  if (!('server' in slice) || slice.server?.specs?.rules === undefined) return slice;
+  if (!('server' in slice) || slice.server?.specs === undefined || !Array.isArray(slice.server.specs)) return slice;
 
   const modifiedSlice = structuredClone(slice);
-  if ('server' in modifiedSlice && modifiedSlice.server?.specs?.rules !== undefined) {
-    (modifiedSlice.server.specs as { rules: unknown[] }).rules = addRuleIds(modifiedSlice.server.specs.rules);
+  if (
+    'server' in modifiedSlice &&
+    modifiedSlice.server?.specs !== undefined &&
+    Array.isArray(modifiedSlice.server.specs)
+  ) {
+    modifiedSlice.server.specs = processSpecs(modifiedSlice.server.specs);
   }
   return modifiedSlice;
 }

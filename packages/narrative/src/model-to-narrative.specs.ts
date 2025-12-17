@@ -12,6 +12,7 @@ describe('modelToNarrative', () => {
   data,
   describe,
   example,
+  given,
   gql,
   it,
   narrative,
@@ -21,6 +22,8 @@ describe('modelToNarrative', () => {
   sink,
   source,
   specs,
+  then,
+  when,
 } from '@auto-engineer/narrative';
 import type { Command, Event, State } from '@auto-engineer/narrative';
 import { AI, ProductCatalog } from '../server/src/integrations';
@@ -117,34 +120,36 @@ narrative('Seasonal Assistant', () => {
       data([sink().event('ShoppingCriteriaEntered').toStream('shopping-session-\${sessionId}')]);
       specs('When shopper submits criteria, a shopping session is started', () => {
         rule('Valid criteria should start a shopping session', () => {
-          example('User submits shopping criteria for children')
-            .when<EnterShoppingCriteria>({
-              sessionId: 'shopper-123',
-              criteria:
-                'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
-            })
-            .then<ShoppingCriteriaEntered>({
+          example('User submits shopping criteria for children', () => {
+            when<EnterShoppingCriteria>({
               sessionId: 'shopper-123',
               criteria:
                 'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
             });
+            then<ShoppingCriteriaEntered>({
+              sessionId: 'shopper-123',
+              criteria:
+                'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
+            });
+          });
         });
       });
     });
   react('creates a chat session').server(() => {
     specs('When shopping criteria are entered, request wishlist creation', () => {
       rule('Shopping criteria should trigger item suggestion', () => {
-        example('Criteria entered triggers wishlist creation')
-          .when<ShoppingCriteriaEntered>({
+        example('Criteria entered triggers wishlist creation', () => {
+          when<ShoppingCriteriaEntered>({
             sessionId: 'session-abc',
             criteria:
               'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
-          })
-          .then<SuggestShoppingItems>({
+          });
+          then<SuggestShoppingItems>({
             sessionId: 'session-abc',
             prompt:
               'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
           });
+        });
       });
     });
   });
@@ -161,8 +166,8 @@ narrative('Seasonal Assistant', () => {
     ]);
     specs('When chat is triggered, AI suggests items based on product catalog', () => {
       rule('AI should suggest relevant items from available products', () => {
-        example('Product catalog with matching items generates suggestions')
-          .given<Products>({
+        example('Product catalog with matching items generates suggestions', () => {
+          given<Products>({
             products: [
               {
                 productId: 'prod-soccer-ball',
@@ -197,13 +202,13 @@ narrative('Seasonal Assistant', () => {
                 imageUrl: 'https://example.com/mtg-starter.jpg',
               },
             ],
-          })
-          .when<SuggestShoppingItems>({
+          });
+          when<SuggestShoppingItems>({
             sessionId: 'session-abc',
             prompt:
               'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
-          })
-          .then<ShoppingItemsSuggested>({
+          });
+          then<ShoppingItemsSuggested>({
             sessionId: 'session-abc',
             suggestedItems: [
               {
@@ -232,6 +237,7 @@ narrative('Seasonal Assistant', () => {
               },
             ],
           });
+        });
       });
     });
   });
@@ -260,8 +266,8 @@ narrative('Seasonal Assistant', () => {
       data([source().state('SuggestedItems').fromProjection('SuggestedItemsProjection', 'sessionId')]);
       specs('Suggested items are available for viewing', () => {
         rule('Items should be available for viewing after suggestion', () => {
-          example('Item becomes available after AI suggestion event')
-            .when<ShoppingItemsSuggested>({
+          example('Item becomes available after AI suggestion event', () => {
+            when<ShoppingItemsSuggested>({
               sessionId: 'session-abc',
               suggestedItems: [
                 {
@@ -289,8 +295,8 @@ narrative('Seasonal Assistant', () => {
                   reason: 'Ideal starter set for Magic the Gathering enthusiasts',
                 },
               ],
-            })
-            .then<SuggestedItems>({
+            });
+            then<SuggestedItems>({
               sessionId: 'session-abc',
               items: [
                 {
@@ -319,6 +325,7 @@ narrative('Seasonal Assistant', () => {
                 },
               ],
             });
+          });
         });
       });
     });
@@ -334,17 +341,8 @@ narrative('Seasonal Assistant', () => {
       data([sink().event('ItemsAddedToCart').toStream('shopping-session-\${sessionId}')]);
       specs('When shopper accepts items, they are added to cart', () => {
         rule('Accepted items should be added to the shopping cart', () => {
-          example('User selects all suggested items for cart')
-            .when<AddItemsToCart>({
-              sessionId: 'session-abc',
-              items: [
-                { productId: 'prod-soccer-ball', quantity: 1 },
-                { productId: 'prod-craft-kit', quantity: 1 },
-                { productId: 'prod-laptop-bag', quantity: 1 },
-                { productId: 'prod-mtg-starter', quantity: 1 },
-              ],
-            })
-            .then<ItemsAddedToCart>({
+          example('User selects all suggested items for cart', () => {
+            when<AddItemsToCart>({
               sessionId: 'session-abc',
               items: [
                 { productId: 'prod-soccer-ball', quantity: 1 },
@@ -353,6 +351,16 @@ narrative('Seasonal Assistant', () => {
                 { productId: 'prod-mtg-starter', quantity: 1 },
               ],
             });
+            then<ItemsAddedToCart>({
+              sessionId: 'session-abc',
+              items: [
+                { productId: 'prod-soccer-ball', quantity: 1 },
+                { productId: 'prod-craft-kit', quantity: 1 },
+                { productId: 'prod-laptop-bag', quantity: 1 },
+                { productId: 'prod-mtg-starter', quantity: 1 },
+              ],
+            });
+          });
         });
       });
     });
@@ -487,10 +495,13 @@ narrative('Test Flow without IDs', () => {
               },
               server: {
                 description: 'Product query server',
-                specs: {
-                  name: 'Product data specs',
-                  rules: [],
-                },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Product data specs',
+                    rules: [],
+                  },
+                ],
               },
             },
           ],
@@ -541,30 +552,36 @@ narrative('Test Flow with IDs', 'FLOW-123', () => {
               },
               server: {
                 description: 'Command processing server',
-                specs: {
-                  name: 'Command Processing',
-                  rules: [
-                    {
-                      id: 'RULE-ABC',
-                      description: 'Valid commands should be processed',
-                      examples: [
-                        {
-                          description: 'User submits valid command',
-                          when: {
-                            commandRef: 'ProcessCommand',
-                            exampleData: { id: 'cmd-123', action: 'create' },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Command Processing',
+                    rules: [
+                      {
+                        id: 'RULE-ABC',
+                        name: 'Valid commands should be processed',
+                        examples: [
+                          {
+                            id: 'EX-001',
+                            name: 'User submits valid command',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'ProcessCommand',
+                                docString: { id: 'cmd-123', action: 'create' },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'CommandProcessed',
+                                docString: { id: 'cmd-123', status: 'success' },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              eventRef: 'CommandProcessed',
-                              exampleData: { id: 'cmd-123', status: 'success' },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -596,7 +613,8 @@ narrative('Test Flow with IDs', 'FLOW-123', () => {
 
     const code = await modelToNarrative(modelWithRuleIds);
 
-    expect(code).toEqual(`import { command, example, narrative, rule, specs } from '@auto-engineer/narrative';
+    expect(code)
+      .toEqual(`import { command, example, narrative, rule, specs, then, when } from '@auto-engineer/narrative';
 import type { Command, Event } from '@auto-engineer/narrative';
 type ProcessCommand = Command<
   'ProcessCommand',
@@ -616,9 +634,10 @@ narrative('Test Flow with Rule IDs', 'FLOW-456', () => {
   command('process command', 'SLICE-789').server(() => {
     specs('Command Processing', () => {
       rule('Valid commands should be processed', 'RULE-ABC', () => {
-        example('User submits valid command')
-          .when<ProcessCommand>({ id: 'cmd-123', action: 'create' })
-          .then<CommandProcessed>({ id: 'cmd-123', status: 'success' });
+        example('User submits valid command', () => {
+          when<ProcessCommand>({ id: 'cmd-123', action: 'create' });
+          then<CommandProcessed>({ id: 'cmd-123', status: 'success' });
+        });
       });
     });
   });
@@ -747,59 +766,64 @@ narrative('Questionnaire Flow', 'QUEST-001', () => {});
                     },
                   },
                 ],
-                specs: {
-                  name: '',
-                  rules: [
-                    {
-                      id: 'r1A3Bp9W',
-                      description: 'questionnaires show current progress',
-                      examples: [
-                        {
-                          description: 'a question has already been answered',
-                          given: [
-                            {
-                              eventRef: 'QuestionnaireLinkSent',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                link: 'https://app.example.com/q/q-001?participant=participant-abc',
-                                sentAt: new Date('2030-01-01T09:00:00.000Z'),
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: '',
+                    rules: [
+                      {
+                        id: 'r1A3Bp9W',
+                        name: 'questionnaires show current progress',
+                        examples: [
+                          {
+                            id: 'EX-001',
+                            name: 'a question has already been answered',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'QuestionnaireLinkSent',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  link: 'https://app.example.com/q/q-001?participant=participant-abc',
+                                  sentAt: new Date('2030-01-01T09:00:00.000Z'),
+                                },
                               },
-                            },
-                          ],
-                          when: {
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              participantId: 'participant-abc',
-                              questionId: 'q1',
-                              answer: 'Yes',
-                              savedAt: new Date('2030-01-01T09:05:00.000Z'),
-                            },
-                            eventRef: 'QuestionAnswered',
+                              {
+                                keyword: 'When',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                  savedAt: new Date('2030-01-01T09:05:00.000Z'),
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionnaireProgress',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  status: 'in_progress',
+                                  currentQuestionId: 'q2',
+                                  remainingQuestions: ['q2', 'q3'],
+                                  answers: [
+                                    {
+                                      questionId: 'q1',
+                                      value: 'Yes',
+                                    },
+                                  ],
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              stateRef: 'QuestionnaireProgress',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                status: 'in_progress',
-                                currentQuestionId: 'q2',
-                                remainingQuestions: ['q2', 'q3'],
-                                answers: [
-                                  {
-                                    questionId: 'q1',
-                                    value: 'Yes',
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -921,6 +945,7 @@ narrative('Questionnaire Flow', 'QUEST-001', () => {});
   describe,
   example,
   experience,
+  given,
   gql,
   it,
   narrative,
@@ -928,6 +953,8 @@ narrative('Questionnaire Flow', 'QUEST-001', () => {});
   rule,
   source,
   specs,
+  then,
+  when,
 } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type QuestionnaireLinkSent = Event<
@@ -996,21 +1023,21 @@ narrative('Questionnaires', 'Q9m2Kp4Lx', () => {
       data([source().state('QuestionnaireProgress').fromProjection('Questionnaires', 'questionnaire-participantId')]);
       specs(() => {
         rule('questionnaires show current progress', 'r1A3Bp9W', () => {
-          example('a question has already been answered')
-            .given<QuestionnaireLinkSent>({
+          example('a question has already been answered', () => {
+            given<QuestionnaireLinkSent>({
               questionnaireId: 'q-001',
               participantId: 'participant-abc',
               link: 'https://app.example.com/q/q-001?participant=participant-abc',
               sentAt: new Date('2030-01-01T09:00:00.000Z'),
-            })
-            .when<QuestionAnswered>({
+            });
+            when<QuestionAnswered>({
               questionnaireId: 'q-001',
               participantId: 'participant-abc',
               questionId: 'q1',
               answer: 'Yes',
               savedAt: new Date('2030-01-01T09:05:00.000Z'),
-            })
-            .then<QuestionnaireProgress>({
+            });
+            then<QuestionnaireProgress>({
               questionnaireId: 'q-001',
               participantId: 'participant-abc',
               status: 'in_progress',
@@ -1018,6 +1045,7 @@ narrative('Questionnaires', 'Q9m2Kp4Lx', () => {
               remainingQuestions: ['q2', 'q3'],
               answers: [{ questionId: 'q1', value: 'Yes' }],
             });
+          });
         });
       });
     });
@@ -1042,71 +1070,78 @@ narrative('Questionnaires', 'Q9m2Kp4Lx', () => {
               },
               server: {
                 description: 'Test server for duplicate rules',
-                specs: {
-                  name: 'Test Rules',
-                  rules: [
-                    {
-                      id: 'r1A3Bp9W',
-                      description: 'questionnaires show current progress',
-                      examples: [
-                        {
-                          description: 'a question has already been answered',
-                          given: [
-                            {
-                              eventRef: 'QuestionnaireLinkSent',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Test Rules',
+                    rules: [
+                      {
+                        id: 'r1A3Bp9W',
+                        name: 'questionnaires show current progress',
+                        examples: [
+                          {
+                            id: 'EX-001',
+                            name: 'a question has already been answered',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'QuestionnaireLinkSent',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                },
                               },
-                            },
-                          ],
-                          when: {
-                            eventRef: 'QuestionAnswered',
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              questionId: 'q1',
-                              answer: 'Yes',
-                            },
+                              {
+                                keyword: 'When',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionnaireProgress',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  status: 'in_progress',
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              stateRef: 'QuestionnaireProgress',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                status: 'in_progress',
+                          {
+                            id: 'EX-002',
+                            name: 'no questions have been answered yet',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'QuestionnaireLinkSent',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                },
                               },
-                            },
-                          ],
-                        },
-                        {
-                          description: 'no questions have been answered yet',
-                          given: [
-                            {
-                              eventRef: 'QuestionnaireLinkSent',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
+                              {
+                                keyword: 'When',
+                                text: 'QuestionnaireLinkSent',
+                                docString: {},
                               },
-                            },
-                          ],
-                          when: {
-                            eventRef: 'QuestionnaireLinkSent',
-                            exampleData: {},
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionnaireProgress',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  status: 'in_progress',
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              stateRef: 'QuestionnaireProgress',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                status: 'in_progress',
-                              },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -1149,7 +1184,8 @@ narrative('Questionnaires', 'Q9m2Kp4Lx', () => {
 
     const code = await modelToNarrative(modelWithDuplicateRules);
 
-    expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
+    expect(code)
+      .toEqual(`import { example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type QuestionnaireLinkSent = Event<
   'QuestionnaireLinkSent',
@@ -1177,14 +1213,15 @@ narrative('Test Flow', 'TEST-FLOW', () => {
   query('test slice', 'TEST-SLICE').server(() => {
     specs('Test Rules', () => {
       rule('questionnaires show current progress', 'r1A3Bp9W', () => {
-        example('a question has already been answered')
-          .given<QuestionnaireLinkSent>({ questionnaireId: 'q-001', participantId: 'participant-abc' })
-          .when<QuestionAnswered>({ questionnaireId: 'q-001', questionId: 'q1', answer: 'Yes' })
-          .then<QuestionnaireProgress>({ questionnaireId: 'q-001', status: 'in_progress' });
-        example('no questions have been answered yet')
-          .given<QuestionnaireLinkSent>({ questionnaireId: 'q-001', participantId: 'participant-abc' })
-          .when<QuestionnaireLinkSent>({})
-          .then<QuestionnaireProgress>({ questionnaireId: 'q-001', status: 'in_progress' });
+        example('a question has already been answered', () => {
+          given<QuestionnaireLinkSent>({ questionnaireId: 'q-001', participantId: 'participant-abc' });
+          when<QuestionAnswered>({ questionnaireId: 'q-001', questionId: 'q1', answer: 'Yes' });
+          then<QuestionnaireProgress>({ questionnaireId: 'q-001', status: 'in_progress' });
+        });
+        example('no questions have been answered yet', () => {
+          given<QuestionnaireLinkSent>({ questionnaireId: 'q-001', participantId: 'participant-abc' });
+          then<QuestionnaireProgress>({ questionnaireId: 'q-001', status: 'in_progress' });
+        });
       });
     });
   });
@@ -1192,7 +1229,7 @@ narrative('Test Flow', 'TEST-FLOW', () => {
 `);
   });
 
-  it('should chain multiple given examples with .and() syntax', async () => {
+  it('should chain multiple given examples with and() syntax', async () => {
     const modelWithMultiGiven: Model = {
       variant: 'specs',
       narratives: [
@@ -1209,84 +1246,92 @@ narrative('Test Flow', 'TEST-FLOW', () => {
               },
               server: {
                 description: 'Multi given server rules',
-                specs: {
-                  name: 'Multi Given Rules',
-                  rules: [
-                    {
-                      id: 'MultiGiven',
-                      description: 'all questions have been answered',
-                      examples: [
-                        {
-                          description: 'questionnaire with multiple events',
-                          given: [
-                            {
-                              stateRef: 'QuestionnaireConfig',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                numberOfQuestions: 3,
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Multi Given Rules',
+                    rules: [
+                      {
+                        id: 'MultiGiven',
+                        name: 'all questions have been answered',
+                        examples: [
+                          {
+                            id: 'EX-001',
+                            name: 'questionnaire with multiple events',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'QuestionnaireConfig',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  numberOfQuestions: 3,
+                                },
                               },
-                            },
-                            {
-                              eventRef: 'QuestionnaireLinkSent',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                link: 'https://example.com/q/q-001',
-                                sentAt: new Date('2030-01-01T09:00:00.000Z'),
+                              {
+                                keyword: 'And',
+                                text: 'QuestionnaireLinkSent',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  link: 'https://example.com/q/q-001',
+                                  sentAt: new Date('2030-01-01T09:00:00.000Z'),
+                                },
                               },
-                            },
-                            {
-                              eventRef: 'QuestionAnswered',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                questionId: 'q1',
-                                answer: 'Yes',
-                                savedAt: new Date('2030-01-01T09:05:00.000Z'),
+                              {
+                                keyword: 'And',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q1',
+                                  answer: 'Yes',
+                                  savedAt: new Date('2030-01-01T09:05:00.000Z'),
+                                },
                               },
-                            },
-                            {
-                              eventRef: 'QuestionAnswered',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                questionId: 'q2',
-                                answer: 'No',
-                                savedAt: new Date('2030-01-01T09:10:00.000Z'),
+                              {
+                                keyword: 'And',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q2',
+                                  answer: 'No',
+                                  savedAt: new Date('2030-01-01T09:10:00.000Z'),
+                                },
                               },
-                            },
-                          ],
-                          when: {
-                            eventRef: 'QuestionAnswered',
-                            exampleData: {
-                              questionnaireId: 'q-001',
-                              participantId: 'participant-abc',
-                              questionId: 'q3',
-                              answer: 'Maybe',
-                              savedAt: new Date('2030-01-01T09:15:00.000Z'),
-                            },
+                              {
+                                keyword: 'When',
+                                text: 'QuestionAnswered',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  questionId: 'q3',
+                                  answer: 'Maybe',
+                                  savedAt: new Date('2030-01-01T09:15:00.000Z'),
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionnaireProgress',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  status: 'ready_to_submit',
+                                  currentQuestionId: null,
+                                  remainingQuestions: [],
+                                  answers: [
+                                    { questionId: 'q1', value: 'Yes' },
+                                    { questionId: 'q2', value: 'No' },
+                                  ],
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              stateRef: 'QuestionnaireProgress',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                status: 'ready_to_submit',
-                                currentQuestionId: null,
-                                remainingQuestions: [],
-                                answers: [
-                                  { questionId: 'q1', value: 'Yes' },
-                                  { questionId: 'q2', value: 'No' },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -1346,7 +1391,8 @@ narrative('Test Flow', 'TEST-FLOW', () => {
 
     const code = await modelToNarrative(modelWithMultiGiven);
 
-    expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
+    expect(code)
+      .toEqual(`import { and, example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type QuestionnaireConfig = State<
   'QuestionnaireConfig',
@@ -1392,36 +1438,36 @@ narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
   query('multi given slice', 'MULTI-SLICE').server(() => {
     specs('Multi Given Rules', () => {
       rule('all questions have been answered', 'MultiGiven', () => {
-        example('questionnaire with multiple events')
-          .given<QuestionnaireConfig>({ questionnaireId: 'q-001', numberOfQuestions: 3 })
-          .and<QuestionnaireLinkSent>({
+        example('questionnaire with multiple events', () => {
+          given<QuestionnaireConfig>({ questionnaireId: 'q-001', numberOfQuestions: 3 });
+          and<QuestionnaireLinkSent>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             link: 'https://example.com/q/q-001',
             sentAt: new Date('2030-01-01T09:00:00.000Z'),
-          })
-          .and<QuestionAnswered>({
+          });
+          and<QuestionAnswered>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             questionId: 'q1',
             answer: 'Yes',
             savedAt: new Date('2030-01-01T09:05:00.000Z'),
-          })
-          .and<QuestionAnswered>({
+          });
+          and<QuestionAnswered>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             questionId: 'q2',
             answer: 'No',
             savedAt: new Date('2030-01-01T09:10:00.000Z'),
-          })
-          .when<QuestionAnswered>({
+          });
+          when<QuestionAnswered>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             questionId: 'q3',
             answer: 'Maybe',
             savedAt: new Date('2030-01-01T09:15:00.000Z'),
-          })
-          .then<QuestionnaireProgress>({
+          });
+          then<QuestionnaireProgress>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             status: 'ready_to_submit',
@@ -1432,6 +1478,7 @@ narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
               { questionId: 'q2', value: 'No' },
             ],
           });
+        });
       });
     });
   });
@@ -1480,45 +1527,50 @@ narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
                     },
                   },
                 ],
-                specs: {
-                  name: 'Database State Rules',
-                  rules: [
-                    {
-                      id: 'RefState',
-                      description: 'questionnaire config is available when referenced',
-                      examples: [
-                        {
-                          description: 'config from database is accessible',
-                          given: [
-                            {
-                              stateRef: 'QuestionnaireConfig',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                numberOfQuestions: 5,
-                                title: 'Customer Satisfaction Survey',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Database State Rules',
+                    rules: [
+                      {
+                        id: 'RefState',
+                        name: 'questionnaire config is available when referenced',
+                        examples: [
+                          {
+                            id: 'EX-001',
+                            name: 'config from database is accessible',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'QuestionnaireConfig',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  numberOfQuestions: 5,
+                                  title: 'Customer Satisfaction Survey',
+                                },
                               },
-                            },
-                          ],
-                          when: {
-                            eventRef: 'QuestionnaireProgress',
-                            exampleData: {},
+                              {
+                                keyword: 'When',
+                                text: 'QuestionnaireProgress',
+                                docString: {},
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'QuestionnaireProgress',
+                                docString: {
+                                  questionnaireId: 'q-001',
+                                  participantId: 'participant-abc',
+                                  status: 'in_progress',
+                                  totalQuestions: 5,
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              stateRef: 'QuestionnaireProgress',
-                              exampleData: {
-                                questionnaireId: 'q-001',
-                                participantId: 'participant-abc',
-                                status: 'in_progress',
-                                totalQuestions: 5,
-                              },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -1553,7 +1605,7 @@ narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
     const code = await modelToNarrative(modelWithReferencedStates);
 
     expect(code)
-      .toEqual(`import { data, example, narrative, query, rule, source, specs } from '@auto-engineer/narrative';
+      .toEqual(`import { data, example, given, narrative, query, rule, source, specs, then } from '@auto-engineer/narrative';
 import type { State } from '@auto-engineer/narrative';
 type QuestionnaireProgress = State<
   'QuestionnaireProgress',
@@ -1580,19 +1632,19 @@ narrative('Referenced States Flow', 'REF-STATES', () => {
     ]);
     specs('Database State Rules', () => {
       rule('questionnaire config is available when referenced', 'RefState', () => {
-        example('config from database is accessible')
-          .given<QuestionnaireConfig>({
+        example('config from database is accessible', () => {
+          given<QuestionnaireConfig>({
             questionnaireId: 'q-001',
             numberOfQuestions: 5,
             title: 'Customer Satisfaction Survey',
-          })
-          .when<QuestionnaireProgress>({})
-          .then<QuestionnaireProgress>({
+          });
+          then<QuestionnaireProgress>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             status: 'in_progress',
             totalQuestions: 5,
           });
+        });
       });
     });
   });
@@ -1617,48 +1669,53 @@ narrative('Referenced States Flow', 'REF-STATES', () => {
               },
               server: {
                 description: 'Date server with Date fields',
-                specs: {
-                  name: 'Date Field Rules',
-                  rules: [
-                    {
-                      id: 'DateRule',
-                      description: 'handles Date fields correctly',
-                      examples: [
-                        {
-                          description: 'event with Date fields',
-                          given: [
-                            {
-                              eventRef: 'TimestampedEvent',
-                              exampleData: {
-                                id: 'event-123',
-                                sentAt: new Date('2030-01-01T09:00:00.000Z'),
-                                savedAt: new Date('2030-01-01T09:05:00.000Z'),
-                                attemptedAt: '2030-01-01T09:10:00.000Z',
-                                submittedAt: '2030-01-01T09:15:00.000Z',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Date Field Rules',
+                    rules: [
+                      {
+                        id: 'DateRule',
+                        name: 'handles Date fields correctly',
+                        examples: [
+                          {
+                            id: 'EX-001',
+                            name: 'event with Date fields',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'TimestampedEvent',
+                                docString: {
+                                  id: 'event-123',
+                                  sentAt: new Date('2030-01-01T09:00:00.000Z'),
+                                  savedAt: new Date('2030-01-01T09:05:00.000Z'),
+                                  attemptedAt: '2030-01-01T09:10:00.000Z',
+                                  submittedAt: '2030-01-01T09:15:00.000Z',
+                                },
                               },
-                            },
-                          ],
-                          when: {
-                            eventRef: 'ProcessEvent',
-                            exampleData: {
-                              processedAt: '2030-01-01T10:00:00.000Z',
-                            },
+                              {
+                                keyword: 'When',
+                                text: 'ProcessEvent',
+                                docString: {
+                                  processedAt: '2030-01-01T10:00:00.000Z',
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'ProcessState',
+                                docString: {
+                                  id: 'state-123',
+                                  completedAt: '2030-01-01T11:00:00.000Z',
+                                  status: 'completed',
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              stateRef: 'ProcessState',
-                              exampleData: {
-                                id: 'state-123',
-                                completedAt: '2030-01-01T11:00:00.000Z',
-                                status: 'completed',
-                              },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -1701,7 +1758,8 @@ narrative('Referenced States Flow', 'REF-STATES', () => {
 
     const code = await modelToNarrative(modelWithDateFields);
 
-    expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
+    expect(code)
+      .toEqual(`import { example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type TimestampedEvent = Event<
   'TimestampedEvent',
@@ -1731,20 +1789,21 @@ narrative('Date Handling Flow', 'DATE-FLOW', () => {
   query('date handling slice', 'DATE-SLICE').server(() => {
     specs('Date Field Rules', () => {
       rule('handles Date fields correctly', 'DateRule', () => {
-        example('event with Date fields')
-          .given<TimestampedEvent>({
+        example('event with Date fields', () => {
+          given<TimestampedEvent>({
             id: 'event-123',
             sentAt: new Date('2030-01-01T09:00:00.000Z'),
             savedAt: new Date('2030-01-01T09:05:00.000Z'),
             attemptedAt: new Date('2030-01-01T09:10:00.000Z'),
             submittedAt: new Date('2030-01-01T09:15:00.000Z'),
-          })
-          .when<ProcessEvent>({ processedAt: new Date('2030-01-01T10:00:00.000Z') })
-          .then<ProcessState>({
+          });
+          when<ProcessEvent>({ processedAt: new Date('2030-01-01T10:00:00.000Z') });
+          then<ProcessState>({
             id: 'state-123',
             completedAt: new Date('2030-01-01T11:00:00.000Z'),
             status: 'completed',
           });
+        });
       });
     });
   });
@@ -1841,71 +1900,74 @@ narrative('Response Analytics', () => {
               },
               server: {
                 description: 'Summary calculation server',
-                specs: {
-                  name: 'Summary Statistics',
-                  rules: [
-                    {
-                      id: 'RULE-SUMMARY',
-                      description: 'summary shows overall todo list statistics',
-                      examples: [
-                        {
-                          description: 'calculates summary from multiple todos',
-                          given: [
-                            {
-                              eventRef: 'TodoAdded',
-                              exampleData: {
-                                todoId: 'todo-001',
-                                description: 'Buy groceries',
-                                status: 'pending',
-                                addedAt: new Date('2030-01-01T09:00:00.000Z'),
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Summary Statistics',
+                    rules: [
+                      {
+                        id: 'RULE-SUMMARY',
+                        name: 'summary shows overall todo list statistics',
+                        examples: [
+                          {
+                            id: 'EX-001',
+                            name: 'calculates summary from multiple todos',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'TodoAdded',
+                                docString: {
+                                  todoId: 'todo-001',
+                                  description: 'Buy groceries',
+                                  status: 'pending',
+                                  addedAt: new Date('2030-01-01T09:00:00.000Z'),
+                                },
                               },
-                            },
-                            {
-                              eventRef: 'TodoAdded',
-                              exampleData: {
-                                todoId: 'todo-002',
-                                description: 'Write report',
-                                status: 'pending',
-                                addedAt: new Date('2030-01-01T09:10:00.000Z'),
+                              {
+                                keyword: 'And',
+                                text: 'TodoAdded',
+                                docString: {
+                                  todoId: 'todo-002',
+                                  description: 'Write report',
+                                  status: 'pending',
+                                  addedAt: new Date('2030-01-01T09:10:00.000Z'),
+                                },
                               },
-                            },
-                            {
-                              eventRef: 'TodoMarkedInProgress',
-                              exampleData: {
-                                todoId: 'todo-001',
-                                markedAt: new Date('2030-01-01T10:00:00.000Z'),
+                              {
+                                keyword: 'And',
+                                text: 'TodoMarkedInProgress',
+                                docString: {
+                                  todoId: 'todo-001',
+                                  markedAt: new Date('2030-01-01T10:00:00.000Z'),
+                                },
                               },
-                            },
-                            {
-                              eventRef: 'TodoMarkedComplete',
-                              exampleData: {
-                                todoId: 'todo-002',
-                                completedAt: new Date('2030-01-01T11:00:00.000Z'),
+                              {
+                                keyword: 'And',
+                                text: 'TodoMarkedComplete',
+                                docString: {
+                                  todoId: 'todo-002',
+                                  completedAt: new Date('2030-01-01T11:00:00.000Z'),
+                                },
                               },
-                            },
-                          ],
-                          when: {
-                            eventRef: '',
-                            exampleData: {},
+                              {
+                                keyword: 'Then',
+                                text: 'TodoListSummary',
+                                docString: {
+                                  summaryId: 'main-summary',
+                                  totalTodos: 2,
+                                  pendingCount: 0,
+                                  inProgressCount: 1,
+                                  completedCount: 1,
+                                  completionPercentage: 50,
+                                },
+                              },
+                            ],
                           },
-                          then: [
-                            {
-                              stateRef: 'TodoListSummary',
-                              exampleData: {
-                                summaryId: 'main-summary',
-                                totalTodos: 2,
-                                pendingCount: 0,
-                                inProgressCount: 1,
-                                completedCount: 1,
-                                completionPercentage: 50,
-                              },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
@@ -1963,7 +2025,8 @@ narrative('Response Analytics', () => {
 
     const code = await modelToNarrative(modelWithEmptyWhen);
 
-    expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
+    expect(code)
+      .toEqual(`import { and, example, given, narrative, query, rule, specs, then } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type TodoAdded = Event<
   'TodoAdded',
@@ -2003,22 +2066,22 @@ narrative('Todo List Summary', 'TODO-001', () => {
   query('views completion summary', 'SUMMARY-001').server(() => {
     specs('Summary Statistics', () => {
       rule('summary shows overall todo list statistics', 'RULE-SUMMARY', () => {
-        example('calculates summary from multiple todos')
-          .given<TodoAdded>({
+        example('calculates summary from multiple todos', () => {
+          given<TodoAdded>({
             todoId: 'todo-001',
             description: 'Buy groceries',
             status: 'pending',
             addedAt: new Date('2030-01-01T09:00:00.000Z'),
-          })
-          .and<TodoAdded>({
+          });
+          and<TodoAdded>({
             todoId: 'todo-002',
             description: 'Write report',
             status: 'pending',
             addedAt: new Date('2030-01-01T09:10:00.000Z'),
-          })
-          .and<TodoMarkedInProgress>({ todoId: 'todo-001', markedAt: new Date('2030-01-01T10:00:00.000Z') })
-          .and<TodoMarkedComplete>({ todoId: 'todo-002', completedAt: new Date('2030-01-01T11:00:00.000Z') })
-          .then<TodoListSummary>({
+          });
+          and<TodoMarkedInProgress>({ todoId: 'todo-001', markedAt: new Date('2030-01-01T10:00:00.000Z') });
+          and<TodoMarkedComplete>({ todoId: 'todo-002', completedAt: new Date('2030-01-01T11:00:00.000Z') });
+          then<TodoListSummary>({
             summaryId: 'main-summary',
             totalTodos: 2,
             pendingCount: 0,
@@ -2026,14 +2089,15 @@ narrative('Todo List Summary', 'TODO-001', () => {
             completedCount: 1,
             completionPercentage: 50,
           });
+        });
       });
     });
   });
 });
 `);
 
-    expect(code).not.toContain('.when({})');
-    expect(code).not.toContain('.when<');
+    expect(code).not.toContain('when({})');
+    expect(code).not.toContain('when<');
   });
 
   describe('projection DSL generation', () => {
@@ -2067,10 +2131,13 @@ narrative('Todo List Summary', 'TODO-001', () => {
                       },
                     },
                   ],
-                  specs: {
-                    name: 'Summary Rules',
-                    rules: [],
-                  },
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: 'Summary Rules',
+                      rules: [],
+                    },
+                  ],
                 },
               },
             ],
@@ -2140,10 +2207,13 @@ narrative('Todo Summary Flow', 'TODO-SUMMARY', () => {
                       },
                     },
                   ],
-                  specs: {
-                    name: 'Todo Rules',
-                    rules: [],
-                  },
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: 'Todo Rules',
+                      rules: [],
+                    },
+                  ],
                 },
               },
             ],
@@ -2213,10 +2283,13 @@ narrative('Todo Flow', 'TODO-FLOW', () => {
                       },
                     },
                   ],
-                  specs: {
-                    name: 'User Project Rules',
-                    rules: [],
-                  },
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: 'User Project Rules',
+                      rules: [],
+                    },
+                  ],
                 },
               },
             ],
@@ -2288,10 +2361,13 @@ narrative('User Project Flow', 'USER-PROJECT-FLOW', () => {
                       },
                     },
                   ],
-                  specs: {
-                    name: 'Summary Rules',
-                    rules: [],
-                  },
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: 'Summary Rules',
+                      rules: [],
+                    },
+                  ],
                 },
               },
               {
@@ -2316,10 +2392,13 @@ narrative('User Project Flow', 'USER-PROJECT-FLOW', () => {
                       },
                     },
                   ],
-                  specs: {
-                    name: 'Todo Rules',
-                    rules: [],
-                  },
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: 'Todo Rules',
+                      rules: [],
+                    },
+                  ],
                 },
               },
               {
@@ -2344,10 +2423,13 @@ narrative('User Project Flow', 'USER-PROJECT-FLOW', () => {
                       },
                     },
                   ],
-                  specs: {
-                    name: 'User Project Rules',
-                    rules: [],
-                  },
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: 'User Project Rules',
+                      rules: [],
+                    },
+                  ],
                 },
               },
             ],

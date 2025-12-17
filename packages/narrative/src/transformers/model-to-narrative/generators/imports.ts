@@ -1,20 +1,24 @@
 type BuildImportsOpts = { flowImport: string; integrationImport: string };
 
 export const ALL_FLOW_FUNCTION_NAMES = [
+  'and',
   'command',
+  'data',
+  'describe',
+  'example',
+  'experience',
+  'given',
+  'gql',
+  'it',
+  'narrative',
   'query',
   'react',
-  'experience',
-  'narrative',
-  'describe',
-  'it',
-  'specs',
   'rule',
-  'example',
-  'gql',
-  'source',
-  'data',
   'sink',
+  'source',
+  'specs',
+  'then',
+  'when',
 ] as const;
 
 export function buildImports(

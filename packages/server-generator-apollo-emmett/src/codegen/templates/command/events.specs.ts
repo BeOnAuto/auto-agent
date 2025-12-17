@@ -18,45 +18,50 @@ describe('events.ts.ejs', () => {
               },
               server: {
                 description: 'test',
-                specs: {
-                  name: 'Create listing command',
-                  rules: [
-                    {
-                      description: 'Should create listing successfully',
-                      examples: [
-                        {
-                          description: 'User creates listing with valid data',
-                          when: {
-                            commandRef: 'CreateListing',
-                            exampleData: {
-                              propertyId: 'listing_123',
-                              title: 'blah',
-                              pricePerNight: 250,
-                              maxGuests: 4,
-                              amenities: ['wifi', 'kitchen'],
-                              available: true,
-                              tags: ['some tag'],
-                              rating: 4.8,
-                              metadata: { foo: 'bar' },
-                              listedAt: '2024-01-15T10:00:00Z',
-                            },
-                          },
-                          then: [
-                            {
-                              eventRef: 'ListingCreated',
-                              exampleData: {
-                                propertyId: 'listing_123',
-                                listedAt: '2024-01-15T10:00:00Z',
-                                rating: 4.8,
-                                metadata: { foo: 'bar' },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Create listing command',
+                    rules: [
+                      {
+                        name: 'Should create listing successfully',
+                        examples: [
+                          {
+                            name: 'User creates listing with valid data',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'CreateListing',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  title: 'blah',
+                                  pricePerNight: 250,
+                                  maxGuests: 4,
+                                  amenities: ['wifi', 'kitchen'],
+                                  available: true,
+                                  tags: ['some tag'],
+                                  rating: 4.8,
+                                  metadata: { foo: 'bar' },
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                },
                               },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
+                              {
+                                keyword: 'Then',
+                                text: 'ListingCreated',
+                                docString: {
+                                  propertyId: 'listing_123',
+                                  listedAt: '2024-01-15T10:00:00Z',
+                                  rating: 4.8,
+                                  metadata: { foo: 'bar' },
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
               },
             },
           ],
