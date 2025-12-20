@@ -1,0 +1,194 @@
+{
+  "eventHandlers": [
+    "SchemaExported",
+    "SliceGenerated",
+    "SliceImplemented",
+    "ServerGenerated",
+    "IAGenerated",
+    "ClientGenerated",
+    "ComponentImplemented",
+    "ComponentImplementationFailed",
+    "ClientChecked"
+  ],
+  "folds": [],
+  "commandHandlers": [
+    "CheckClient",
+    "CheckLint",
+    "CheckTests",
+    "CheckTypes",
+    "CopyExample",
+    "ExportSchema",
+    "GenerateClient",
+    "GenerateIA",
+    "GenerateServer",
+    "ImplementClient",
+    "ImplementComponent",
+    "ImplementServer",
+    "ImplementSlice",
+    "ImportDesignSystem",
+    "StartClient",
+    "StartServer"
+  ],
+  "commandsWithMetadata": [
+    {
+      "id": "@auto-engineer/frontend-checks/check:client",
+      "name": "CheckClient",
+      "alias": "check:client",
+      "description": "Full frontend validation suite",
+      "package": "@auto-engineer/frontend-checks",
+      "version": "0.13.1",
+      "category": "validation",
+      "icon": "monitor"
+    },
+    {
+      "id": "@auto-engineer/server-checks/check:lint",
+      "name": "CheckLint",
+      "alias": "check:lint",
+      "description": "ESLint with optional auto-fix",
+      "package": "@auto-engineer/server-checks",
+      "version": "0.13.1",
+      "category": "check",
+      "icon": "sparkles"
+    },
+    {
+      "id": "@auto-engineer/server-checks/check:tests",
+      "name": "CheckTests",
+      "alias": "check:tests",
+      "description": "Run Vitest test suites",
+      "package": "@auto-engineer/server-checks",
+      "version": "0.13.1",
+      "category": "check",
+      "icon": "flask-conical"
+    },
+    {
+      "id": "@auto-engineer/server-checks/check:types",
+      "name": "CheckTypes",
+      "alias": "check:types",
+      "description": "TypeScript type checking",
+      "package": "@auto-engineer/server-checks",
+      "version": "0.13.1",
+      "category": "check",
+      "icon": "shield-check"
+    },
+    {
+      "id": "@auto-engineer/frontend-generator-react-graphql/copy:example",
+      "name": "CopyExample",
+      "alias": "copy:example",
+      "description": "Copy example React GraphQL template",
+      "package": "@auto-engineer/frontend-generator-react-graphql",
+      "version": "0.13.1",
+      "category": "copy",
+      "icon": "copy"
+    },
+    {
+      "id": "@auto-engineer/narrative/export:schema",
+      "name": "ExportSchema",
+      "alias": "export:schema",
+      "description": "Export flow schemas to context directory",
+      "package": "@auto-engineer/narrative",
+      "version": "0.13.1",
+      "category": "export",
+      "icon": "download"
+    },
+    {
+      "id": "@auto-engineer/frontend-generator-react-graphql/generate:client",
+      "name": "GenerateClient",
+      "alias": "generate:client",
+      "description": "Generate React client app",
+      "package": "@auto-engineer/frontend-generator-react-graphql",
+      "version": "0.13.1",
+      "category": "generate",
+      "icon": "monitor"
+    },
+    {
+      "id": "@auto-engineer/information-architect/generate:ia",
+      "name": "GenerateIA",
+      "alias": "generate:ia",
+      "description": "Generate Information Architecture",
+      "package": "@auto-engineer/information-architect",
+      "version": "0.13.1",
+      "category": "generate",
+      "icon": "building"
+    },
+    {
+      "id": "@auto-engineer/server-generator-apollo-emmett/generate:server",
+      "name": "GenerateServer",
+      "alias": "generate:server",
+      "description": "Generate server from model",
+      "package": "@auto-engineer/server-generator-apollo-emmett",
+      "version": "0.13.1",
+      "category": "generate",
+      "icon": "server"
+    },
+    {
+      "id": "@auto-engineer/frontend-implementer/implement:client",
+      "name": "ImplementClient",
+      "alias": "implement:client",
+      "description": "AI implements client",
+      "package": "@auto-engineer/frontend-implementer",
+      "version": "0.13.1",
+      "category": "implement",
+      "icon": "code"
+    },
+    {
+      "id": "@auto-engineer/component-implementer/implement:component",
+      "name": "ImplementComponent",
+      "alias": "implement:component",
+      "description": "AI implements a single component (atom, molecule, organism, or page)",
+      "package": "@auto-engineer/component-implementer",
+      "version": "0.13.1",
+      "category": "implement",
+      "icon": "layers"
+    },
+    {
+      "id": "@auto-engineer/server-implementer/implement:server",
+      "name": "ImplementServer",
+      "alias": "implement:server",
+      "description": "AI implements server TODOs and tests",
+      "package": "@auto-engineer/server-implementer",
+      "version": "0.13.1",
+      "category": "implement",
+      "icon": "server"
+    },
+    {
+      "id": "@auto-engineer/server-implementer/implement:slice",
+      "name": "ImplementSlice",
+      "alias": "implement:slice",
+      "description": "AI implements a specific server slice",
+      "package": "@auto-engineer/server-implementer",
+      "version": "0.13.1",
+      "category": "implement",
+      "icon": "layers"
+    },
+    {
+      "id": "@auto-engineer/design-system-importer/import:design-system",
+      "name": "ImportDesignSystem",
+      "alias": "import:design-system",
+      "description": "Import Figma design system",
+      "package": "@auto-engineer/design-system-importer",
+      "version": "0.13.1",
+      "category": "import",
+      "icon": "palette"
+    },
+    {
+      "id": "@auto-engineer/dev-server/start:client",
+      "name": "StartClient",
+      "alias": "start:client",
+      "description": "Start the development client",
+      "package": "@auto-engineer/dev-server",
+      "version": "0.13.1",
+      "category": "dev",
+      "icon": "monitor"
+    },
+    {
+      "id": "@auto-engineer/dev-server/start:server",
+      "name": "StartServer",
+      "alias": "start:server",
+      "description": "Start the development server",
+      "package": "@auto-engineer/dev-server",
+      "version": "0.13.1",
+      "category": "dev",
+      "icon": "server"
+    }
+  ]
+}
