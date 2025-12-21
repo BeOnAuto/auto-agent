@@ -20,14 +20,18 @@ One atomic test + implementation per cycle (5-15 min).
 - Independent, valuable, small, testable
 - Define: value added, code surface size (S/M/L), complexity (S/M/L)
 - 1-2 line approach description
+- Create `pomodoro-plan.md` with sections: TODO / IN PROGRESS / DONE
+- Commit the plan with initial pomodoros
 
 **Execution:**
 
-1. Write ONE failing test (Red)
-2. Write MINIMAL code to pass (Green)
-3. TCR: `test && commit || revert`
-4. Refactor if needed
-5. TCR: `test && commit || revert`
+1. Move pomodoro to IN PROGRESS in `pomodoro-plan.md`
+2. Write ONE failing test (Red)
+3. Write MINIMAL code to pass (Green)
+4. TCR: `test && commit || revert` (include plan update)
+5. Refactor if needed
+6. TCR: `test && commit || revert`
+7. Move pomodoro to DONE in the `pomodoro-plan.md`, commit with TCR
 
 **TCR Command:**
 
