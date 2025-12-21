@@ -10,3 +10,7 @@ export interface CommandDispatch<D extends DataRecord = DataRecord> {
   commandType: string;
   data: DataOrFactory<D>;
 }
+
+export function dispatch<D extends DataRecord>(commandType: string, data: DataOrFactory<D>): CommandDispatch<D> {
+  return { commandType, data };
+}

@@ -2,24 +2,6 @@
 
 ## TODO
 
-### Pomodoro 4: dispatch() Helper
-
-| Value | Ergonomic CommandDispatch creation |
-| Approach | Simple factory function |
-| Size | S |
-
-```typescript
-it('should create CommandDispatch via dispatch()', () => {
-  const cmd = dispatch('CheckTests', { targetDirectory: './src' });
-  expect(cmd).toEqual({
-    commandType: 'CheckTests',
-    data: { targetDirectory: './src' },
-  });
-});
-```
-
----
-
 ### Pomodoro 5: PipelineDescriptor Type
 
 | Value | Pipeline structure definition |
@@ -291,6 +273,24 @@ it('should create complete simple pipeline', () => {
 ---
 
 ## DONE
+
+### Pomodoro 4: dispatch() Helper
+
+| Value | Ergonomic CommandDispatch creation |
+| Approach | Simple factory function |
+| Size | S |
+
+```typescript
+it('should create CommandDispatch via dispatch()', () => {
+  const cmd = dispatch('CheckTests', { targetDirectory: './src' });
+  expect(cmd).toEqual({
+    commandType: 'CheckTests',
+    data: { targetDirectory: './src' },
+  });
+});
+```
+
+---
 
 ### Pomodoro 3: CommandDispatch Type
 

@@ -1,4 +1,4 @@
-import { Command, CommandDispatch, Event } from './types';
+import { Command, CommandDispatch, dispatch, Event } from './types';
 
 describe('Core Types', () => {
   it('should re-export Command and Event from message-bus', () => {
@@ -30,5 +30,15 @@ describe('CommandDispatch', () => {
     const event: Event = { type: 'SliceGenerated', data: { path: './slice' } };
     const resolved = typeof cmd.data === 'function' ? cmd.data(event) : cmd.data;
     expect(resolved).toEqual({ slicePath: './slice' });
+  });
+});
+
+describe('dispatch()', () => {
+  it('should create CommandDispatch via dispatch()', () => {
+    const cmd = dispatch('CheckTests', { targetDirectory: './src' });
+    expect(cmd).toEqual({
+      commandType: 'CheckTests',
+      data: { targetDirectory: './src' },
+    });
   });
 });
