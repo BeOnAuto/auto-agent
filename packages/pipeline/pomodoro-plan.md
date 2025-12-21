@@ -2,37 +2,6 @@
 
 ## TODO
 
-### Pomodoro 3: CommandDispatch Type
-
-| Value | Dispatch instruction type |
-| Approach | Simple interface with commandType + data |
-| Size | S |
-
-```typescript
-it('should create CommandDispatch with static data', () => {
-  const cmd: CommandDispatch = {
-    commandType: 'CheckTests',
-    data: { targetDirectory: './src', scope: 'slice' },
-  };
-  expect(cmd).toEqual({
-    commandType: 'CheckTests',
-    data: { targetDirectory: './src', scope: 'slice' },
-  });
-});
-
-it('should create CommandDispatch with data factory', () => {
-  const cmd: CommandDispatch = {
-    commandType: 'ImplementSlice',
-    data: (e) => ({ slicePath: e.data.path }),
-  };
-  const event: Event = { type: 'SliceGenerated', data: { path: './slice' } };
-  const resolved = typeof cmd.data === 'function' ? cmd.data(event) : cmd.data;
-  expect(resolved).toEqual({ slicePath: './slice' });
-});
-```
-
----
-
 ### Pomodoro 4: dispatch() Helper
 
 | Value | Ergonomic CommandDispatch creation |
@@ -322,6 +291,37 @@ it('should create complete simple pipeline', () => {
 ---
 
 ## DONE
+
+### Pomodoro 3: CommandDispatch Type
+
+| Value | Dispatch instruction type |
+| Approach | Simple interface with commandType + data |
+| Size | S |
+
+```typescript
+it('should create CommandDispatch with static data', () => {
+  const cmd: CommandDispatch = {
+    commandType: 'CheckTests',
+    data: { targetDirectory: './src', scope: 'slice' },
+  };
+  expect(cmd).toEqual({
+    commandType: 'CheckTests',
+    data: { targetDirectory: './src', scope: 'slice' },
+  });
+});
+
+it('should create CommandDispatch with data factory', () => {
+  const cmd: CommandDispatch = {
+    commandType: 'ImplementSlice',
+    data: (e) => ({ slicePath: e.data.path }),
+  };
+  const event: Event = { type: 'SliceGenerated', data: { path: './slice' } };
+  const resolved = typeof cmd.data === 'function' ? cmd.data(event) : cmd.data;
+  expect(resolved).toEqual({ slicePath: './slice' });
+});
+```
+
+---
 
 ### Pomodoro 2: Core Types
 
