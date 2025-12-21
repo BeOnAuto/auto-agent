@@ -672,6 +672,12 @@ importers:
         specifier: ^4.20.3
         version: 4.20.5
 
+  packages/pipeline:
+    dependencies:
+      '@auto-engineer/message-bus':
+        specifier: workspace:*
+        version: link:../message-bus
+
   packages/server-checks:
     dependencies:
       '@auto-engineer/cli':
