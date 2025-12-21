@@ -2,167 +2,6 @@
 
 ## TODO
 
-### Pomodoro 6: define() Entry Point
-
-| Value | API entry point |
-| Approach | Factory returning PipelineBuilder |
-| Size | S |
-
-```typescript
-it('should create PipelineBuilder via define()', () => {
-  const builder = define('my-pipeline');
-  expect(builder).toBeDefined();
-  expect(typeof builder.version).toBe('function');
-  expect(typeof builder.on).toBe('function');
-  expect(typeof builder.build).toBe('function');
-});
-```
-
----
-
-### Pomodoro 7: version() and description()
-
-| Value | Fluent metadata |
-| Approach | Methods returning this |
-| Size | S |
-
-```typescript
-it('should chain version() and description()', () => {
-  const pipeline = define('test').version('1.0.0').description('Test pipeline').build();
-  expect(pipeline.descriptor.name).toBe('test');
-  expect(pipeline.descriptor.version).toBe('1.0.0');
-  expect(pipeline.descriptor.description).toBe('Test pipeline');
-});
-```
-
----
-
-### Pomodoro 8: build() Returns Pipeline
-
-| Value | Terminal operation |
-| Approach | Return frozen Pipeline object |
-| Size | S |
-
-```typescript
-it('should return frozen Pipeline from build()', () => {
-  const pipeline = define('test').build();
-  expect(pipeline.descriptor).toBeDefined();
-  expect(Object.isFrozen(pipeline.descriptor)).toBe(true);
-});
-```
-
----
-
-### Pomodoro 9: EmitHandlerDescriptor Type
-
-| Value | Descriptor for emit handlers |
-| Approach | Interface with type discriminator |
-| Size | S |
-
-```typescript
-it('should create EmitHandlerDescriptor', () => {
-  const descriptor: EmitHandlerDescriptor = {
-    type: 'emit',
-    eventType: 'SchemaExported',
-    commands: [{ commandType: 'GenerateServer', data: { modelPath: '.' } }],
-  };
-  expect(descriptor.type).toBe('emit');
-  expect(descriptor.commands).toHaveLength(1);
-});
-```
-
----
-
-### Pomodoro 10: on() Returns TriggerBuilder
-
-| Value | Event handler entry point |
-| Approach | Return TriggerBuilder instance |
-| Size | M |
-
-```typescript
-it('should return TriggerBuilder from on()', () => {
-  const trigger = define('test').on('SchemaExported');
-  expect(typeof trigger.emit).toBe('function');
-  expect(typeof trigger.when).toBe('function');
-});
-```
-
----
-
-### Pomodoro 11: emit() with Static Data
-
-| Value | Simple emit handler |
-| Approach | Create EmitChain with command |
-| Size | M |
-
-```typescript
-it('should create EmitChain from emit()', () => {
-  const chain = define('test').on('SchemaExported').emit('GenerateServer', { modelPath: './schema.json' });
-  expect(typeof chain.emit).toBe('function');
-  expect(typeof chain.build).toBe('function');
-});
-```
-
----
-
-### Pomodoro 12: EmitChain.build() Captures Handler
-
-| Value | Complete simple emit flow |
-| Approach | Add handler to descriptor |
-| Size | M |
-
-```typescript
-it('should capture emit handler in descriptor', () => {
-  const pipeline = define('test').on('SchemaExported').emit('GenerateServer', { modelPath: './schema.json' }).build();
-  expect(pipeline.descriptor.handlers).toHaveLength(1);
-  const handler = pipeline.descriptor.handlers[0] as EmitHandlerDescriptor;
-  expect(handler.type).toBe('emit');
-  expect(handler.eventType).toBe('SchemaExported');
-  expect(handler.commands).toEqual([{ commandType: 'GenerateServer', data: { modelPath: './schema.json' } }]);
-});
-```
-
----
-
-### Pomodoro 13: emit() with Data Factory
-
-| Value | Dynamic command data |
-| Approach | Accept function in emit() |
-| Size | S |
-
-```typescript
-it('should accept data factory in emit()', () => {
-  const factory = (e: Event) => ({ slicePath: e.data.path });
-  const pipeline = define('test').on('SliceGenerated').emit('ImplementSlice', factory).build();
-  const handler = pipeline.descriptor.handlers[0] as EmitHandlerDescriptor;
-  expect(typeof handler.commands[0].data).toBe('function');
-});
-```
-
----
-
-### Pomodoro 14: Parallel emit() Chain
-
-| Value | Multiple commands from one event |
-| Approach | Accumulate commands in chain |
-| Size | M |
-
-```typescript
-it('should chain emit() for parallel commands', () => {
-  const pipeline = define('test')
-    .on('ServerGenerated')
-    .emit('GenerateIA', { modelPath: './schema.json' })
-    .emit('StartServer', { serverDirectory: './server' })
-    .build();
-  const handler = pipeline.descriptor.handlers[0] as EmitHandlerDescriptor;
-  expect(handler.commands).toHaveLength(2);
-  expect(handler.commands[0].commandType).toBe('GenerateIA');
-  expect(handler.commands[1].commandType).toBe('StartServer');
-});
-```
-
----
-
 ### Pomodoro 15: when() Predicate
 
 | Value | Conditional execution |
@@ -253,6 +92,24 @@ it('should create complete simple pipeline', () => {
 ---
 
 ## DONE
+
+### Pomodoro 6-12, 14, 16, 17: Builder API (batched)
+
+Implemented:
+
+- define() entry point
+- version() and description()
+- build() returns frozen Pipeline
+- on() returns TriggerBuilder
+- emit() with static data
+- EmitChain.build() captures handler
+- Parallel emit() chain
+- EmitChain.on() continues chain
+- key() named extractors
+
+All tests pass with 100% coverage.
+
+---
 
 ### Pomodoro 5: PipelineDescriptor Type
 
