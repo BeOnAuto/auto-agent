@@ -2,23 +2,6 @@
 
 ## TODO
 
-### Pomodoro 2: Core Types
-
-| Value | Foundation types |
-| Approach | Re-export message-bus types + add pipeline types |
-| Size | S |
-
-```typescript
-it('should re-export Command and Event from message-bus', () => {
-  const cmd: Command = { type: 'Test', data: {} };
-  const evt: Event = { type: 'TestDone', data: {} };
-  expect(cmd.type).toBe('Test');
-  expect(evt.type).toBe('TestDone');
-});
-```
-
----
-
 ### Pomodoro 3: CommandDispatch Type
 
 | Value | Dispatch instruction type |
@@ -339,6 +322,23 @@ it('should create complete simple pipeline', () => {
 ---
 
 ## DONE
+
+### Pomodoro 2: Core Types
+
+| Value | Foundation types |
+| Approach | Re-export message-bus types + add pipeline types |
+| Size | S |
+
+```typescript
+it('should re-export Command and Event from message-bus', () => {
+  const cmd: Command = { type: 'Test', data: {} };
+  const evt: Event = { type: 'TestDone', data: {} };
+  expect(cmd.type).toBe('Test');
+  expect(evt.type).toBe('TestDone');
+});
+```
+
+---
 
 ### Pomodoro 1: Package Scaffold
 
