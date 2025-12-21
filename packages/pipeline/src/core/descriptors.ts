@@ -1,5 +1,6 @@
 import type { Event } from '@auto-engineer/message-bus';
 import type { CommandDispatch } from './types';
+import type { PipelineContext } from '../runtime/context';
 
 export type KeyExtractor = (event: Event) => string;
 
@@ -63,7 +64,7 @@ export interface CustomHandlerDescriptor {
   type: 'custom';
   eventType: string;
   predicate?: EventPredicate;
-  handler: (event: Event) => void | Promise<void>;
+  handler: (event: Event, ctx: PipelineContext) => void | Promise<void>;
   declaredEmits?: string[];
 }
 

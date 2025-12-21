@@ -2,8 +2,10 @@ import type { Event } from '@auto-engineer/message-bus';
 import type {
   CustomHandlerDescriptor,
   EmitHandlerDescriptor,
+  ForEachPhasedDescriptor,
   HandlerDescriptor,
   PipelineDescriptor,
+  RunAwaitHandlerDescriptor,
 } from '../core/descriptors';
 import type { PipelineContext } from './context';
 
@@ -34,7 +36,13 @@ export class PipelineRuntime {
           await this.executeEmitHandler(handler, event, ctx);
           break;
         case 'custom':
-          await this.executeCustomHandler(handler, event);
+          await this.executeCustomHandler(handler, event, ctx);
+          break;
+        case 'run-await':
+          await this.executeRunAwaitHandler(handler, event, ctx);
+          break;
+        case 'foreach-phased':
+          await this.executeForEachPhasedHandler(handler, event, ctx);
           break;
       }
     }
@@ -47,8 +55,49 @@ export class PipelineRuntime {
     }
   }
 
-  private async executeCustomHandler(handler: CustomHandlerDescriptor, event: Event): Promise<void> {
-    await handler.handler(event);
+  private async executeCustomHandler(
+    handler: CustomHandlerDescriptor,
+    event: Event,
+    ctx: PipelineContext,
+  ): Promise<void> {
+    await handler.handler(event, ctx);
+  }
+
+  private async executeRunAwaitHandler(
+    handler: RunAwaitHandlerDescriptor,
+    event: Event,
+    ctx: PipelineContext,
+  ): Promise<void> {
+    const commands = typeof handler.commands === 'function' ? handler.commands(event) : handler.commands;
+    for (const command of commands) {
+      const data = typeof command.data === 'function' ? command.data(event) : command.data;
+      await ctx.sendCommand(command.commandType, data);
+    }
+  }
+
+  private async executeForEachPhasedHandler(
+    handler: ForEachPhasedDescriptor,
+    event: Event,
+    ctx: PipelineContext,
+  ): Promise<void> {
+    const items = handler.itemsSelector(event);
+    const phaseGroups: Record<string, unknown[]> = {};
+
+    for (const phase of handler.phases) {
+      phaseGroups[phase] = [];
+    }
+
+    for (const item of items) {
+      const phase = handler.classifier(item);
+      phaseGroups[phase]?.push(item);
+    }
+
+    for (const phase of handler.phases) {
+      for (const item of phaseGroups[phase]) {
+        const command = handler.emitFactory(item, phase, event);
+        await ctx.sendCommand(command.commandType, command.data);
+      }
+    }
   }
 
   private buildHandlerIndex(): Map<string, HandlerDescriptor[]> {

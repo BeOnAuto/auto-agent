@@ -87,4 +87,128 @@ describe('PipelineRuntime', () => {
     );
     expect(called).toBe(true);
   });
+
+  it('should dispatch run-await commands with static array', async () => {
+    const sent: string[] = [];
+    const ctx = {
+      sendCommand: async (type: string) => {
+        sent.push(type);
+      },
+      emit: async () => {},
+      correlationId: 'test',
+    };
+    const pipeline = define('test')
+      .on('Start')
+      .run([
+        { commandType: 'A', data: {} },
+        { commandType: 'B', data: {} },
+      ])
+      .awaitAll('key', () => '')
+      .build();
+    const runtime = new PipelineRuntime(pipeline.descriptor);
+    await runtime.handleEvent({ type: 'Start', data: {} }, ctx);
+    expect(sent).toEqual(['A', 'B']);
+  });
+
+  it('should dispatch run-await commands with factory', async () => {
+    const sent: Array<{ type: string; data: unknown }> = [];
+    const ctx = {
+      sendCommand: async (type: string, data: unknown) => {
+        sent.push({ type, data });
+      },
+      emit: async () => {},
+      correlationId: 'test',
+    };
+    type ItemsEvent = { type: string; data: { items: Array<{ id: string }> } };
+    const pipeline = define('test')
+      .on('Items')
+      .run((e: ItemsEvent) => e.data.items.map((item) => ({ commandType: 'Process', data: { itemId: item.id } })))
+      .awaitAll('byItem', () => '')
+      .build();
+    const runtime = new PipelineRuntime(pipeline.descriptor);
+    await runtime.handleEvent({ type: 'Items', data: { items: [{ id: '1' }, { id: '2' }] } }, ctx);
+    expect(sent).toHaveLength(2);
+    expect(sent[0].data).toEqual({ itemId: '1' });
+    expect(sent[1].data).toEqual({ itemId: '2' });
+  });
+
+  it('should dispatch run-await commands with data factory per command', async () => {
+    const sent: Array<{ type: string; data: unknown }> = [];
+    const ctx = {
+      sendCommand: async (type: string, data: unknown) => {
+        sent.push({ type, data });
+      },
+      emit: async () => {},
+      correlationId: 'test',
+    };
+    type MyEvent = { type: string; data: { x: number } };
+    const pipeline = define('test')
+      .on('Start')
+      .run((e: MyEvent) => [{ commandType: 'Cmd', data: { val: e.data.x * 2 } }])
+      .awaitAll('key', () => '')
+      .build();
+    const runtime = new PipelineRuntime(pipeline.descriptor);
+    await runtime.handleEvent({ type: 'Start', data: { x: 5 } }, ctx);
+    expect(sent[0].data).toEqual({ val: 10 });
+  });
+
+  it('should resolve data factory in static run-await commands', async () => {
+    const sent: Array<{ type: string; data: unknown }> = [];
+    const ctx = {
+      sendCommand: async (type: string, data: unknown) => {
+        sent.push({ type, data });
+      },
+      emit: async () => {},
+      correlationId: 'test',
+    };
+    const dataFactory = (e: { data: { v?: number } }) => ({ result: (e.data.v ?? 0) * 3 });
+    const runtime = new PipelineRuntime({
+      name: 'test',
+      keys: new Map(),
+      handlers: [
+        {
+          type: 'run-await',
+          eventType: 'Start',
+          commands: [{ commandType: 'Cmd', data: dataFactory }],
+          awaitConfig: { keyName: 'k', key: () => '' },
+        },
+      ],
+    });
+    await runtime.handleEvent({ type: 'Start', data: { v: 7 } }, ctx);
+    expect(sent[0].data).toEqual({ result: 21 });
+  });
+
+  it('should process items in phase order for foreach-phased', async () => {
+    const sent: string[] = [];
+    const ctx = {
+      sendCommand: async (_: string, data: unknown) => {
+        sent.push((data as { id: string }).id);
+      },
+      emit: async () => {},
+      correlationId: 'test',
+    };
+    type Item = { id: string; p: 'high' | 'low' };
+    const pipeline = define('test')
+      .on('Items')
+      .forEach((e: { data: { items: Item[] } }) => e.data.items)
+      .groupInto(['high', 'low'], (i: Item) => i.p)
+      .process('Cmd', (i: Item) => ({ id: i.id }))
+      .onComplete({ success: 'Done', failure: 'Fail', itemKey: () => '' })
+      .build();
+    const runtime = new PipelineRuntime(pipeline.descriptor);
+    await runtime.handleEvent(
+      {
+        type: 'Items',
+        data: {
+          items: [
+            { id: '1', p: 'low' },
+            { id: '2', p: 'high' },
+            { id: '3', p: 'high' },
+          ],
+        },
+      },
+      ctx,
+    );
+    expect(sent).toEqual(['2', '3', '1']);
+  });
 });

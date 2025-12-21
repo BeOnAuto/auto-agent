@@ -3,10 +3,17 @@
 ## Pomodoro + TDD + TCR + 100% Coverage
 
 ```
-╔════════════════════════════════════════════════════════════════╗
-║  Red -> Green -> Commit -> Refactor -> Commit                  ║
-║  Small steps. Always passing. Always committed.                ║
-╚════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════╗
+║                                                                       ║
+║   Red ───► Green ───►[TCR]───► Refactor ───►[TCR]───► Done           ║
+║                                                                       ║
+║   [TCR] = test ──┬── pass ──► commit ──► continue                    ║
+║                  └── fail ──► REVERT ──► rethink                     ║
+║                                                                       ║
+║   REVERT means STOP. Don't fix in place. Rethink:                    ║
+║     • Same approach, smaller step  OR  • Different approach          ║
+║                                                                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
 ```
 
 ---
@@ -39,6 +46,22 @@ pnpm test --run && \
   git add -A && git commit -m "<COMMITIZEN FORMAT>" || \
   git checkout -- packages/<package>/
 ```
+
+**CRITICAL: Revert Means Rethink**
+
+When you notice your implementation is broken:
+
+- **DO NOT** continue down the same path trying to patch errors
+- **DO NOT** add more code to fix the code you just wrote
+- **DO** execute the revert immediately
+- **DO** ask: was the approach wrong, or was the step too big?
+
+After reverting, choose one:
+
+1. **Same approach, smaller step** — the idea was sound, but you skipped TDD discipline. Break it into tinier increments.
+2. **Different approach** — the design itself was flawed. Try a fundamentally different angle.
+
+The revert is not a punishment—it is the process. Patching broken code compounds the mistake.
 
 ---
 

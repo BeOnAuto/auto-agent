@@ -14,6 +14,7 @@ import type {
 } from '../core/descriptors';
 import type { CommandDispatch } from '../core/types';
 import type { GraphEdge, GraphIR, GraphNode } from '../graph/types';
+import type { PipelineContext } from '../runtime/context';
 
 export interface Pipeline {
   descriptor: Readonly<PipelineDescriptor>;
@@ -38,7 +39,7 @@ export interface TriggerBuilder {
   run(commands: CommandDispatch[]): RunBuilder;
   run<E>(factory: (event: E) => CommandDispatch[]): RunBuilder;
   forEach<E, T>(itemsSelector: (event: E) => T[]): ForEachBuilder<T>;
-  handle<E>(handler: (event: E) => void | Promise<void>, options?: HandleOptions): HandleChain;
+  handle<E>(handler: (event: E, ctx: PipelineContext) => void | Promise<void>, options?: HandleOptions): HandleChain;
 }
 
 export interface ForEachBuilder<T> {
@@ -269,11 +270,11 @@ class TriggerBuilderImpl implements TriggerBuilder {
     );
   }
 
-  handle<E>(handler: (event: E) => void | Promise<void>, options?: HandleOptions): HandleChain {
+  handle<E>(handler: (event: E, ctx: PipelineContext) => void | Promise<void>, options?: HandleOptions): HandleChain {
     return new HandleChainImpl(
       this.parent,
       this.eventType,
-      handler as (event: Event) => void | Promise<void>,
+      handler as (event: Event, ctx: PipelineContext) => void | Promise<void>,
       this.predicate,
       options?.emits,
     );
@@ -319,7 +320,7 @@ class HandleChainImpl implements HandleChain {
   constructor(
     private readonly parent: PipelineBuilderImpl,
     private readonly eventType: string,
-    private readonly handler: (event: Event) => void | Promise<void>,
+    private readonly handler: (event: Event, ctx: PipelineContext) => void | Promise<void>,
     private readonly predicate?: EventPredicate,
     private readonly declaredEmits?: string[],
   ) {}

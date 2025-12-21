@@ -349,13 +349,44 @@ it('should extract graph from emit handler', () => {
 
 ## IN PROGRESS
 
-### Phase 6: Runtime (Pomodoros 43-54)
+### Phase 8: CLI Integration (Pomodoros 67-70)
 
-Currently implementing runtime execution layer. Next: run-await and foreach-phased handlers.
+Currently working on CLI integration to run E2E tests against the new pipeline infrastructure.
 
 ---
 
 ## DONE
+
+### Pomodoro 55-66: PipelineServer
+
+Implemented:
+
+- `PipelineServer` class with HTTP endpoints
+- `/health`, `/registry`, `/pipeline`, `/messages`, `/sessions`, `/stats` endpoints
+- `POST /command` with command handler validation and 404 for unknown commands
+- Event routing through registered pipelines
+- Custom handler context support (emit, sendCommand)
+- Command handlers returning multiple events
+- Integration test for complete workflow
+- 16 tests for server functionality
+- Exports added to public API
+
+All 80 tests pass with 100% coverage.
+
+---
+
+### Pomodoro 51-52: Run-await and ForEach-phased Runtime
+
+Implemented:
+
+- `handleEvent()` for run-await handlers with command dispatch
+- Data factory support in static run-await commands
+- ForEach-phased item processing with phase ordering
+- Custom handler receives PipelineContext
+
+All 80 tests pass with 100% coverage.
+
+---
 
 ### Pomodoro 45-50: PipelineRuntime Core
 
