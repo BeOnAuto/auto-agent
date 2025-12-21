@@ -1,5 +1,16 @@
 # @auto-engineer/flow
 
+## 0.13.2
+
+### Patch Changes
+
+- add optional id to specs, steps, and client specs
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.13.2
+  - @auto-engineer/id@0.13.2
+  - @auto-engineer/message-bus@0.13.2
+
 ## 0.13.1
 
 ### Patch Changes

@@ -52,6 +52,7 @@ describe('hasAllIds', () => {
               description: 'Test server',
               specs: [
                 {
+                  id: 'SPEC-001',
                   type: 'gherkin',
                   feature: 'Test specs',
                   rules: [
@@ -59,6 +60,66 @@ describe('hasAllIds', () => {
                       id: 'RULE-001',
                       name: 'Test rule with ID',
                       examples: [],
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+    messages: [],
+    integrations: [],
+  });
+
+  const createModelWithFullIds = (): Model => ({
+    variant: 'specs',
+    narratives: [
+      {
+        name: 'Test Flow with Full IDs',
+        id: 'FLOW-001',
+        slices: [
+          {
+            type: 'command',
+            name: 'Test slice with ID',
+            id: 'SLICE-001',
+            client: { specs: [] },
+            server: {
+              description: 'Test server',
+              specs: [
+                {
+                  id: 'SPEC-001',
+                  type: 'gherkin',
+                  feature: 'Test specs',
+                  rules: [
+                    {
+                      id: 'RULE-001',
+                      name: 'Test rule with ID',
+                      examples: [
+                        {
+                          id: 'EXAMPLE-001',
+                          name: 'Test example',
+                          steps: [
+                            {
+                              id: 'STEP-001',
+                              keyword: 'Given',
+                              text: 'TestState',
+                              docString: { value: 'test' },
+                            },
+                            {
+                              id: 'STEP-002',
+                              keyword: 'When',
+                              text: 'TestCommand',
+                            },
+                            {
+                              id: 'STEP-003',
+                              keyword: 'Then',
+                              text: 'TestEvent',
+                            },
+                          ],
+                        },
+                      ],
                     },
                   ],
                 },
@@ -84,7 +145,7 @@ describe('hasAllIds', () => {
             name: 'Active Surveys Summary',
             id: 'slice1',
             type: 'experience',
-            client: { specs: [{ type: 'it', title: 'show active surveys summary' }] },
+            client: { specs: [{ type: 'it', id: 'it1', title: 'show active surveys summary' }] },
           },
         ],
       },
@@ -97,7 +158,7 @@ describe('hasAllIds', () => {
             name: 'Create Survey Form',
             id: includeAllSliceIds ? 'slice2' : undefined,
             type: 'experience',
-            client: { specs: [{ type: 'it', title: 'allow entering survey title' }] },
+            client: { specs: [{ type: 'it', id: 'it2', title: 'allow entering survey title' }] },
           },
         ],
       },
@@ -110,7 +171,7 @@ describe('hasAllIds', () => {
             name: 'Response Rate Charts',
             id: 'slice3',
             type: 'experience',
-            client: { specs: [{ type: 'it', title: 'show daily response rate charts' }] },
+            client: { specs: [{ type: 'it', id: 'it3', title: 'show daily response rate charts' }] },
           },
         ],
       },
@@ -165,5 +226,219 @@ describe('hasAllIds', () => {
   it('should return false when any slice in multiple flows with same sourceFile is missing ID', () => {
     const model = createMultipleFlowsModel(true, false);
     expect(hasAllIds(model)).toBe(false);
+  });
+
+  it('should return false if any spec is missing an ID', () => {
+    const model = createModelWithFullIds();
+    const modifiedModel = structuredClone(model);
+    const slice = modifiedModel.narratives[0].slices[0];
+    if ('server' in slice && slice.server?.specs !== undefined && Array.isArray(slice.server.specs)) {
+      slice.server.specs[0].id = '';
+    }
+    expect(hasAllIds(modifiedModel)).toBe(false);
+  });
+
+  it('should return false if any example is missing an ID', () => {
+    const model = createModelWithFullIds();
+    const modifiedModel = structuredClone(model);
+    const slice = modifiedModel.narratives[0].slices[0];
+    if ('server' in slice && slice.server?.specs !== undefined && Array.isArray(slice.server.specs)) {
+      slice.server.specs[0].rules[0].examples[0].id = '';
+    }
+    expect(hasAllIds(modifiedModel)).toBe(false);
+  });
+
+  it('should return false if any step is missing an ID', () => {
+    const model = createModelWithFullIds();
+    const modifiedModel = structuredClone(model);
+    const slice = modifiedModel.narratives[0].slices[0];
+    if ('server' in slice && slice.server?.specs !== undefined && Array.isArray(slice.server.specs)) {
+      slice.server.specs[0].rules[0].examples[0].steps[0].id = '';
+    }
+    expect(hasAllIds(modifiedModel)).toBe(false);
+  });
+
+  it('should return false if step with error is missing an ID', () => {
+    const model: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          id: 'FLOW-001',
+          slices: [
+            {
+              type: 'command',
+              name: 'Test slice',
+              id: 'SLICE-001',
+              client: { specs: [] },
+              server: {
+                description: 'Test server',
+                specs: [
+                  {
+                    id: 'SPEC-001',
+                    type: 'gherkin',
+                    feature: 'Test specs',
+                    rules: [
+                      {
+                        id: 'RULE-001',
+                        name: 'Test rule',
+                        examples: [
+                          {
+                            id: 'EXAMPLE-001',
+                            name: 'Error example',
+                            steps: [
+                              {
+                                id: 'STEP-001',
+                                keyword: 'Given',
+                                text: 'TestState',
+                              },
+                              {
+                                keyword: 'Then',
+                                error: { type: 'ValidationError', message: 'Invalid input' },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+    expect(hasAllIds(model)).toBe(false);
+  });
+
+  it('should return false if client it spec is missing an ID', () => {
+    const model: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          id: 'FLOW-001',
+          slices: [
+            {
+              name: 'Test slice',
+              id: 'SLICE-001',
+              type: 'experience',
+              client: {
+                specs: [{ type: 'it', title: 'test without id' }],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+    expect(hasAllIds(model)).toBe(false);
+  });
+
+  it('should return false if client describe spec is missing an ID', () => {
+    const model: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          id: 'FLOW-001',
+          slices: [
+            {
+              name: 'Test slice',
+              id: 'SLICE-001',
+              type: 'experience',
+              client: {
+                specs: [
+                  {
+                    type: 'describe',
+                    title: 'test describe without id',
+                    children: [{ type: 'it', id: 'IT-001', title: 'nested it with id' }],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+    expect(hasAllIds(model)).toBe(false);
+  });
+
+  it('should return false if nested client it spec is missing an ID', () => {
+    const model: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          id: 'FLOW-001',
+          slices: [
+            {
+              name: 'Test slice',
+              id: 'SLICE-001',
+              type: 'experience',
+              client: {
+                specs: [
+                  {
+                    type: 'describe',
+                    id: 'DESC-001',
+                    title: 'test describe with id',
+                    children: [{ type: 'it', title: 'nested it without id' }],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+    expect(hasAllIds(model)).toBe(false);
+  });
+
+  it('should return true for client specs with all IDs', () => {
+    const model: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          id: 'FLOW-001',
+          slices: [
+            {
+              name: 'Test slice',
+              id: 'SLICE-001',
+              type: 'experience',
+              client: {
+                specs: [
+                  {
+                    type: 'describe',
+                    id: 'DESC-001',
+                    title: 'test describe',
+                    children: [
+                      { type: 'it', id: 'IT-001', title: 'first it' },
+                      {
+                        type: 'describe',
+                        id: 'DESC-002',
+                        title: 'nested describe',
+                        children: [{ type: 'it', id: 'IT-002', title: 'nested it' }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+    expect(hasAllIds(model)).toBe(true);
   });
 });

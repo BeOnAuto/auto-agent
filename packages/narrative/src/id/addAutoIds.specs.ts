@@ -286,4 +286,374 @@ describe('addAutoIds', () => {
     expect(result.narratives[1].sourceFile).toBe('/path/to/homepage.narrative.ts');
     expect(result.narratives[2].sourceFile).toBe('/path/to/homepage.narrative.ts');
   });
+
+  it('should assign IDs to specs', () => {
+    const modelWithSpecs: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          slices: [
+            {
+              type: 'command',
+              name: 'Test Command',
+              client: { specs: [] },
+              server: {
+                description: 'Test server',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Test Feature',
+                    rules: [],
+                  },
+                  {
+                    id: 'EXISTING-SPEC-001',
+                    type: 'gherkin',
+                    feature: 'Existing Feature',
+                    rules: [],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+
+    const result = addAutoIds(modelWithSpecs);
+    const slice = result.narratives[0].slices[0];
+
+    if ('server' in slice && slice.server?.specs != null && Array.isArray(slice.server.specs)) {
+      expect(slice.server.specs[0].id).toMatch(AUTO_ID_REGEX);
+      expect(slice.server.specs[1].id).toBe('EXISTING-SPEC-001');
+    }
+  });
+
+  it('should assign IDs to steps', () => {
+    const modelWithSteps: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          slices: [
+            {
+              type: 'command',
+              name: 'Test Command',
+              client: { specs: [] },
+              server: {
+                description: 'Test server',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Test Feature',
+                    rules: [
+                      {
+                        name: 'Test Rule',
+                        examples: [
+                          {
+                            name: 'Test Example',
+                            steps: [
+                              { keyword: 'Given', text: 'TestState', docString: { value: 'test' } },
+                              { keyword: 'When', text: 'TestCommand' },
+                              { id: 'EXISTING-STEP-001', keyword: 'Then', text: 'TestEvent' },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+
+    const result = addAutoIds(modelWithSteps);
+    const slice = result.narratives[0].slices[0];
+
+    if ('server' in slice && slice.server?.specs != null && Array.isArray(slice.server.specs)) {
+      const steps = slice.server.specs[0].rules[0].examples[0].steps;
+      expect(steps[0].id).toMatch(AUTO_ID_REGEX);
+      expect(steps[1].id).toMatch(AUTO_ID_REGEX);
+      expect(steps[2].id).toBe('EXISTING-STEP-001');
+    }
+  });
+
+  it('should preserve existing example IDs', () => {
+    const modelWithExistingExampleId: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          slices: [
+            {
+              type: 'command',
+              name: 'Test Command',
+              client: { specs: [] },
+              server: {
+                description: 'Test server',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Test Feature',
+                    rules: [
+                      {
+                        name: 'Test Rule',
+                        examples: [
+                          {
+                            name: 'Example without id',
+                            steps: [{ keyword: 'Given', text: 'TestState' }],
+                          },
+                          {
+                            id: 'EXISTING-EXAMPLE-001',
+                            name: 'Example with existing id',
+                            steps: [{ keyword: 'Given', text: 'TestState' }],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+
+    const result = addAutoIds(modelWithExistingExampleId);
+    const slice = result.narratives[0].slices[0];
+
+    if ('server' in slice && slice.server?.specs != null && Array.isArray(slice.server.specs)) {
+      const examples = slice.server.specs[0].rules[0].examples;
+      expect(examples[0].id).toMatch(AUTO_ID_REGEX);
+      expect(examples[1].id).toBe('EXISTING-EXAMPLE-001');
+    }
+  });
+
+  it('should assign IDs to steps with errors', () => {
+    const modelWithErrorSteps: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          slices: [
+            {
+              type: 'command',
+              name: 'Test Command',
+              client: { specs: [] },
+              server: {
+                description: 'Test server',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Test Feature',
+                    rules: [
+                      {
+                        name: 'Error Rule',
+                        examples: [
+                          {
+                            name: 'Error Example',
+                            steps: [
+                              { keyword: 'Given', text: 'TestState' },
+                              { keyword: 'When', text: 'InvalidCommand' },
+                              { keyword: 'Then', error: { type: 'ValidationError', message: 'Invalid input' } },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+
+    const result = addAutoIds(modelWithErrorSteps);
+    const slice = result.narratives[0].slices[0];
+
+    if ('server' in slice && slice.server?.specs != null && Array.isArray(slice.server.specs)) {
+      const steps = slice.server.specs[0].rules[0].examples[0].steps;
+      expect(steps[0].id).toMatch(AUTO_ID_REGEX);
+      expect(steps[1].id).toMatch(AUTO_ID_REGEX);
+      expect(steps[2].id).toMatch(AUTO_ID_REGEX);
+    }
+  });
+
+  it('should assign IDs to client it specs', () => {
+    const modelWithClientSpecs: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          slices: [
+            {
+              type: 'experience',
+              name: 'Test Experience',
+              client: {
+                specs: [
+                  { type: 'it', title: 'first test' },
+                  { type: 'it', id: 'EXISTING-IT-001', title: 'second test with id' },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+
+    const result = addAutoIds(modelWithClientSpecs);
+    const slice = result.narratives[0].slices[0];
+
+    if ('client' in slice && slice.client?.specs != null) {
+      expect(slice.client.specs[0].id).toMatch(AUTO_ID_REGEX);
+      expect(slice.client.specs[1].id).toBe('EXISTING-IT-001');
+    }
+  });
+
+  it('should assign IDs to client describe specs', () => {
+    const modelWithDescribe: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          slices: [
+            {
+              type: 'experience',
+              name: 'Test Experience',
+              client: {
+                specs: [
+                  {
+                    type: 'describe',
+                    title: 'describe without id',
+                    children: [{ type: 'it', title: 'nested it' }],
+                  },
+                  {
+                    type: 'describe',
+                    id: 'EXISTING-DESC-001',
+                    title: 'describe with id',
+                    children: [],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+
+    const result = addAutoIds(modelWithDescribe);
+    const slice = result.narratives[0].slices[0];
+
+    if ('client' in slice && slice.client?.specs != null) {
+      expect(slice.client.specs[0].id).toMatch(AUTO_ID_REGEX);
+      expect(slice.client.specs[1].id).toBe('EXISTING-DESC-001');
+    }
+  });
+
+  it('should assign IDs to nested client specs', () => {
+    const modelWithNestedSpecs: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          slices: [
+            {
+              type: 'experience',
+              name: 'Test Experience',
+              client: {
+                specs: [
+                  {
+                    type: 'describe',
+                    title: 'outer describe',
+                    children: [
+                      { type: 'it', title: 'outer it' },
+                      {
+                        type: 'describe',
+                        title: 'inner describe',
+                        children: [
+                          { type: 'it', title: 'inner it 1' },
+                          { type: 'it', title: 'inner it 2' },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+
+    const result = addAutoIds(modelWithNestedSpecs);
+    const slice = result.narratives[0].slices[0];
+
+    if ('client' in slice && slice.client?.specs != null) {
+      const outerDescribe = slice.client.specs[0];
+      expect(outerDescribe.id).toMatch(AUTO_ID_REGEX);
+
+      if (outerDescribe.type === 'describe' && outerDescribe.children) {
+        expect(outerDescribe.children[0].id).toMatch(AUTO_ID_REGEX);
+
+        const innerDescribe = outerDescribe.children[1];
+        expect(innerDescribe.id).toMatch(AUTO_ID_REGEX);
+
+        if (innerDescribe.type === 'describe' && innerDescribe.children) {
+          expect(innerDescribe.children[0].id).toMatch(AUTO_ID_REGEX);
+          expect(innerDescribe.children[1].id).toMatch(AUTO_ID_REGEX);
+
+          expect(innerDescribe.children[0].id).not.toBe(innerDescribe.children[1].id);
+        }
+      }
+    }
+  });
+
+  it('should not mutate original client specs', () => {
+    const modelWithClientSpecs: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Test Flow',
+          slices: [
+            {
+              type: 'experience',
+              name: 'Test Experience',
+              client: {
+                specs: [{ type: 'it', title: 'test' }],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+      integrations: [],
+    };
+
+    const originalSpec = modelWithClientSpecs.narratives[0].slices[0];
+    addAutoIds(modelWithClientSpecs);
+
+    if ('client' in originalSpec && originalSpec.client?.specs != null) {
+      expect(originalSpec.client.specs[0].id).toBeUndefined();
+    }
+  });
 });

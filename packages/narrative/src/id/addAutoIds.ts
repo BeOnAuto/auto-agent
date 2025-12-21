@@ -1,5 +1,5 @@
 import { generateAutoId } from './generators';
-import { Model, Slice, Spec, Rule, Example } from '../index';
+import { Model, Slice, Spec, Rule, Example, Step, ClientSpecNode } from '../index';
 
 function ensureId(item: { id?: string }): void {
   if (item.id === undefined || item.id === '') {
@@ -7,10 +7,19 @@ function ensureId(item: { id?: string }): void {
   }
 }
 
+function processSteps(steps: Step[]): Step[] {
+  return steps.map((step) => {
+    const stepCopy = { ...step };
+    ensureId(stepCopy);
+    return stepCopy;
+  });
+}
+
 function processExamples(examples: Example[]): Example[] {
   return examples.map((example) => {
     const exampleCopy = { ...example };
     ensureId(exampleCopy);
+    exampleCopy.steps = processSteps(example.steps);
     return exampleCopy;
   });
 }
@@ -25,10 +34,12 @@ function processRules(rules: Rule[]): Rule[] {
 }
 
 function processSpecs(specs: Spec[]): Spec[] {
-  return specs.map((spec) => ({
-    ...spec,
-    rules: processRules(spec.rules),
-  }));
+  return specs.map((spec) => {
+    const specCopy = { ...spec };
+    ensureId(specCopy);
+    specCopy.rules = processRules(spec.rules);
+    return specCopy;
+  });
 }
 
 function processServerSpecs(slice: Slice): Slice {
@@ -45,9 +56,25 @@ function processServerSpecs(slice: Slice): Slice {
   return modifiedSlice;
 }
 
+function processClientSpecNodes(nodes: ClientSpecNode[]): ClientSpecNode[] {
+  return nodes.map((node) => {
+    const nodeCopy = { ...node };
+    ensureId(nodeCopy);
+    if (nodeCopy.type === 'describe' && nodeCopy.children) {
+      nodeCopy.children = processClientSpecNodes(nodeCopy.children);
+    }
+    return nodeCopy;
+  });
+}
+
 function processClientSpecs(slice: Slice): Slice {
-  // Client specs use string rules (no IDs needed), so nothing to process
-  return slice;
+  if (!('client' in slice) || slice.client?.specs === undefined || !Array.isArray(slice.client.specs)) return slice;
+
+  const modifiedSlice = structuredClone(slice);
+  if ('client' in modifiedSlice && modifiedSlice.client?.specs !== undefined) {
+    modifiedSlice.client.specs = processClientSpecNodes(modifiedSlice.client.specs);
+  }
+  return modifiedSlice;
 }
 
 function processSlice(slice: Slice): Slice {

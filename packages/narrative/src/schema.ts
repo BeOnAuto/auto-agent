@@ -158,12 +158,14 @@ const StepErrorSchema = z.object({
 });
 
 const StepWithDocStringSchema = z.object({
+  id: z.string().optional().describe('Optional unique identifier for the step'),
   keyword: z.enum(['Given', 'When', 'Then', 'And']).describe('Gherkin keyword'),
   text: z.string().describe('The type name (e.g., AddTodo, TodoAdded)'),
   docString: z.record(z.unknown()).optional().describe('The example data'),
 });
 
 const StepWithErrorSchema = z.object({
+  id: z.string().optional().describe('Optional unique identifier for the step'),
   keyword: z.literal('Then').describe('Error steps use Then keyword'),
   error: StepErrorSchema.describe('Error details'),
 });
@@ -188,6 +190,7 @@ const RuleSchema = z
 
 const SpecSchema = z
   .object({
+    id: z.string().optional().describe('Optional unique identifier for the spec'),
     type: z.literal('gherkin').describe('Specification type'),
     feature: z.string().describe('Feature name'),
     rules: z.array(RuleSchema).describe('Business rules for this spec'),
