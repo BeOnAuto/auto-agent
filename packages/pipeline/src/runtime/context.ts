@@ -3,3 +3,7 @@ export interface PipelineContext {
   sendCommand: (type: string, data: unknown) => Promise<void>;
   correlationId: string;
 }
+
+export interface RuntimeConfig {
+  defaultTimeout?: number;
+}

@@ -349,11 +349,25 @@ it('should extract graph from emit handler', () => {
 
 ## IN PROGRESS
 
-(none)
+### Phase 6: Runtime (Pomodoros 43-54)
+
+Currently implementing runtime execution layer.
 
 ---
 
 ## DONE
+
+### Pomodoro 43-44: PipelineContext & RuntimeConfig
+
+Implemented:
+
+- `PipelineContext` interface with `emit()`, `sendCommand()`, `correlationId`
+- `RuntimeConfig` interface with optional `defaultTimeout`
+- 4 tests for context/config types
+
+All 52 tests pass with 100% coverage.
+
+---
 
 ### Pomodoro 38-42: Phase 5 Graph Extraction
 
