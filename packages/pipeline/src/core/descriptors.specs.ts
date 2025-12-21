@@ -13,7 +13,8 @@ describe('PipelineDescriptor', () => {
   });
 
   it('should store key extractors', () => {
-    const extractor: KeyExtractor = (e: Event) => e.data.slicePath ?? '';
+    type SliceEvent = Event & { data: { slicePath?: string } };
+    const extractor: KeyExtractor = (e) => (e as SliceEvent).data.slicePath ?? '';
     const keys = new Map<string, KeyExtractor>();
     keys.set('bySlice', extractor);
 

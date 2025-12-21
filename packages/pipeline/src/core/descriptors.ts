@@ -1,5 +1,5 @@
 import type { Event } from '@auto-engineer/message-bus';
-import type { CommandDispatch, DataOrFactory } from './types';
+import type { CommandDispatch } from './types';
 
 export type KeyExtractor = (event: Event) => string;
 
@@ -12,15 +12,35 @@ export interface EmitHandlerDescriptor {
   commands: CommandDispatch[];
 }
 
+export interface SuccessContext<T = unknown> {
+  results: T[];
+  duration: number;
+  triggerEvent: Event;
+}
+
+export interface FailureContext<T = unknown> {
+  failures: Array<{ key: string; error: unknown }>;
+  successes: T[];
+  triggerEvent: Event;
+}
+
+export interface GatherEventConfig<T = unknown> {
+  eventType: string;
+  dataFactory: (context: T) => Record<string, unknown>;
+}
+
 export interface RunAwaitHandlerDescriptor {
   type: 'run-await';
   eventType: string;
   predicate?: EventPredicate;
   commands: CommandDispatch[] | ((event: Event) => CommandDispatch[]);
   awaitConfig: {
+    keyName: string;
     key: KeyExtractor;
     timeout?: number;
   };
+  onSuccess?: GatherEventConfig<SuccessContext>;
+  onFailure?: GatherEventConfig<FailureContext>;
 }
 
 export interface ForEachPhasedDescriptor {
