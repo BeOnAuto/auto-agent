@@ -351,11 +351,27 @@ it('should extract graph from emit handler', () => {
 
 ### Phase 8: CLI Integration (Pomodoros 67-70)
 
-Currently working on CLI integration to run E2E tests against the new pipeline infrastructure.
+Exports complete. Next: CLI factory function and E2E verification.
 
 ---
 
 ## DONE
+
+### Pomodoro 53-54: AwaitTracker
+
+Implemented:
+
+- `AwaitTracker` class for scatter-gather completion tracking
+- `startAwaiting()` to register pending keys
+- `markComplete()` to mark individual keys as done
+- `isComplete()` to check if all keys are done
+- `getResults()` to collect results and clear tracking
+- 7 tests for await tracking functionality
+- Exported from package index
+
+All 87 tests pass with 100% coverage.
+
+---
 
 ### Pomodoro 55-66: PipelineServer
 

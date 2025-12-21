@@ -38,5 +38,7 @@ export type { GraphEdge, GraphIR, GraphNode, NodeType } from './graph/types';
 export { PipelineRuntime } from './runtime/pipeline-runtime';
 export type { PipelineContext, RuntimeConfig } from './runtime/context';
 
+export { AwaitTracker } from './runtime/await-tracker';
+
 export { PipelineServer } from './server/pipeline-server';
 export type { PipelineServerConfig, CommandHandlerWithMetadata } from './server/pipeline-server';
