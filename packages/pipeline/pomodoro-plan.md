@@ -351,11 +351,26 @@ it('should extract graph from emit handler', () => {
 
 ### Phase 6: Runtime (Pomodoros 43-54)
 
-Currently implementing runtime execution layer.
+Currently implementing runtime execution layer. Next: run-await and foreach-phased handlers.
 
 ---
 
 ## DONE
+
+### Pomodoro 45-50: PipelineRuntime Core
+
+Implemented:
+
+- `PipelineRuntime` class with descriptor and handler index
+- `getHandlersForEvent()` for O(1) handler lookup by event type
+- `getMatchingHandlers()` with predicate filtering
+- `handleEvent()` for emit and custom handlers
+- Data factory resolution for emit handlers
+- 7 tests for runtime functionality
+
+All 59 tests pass with 100% coverage.
+
+---
 
 ### Pomodoro 43-44: PipelineContext & RuntimeConfig
 
@@ -364,8 +379,6 @@ Implemented:
 - `PipelineContext` interface with `emit()`, `sendCommand()`, `correlationId`
 - `RuntimeConfig` interface with optional `defaultTimeout`
 - 4 tests for context/config types
-
-All 52 tests pass with 100% coverage.
 
 ---
 
