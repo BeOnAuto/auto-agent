@@ -222,6 +222,20 @@ describe('run() and awaitAll() - Scatter-Gather', () => {
     expect(pipeline.descriptor.handlers).toHaveLength(2);
   });
 
+  it('should chain onSuccess and onFailure from GatherChain', () => {
+    const pipeline = define('test')
+      .on('StartBatch')
+      .run([{ commandType: 'ProcessItem', data: {} }])
+      .awaitAll('byTask', (e: { data: { taskId: string } }) => e.data.taskId)
+      .onFailure('BatchFailed', (ctx) => ({ errors: ctx.failures }))
+      .onSuccess('BatchDone', (ctx) => ({ count: ctx.results.length }))
+      .build();
+
+    const handler = pipeline.descriptor.handlers[0] as RunAwaitHandlerDescriptor;
+    expect(handler.onSuccess?.eventType).toBe('BatchDone');
+    expect(handler.onFailure?.eventType).toBe('BatchFailed');
+  });
+
   it('should chain build() from GatherBuilder', () => {
     const pipeline = define('test')
       .on('StartBatch')
@@ -395,6 +409,16 @@ describe('forEach() and groupInto() - Phased Execution', () => {
     expect(handler.type).toBe('foreach-phased');
     expect(handler.phases).toEqual(['high', 'medium', 'low']);
     expect(handler.stopOnFailure).toBe(true);
+  });
+
+  it('should throw when build() is called without onComplete()', () => {
+    const chain = define('test')
+      .on('ItemsReady')
+      .forEach((e: { data: { items: unknown[] } }) => e.data.items)
+      .groupInto(['phase1'], () => 'phase1')
+      .process('ProcessItem', () => ({}));
+
+    expect(() => chain.build()).toThrow('onComplete() must be called before build()');
   });
 });
 

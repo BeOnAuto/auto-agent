@@ -46,6 +46,20 @@ describe('Pipeline.toGraph()', () => {
     expect(graph.nodes.some((n) => n.id === 'evt:BatchFailed')).toBe(true);
   });
 
+  it('should extract graph from run-await handler with command factory', () => {
+    type BatchEvent = { data: { items: Array<{ id: string }> } };
+    const pipeline = define('test')
+      .on('BatchReady')
+      .run((e: BatchEvent) => e.data.items.map((item) => ({ commandType: 'ProcessItem', data: { id: item.id } })))
+      .awaitAll('byItem', () => 'key')
+      .build();
+
+    const graph = pipeline.toGraph();
+    expect(graph.nodes.some((n) => n.id === 'evt:BatchReady')).toBe(true);
+    expect(graph.nodes).toHaveLength(1);
+    expect(graph.edges).toHaveLength(0);
+  });
+
   it('should extract graph from foreach-phased handler', () => {
     const pipeline = define('test')
       .on('ItemsReady')

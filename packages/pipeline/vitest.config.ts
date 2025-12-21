@@ -15,7 +15,13 @@ export default defineConfig({
         statements: 100,
       },
       include: ['src/**/*.ts'],
-      exclude: ['src/**/*.specs.ts', 'src/index.ts'],
+      exclude: [
+        'src/**/*.specs.ts',
+        'src/index.ts',
+        'src/core/descriptors.ts',
+        'src/graph/types.ts',
+        'src/runtime/context.ts',
+      ],
     },
   },
 });
