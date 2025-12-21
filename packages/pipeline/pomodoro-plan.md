@@ -347,15 +347,38 @@ it('should extract graph from emit handler', () => {
 
 ---
 
-## IN PROGRESS
+## DONE
 
-### Phase 8: CLI Integration (Pomodoros 67-70)
+### Phase 8: CLI Integration (Pomodoros 67-70) ✅
 
-Exports complete. Next: CLI factory function and E2E verification.
+Pomodoro 67-70 complete. E2E tests validate CLI parity.
+
+### Pomodoro 69-70: E2E Tests for CLI Parity
+
+Implemented:
+
+- 8 E2E tests validating endpoint compatibility
+- Tests for `/registry`, `/pipeline`, `/sessions`, `/messages`, `/stats`, `/command`
+- Tests for command execution and event routing through pipeline
+- Tests for pipeline chain with multiple handlers
+
+All 99 tests pass with 100% coverage.
 
 ---
 
-## DONE
+### Pomodoro 67-68: Enhanced /pipeline Response
+
+Implemented:
+
+- Added `folds: []` to `/registry` response
+- Added `commandToEvents` mapping from command handlers
+- Added `eventToCommand` mapping from pipeline handlers
+- Added `PipelineNode` shape with `id`, `name`, `title`, `status`
+- 4 new tests for response shapes
+
+All 91 tests pass with 100% coverage.
+
+---
 
 ### Pomodoro 53-54: AwaitTracker
 

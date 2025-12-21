@@ -18,12 +18,27 @@ interface RegistryResponse {
   eventHandlers: string[];
   commandHandlers: string[];
   commandsWithMetadata: CommandMetadata[];
+  folds: string[];
 }
 
 interface GraphNode {
   id: string;
   type: string;
   label: string;
+}
+
+interface PipelineNode {
+  id: string;
+  name: string;
+  title: string;
+  status: string;
+}
+
+interface PipelineResponse {
+  nodes: PipelineNode[];
+  edges: Array<{ from: string; to: string }>;
+  commandToEvents: Record<string, string[]>;
+  eventToCommand: Record<string, string>;
 }
 
 interface GraphResponse {
@@ -139,6 +154,14 @@ describe('PipelineServer', () => {
       expect(metadata.examples).toEqual(['ex']);
       await server.stop();
     });
+
+    it('should return registry with folds array', async () => {
+      const server = new PipelineServer({ port: 0 });
+      await server.start();
+      const data = await fetchAs<RegistryResponse>(`http://localhost:${server.port}/registry`);
+      expect(data.folds).toEqual([]);
+      await server.stop();
+    });
   });
 
   describe('GET /pipeline', () => {
@@ -149,6 +172,49 @@ describe('PipelineServer', () => {
       await server.start();
       const data = await fetchAs<GraphResponse>(`http://localhost:${server.port}/pipeline`);
       expect(data.nodes.some((n) => n.id === 'evt:Start')).toBe(true);
+      await server.stop();
+    });
+
+    it('should return pipeline response with commandToEvents', async () => {
+      const handler = {
+        name: 'Gen',
+        events: ['GenDone', 'GenProgress'],
+        handle: async () => ({ type: 'GenDone', data: {} }),
+      };
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      expect(data.commandToEvents).toEqual({ Gen: ['GenDone', 'GenProgress'] });
+      await server.stop();
+    });
+
+    it('should return pipeline response with eventToCommand', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      expect(data.eventToCommand).toEqual({ Start: 'Process' });
+      await server.stop();
+    });
+
+    it('should return pipeline nodes with name, title, and status', async () => {
+      const handler = {
+        name: 'Cmd',
+        alias: 'cmd',
+        description: 'Test command',
+        handle: async () => ({ type: 'Done', data: {} }),
+      };
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      const cmdNode = data.nodes.find((n) => n.id === 'Cmd');
+      expect(cmdNode).toBeDefined();
+      expect(cmdNode?.name).toBe('Cmd');
+      expect(cmdNode?.title).toBe('Test command');
+      expect(cmdNode?.status).toBe('None');
       await server.stop();
     });
   });

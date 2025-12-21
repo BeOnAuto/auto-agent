@@ -135,25 +135,22 @@ export class PipelineServer {
         eventHandlers,
         commandHandlers: Array.from(this.commandHandlers.keys()),
         commandsWithMetadata,
+        folds: [],
       });
     });
 
     this.app.get('/pipeline', (_req, res) => {
-      const combinedGraph: GraphIR = { nodes: [], edges: [] };
-      const nodeSet = new Set<string>();
+      const combinedGraph = this.buildCombinedGraph();
+      const commandToEvents = this.buildCommandToEvents();
+      const eventToCommand = this.buildEventToCommand();
+      const pipelineNodes = this.buildPipelineNodes();
 
-      for (const pipeline of this.pipelines.values()) {
-        const graph = pipeline.toGraph();
-        for (const node of graph.nodes) {
-          if (!nodeSet.has(node.id)) {
-            nodeSet.add(node.id);
-            combinedGraph.nodes.push(node);
-          }
-        }
-        combinedGraph.edges.push(...graph.edges);
-      }
-
-      res.json(combinedGraph);
+      res.json({
+        nodes: [...combinedGraph.nodes, ...pipelineNodes],
+        edges: combinedGraph.edges,
+        commandToEvents,
+        eventToCommand,
+      });
     });
 
     this.app.post('/command', (req, res) => {
@@ -213,6 +210,58 @@ export class PipelineServer {
         res.json(sessions);
       })();
     });
+  }
+
+  private buildCombinedGraph(): GraphIR {
+    const combinedGraph: GraphIR = { nodes: [], edges: [] };
+    const nodeSet = new Set<string>();
+
+    for (const pipeline of this.pipelines.values()) {
+      const graph = pipeline.toGraph();
+      for (const node of graph.nodes) {
+        if (!nodeSet.has(node.id)) {
+          nodeSet.add(node.id);
+          combinedGraph.nodes.push(node);
+        }
+      }
+      combinedGraph.edges.push(...graph.edges);
+    }
+
+    return combinedGraph;
+  }
+
+  private buildCommandToEvents(): Record<string, string[]> {
+    const commandToEvents: Record<string, string[]> = {};
+    for (const [name, handler] of this.commandHandlers.entries()) {
+      if (handler.events !== undefined && Array.isArray(handler.events)) {
+        commandToEvents[name] = handler.events;
+      }
+    }
+    return commandToEvents;
+  }
+
+  private buildEventToCommand(): Record<string, string> {
+    const eventToCommand: Record<string, string> = {};
+    for (const pipeline of this.pipelines.values()) {
+      for (const handler of pipeline.descriptor.handlers) {
+        if (handler.type === 'emit') {
+          for (const cmd of handler.commands) {
+            eventToCommand[handler.eventType] = cmd.commandType;
+          }
+        }
+      }
+    }
+    return eventToCommand;
+  }
+
+  private buildPipelineNodes(): Array<{ id: string; name: string; title: string; alias?: string; status: 'None' }> {
+    return Array.from(this.commandHandlers.entries()).map(([name, handler]) => ({
+      id: name,
+      name,
+      title: handler.description ?? '',
+      alias: handler.alias,
+      status: 'None' as const,
+    }));
   }
 
   private async processCommand(command: Command & { correlationId: string; requestId: string }): Promise<void> {
