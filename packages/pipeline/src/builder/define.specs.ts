@@ -40,6 +40,14 @@ describe('on() and emit()', () => {
     expect(handler.commands).toEqual([{ commandType: 'GenerateServer', data: { modelPath: './schema.json' } }]);
   });
 
+  it('should accept data factory in emit()', () => {
+    type SliceEvent = { data: { path: string } };
+    const factory = (e: SliceEvent) => ({ slicePath: e.data.path });
+    const pipeline = define('test').on('SliceGenerated').emit('ImplementSlice', factory).build();
+    const handler = pipeline.descriptor.handlers[0] as EmitHandlerDescriptor;
+    expect(typeof handler.commands[0].data).toBe('function');
+  });
+
   it('should chain emit() for parallel commands', () => {
     const pipeline = define('test')
       .on('ServerGenerated')
@@ -59,5 +67,43 @@ describe('on() and emit()', () => {
     const handlerB = pipeline.descriptor.handlers[1] as EmitHandlerDescriptor;
     expect(handlerA.eventType).toBe('EventA');
     expect(handlerB.eventType).toBe('EventB');
+  });
+});
+
+describe('when() predicate', () => {
+  it('should apply predicate with when()', () => {
+    type ClientEvent = { data: { components?: string[] } };
+    const predicate = (e: ClientEvent) => (e.data.components?.length ?? 0) > 0;
+    const pipeline = define('test')
+      .on('ClientGenerated')
+      .when(predicate)
+      .emit('ImplementComponent', { path: './c' })
+      .build();
+    expect(pipeline.descriptor.handlers[0].predicate).toBe(predicate);
+  });
+});
+
+describe('Integration', () => {
+  it('should create complete simple pipeline', () => {
+    type SliceEvent = { data: { slicePath: string } };
+    const pipeline = define('kanban')
+      .version('1.0.0')
+      .description('Kanban app generation')
+      .key('bySlice', (e: SliceEvent) => e.data.slicePath ?? '')
+      .on('SchemaExported')
+      .emit('GenerateServer', { modelPath: './schema.json', destination: '.' })
+      .on('SliceGenerated')
+      .emit('ImplementSlice', (e: SliceEvent) => ({
+        slicePath: e.data.slicePath,
+        context: { attemptNumber: 0, previousOutputs: 'errors' },
+        aiOptions: { maxTokens: 2000 },
+      }))
+      .on('ServerGenerated')
+      .emit('GenerateIA', { modelPath: './schema.json', outputDir: './.context' })
+      .emit('StartServer', { serverDirectory: './server' })
+      .build();
+
+    expect(pipeline.descriptor.name).toBe('kanban');
+    expect(pipeline.descriptor.handlers).toHaveLength(3);
   });
 });

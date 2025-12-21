@@ -2,86 +2,7 @@
 
 ## TODO
 
-### Pomodoro 15: when() Predicate
-
-| Value | Conditional execution |
-| Approach | Store predicate in handler |
-| Size | S |
-
-```typescript
-it('should apply predicate with when()', () => {
-  const predicate = (e: Event) => e.data.components?.length > 0;
-  const pipeline = define('test')
-    .on('ClientGenerated')
-    .when(predicate)
-    .emit('ImplementComponent', { path: './c' })
-    .build();
-  expect(pipeline.descriptor.handlers[0].predicate).toBe(predicate);
-});
-```
-
----
-
-### Pomodoro 16: EmitChain.on() Continues Chain
-
-| Value | Multi-handler pipelines |
-| Approach | Return to on() |
-| Size | M |
-
-```typescript
-it('should chain on() from EmitChain', () => {
-  const pipeline = define('test').on('EventA').emit('CmdA', { d: 'a' }).on('EventB').emit('CmdB', { d: 'b' }).build();
-  expect(pipeline.descriptor.handlers).toHaveLength(2);
-});
-```
-
----
-
-### Pomodoro 17: key() Named Extractors
-
-| Value | Reusable correlation keys |
-| Approach | Store in keys Map |
-| Size | S |
-
-```typescript
-it('should define named key extractors', () => {
-  const extractor = (e: Event) => e.data.slicePath ?? '';
-  const pipeline = define('test').key('bySlice', extractor).build();
-  expect(pipeline.descriptor.keys.get('bySlice')).toBe(extractor);
-});
-```
-
----
-
-### Pomodoro 18: Integration Test
-
-| Value | Validates Phase 1 API |
-| Approach | Complete pipeline matching spec |
-| Size | S |
-
-```typescript
-it('should create complete simple pipeline', () => {
-  const pipeline = define('kanban')
-    .version('1.0.0')
-    .description('Kanban app generation')
-    .key('bySlice', (e) => e.data.slicePath ?? '')
-    .on('SchemaExported')
-    .emit('GenerateServer', { modelPath: './schema.json', destination: '.' })
-    .on('SliceGenerated')
-    .emit('ImplementSlice', (e) => ({
-      slicePath: e.data.slicePath,
-      context: { attemptNumber: 0, previousOutputs: 'errors' },
-      aiOptions: { maxTokens: 2000 },
-    }))
-    .on('ServerGenerated')
-    .emit('GenerateIA', { modelPath: './schema.json', outputDir: './.context' })
-    .emit('StartServer', { serverDirectory: './server' })
-    .build();
-
-  expect(pipeline.descriptor.name).toBe('kanban');
-  expect(pipeline.descriptor.handlers).toHaveLength(3);
-});
-```
+(none - Phase 1 complete!)
 
 ---
 
@@ -92,6 +13,16 @@ it('should create complete simple pipeline', () => {
 ---
 
 ## DONE
+
+### Pomodoro 13, 15, 18: Remaining Phase 1 features
+
+- emit() with data factory
+- when() predicate for conditional execution
+- Integration test with complete pipeline
+
+All Phase 1 tests pass with 100% coverage.
+
+---
 
 ### Pomodoro 6-12, 14, 16, 17: Builder API (batched)
 

@@ -1,5 +1,4 @@
-import type { Event } from '@auto-engineer/message-bus';
-import type { HandlerDescriptor, KeyExtractor, PipelineDescriptor } from '../core/descriptors';
+import type { EventPredicate, HandlerDescriptor, KeyExtractor, PipelineDescriptor } from '../core/descriptors';
 
 export interface Pipeline {
   descriptor: Readonly<PipelineDescriptor>;
@@ -8,12 +7,13 @@ export interface Pipeline {
 export interface PipelineBuilder {
   version(v: string): PipelineBuilder;
   description(d: string): PipelineBuilder;
-  key(name: string, extractor: KeyExtractor): PipelineBuilder;
+  key<E>(name: string, extractor: (event: E) => string): PipelineBuilder;
   on(eventType: string): TriggerBuilder;
   build(): Pipeline;
 }
 
 export interface TriggerBuilder {
+  when<E>(predicate: (event: E) => boolean): TriggerBuilder;
   emit(commandType: string, data: unknown): EmitChain;
 }
 
@@ -44,8 +44,8 @@ class PipelineBuilderImpl implements PipelineBuilder {
     return this;
   }
 
-  key(name: string, extractor: KeyExtractor): PipelineBuilder {
-    this.keys.set(name, extractor);
+  key<E>(name: string, extractor: (event: E) => string): PipelineBuilder {
+    this.keys.set(name, extractor as KeyExtractor);
     return this;
   }
 
@@ -70,13 +70,20 @@ class PipelineBuilderImpl implements PipelineBuilder {
 }
 
 class TriggerBuilderImpl implements TriggerBuilder {
+  private predicate?: EventPredicate;
+
   constructor(
     private readonly parent: PipelineBuilderImpl,
     private readonly eventType: string,
   ) {}
 
+  when<E>(predicate: (event: E) => boolean): TriggerBuilder {
+    this.predicate = predicate as EventPredicate;
+    return this;
+  }
+
   emit(commandType: string, data: unknown): EmitChain {
-    return new EmitChainImpl(this.parent, this.eventType, [{ commandType, data }]);
+    return new EmitChainImpl(this.parent, this.eventType, [{ commandType, data }], this.predicate);
   }
 }
 
@@ -85,10 +92,11 @@ class EmitChainImpl implements EmitChain {
     private readonly parent: PipelineBuilderImpl,
     private readonly eventType: string,
     private readonly commands: Array<{ commandType: string; data: unknown }>,
+    private readonly predicate?: EventPredicate,
   ) {}
 
   emit(commandType: string, data: unknown): EmitChain {
-    return new EmitChainImpl(this.parent, this.eventType, [...this.commands, { commandType, data }]);
+    return new EmitChainImpl(this.parent, this.eventType, [...this.commands, { commandType, data }], this.predicate);
   }
 
   on(eventType: string): TriggerBuilder {
@@ -105,6 +113,7 @@ class EmitChainImpl implements EmitChain {
     this.parent.addHandler({
       type: 'emit',
       eventType: this.eventType,
+      predicate: this.predicate,
       commands: this.commands.map((c) => ({
         commandType: c.commandType,
         data: c.data as Record<string, unknown>,
