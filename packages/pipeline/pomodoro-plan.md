@@ -2,26 +2,6 @@
 
 ## TODO
 
-### Pomodoro 5: PipelineDescriptor Type
-
-| Value | Pipeline structure definition |
-| Approach | Interface with metadata + handlers array |
-| Size | S |
-
-```typescript
-it('should create PipelineDescriptor', () => {
-  const descriptor: PipelineDescriptor = {
-    name: 'test-pipeline',
-    version: '1.0.0',
-    keys: new Map(),
-    handlers: [],
-  };
-  expect(descriptor.name).toBe('test-pipeline');
-});
-```
-
----
-
 ### Pomodoro 6: define() Entry Point
 
 | Value | API entry point |
@@ -273,6 +253,26 @@ it('should create complete simple pipeline', () => {
 ---
 
 ## DONE
+
+### Pomodoro 5: PipelineDescriptor Type
+
+| Value | Pipeline structure definition |
+| Approach | Interface with metadata + handlers array |
+| Size | S |
+
+```typescript
+it('should create PipelineDescriptor', () => {
+  const descriptor: PipelineDescriptor = {
+    name: 'test-pipeline',
+    version: '1.0.0',
+    keys: new Map(),
+    handlers: [],
+  };
+  expect(descriptor.name).toBe('test-pipeline');
+});
+```
+
+---
 
 ### Pomodoro 4: dispatch() Helper
 
