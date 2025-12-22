@@ -413,6 +413,54 @@ describe('PipelineServer', () => {
     });
   });
 
+  describe('GET /pipeline/diagram', () => {
+    it('should return HTML content type', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/diagram`);
+      expect(res.headers.get('content-type')).toContain('text/html');
+      await server.stop();
+    });
+
+    it('should include mermaid.js script', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/diagram`);
+      const html = await res.text();
+      expect(html).toContain('mermaid');
+      await server.stop();
+    });
+
+    it('should include the pipeline mermaid definition', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/diagram`);
+      const html = await res.text();
+      expect(html).toContain('flowchart TD');
+      expect(html).toContain('evt_Start');
+      await server.stop();
+    });
+
+    it('should have a valid HTML structure', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/diagram`);
+      const html = await res.text();
+      expect(html).toContain('<!DOCTYPE html>');
+      expect(html).toContain('<html');
+      expect(html).toContain('</html>');
+      await server.stop();
+    });
+  });
+
   describe('integration', () => {
     it('should execute complete workflow', async () => {
       const handler = {

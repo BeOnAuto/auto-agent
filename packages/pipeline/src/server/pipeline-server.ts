@@ -195,6 +195,12 @@ export class PipelineServer {
       res.type('text/plain').send(mermaid);
     });
 
+    this.app.get('/pipeline/diagram', (_req, res) => {
+      const mermaidDefinition = this.buildMermaidDiagram();
+      const html = this.buildDiagramHtml(mermaidDefinition);
+      res.type('text/html').send(html);
+    });
+
     this.app.post('/command', (req, res) => {
       void (async () => {
         const command = req.body as Command;
@@ -456,5 +462,52 @@ export class PipelineServer {
         }
       }
     }
+  }
+
+  private buildDiagramHtml(mermaidDefinition: string): string {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pipeline Diagram</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin-top: 0;
+      color: #333;
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pipeline Diagram</h1>
+    <div class="mermaid">
+${mermaidDefinition}
+    </div>
+  </div>
+</body>
+</html>`;
   }
 }
