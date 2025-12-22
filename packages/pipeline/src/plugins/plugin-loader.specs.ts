@@ -263,5 +263,19 @@ describe('PluginLoader', () => {
       expect(handlerNames).toContain('CheckTypes');
       expect(handlerNames).toContain('CheckLint');
     });
+
+    it('should load handlers from multiple real packages', async () => {
+      const loader = new PluginLoader();
+      const handlers = await loader.loadPlugins([
+        '@auto-engineer/server-checks',
+        '@auto-engineer/server-generator-apollo-emmett',
+      ]);
+      const handlerNames = handlers.map((h) => h.name);
+      expect(handlerNames).toContain('CheckTests');
+      expect(handlerNames).toContain('CheckTypes');
+      expect(handlerNames).toContain('CheckLint');
+      expect(handlerNames).toContain('GenerateServer');
+      expect(handlers.length).toBeGreaterThan(3);
+    });
   });
 });
