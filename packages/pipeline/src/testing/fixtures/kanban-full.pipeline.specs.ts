@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createKanbanFullPipeline, resetKanbanState } from './kanban-full.pipeline';
-import type { EmitHandlerDescriptor } from '../../core/descriptors';
+import type { EmitHandlerDescriptor, ForEachPhasedDescriptor } from '../../core/descriptors';
 
 describe('kanban-full.pipeline', () => {
   beforeEach(() => {
@@ -156,6 +156,100 @@ describe('kanban-full.pipeline', () => {
         iaSchemaPath: './.context/auto-ia-scheme.json',
         gqlSchemaPath: './.context/schema.graphql',
         figmaVariablesPath: './.context/figma-file.json',
+      });
+    });
+  });
+
+  describe('ClientGenerated edge cases', () => {
+    it('should have predicate on foreach-phased handler to check for valid components', () => {
+      const pipeline = createKanbanFullPipeline();
+      const foreachHandler = pipeline.descriptor.handlers.find(
+        (h): h is ForEachPhasedDescriptor => h.type === 'foreach-phased' && h.eventType === 'ClientGenerated',
+      );
+      expect(foreachHandler).toBeDefined();
+      expect(foreachHandler?.predicate).toBeDefined();
+    });
+
+    it('should predicate return true when components array has items', () => {
+      const pipeline = createKanbanFullPipeline();
+      const foreachHandler = pipeline.descriptor.handlers.find(
+        (h): h is ForEachPhasedDescriptor => h.type === 'foreach-phased' && h.eventType === 'ClientGenerated',
+      );
+      const predicate = foreachHandler?.predicate;
+      const eventWithComponents = {
+        type: 'ClientGenerated',
+        data: {
+          components: [{ type: 'molecule', filePath: 'src/Foo.tsx' }],
+          targetDir: './client',
+        },
+      };
+      expect(predicate?.(eventWithComponents)).toBe(true);
+    });
+
+    it('should predicate return false when data is null', () => {
+      const pipeline = createKanbanFullPipeline();
+      const foreachHandler = pipeline.descriptor.handlers.find(
+        (h): h is ForEachPhasedDescriptor => h.type === 'foreach-phased' && h.eventType === 'ClientGenerated',
+      );
+      const predicate = foreachHandler?.predicate;
+      const eventWithNullData = { type: 'ClientGenerated', data: null as unknown as Record<string, unknown> };
+      expect(predicate?.(eventWithNullData)).toBe(false);
+    });
+
+    it('should predicate return false when components is not an array', () => {
+      const pipeline = createKanbanFullPipeline();
+      const foreachHandler = pipeline.descriptor.handlers.find(
+        (h): h is ForEachPhasedDescriptor => h.type === 'foreach-phased' && h.eventType === 'ClientGenerated',
+      );
+      const predicate = foreachHandler?.predicate;
+      const eventWithInvalidComponents = { type: 'ClientGenerated', data: { components: 'not-array' } };
+      expect(predicate?.(eventWithInvalidComponents)).toBe(false);
+    });
+
+    it('should predicate return false when components array is empty', () => {
+      const pipeline = createKanbanFullPipeline();
+      const foreachHandler = pipeline.descriptor.handlers.find(
+        (h): h is ForEachPhasedDescriptor => h.type === 'foreach-phased' && h.eventType === 'ClientGenerated',
+      );
+      const predicate = foreachHandler?.predicate;
+      const eventWithEmptyComponents = { type: 'ClientGenerated', data: { components: [] } };
+      expect(predicate?.(eventWithEmptyComponents)).toBe(false);
+    });
+
+    it('should have fallback emit handler for invalid ClientGenerated data', () => {
+      const pipeline = createKanbanFullPipeline();
+      const fallbackHandler = pipeline.descriptor.handlers.find(
+        (h): h is EmitHandlerDescriptor =>
+          h.type === 'emit' && h.eventType === 'ClientGenerated' && h.predicate !== undefined,
+      );
+      expect(fallbackHandler).toBeDefined();
+      const fallbackPredicate = fallbackHandler?.predicate;
+      expect(fallbackPredicate?.({ type: 'ClientGenerated', data: null as unknown as Record<string, unknown> })).toBe(
+        true,
+      );
+      expect(fallbackPredicate?.({ type: 'ClientGenerated', data: { components: [] } })).toBe(true);
+    });
+
+    it('should fallback handler emit ImplementComponent with example data', () => {
+      const pipeline = createKanbanFullPipeline();
+      const fallbackHandler = pipeline.descriptor.handlers.find(
+        (h): h is EmitHandlerDescriptor =>
+          h.type === 'emit' && h.eventType === 'ClientGenerated' && h.predicate !== undefined,
+      );
+      const implementCmd = fallbackHandler?.commands.find((c) => c.commandType === 'ImplementComponent');
+      expect(implementCmd).toBeDefined();
+      const data =
+        typeof implementCmd?.data === 'function'
+          ? implementCmd.data({ type: 'ClientGenerated', data: null as unknown as Record<string, unknown> })
+          : implementCmd?.data;
+      expect(data).toEqual({
+        projectDir: './client',
+        iaSchemeDir: './.context',
+        designSystemPath: './.context/design-system.md',
+        componentType: 'molecule',
+        filePath: 'client/src/components/molecules/Example.tsx',
+        componentName: 'Example.tsx',
+        aiOptions: { maxTokens: 3000 },
       });
     });
   });

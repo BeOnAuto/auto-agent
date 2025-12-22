@@ -60,6 +60,14 @@ function incrementRetryCount(slicePath: string): number {
   return attempts + 1;
 }
 
+function hasValidComponents(e: { data: ClientGeneratedData | null }): boolean {
+  return e.data !== null && Array.isArray(e.data.components) && e.data.components.length > 0;
+}
+
+function hasInvalidComponents(e: { data: ClientGeneratedData | null }): boolean {
+  return !hasValidComponents(e);
+}
+
 export function createKanbanFullPipeline() {
   return define('kanban-full')
     .on('SchemaExported')
@@ -134,6 +142,19 @@ export function createKanbanFullPipeline() {
     }))
 
     .on('ClientGenerated')
+    .when(hasInvalidComponents)
+    .emit('ImplementComponent', () => ({
+      projectDir: './client',
+      iaSchemeDir: './.context',
+      designSystemPath: './.context/design-system.md',
+      componentType: 'molecule',
+      filePath: 'client/src/components/molecules/Example.tsx',
+      componentName: 'Example.tsx',
+      aiOptions: { maxTokens: 3000 },
+    }))
+
+    .on('ClientGenerated')
+    .when(hasValidComponents)
     .forEach((e: { data: ClientGeneratedData }) => e.data.components)
     .groupInto(['molecule', 'organism', 'page'], (c) => c.type)
     .process('ImplementComponent', (c: Component) => ({
