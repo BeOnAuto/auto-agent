@@ -51,12 +51,9 @@ export class SettledTracker {
     });
 
     for (const commandType of registration.commandTypes) {
-      const existing = this.commandToTemplateIds.get(commandType);
-      if (existing) {
-        existing.add(templateId);
-      } else {
-        this.commandToTemplateIds.set(commandType, new Set([templateId]));
-      }
+      const existing = this.commandToTemplateIds.get(commandType) ?? new Set<string>();
+      existing.add(templateId);
+      this.commandToTemplateIds.set(commandType, existing);
     }
   }
 
@@ -91,13 +88,11 @@ export class SettledTracker {
 
   isWaitingFor(correlationId: string, commandType: string): boolean {
     for (const instance of this.handlerInstances.values()) {
-      if (instance.correlationId !== correlationId) {
-        continue;
-      }
-
-      const tracker = instance.commandTrackers.get(commandType);
-      if (tracker && tracker.hasStarted && !tracker.hasCompleted) {
-        return true;
+      if (instance.correlationId === correlationId) {
+        const tracker = instance.commandTrackers.get(commandType);
+        if (tracker?.hasStarted === true && tracker.hasCompleted === false) {
+          return true;
+        }
       }
     }
     return false;
@@ -165,11 +160,7 @@ export class SettledTracker {
     const instanceId = this.generateInstanceId(templateId, correlationId);
     const instance = this.handlerInstances.get(instanceId);
 
-    if (!instance) {
-      return;
-    }
-
-    const tracker = instance.commandTrackers.get(commandType);
+    const tracker = instance?.commandTrackers.get(commandType);
     if (tracker) {
       tracker.hasStarted = true;
       tracker.hasCompleted = false;

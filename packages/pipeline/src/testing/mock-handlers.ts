@@ -33,18 +33,6 @@ export function resetCallCounts(): void {
   callCounts.clear();
 }
 
-export function createSimpleMockHandler(
-  name: string,
-  events: string[],
-  eventFactory: (cmd: Command) => Event | Event[],
-): CommandHandlerWithMetadata {
-  return {
-    name,
-    events,
-    handle: async (cmd: Command) => eventFactory(cmd),
-  };
-}
-
 interface StatefulHandlerConfig {
   name: string;
   events: string[];
