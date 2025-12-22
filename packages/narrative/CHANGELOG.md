@@ -1,5 +1,16 @@
 # @auto-engineer/flow
 
+## 0.13.3
+
+### Patch Changes
+
+- handle CJS/ESM interop for TypeScript dynamic import in browser
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.13.3
+  - @auto-engineer/id@0.13.3
+  - @auto-engineer/message-bus@0.13.3
+
 ## 0.13.2
 
 ### Patch Changes
