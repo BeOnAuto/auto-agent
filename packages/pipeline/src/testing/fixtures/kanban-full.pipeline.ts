@@ -167,9 +167,9 @@ export function createKanbanFullPipeline() {
       projectDir: './client',
       iaSchemeDir: './.context',
       designSystemPath: './.context/design-system.md',
-      componentType: c.type,
-      filePath: c.filePath,
-      componentName: c.filePath.split('/').pop()?.replace('.tsx', '') ?? '',
+      componentType: c.type ?? 'molecule',
+      filePath: c.filePath ?? '',
+      componentName: (c.filePath ?? '').split('/').pop()?.replace('.tsx', '') ?? '',
       aiOptions: { maxTokens: 3000 },
     }))
     .onComplete({

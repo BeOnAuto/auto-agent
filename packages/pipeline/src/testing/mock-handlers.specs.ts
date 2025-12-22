@@ -92,7 +92,7 @@ describe('mock-handlers', () => {
     });
 
     it('should pass attempt number to handler function', async () => {
-      let receivedAttempts: number[] = [];
+      const receivedAttempts: number[] = [];
       const handlers = createMockHandlers([
         {
           name: 'TrackingHandler',
