@@ -1,8 +1,10 @@
+import { vi } from 'vitest';
 import type {
   CustomHandlerDescriptor,
   EmitHandlerDescriptor,
   ForEachPhasedDescriptor,
   RunAwaitHandlerDescriptor,
+  SettledHandlerDescriptor,
 } from '../core/descriptors';
 import { define } from './define';
 
@@ -84,7 +86,66 @@ describe('when() predicate', () => {
       .when(predicate)
       .emit('ImplementComponent', { path: './c' })
       .build();
-    expect(pipeline.descriptor.handlers[0].predicate).toBe(predicate);
+    const handler = pipeline.descriptor.handlers[0];
+    expect(handler.type).toBe('emit');
+    if (handler.type === 'emit') {
+      expect(handler.predicate).toBe(predicate);
+    }
+  });
+});
+
+describe('settled()', () => {
+  it('should create a SettledHandlerDescriptor', () => {
+    const handler = vi.fn();
+    const pipeline = define('test').settled(['CheckTests', 'CheckTypes', 'CheckLint']).dispatch(handler).build();
+
+    const descriptor = pipeline.descriptor.handlers[0] as SettledHandlerDescriptor;
+    expect(descriptor.type).toBe('settled');
+    expect(descriptor.commandTypes).toEqual(['CheckTests', 'CheckTypes', 'CheckLint']);
+    expect(descriptor.handler).toBe(handler);
+  });
+
+  it('should chain multiple settled handlers', () => {
+    const handler1 = vi.fn();
+    const handler2 = vi.fn();
+
+    const pipeline = define('test')
+      .settled(['A', 'B'])
+      .dispatch(handler1)
+      .settled(['C', 'D'])
+      .dispatch(handler2)
+      .build();
+
+    expect(pipeline.descriptor.handlers).toHaveLength(2);
+    expect((pipeline.descriptor.handlers[0] as SettledHandlerDescriptor).commandTypes).toEqual(['A', 'B']);
+    expect((pipeline.descriptor.handlers[1] as SettledHandlerDescriptor).commandTypes).toEqual(['C', 'D']);
+  });
+
+  it('should chain settled with on()', () => {
+    const settledHandler = vi.fn();
+
+    const pipeline = define('test')
+      .settled(['CheckTests', 'CheckTypes'])
+      .dispatch(settledHandler)
+      .on('ServerGenerated')
+      .emit('GenerateIA', {})
+      .build();
+
+    expect(pipeline.descriptor.handlers).toHaveLength(2);
+    expect(pipeline.descriptor.handlers[0].type).toBe('settled');
+    expect(pipeline.descriptor.handlers[1].type).toBe('emit');
+  });
+
+  it('should include settled handler in graph', () => {
+    const pipeline = define('test')
+      .settled(['CheckTests', 'CheckTypes'])
+      .dispatch(() => {})
+      .build();
+
+    const graph = pipeline.toGraph();
+    const settledNode = graph.nodes.find((n) => n.id.startsWith('settled:'));
+    expect(settledNode).toBeDefined();
+    expect(settledNode?.label).toBe('settled(CheckTests, CheckTypes)');
   });
 });
 

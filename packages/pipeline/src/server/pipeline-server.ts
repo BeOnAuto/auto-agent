@@ -15,6 +15,10 @@ import type { Pipeline } from '../builder/define';
 import { PipelineRuntime } from '../runtime/pipeline-runtime';
 import type { PipelineContext } from '../runtime/context';
 import type { GraphIR } from '../graph/types';
+import { SettledTracker } from '../runtime/settled-tracker';
+import { EventCommandMapper } from '../runtime/event-command-map';
+import { PhasedExecutor } from '../runtime/phased-executor';
+import { SSEManager } from './sse-manager';
 
 export interface CommandHandlerWithMetadata extends CommandHandler {
   alias?: string;
@@ -44,6 +48,10 @@ export class PipelineServer {
   private actualPort: number;
   private readonly requestedPort: number;
   private currentSessionId?: string;
+  private readonly settledTracker: SettledTracker;
+  private readonly eventCommandMapper: EventCommandMapper;
+  private readonly phasedExecutor: PhasedExecutor;
+  private readonly sseManager: SSEManager;
 
   constructor(config: PipelineServerConfig) {
     this.requestedPort = config.port;
@@ -54,6 +62,21 @@ export class PipelineServer {
     this.httpServer = createServer(this.app);
     this.messageBus = createMessageBus();
     this.messageStore = config.messageStore ?? new MemoryMessageStore();
+    this.eventCommandMapper = new EventCommandMapper([]);
+    this.settledTracker = new SettledTracker({
+      onDispatch: (commandType, data, correlationId) => {
+        void this.dispatchFromSettled(commandType, data, correlationId);
+      },
+    });
+    this.phasedExecutor = new PhasedExecutor({
+      onDispatch: (commandType, data, correlationId) => {
+        void this.dispatchFromSettled(commandType, data, correlationId);
+      },
+      onComplete: (event, correlationId) => {
+        void this.handlePhasedComplete(event, correlationId);
+      },
+    });
+    this.sseManager = new SSEManager();
     this.setupRoutes();
   }
 
@@ -65,6 +88,7 @@ export class PipelineServer {
     for (const handler of handlers) {
       this.commandHandlers.set(handler.name, handler);
       this.messageBus.registerCommandHandler(handler);
+      this.eventCommandMapper.addHandler(handler);
     }
   }
 
@@ -75,6 +99,15 @@ export class PipelineServer {
   registerPipeline(pipeline: Pipeline): void {
     this.pipelines.set(pipeline.descriptor.name, pipeline);
     this.runtimes.set(pipeline.descriptor.name, new PipelineRuntime(pipeline.descriptor));
+
+    for (const handler of pipeline.descriptor.handlers) {
+      if (handler.type === 'settled') {
+        this.settledTracker.registerHandler({
+          commandTypes: handler.commandTypes,
+          handler: handler.handler,
+        });
+      }
+    }
   }
 
   getPipelineNames(): string[] {
@@ -96,6 +129,7 @@ export class PipelineServer {
   }
 
   async stop(): Promise<void> {
+    this.sseManager.closeAll();
     if (this.currentSessionId !== undefined) {
       await this.messageStore.endSession(this.currentSessionId);
     }
@@ -117,6 +151,9 @@ export class PipelineServer {
       const eventHandlers: string[] = [];
       for (const pipeline of this.pipelines.values()) {
         for (const handler of pipeline.descriptor.handlers) {
+          if (handler.type === 'settled') {
+            continue;
+          }
           if (!eventHandlers.includes(handler.eventType)) {
             eventHandlers.push(handler.eventType);
           }
@@ -210,6 +247,12 @@ export class PipelineServer {
         res.json(sessions);
       })();
     });
+
+    this.app.get('/events', (req, res) => {
+      const clientId = `sse-${nanoid()}`;
+      const correlationIdFilter = req.query.correlationId as string | undefined;
+      this.sseManager.addClient(clientId, res, correlationIdFilter);
+    });
   }
 
   private buildCombinedGraph(): GraphIR {
@@ -268,6 +311,8 @@ export class PipelineServer {
     const handler = this.commandHandlers.get(command.type);
     if (!handler) return;
 
+    this.settledTracker.onCommandStarted(command);
+
     const resultEvent = await handler.handle(command);
     const events = Array.isArray(resultEvent) ? resultEvent : [resultEvent];
 
@@ -279,8 +324,39 @@ export class PipelineServer {
       };
 
       await this.messageStore.saveMessage('$all', eventWithIds, undefined, 'event');
+
+      this.sseManager.broadcast(eventWithIds);
+
+      const sourceCommand = this.eventCommandMapper.getSourceCommand(event.type);
+      if (sourceCommand !== undefined) {
+        this.settledTracker.onEventReceived(eventWithIds, sourceCommand);
+      }
+
+      this.routeEventToPhasedExecutor(eventWithIds);
+
       await this.routeEventToPipelines(eventWithIds);
     }
+  }
+
+  private async dispatchFromSettled(commandType: string, data: unknown, correlationId: string): Promise<void> {
+    const command: Command & { correlationId: string; requestId: string } = {
+      type: commandType,
+      data: data as Record<string, unknown>,
+      correlationId,
+      requestId: `req-${nanoid()}`,
+    };
+    await this.messageStore.saveMessage('$all', command, undefined, 'command');
+    await this.processCommand(command);
+  }
+
+  private async handlePhasedComplete(event: Event, correlationId: string): Promise<void> {
+    const eventWithIds: EventWithCorrelation = {
+      ...event,
+      correlationId,
+    };
+    await this.messageStore.saveMessage('$all', eventWithIds, undefined, 'event');
+    this.sseManager.broadcast(eventWithIds);
+    await this.routeEventToPipelines(eventWithIds);
   }
 
   private async routeEventToPipelines(event: EventWithCorrelation): Promise<void> {
@@ -301,6 +377,7 @@ export class PipelineServer {
           correlationId,
         };
         await this.messageStore.saveMessage('$all', event, undefined, 'event');
+        this.sseManager.broadcast(event);
         await this.routeEventToPipelines(event);
       },
       sendCommand: async (type: string, data: unknown) => {
@@ -313,6 +390,20 @@ export class PipelineServer {
         await this.messageStore.saveMessage('$all', command, undefined, 'command');
         await this.processCommand(command);
       },
+      startPhased: (handler, event) => {
+        this.phasedExecutor.startPhased(handler, event, correlationId);
+      },
     };
+  }
+
+  private routeEventToPhasedExecutor(event: EventWithCorrelation): void {
+    for (const pipeline of this.pipelines.values()) {
+      for (const handler of pipeline.descriptor.handlers) {
+        if (handler.type === 'foreach-phased') {
+          const itemKey = handler.completion.itemKey(event);
+          this.phasedExecutor.onEventReceived(event, itemKey);
+        }
+      }
+    }
   }
 }

@@ -243,4 +243,263 @@ describe('PipelineServer E2E', () => {
       await server.stop();
     });
   });
+
+  describe('settled handler execution', () => {
+    it('should execute settled handler when all commands complete', async () => {
+      let settledHandlerCalled = false;
+      let receivedEvents: Record<string, Array<{ type: string }>> = {};
+
+      const handlers: CommandHandlerWithMetadata[] = [
+        {
+          name: 'CheckTests',
+          events: ['TestsCheckPassed', 'TestsCheckFailed'],
+          handle: async () => ({ type: 'TestsCheckPassed', data: { result: 'pass' } }),
+        },
+        {
+          name: 'CheckTypes',
+          events: ['TypeCheckPassed', 'TypeCheckFailed'],
+          handle: async () => ({ type: 'TypeCheckPassed', data: { result: 'pass' } }),
+        },
+        {
+          name: 'CheckLint',
+          events: ['LintCheckPassed', 'LintCheckFailed'],
+          handle: async () => ({ type: 'LintCheckPassed', data: { result: 'pass' } }),
+        },
+        {
+          name: 'ImplementSlice',
+          events: ['SliceImplemented'],
+          handle: async () => ({ type: 'SliceImplemented', data: {} }),
+        },
+      ];
+
+      const pipeline = define('check-settle')
+        .on('SliceImplemented')
+        .emit('CheckTests', { target: './src' })
+        .emit('CheckTypes', { target: './src' })
+        .emit('CheckLint', { target: './src' })
+        .settled(['CheckTests', 'CheckTypes', 'CheckLint'])
+        .dispatch((events) => {
+          settledHandlerCalled = true;
+          receivedEvents = events as Record<string, Array<{ type: string }>>;
+        })
+        .build();
+
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers(handlers);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      await fetchJson(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'ImplementSlice', data: { slicePath: './adds-todo' } }),
+      });
+
+      await new Promise((r) => setTimeout(r, 300));
+
+      expect(settledHandlerCalled).toBe(true);
+      expect(receivedEvents.CheckTests).toBeDefined();
+      expect(receivedEvents.CheckTypes).toBeDefined();
+      expect(receivedEvents.CheckLint).toBeDefined();
+      expect(receivedEvents.CheckTests[0].type).toBe('TestsCheckPassed');
+      expect(receivedEvents.CheckTypes[0].type).toBe('TypeCheckPassed');
+      expect(receivedEvents.CheckLint[0].type).toBe('LintCheckPassed');
+
+      await server.stop();
+    });
+
+    it('should dispatch command from settled handler', async () => {
+      const handlers: CommandHandlerWithMetadata[] = [
+        {
+          name: 'CheckA',
+          events: ['ADone'],
+          handle: async () => ({ type: 'ADone', data: {} }),
+        },
+        {
+          name: 'CheckB',
+          events: ['BDone'],
+          handle: async () => ({ type: 'BDone', data: {} }),
+        },
+        {
+          name: 'FollowUp',
+          events: ['FollowUpDone'],
+          handle: async () => ({ type: 'FollowUpDone', data: { message: 'completed' } }),
+        },
+        {
+          name: 'Trigger',
+          events: ['Triggered'],
+          handle: async () => ({ type: 'Triggered', data: {} }),
+        },
+      ];
+
+      const pipeline = define('dispatch-test')
+        .on('Triggered')
+        .emit('CheckA', {})
+        .emit('CheckB', {})
+        .settled(['CheckA', 'CheckB'])
+        .dispatch((_events, send) => {
+          send('FollowUp', { reason: 'all checks passed' });
+        })
+        .build();
+
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers(handlers);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      await fetchJson(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'Trigger', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 300));
+
+      const messages = await fetchJson<StoredMessage[]>(`http://localhost:${server.port}/messages`);
+      const eventTypes = messages.filter((m) => m.messageType === 'event').map((m) => m.message.type);
+
+      expect(eventTypes).toContain('Triggered');
+      expect(eventTypes).toContain('ADone');
+      expect(eventTypes).toContain('BDone');
+      expect(eventTypes).toContain('FollowUpDone');
+
+      await server.stop();
+    });
+
+    it('should retry when settled handler returns persist: true', async () => {
+      let checkCallCount = 0;
+      let settledCallCount = 0;
+
+      const handlers: CommandHandlerWithMetadata[] = [
+        {
+          name: 'RunCheck',
+          events: ['CheckPassed', 'CheckFailed'],
+          handle: async () => {
+            checkCallCount++;
+            if (checkCallCount < 3) {
+              return { type: 'CheckFailed', data: { attempt: checkCallCount } };
+            }
+            return { type: 'CheckPassed', data: { attempt: checkCallCount } };
+          },
+        },
+        {
+          name: 'Start',
+          events: ['Started'],
+          handle: async () => ({ type: 'Started', data: {} }),
+        },
+      ];
+
+      const pipeline = define('retry-test')
+        .on('Started')
+        .emit('RunCheck', {})
+        .settled(['RunCheck'])
+        .dispatch((events, send) => {
+          settledCallCount++;
+          const checkEvents = events.RunCheck;
+          const hasFailure = checkEvents.some((e) => e.type === 'CheckFailed');
+
+          if (hasFailure && settledCallCount < 3) {
+            send('RunCheck', { retryAttempt: settledCallCount });
+            return { persist: true };
+          }
+        })
+        .build();
+
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers(handlers);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      await fetchJson(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'Start', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 500));
+
+      const messages = await fetchJson<StoredMessage[]>(`http://localhost:${server.port}/messages`);
+      const eventTypes = messages.filter((m) => m.messageType === 'event').map((m) => m.message.type);
+
+      expect(eventTypes.filter((t) => t === 'CheckFailed')).toHaveLength(2);
+      expect(eventTypes).toContain('CheckPassed');
+      expect(checkCallCount).toBe(3);
+      expect(settledCallCount).toBe(3);
+
+      await server.stop();
+    });
+  });
+
+  describe('phased execution', () => {
+    it('should execute items in phase order with waiting', async () => {
+      const dispatchedOrder: string[] = [];
+
+      interface Component {
+        id: string;
+        type: 'molecule' | 'organism' | 'page';
+      }
+
+      const handlers: CommandHandlerWithMetadata[] = [
+        {
+          name: 'GenerateClient',
+          events: ['ClientGenerated'],
+          handle: async () => ({
+            type: 'ClientGenerated',
+            data: {
+              components: [
+                { id: 'page1', type: 'page' },
+                { id: 'mol1', type: 'molecule' },
+                { id: 'org1', type: 'organism' },
+                { id: 'mol2', type: 'molecule' },
+              ],
+            },
+          }),
+        },
+        {
+          name: 'ImplementComponent',
+          events: ['ComponentImplemented'],
+          handle: async (cmd) => {
+            const filePath = (cmd.data as { filePath: string }).filePath;
+            dispatchedOrder.push(filePath);
+            return { type: 'ComponentImplemented', data: { filePath } };
+          },
+        },
+      ];
+
+      const pipeline = define('phased-test')
+        .on('ClientGenerated')
+        .forEach((e: { data: { components: Component[] } }) => e.data.components)
+        .groupInto(['molecule', 'organism', 'page'], (c: Component) => c.type)
+        .process('ImplementComponent', (c: Component) => ({ filePath: c.id }))
+        .onComplete({
+          success: 'AllComponentsImplemented',
+          failure: 'ComponentsFailed',
+          itemKey: (e) => (e.data as { filePath?: string; id?: string }).filePath ?? (e.data as { id: string }).id,
+        })
+        .build();
+
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers(handlers);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      await fetchJson(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'GenerateClient', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 500));
+
+      const messages = await fetchJson<StoredMessage[]>(`http://localhost:${server.port}/messages`);
+      const eventTypes = messages.filter((m) => m.messageType === 'event').map((m) => m.message.type);
+
+      expect(dispatchedOrder).toEqual(['mol1', 'mol2', 'org1', 'page1']);
+
+      expect(eventTypes).toContain('ComponentImplemented');
+      expect(eventTypes).toContain('AllComponentsImplemented');
+
+      await server.stop();
+    });
+  });
 });

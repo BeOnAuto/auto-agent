@@ -10,6 +10,8 @@ import type {
   KeyExtractor,
   PipelineDescriptor,
   RunAwaitHandlerDescriptor,
+  SettledHandler,
+  SettledHandlerDescriptor,
   SuccessContext,
 } from '../core/descriptors';
 import type { CommandDispatch } from '../core/types';
@@ -26,6 +28,17 @@ export interface PipelineBuilder {
   description(d: string): PipelineBuilder;
   key<E>(name: string, extractor: (event: E) => string): PipelineBuilder;
   on(eventType: string): TriggerBuilder;
+  settled(commandTypes: readonly string[]): SettledBuilder;
+  build(): Pipeline;
+}
+
+export interface SettledBuilder {
+  dispatch(handler: SettledHandler): SettledChain;
+}
+
+export interface SettledChain {
+  on(eventType: string): TriggerBuilder;
+  settled(commandTypes: readonly string[]): SettledBuilder;
   build(): Pipeline;
 }
 
@@ -100,6 +113,7 @@ export interface GatherChain {
 export interface EmitChain {
   emit(commandType: string, data: unknown): EmitChain;
   on(eventType: string): TriggerBuilder;
+  settled(commandTypes: readonly string[]): SettledBuilder;
   build(): Pipeline;
 }
 
@@ -136,6 +150,10 @@ class PipelineBuilderImpl implements PipelineBuilder {
 
   on(eventType: string): TriggerBuilder {
     return new TriggerBuilderImpl(this, eventType);
+  }
+
+  settled(commandTypes: readonly string[]): SettledBuilder {
+    return new SettledBuilderImpl(this, commandTypes);
   }
 
   addHandler(handler: HandlerDescriptor): void {
@@ -211,6 +229,23 @@ function processCustomHandler(ctx: GraphBuilderContext, handler: CustomHandlerDe
   }
 }
 
+function processSettledHandler(ctx: GraphBuilderContext, handler: SettledHandlerDescriptor): void {
+  const settledNodeId = `settled:${handler.commandTypes.join(',')}`;
+  addNode(ctx, settledNodeId, 'command', `settled(${handler.commandTypes.join(', ')})`);
+
+  for (const commandType of handler.commandTypes) {
+    addNode(ctx, `cmd:${commandType}`, 'command', commandType);
+    ctx.edges.push({ from: `cmd:${commandType}`, to: settledNodeId });
+  }
+
+  if (handler.dispatches) {
+    for (const dispatchedCommand of handler.dispatches) {
+      addNode(ctx, `cmd:${dispatchedCommand}`, 'command', dispatchedCommand);
+      ctx.edges.push({ from: settledNodeId, to: `cmd:${dispatchedCommand}` });
+    }
+  }
+}
+
 function extractGraph(descriptor: PipelineDescriptor): GraphIR {
   const ctx: GraphBuilderContext = {
     nodeMap: new Map<string, GraphNode>(),
@@ -230,6 +265,9 @@ function extractGraph(descriptor: PipelineDescriptor): GraphIR {
         break;
       case 'custom':
         processCustomHandler(ctx, handler);
+        break;
+      case 'settled':
+        processSettledHandler(ctx, handler);
         break;
     }
   }
@@ -296,6 +334,11 @@ class EmitChainImpl implements EmitChain {
   on(eventType: string): TriggerBuilder {
     this.finalizeHandler();
     return new TriggerBuilderImpl(this.parent, eventType);
+  }
+
+  settled(commandTypes: readonly string[]): SettledBuilder {
+    this.finalizeHandler();
+    return new SettledBuilderImpl(this.parent, commandTypes);
   }
 
   build(): Pipeline {
@@ -586,6 +629,49 @@ class PhasedTerminalImpl implements PhasedTerminal {
   build(): Pipeline {
     this.phasedChain.finalizeHandler();
     return this.parent.build();
+  }
+}
+
+class SettledBuilderImpl implements SettledBuilder {
+  constructor(
+    private readonly parent: PipelineBuilderImpl,
+    private readonly commandTypes: readonly string[],
+  ) {}
+
+  dispatch(handler: SettledHandler): SettledChain {
+    return new SettledChainImpl(this.parent, this.commandTypes, handler);
+  }
+}
+
+class SettledChainImpl implements SettledChain {
+  constructor(
+    private readonly parent: PipelineBuilderImpl,
+    private readonly commandTypes: readonly string[],
+    private readonly handler: SettledHandler,
+  ) {}
+
+  on(eventType: string): TriggerBuilder {
+    this.finalizeHandler();
+    return new TriggerBuilderImpl(this.parent, eventType);
+  }
+
+  settled(commandTypes: readonly string[]): SettledBuilder {
+    this.finalizeHandler();
+    return new SettledBuilderImpl(this.parent, commandTypes);
+  }
+
+  build(): Pipeline {
+    this.finalizeHandler();
+    return this.parent.build();
+  }
+
+  private finalizeHandler(): void {
+    const descriptor: SettledHandlerDescriptor = {
+      type: 'settled',
+      commandTypes: this.commandTypes,
+      handler: this.handler,
+    };
+    this.parent.addHandler(descriptor);
   }
 }
 

@@ -34,15 +34,17 @@ One atomic test + implementation per cycle (5-15 min).
 
 1. Write ONE failing test (Red)
 2. Write MINIMAL code to pass (Green)
-3. TCR: `test && commit || revert` (include plan update)
+3. Run TCR — this verifies and commits in one step
 4. Refactor if needed
-5. TCR: `test && commit || revert`
+5. Run TCR
 6. Move pomodoro to DONE in the `pomodoro-plan.md`, commit with TCR
 
 **TCR Command:**
 
+Do NOT run tests or checks separately before TCR. TCR _is_ the verification — that's the T.
+
 ```bash
-pnpm test --run && \
+pnpm test --run && pnpm -w run check 2>&1 | tail -30 && \
   git add -A && git commit -m "<COMMITIZEN FORMAT>" || \
   git checkout -- packages/<package>/
 ```
@@ -75,6 +77,24 @@ All thresholds enforced at 100%. Tests drive the code.
 | Add branches only when tested   | Defensive `??`, `?:`, `if/else` untested |
 | Test all error paths            | Leave error handling unverified          |
 | Remove dead code after each run | Keep unused code "just in case"          |
+
+**NEVER Exclude Files to Dodge Coverage**
+
+```
+╔═══════════════════════════════════════════════════════════════════════╗
+║  Excluding a file from coverage to avoid testing it is FORBIDDEN.    ║
+║  "Hard to test" code (file system, dynamic imports, network, etc.)   ║
+║  → Use mocks/stubs at boundaries. That's what they're for.           ║
+╚═══════════════════════════════════════════════════════════════════════╝
+```
+
+Coverage exclusions are ONLY for:
+
+- Type-only files (interfaces, type definitions)
+- Barrel exports (index.ts re-exports)
+- Files that are genuinely 0% logic (pure declarations)
+
+If you're tempted to exclude a file because it's "infrastructure" or "integration-focused" — STOP. Inject dependencies and mock them. The coverage requirement exists precisely to force testable design.
 
 ---
 

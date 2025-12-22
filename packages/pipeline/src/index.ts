@@ -42,3 +42,20 @@ export { AwaitTracker } from './runtime/await-tracker';
 
 export { PipelineServer } from './server/pipeline-server';
 export type { PipelineServerConfig, CommandHandlerWithMetadata } from './server/pipeline-server';
+
+export { SettledTracker } from './runtime/settled-tracker';
+export { EventCommandMapper } from './runtime/event-command-map';
+export { PhasedExecutor } from './runtime/phased-executor';
+export { SSEManager } from './server/sse-manager';
+
+export { EventLogger } from './logging/event-logger';
+export type { LogEntry, EventLoggerOptions } from './logging/event-logger';
+
+export {
+  compareEventSequence,
+  containsSubsequence,
+  findMissingEvents,
+  findUnexpectedEvents,
+  formatSnapshotDiff,
+} from './testing/snapshot-compare';
+export type { SnapshotDiff, SnapshotResult } from './testing/snapshot-compare';

@@ -2,25 +2,25 @@ import type { Event } from '@auto-engineer/message-bus';
 import type {
   CustomHandlerDescriptor,
   EmitHandlerDescriptor,
+  EventHandlerDescriptor,
   ForEachPhasedDescriptor,
-  HandlerDescriptor,
   PipelineDescriptor,
   RunAwaitHandlerDescriptor,
 } from '../core/descriptors';
 import type { PipelineContext } from './context';
 
 export class PipelineRuntime {
-  private readonly handlerIndex: Map<string, HandlerDescriptor[]>;
+  private readonly handlerIndex: Map<string, EventHandlerDescriptor[]>;
 
   constructor(public readonly descriptor: PipelineDescriptor) {
     this.handlerIndex = this.buildHandlerIndex();
   }
 
-  getHandlersForEvent(eventType: string): HandlerDescriptor[] {
+  getHandlersForEvent(eventType: string): EventHandlerDescriptor[] {
     return this.handlerIndex.get(eventType) ?? [];
   }
 
-  getMatchingHandlers(event: Event): HandlerDescriptor[] {
+  getMatchingHandlers(event: Event): EventHandlerDescriptor[] {
     const handlers = this.getHandlersForEvent(event.type);
     return handlers.filter((handler) => {
       if (!handler.predicate) return true;
@@ -42,7 +42,11 @@ export class PipelineRuntime {
           await this.executeRunAwaitHandler(handler, event, ctx);
           break;
         case 'foreach-phased':
-          await this.executeForEachPhasedHandler(handler, event, ctx);
+          if (ctx.startPhased !== undefined) {
+            ctx.startPhased(handler, event);
+          } else {
+            await this.executeForEachPhasedHandler(handler, event, ctx);
+          }
           break;
       }
     }
@@ -100,9 +104,12 @@ export class PipelineRuntime {
     }
   }
 
-  private buildHandlerIndex(): Map<string, HandlerDescriptor[]> {
-    const index = new Map<string, HandlerDescriptor[]>();
+  private buildHandlerIndex(): Map<string, EventHandlerDescriptor[]> {
+    const index = new Map<string, EventHandlerDescriptor[]>();
     for (const handler of this.descriptor.handlers) {
+      if (handler.type === 'settled') {
+        continue;
+      }
       const existing = index.get(handler.eventType) ?? [];
       existing.push(handler);
       index.set(handler.eventType, existing);

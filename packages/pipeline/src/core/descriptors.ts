@@ -68,11 +68,27 @@ export interface CustomHandlerDescriptor {
   declaredEmits?: string[];
 }
 
-export type HandlerDescriptor =
+type SettledSendFunction = (commandType: string, data: unknown) => void;
+
+export type SettledHandler = (
+  events: Record<string, Event[]>,
+  send: SettledSendFunction,
+) => void | { persist: boolean };
+
+export interface SettledHandlerDescriptor {
+  type: 'settled';
+  commandTypes: readonly string[];
+  handler: SettledHandler;
+  dispatches?: readonly string[];
+}
+
+export type EventHandlerDescriptor =
   | EmitHandlerDescriptor
   | RunAwaitHandlerDescriptor
   | ForEachPhasedDescriptor
   | CustomHandlerDescriptor;
+
+export type HandlerDescriptor = EventHandlerDescriptor | SettledHandlerDescriptor;
 
 export interface PipelineDescriptor {
   name: string;
