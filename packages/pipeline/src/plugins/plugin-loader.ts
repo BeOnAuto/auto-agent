@@ -31,6 +31,25 @@ function isValidHandler(obj: unknown): obj is UnifiedCommandHandler {
   );
 }
 
+function isHandlerExportKey(key: string): boolean {
+  return key.endsWith('CommandHandler') || key.endsWith('commandHandler');
+}
+
+function isHandlerObject(value: unknown): boolean {
+  return typeof value === 'object' && value !== null && 'name' in value && 'handle' in value;
+}
+
+function hasCommandsArray(obj: Record<string, unknown>): boolean {
+  return 'COMMANDS' in obj && Array.isArray(obj.COMMANDS);
+}
+
+function getDefaultExport(obj: Record<string, unknown>): Record<string, unknown> | null {
+  if ('default' in obj && typeof obj.default === 'object' && obj.default !== null) {
+    return obj.default as Record<string, unknown>;
+  }
+  return null;
+}
+
 export interface PluginLoaderDeps {
   existsSync: (path: string) => boolean;
   importModule: (path: string) => Promise<unknown>;
@@ -130,21 +149,23 @@ export class PluginLoader {
       return false;
     }
     const obj = mod as Record<string, unknown>;
-    if ('COMMANDS' in obj && Array.isArray(obj.COMMANDS)) {
+
+    if (hasCommandsArray(obj)) {
       return true;
     }
-    if ('default' in obj && typeof obj.default === 'object' && obj.default !== null) {
-      const defaultMod = obj.default as Record<string, unknown>;
-      if ('COMMANDS' in defaultMod && Array.isArray(defaultMod.COMMANDS)) {
-        return true;
-      }
+
+    const defaultMod = getDefaultExport(obj);
+    if (defaultMod !== null && hasCommandsArray(defaultMod)) {
+      return true;
     }
+
+    return this.hasNamedHandlerExports(obj);
+  }
+
+  private hasNamedHandlerExports(obj: Record<string, unknown>): boolean {
     for (const key of Object.keys(obj)) {
-      if (key.endsWith('CommandHandler') || key.endsWith('commandHandler')) {
-        const value = obj[key];
-        if (typeof value === 'object' && value !== null && 'name' in value && 'handle' in value) {
-          return true;
-        }
+      if (isHandlerExportKey(key) && isHandlerObject(obj[key])) {
+        return true;
       }
     }
     return false;
@@ -157,30 +178,25 @@ export class PluginLoader {
 
     const mod = module as Record<string, unknown>;
 
-    if ('COMMANDS' in mod && Array.isArray(mod.COMMANDS)) {
-      return mod.COMMANDS;
+    if (hasCommandsArray(mod)) {
+      return mod.COMMANDS as unknown[];
     }
 
-    if ('default' in mod && typeof mod.default === 'object' && mod.default !== null) {
-      const defaultMod = mod.default as Record<string, unknown>;
-      if ('COMMANDS' in defaultMod && Array.isArray(defaultMod.COMMANDS)) {
-        return defaultMod.COMMANDS;
-      }
+    const defaultMod = getDefaultExport(mod);
+    if (defaultMod !== null && hasCommandsArray(defaultMod)) {
+      return defaultMod.COMMANDS as unknown[];
     }
 
+    return this.extractNamedHandlers(mod);
+  }
+
+  private extractNamedHandlers(mod: Record<string, unknown>): unknown[] {
     const handlers: unknown[] = [];
     for (const [key, value] of Object.entries(mod)) {
-      if (
-        (key.endsWith('CommandHandler') || key.endsWith('commandHandler')) &&
-        typeof value === 'object' &&
-        value !== null &&
-        'name' in value &&
-        'handle' in value
-      ) {
+      if (isHandlerExportKey(key) && isHandlerObject(value)) {
         handlers.push(value);
       }
     }
-
     return handlers;
   }
 }
