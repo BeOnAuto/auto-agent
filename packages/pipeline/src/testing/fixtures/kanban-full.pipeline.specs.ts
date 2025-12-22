@@ -160,6 +160,39 @@ describe('kanban-full.pipeline', () => {
     });
   });
 
+  describe('ClientGenerated with StartClient', () => {
+    it('should emit StartClient when ClientGenerated has valid components', () => {
+      const pipeline = createKanbanFullPipeline();
+      const emitHandlers = pipeline.descriptor.handlers.filter(
+        (h): h is EmitHandlerDescriptor =>
+          h.type === 'emit' && h.eventType === 'ClientGenerated' && h.predicate !== undefined,
+      );
+      const startClientHandler = emitHandlers.find((h) => h.commands.some((c) => c.commandType === 'StartClient'));
+      expect(startClientHandler).toBeDefined();
+      const startClientCmd = startClientHandler?.commands.find((c) => c.commandType === 'StartClient');
+      expect(startClientCmd).toBeDefined();
+      const data =
+        typeof startClientCmd?.data === 'function'
+          ? startClientCmd.data({ type: 'ClientGenerated', data: { components: [], targetDir: './client' } })
+          : startClientCmd?.data;
+      expect(data).toEqual({ clientDirectory: './client' });
+    });
+
+    it('should have predicate for StartClient that checks valid components', () => {
+      const pipeline = createKanbanFullPipeline();
+      const emitHandlers = pipeline.descriptor.handlers.filter(
+        (h): h is EmitHandlerDescriptor =>
+          h.type === 'emit' && h.eventType === 'ClientGenerated' && h.predicate !== undefined,
+      );
+      const startClientHandler = emitHandlers.find((h) => h.commands.some((c) => c.commandType === 'StartClient'));
+      const predicate = startClientHandler?.predicate;
+      expect(
+        predicate?.({ type: 'ClientGenerated', data: { components: [{ type: 'molecule', filePath: 'x' }] } }),
+      ).toBe(true);
+      expect(predicate?.({ type: 'ClientGenerated', data: { components: [] } })).toBe(false);
+    });
+  });
+
   describe('ClientGenerated edge cases', () => {
     it('should have predicate on foreach-phased handler to check for valid components', () => {
       const pipeline = createKanbanFullPipeline();
@@ -220,7 +253,10 @@ describe('kanban-full.pipeline', () => {
       const pipeline = createKanbanFullPipeline();
       const fallbackHandler = pipeline.descriptor.handlers.find(
         (h): h is EmitHandlerDescriptor =>
-          h.type === 'emit' && h.eventType === 'ClientGenerated' && h.predicate !== undefined,
+          h.type === 'emit' &&
+          h.eventType === 'ClientGenerated' &&
+          h.predicate !== undefined &&
+          h.commands.some((c) => c.commandType === 'ImplementComponent'),
       );
       expect(fallbackHandler).toBeDefined();
       const fallbackPredicate = fallbackHandler?.predicate;
@@ -234,7 +270,10 @@ describe('kanban-full.pipeline', () => {
       const pipeline = createKanbanFullPipeline();
       const fallbackHandler = pipeline.descriptor.handlers.find(
         (h): h is EmitHandlerDescriptor =>
-          h.type === 'emit' && h.eventType === 'ClientGenerated' && h.predicate !== undefined,
+          h.type === 'emit' &&
+          h.eventType === 'ClientGenerated' &&
+          h.predicate !== undefined &&
+          h.commands.some((c) => c.commandType === 'ImplementComponent'),
       );
       const implementCmd = fallbackHandler?.commands.find((c) => c.commandType === 'ImplementComponent');
       expect(implementCmd).toBeDefined();

@@ -142,6 +142,12 @@ export function createKanbanFullPipeline() {
     }))
 
     .on('ClientGenerated')
+    .when(hasValidComponents)
+    .emit('StartClient', () => ({
+      clientDirectory: './client',
+    }))
+
+    .on('ClientGenerated')
     .when(hasInvalidComponents)
     .emit('ImplementComponent', () => ({
       projectDir: './client',
