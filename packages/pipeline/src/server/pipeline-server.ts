@@ -190,6 +190,11 @@ export class PipelineServer {
       });
     });
 
+    this.app.get('/pipeline/mermaid', (_req, res) => {
+      const mermaid = this.buildMermaidDiagram();
+      res.type('text/plain').send(mermaid);
+    });
+
     this.app.post('/command', (req, res) => {
       void (async () => {
         const command = req.body as Command;
@@ -305,6 +310,52 @@ export class PipelineServer {
       alias: handler.alias,
       status: 'None' as const,
     }));
+  }
+
+  private buildMermaidDiagram(): string {
+    const graph = this.buildCombinedGraph();
+    const lines: string[] = ['flowchart TD'];
+
+    const eventNodes = new Set<string>();
+    const commandNodes = new Set<string>();
+
+    for (const node of graph.nodes) {
+      const safeId = node.id.replace(/:/g, '_');
+      if (node.id.startsWith('evt:')) {
+        eventNodes.add(safeId);
+        const label = node.id.replace('evt:', '');
+        lines.push(`  ${safeId}([${label}])`);
+      } else if (node.id.startsWith('cmd:')) {
+        commandNodes.add(safeId);
+        const label = node.id.replace('cmd:', '');
+        lines.push(`  ${safeId}[${label}]`);
+      } else if (node.id.startsWith('settled:')) {
+        const label = node.id.replace('settled:', '');
+        lines.push(`  ${safeId}{{${label}}}`);
+      } else {
+        lines.push(`  ${safeId}[${node.id}]`);
+      }
+    }
+
+    for (const edge of graph.edges) {
+      const from = edge.from.replace(/:/g, '_');
+      const to = edge.to.replace(/:/g, '_');
+      lines.push(`  ${from} --> ${to}`);
+    }
+
+    lines.push('');
+    lines.push('  classDef event fill:#e1f5fe,stroke:#01579b');
+    lines.push('  classDef command fill:#fff3e0,stroke:#e65100');
+    lines.push('  classDef settled fill:#f3e5f5,stroke:#7b1fa2');
+
+    if (eventNodes.size > 0) {
+      lines.push(`  class ${[...eventNodes].join(',')} event`);
+    }
+    if (commandNodes.size > 0) {
+      lines.push(`  class ${[...commandNodes].join(',')} command`);
+    }
+
+    return lines.join('\n');
   }
 
   private async processCommand(command: Command & { correlationId: string; requestId: string }): Promise<void> {

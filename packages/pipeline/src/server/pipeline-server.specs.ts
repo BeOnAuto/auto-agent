@@ -354,6 +354,65 @@ describe('PipelineServer', () => {
     });
   });
 
+  describe('GET /pipeline/mermaid', () => {
+    it('should return mermaid diagram as text', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      expect(res.headers.get('content-type')).toContain('text/plain');
+      const mermaid = await res.text();
+      expect(mermaid).toContain('flowchart TD');
+      await server.stop();
+    });
+
+    it('should include event nodes in mermaid diagram', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('evt_Start');
+      await server.stop();
+    });
+
+    it('should include command nodes in mermaid diagram', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('cmd_Process');
+      await server.stop();
+    });
+
+    it('should include edges in mermaid diagram', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('-->');
+      await server.stop();
+    });
+
+    it('should style event and command nodes differently', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('classDef event');
+      expect(mermaid).toContain('classDef command');
+      await server.stop();
+    });
+  });
+
   describe('integration', () => {
     it('should execute complete workflow', async () => {
       const handler = {
