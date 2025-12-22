@@ -20,6 +20,11 @@ import { createVfsCompilerHost } from './vfs-compiler-host';
 
 const debug = createDebug('auto:flow:graph');
 
+function interopDefault<T>(mod: unknown): T {
+  const m = mod as Record<string, unknown> | null;
+  return m !== null && typeof m === 'object' && 'default' in m ? ((m.default as T) ?? (mod as T)) : (mod as T);
+}
+
 async function collectAllTypings(
   vfs: IFileStore,
   externalPkgs: Set<string>,
@@ -166,7 +171,7 @@ export async function buildGraph(
   importMap: Record<string, unknown>,
   rootDir: string,
 ): Promise<BuildGraphResult> {
-  const ts = await import('typescript');
+  const ts = interopDefault<typeof import('typescript')>(await import('typescript'));
 
   const graph: Graph = new Map();
   const visited = new Set<string>();
