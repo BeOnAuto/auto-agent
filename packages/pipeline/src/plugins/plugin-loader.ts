@@ -91,15 +91,31 @@ export class PluginLoader {
 
   private async tryLoadModule(packageName: string): Promise<unknown> {
     const shortName = packageName.replace('@auto-engineer/', '');
+    const distPaths = ['dist', 'dist/src'];
+    const entryPoints = ['index.js', 'node.js'];
 
-    const workspaceDistPath = resolve(this.workspaceRoot, 'packages', shortName, 'dist', 'index.js');
-    if (this.deps.existsSync(workspaceDistPath)) {
-      return this.deps.importModule(workspaceDistPath);
+    for (const distPath of distPaths) {
+      for (const entry of entryPoints) {
+        const workspacePath = resolve(this.workspaceRoot, 'packages', shortName, distPath, entry);
+        if (this.deps.existsSync(workspacePath)) {
+          const mod = await this.deps.importModule(workspacePath);
+          if (this.hasCommands(mod)) {
+            return mod;
+          }
+        }
+      }
     }
 
-    const nodeModulesPath = resolve(this.workspaceRoot, 'node_modules', packageName, 'dist', 'index.js');
-    if (this.deps.existsSync(nodeModulesPath)) {
-      return this.deps.importModule(nodeModulesPath);
+    for (const distPath of distPaths) {
+      for (const entry of entryPoints) {
+        const nodeModulesPath = resolve(this.workspaceRoot, 'node_modules', packageName, distPath, entry);
+        if (this.deps.existsSync(nodeModulesPath)) {
+          const mod = await this.deps.importModule(nodeModulesPath);
+          if (this.hasCommands(mod)) {
+            return mod;
+          }
+        }
+      }
     }
 
     try {
@@ -107,6 +123,31 @@ export class PluginLoader {
     } catch {
       return null;
     }
+  }
+
+  private hasCommands(mod: unknown): boolean {
+    if (typeof mod !== 'object' || mod === null) {
+      return false;
+    }
+    const obj = mod as Record<string, unknown>;
+    if ('COMMANDS' in obj && Array.isArray(obj.COMMANDS)) {
+      return true;
+    }
+    if ('default' in obj && typeof obj.default === 'object' && obj.default !== null) {
+      const defaultMod = obj.default as Record<string, unknown>;
+      if ('COMMANDS' in defaultMod && Array.isArray(defaultMod.COMMANDS)) {
+        return true;
+      }
+    }
+    for (const key of Object.keys(obj)) {
+      if (key.endsWith('CommandHandler') || key.endsWith('commandHandler')) {
+        const value = obj[key];
+        if (typeof value === 'object' && value !== null && 'name' in value && 'handle' in value) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private extractCommands(module: unknown): unknown[] {
@@ -127,6 +168,19 @@ export class PluginLoader {
       }
     }
 
-    return [];
+    const handlers: unknown[] = [];
+    for (const [key, value] of Object.entries(mod)) {
+      if (
+        (key.endsWith('CommandHandler') || key.endsWith('commandHandler')) &&
+        typeof value === 'object' &&
+        value !== null &&
+        'name' in value &&
+        'handle' in value
+      ) {
+        handlers.push(value);
+      }
+    }
+
+    return handlers;
   }
 }

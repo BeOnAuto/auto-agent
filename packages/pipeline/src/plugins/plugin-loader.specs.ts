@@ -49,7 +49,7 @@ describe('PluginLoader', () => {
 
       expect(handlers).toHaveLength(1);
       expect(handlers[0].name).toBe('GenerateServer');
-      expect(deps.existsSync).toHaveBeenCalledTimes(2);
+      expect(deps.existsSync).toHaveBeenCalled();
     });
 
     it('should fallback to direct import when neither workspace nor node_modules found', async () => {
@@ -276,6 +276,20 @@ describe('PluginLoader', () => {
       expect(handlerNames).toContain('CheckLint');
       expect(handlerNames).toContain('GenerateServer');
       expect(handlers.length).toBeGreaterThan(3);
+    });
+
+    it('should load ExportSchema from narrative package node entry', async () => {
+      const loader = new PluginLoader();
+      const handlers = await loader.loadPlugin('@auto-engineer/narrative');
+      const handlerNames = handlers.map((h) => h.name);
+      expect(handlerNames).toContain('ExportSchema');
+    });
+
+    it('should load GenerateClient from frontend-generator package', async () => {
+      const loader = new PluginLoader();
+      const handlers = await loader.loadPlugin('@auto-engineer/frontend-generator-react-graphql');
+      const handlerNames = handlers.map((h) => h.name);
+      expect(handlerNames).toContain('GenerateClient');
     });
   });
 });
