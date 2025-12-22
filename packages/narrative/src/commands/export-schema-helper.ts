@@ -50,7 +50,7 @@ const main = async () => {
     await fs.ensureDir(contextDir);
     await fs.writeText(outPath, json);
     debug('Schema written to: %s', outPath);
-    debug(JSON.stringify({ success: true, outputPath: outPath }));
+    console.log(JSON.stringify({ success: true, outputPath: outPath }));
   } catch (error) {
     debug('Error occurred: %o', error);
 

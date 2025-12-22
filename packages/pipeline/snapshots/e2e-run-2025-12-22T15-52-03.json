@@ -1,0 +1,613 @@
+{
+  "timestamp": "2025-12-22T15:52:03.528Z",
+  "config": {
+    "exampleDir": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo",
+    "handlersLoaded": 15
+  },
+  "summary": {
+    "totalMessages": 58,
+    "events": 31,
+    "commands": 27,
+    "eventCounts": {
+      "SchemaExported": 1,
+      "SliceGenerated": 5,
+      "SliceImplemented": 6,
+      "TestsCheckPassed": 6,
+      "TypeCheckPassed": 6,
+      "LintCheckPassed": 5,
+      "LintCheckFailed": 1,
+      "ServerGenerated": 1
+    }
+  },
+  "messages": [
+    {
+      "type": "ExportSchema",
+      "data": {
+        "directory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo"
+      },
+      "messageType": "command",
+      "position": "1"
+    },
+    {
+      "type": "SchemaExported",
+      "data": {
+        "directory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo",
+        "outputPath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/.context/schema.json"
+      },
+      "messageType": "event",
+      "position": "2"
+    },
+    {
+      "type": "GenerateServer",
+      "data": {
+        "modelPath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/.context/schema.json",
+        "destination": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo"
+      },
+      "messageType": "command",
+      "position": "3"
+    },
+    {
+      "type": "SliceGenerated",
+      "data": {
+        "flowName": "Todo List",
+        "sliceName": "adds a new todo",
+        "sliceType": "command",
+        "schemaPath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/.context/schema.json",
+        "slicePath": "server/src/domain/flows/todo-list/adds-a-new-todo"
+      },
+      "messageType": "event",
+      "position": "4"
+    },
+    {
+      "type": "ImplementSlice",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/adds-a-new-todo",
+        "context": {
+          "previousOutputs": "errors",
+          "attemptNumber": 0
+        },
+        "aiOptions": {
+          "maxTokens": 2000
+        }
+      },
+      "messageType": "command",
+      "position": "5"
+    },
+    {
+      "type": "SliceImplemented",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/adds-a-new-todo",
+        "filesImplemented": ["decide.ts", "evolve.ts", "state.ts"]
+      },
+      "messageType": "event",
+      "position": "6"
+    },
+    {
+      "type": "CheckTests",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/adds-a-new-todo",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "7"
+    },
+    {
+      "type": "TestsCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/adds-a-new-todo",
+        "testsRun": 0,
+        "testsPassed": 0
+      },
+      "messageType": "event",
+      "position": "8"
+    },
+    {
+      "type": "CheckTypes",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/adds-a-new-todo",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "9"
+    },
+    {
+      "type": "TypeCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/adds-a-new-todo",
+        "checkedFiles": 9
+      },
+      "messageType": "event",
+      "position": "10"
+    },
+    {
+      "type": "CheckLint",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/adds-a-new-todo",
+        "scope": "slice",
+        "fix": true
+      },
+      "messageType": "command",
+      "position": "11"
+    },
+    {
+      "type": "LintCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/adds-a-new-todo",
+        "filesChecked": 9
+      },
+      "messageType": "event",
+      "position": "12"
+    },
+    {
+      "type": "SliceGenerated",
+      "data": {
+        "flowName": "Todo List",
+        "sliceName": "moves todo to in progress",
+        "sliceType": "command",
+        "schemaPath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/.context/schema.json",
+        "slicePath": "server/src/domain/flows/todo-list/moves-todo-to-in-progress"
+      },
+      "messageType": "event",
+      "position": "13"
+    },
+    {
+      "type": "ImplementSlice",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/moves-todo-to-in-progress",
+        "context": {
+          "previousOutputs": "errors",
+          "attemptNumber": 0
+        },
+        "aiOptions": {
+          "maxTokens": 2000
+        }
+      },
+      "messageType": "command",
+      "position": "14"
+    },
+    {
+      "type": "SliceImplemented",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/moves-todo-to-in-progress",
+        "filesImplemented": ["decide.ts", "evolve.ts", "state.ts"]
+      },
+      "messageType": "event",
+      "position": "15"
+    },
+    {
+      "type": "CheckTests",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/moves-todo-to-in-progress",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "16"
+    },
+    {
+      "type": "TestsCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/moves-todo-to-in-progress",
+        "testsRun": 0,
+        "testsPassed": 0
+      },
+      "messageType": "event",
+      "position": "17"
+    },
+    {
+      "type": "CheckTypes",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/moves-todo-to-in-progress",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "18"
+    },
+    {
+      "type": "TypeCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/moves-todo-to-in-progress",
+        "checkedFiles": 9
+      },
+      "messageType": "event",
+      "position": "19"
+    },
+    {
+      "type": "CheckLint",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/moves-todo-to-in-progress",
+        "scope": "slice",
+        "fix": true
+      },
+      "messageType": "command",
+      "position": "20"
+    },
+    {
+      "type": "LintCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/moves-todo-to-in-progress",
+        "filesChecked": 9
+      },
+      "messageType": "event",
+      "position": "21"
+    },
+    {
+      "type": "SliceGenerated",
+      "data": {
+        "flowName": "Todo List",
+        "sliceName": "marks todo as complete",
+        "sliceType": "command",
+        "schemaPath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/.context/schema.json",
+        "slicePath": "server/src/domain/flows/todo-list/marks-todo-as-complete"
+      },
+      "messageType": "event",
+      "position": "22"
+    },
+    {
+      "type": "ImplementSlice",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/marks-todo-as-complete",
+        "context": {
+          "previousOutputs": "errors",
+          "attemptNumber": 0
+        },
+        "aiOptions": {
+          "maxTokens": 2000
+        }
+      },
+      "messageType": "command",
+      "position": "23"
+    },
+    {
+      "type": "SliceImplemented",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/marks-todo-as-complete",
+        "filesImplemented": ["decide.ts", "evolve.ts", "state.ts"]
+      },
+      "messageType": "event",
+      "position": "24"
+    },
+    {
+      "type": "CheckTests",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/marks-todo-as-complete",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "25"
+    },
+    {
+      "type": "TestsCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/marks-todo-as-complete",
+        "testsRun": 0,
+        "testsPassed": 0
+      },
+      "messageType": "event",
+      "position": "26"
+    },
+    {
+      "type": "CheckTypes",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/marks-todo-as-complete",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "27"
+    },
+    {
+      "type": "TypeCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/marks-todo-as-complete",
+        "checkedFiles": 9
+      },
+      "messageType": "event",
+      "position": "28"
+    },
+    {
+      "type": "CheckLint",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/marks-todo-as-complete",
+        "scope": "slice",
+        "fix": true
+      },
+      "messageType": "command",
+      "position": "29"
+    },
+    {
+      "type": "LintCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/marks-todo-as-complete",
+        "filesChecked": 9
+      },
+      "messageType": "event",
+      "position": "30"
+    },
+    {
+      "type": "SliceGenerated",
+      "data": {
+        "flowName": "Todo List",
+        "sliceName": "views all todos",
+        "sliceType": "query",
+        "schemaPath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/.context/schema.json",
+        "slicePath": "server/src/domain/flows/todo-list/views-all-todos"
+      },
+      "messageType": "event",
+      "position": "31"
+    },
+    {
+      "type": "ImplementSlice",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-all-todos",
+        "context": {
+          "previousOutputs": "errors",
+          "attemptNumber": 0
+        },
+        "aiOptions": {
+          "maxTokens": 2000
+        }
+      },
+      "messageType": "command",
+      "position": "32"
+    },
+    {
+      "type": "SliceImplemented",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-all-todos",
+        "filesImplemented": ["projection.ts", "query.resolver.ts"]
+      },
+      "messageType": "event",
+      "position": "33"
+    },
+    {
+      "type": "CheckTests",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-all-todos",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "34"
+    },
+    {
+      "type": "TestsCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-all-todos",
+        "testsRun": 0,
+        "testsPassed": 0
+      },
+      "messageType": "event",
+      "position": "35"
+    },
+    {
+      "type": "CheckTypes",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-all-todos",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "36"
+    },
+    {
+      "type": "TypeCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-all-todos",
+        "checkedFiles": 4
+      },
+      "messageType": "event",
+      "position": "37"
+    },
+    {
+      "type": "CheckLint",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-all-todos",
+        "scope": "slice",
+        "fix": true
+      },
+      "messageType": "command",
+      "position": "38"
+    },
+    {
+      "type": "LintCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-all-todos",
+        "filesChecked": 4
+      },
+      "messageType": "event",
+      "position": "39"
+    },
+    {
+      "type": "SliceGenerated",
+      "data": {
+        "flowName": "Todo List",
+        "sliceName": "views completion summary",
+        "sliceType": "query",
+        "schemaPath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/.context/schema.json",
+        "slicePath": "server/src/domain/flows/todo-list/views-completion-summary"
+      },
+      "messageType": "event",
+      "position": "40"
+    },
+    {
+      "type": "ImplementSlice",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "context": {
+          "previousOutputs": "errors",
+          "attemptNumber": 0
+        },
+        "aiOptions": {
+          "maxTokens": 2000
+        }
+      },
+      "messageType": "command",
+      "position": "41"
+    },
+    {
+      "type": "SliceImplemented",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "filesImplemented": ["projection.ts"]
+      },
+      "messageType": "event",
+      "position": "42"
+    },
+    {
+      "type": "CheckTests",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "43"
+    },
+    {
+      "type": "TestsCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "testsRun": 0,
+        "testsPassed": 0
+      },
+      "messageType": "event",
+      "position": "44"
+    },
+    {
+      "type": "CheckTypes",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "45"
+    },
+    {
+      "type": "TypeCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "checkedFiles": 4
+      },
+      "messageType": "event",
+      "position": "46"
+    },
+    {
+      "type": "CheckLint",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "scope": "slice",
+        "fix": true
+      },
+      "messageType": "command",
+      "position": "47"
+    },
+    {
+      "type": "LintCheckFailed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "errors": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary/projection.ts\n   26:11  error  Method 'evolve' has a complexity of 22. Maximum allowed is 10                                      complexity\n   52:26  error  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions\n   94:26  error  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions\n  136:26  error  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions",
+        "filesWithIssues": ["projection.ts"],
+        "errorCount": 4,
+        "warningCount": 0
+      },
+      "messageType": "event",
+      "position": "48"
+    },
+    {
+      "type": "ImplementSlice",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "context": {
+          "previousOutputs": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary/projection.ts\n   26:11  error  Method 'evolve' has a complexity of 22. Maximum allowed is 10                                      complexity\n   52:26  error  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions\n   94:26  error  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions\n  136:26  error  Unexpected nullable string value in conditional. Please handle the nullish/empty cases explicitly  @typescript-eslint/strict-boolean-expressions",
+          "attemptNumber": 1
+        },
+        "aiOptions": {
+          "maxTokens": 2000
+        }
+      },
+      "messageType": "command",
+      "position": "49"
+    },
+    {
+      "type": "ServerGenerated",
+      "data": {
+        "modelPath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/.context/schema.json",
+        "destination": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo",
+        "serverDir": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server",
+        "contextSchemaGraphQL": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/.context/schema.graphql"
+      },
+      "messageType": "event",
+      "position": "50"
+    },
+    {
+      "type": "GenerateIA",
+      "data": {
+        "modelPath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/.context/schema.json",
+        "outputDir": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/.context"
+      },
+      "messageType": "command",
+      "position": "51"
+    },
+    {
+      "type": "SliceImplemented",
+      "data": {
+        "slicePath": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "filesImplemented": ["projection.ts"]
+      },
+      "messageType": "event",
+      "position": "52"
+    },
+    {
+      "type": "CheckTests",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "53"
+    },
+    {
+      "type": "TestsCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "testsRun": 0,
+        "testsPassed": 0
+      },
+      "messageType": "event",
+      "position": "54"
+    },
+    {
+      "type": "CheckTypes",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "scope": "slice"
+      },
+      "messageType": "command",
+      "position": "55"
+    },
+    {
+      "type": "TypeCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "checkedFiles": 4
+      },
+      "messageType": "event",
+      "position": "56"
+    },
+    {
+      "type": "CheckLint",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "scope": "slice",
+        "fix": true
+      },
+      "messageType": "command",
+      "position": "57"
+    },
+    {
+      "type": "LintCheckPassed",
+      "data": {
+        "targetDirectory": "/Users/sam/WebstormProjects/top/auto-engineer/examples/kanban-todo/server/src/domain/flows/todo-list/views-completion-summary",
+        "filesChecked": 4
+      },
+      "messageType": "event",
+      "position": "58"
+    }
+  ]
+}

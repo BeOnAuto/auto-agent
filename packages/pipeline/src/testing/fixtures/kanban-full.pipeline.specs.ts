@@ -59,7 +59,10 @@ describe('kanban-full.pipeline', () => {
       expect(cmd).toBeDefined();
       const data =
         typeof cmd?.data === 'function'
-          ? cmd.data({ type: 'SchemaExported', data: { outputPath: './schema.json' } })
+          ? cmd.data({
+              type: 'SchemaExported',
+              data: { outputPath: './.context/schema.json', directory: '.' },
+            })
           : cmd?.data;
       expect(data).toEqual({
         modelPath: './.context/schema.json',

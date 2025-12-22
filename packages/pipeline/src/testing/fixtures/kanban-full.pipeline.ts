@@ -6,6 +6,11 @@ interface Component {
   filePath: string;
 }
 
+interface SchemaExportedData {
+  directory: string;
+  outputPath: string;
+}
+
 interface SliceGeneratedData {
   slicePath: string;
 }
@@ -26,6 +31,7 @@ interface CheckEventData {
 
 const MAX_RETRIES = 4;
 const sliceRetryState = new Map<string, number>();
+let projectRoot = '';
 
 function hasAnyFailures(events: Event[]): boolean {
   return events.some((e) => e.type.includes('Failed'));
@@ -68,17 +74,33 @@ function hasInvalidComponents(e: { data: ClientGeneratedData | null }): boolean 
   return !hasValidComponents(e);
 }
 
+function resolvePath(relativePath: string): string {
+  if (projectRoot === '') {
+    return relativePath;
+  }
+  if (relativePath.startsWith('/')) {
+    return relativePath;
+  }
+  if (relativePath.startsWith('./')) {
+    return `${projectRoot}/${relativePath.slice(2)}`;
+  }
+  return `${projectRoot}/${relativePath}`;
+}
+
 export function createKanbanFullPipeline() {
   return define('kanban-full')
     .on('SchemaExported')
-    .emit('GenerateServer', () => ({
-      modelPath: './.context/schema.json',
-      destination: '.',
-    }))
+    .emit('GenerateServer', (e: { data: SchemaExportedData }) => {
+      projectRoot = e.data.directory;
+      return {
+        modelPath: e.data.outputPath,
+        destination: e.data.directory,
+      };
+    })
 
     .on('SliceGenerated')
     .emit('ImplementSlice', (e: { data: SliceGeneratedData }) => ({
-      slicePath: e.data.slicePath,
+      slicePath: resolvePath(e.data.slicePath),
       context: { previousOutputs: 'errors', attemptNumber: 0 },
       aiOptions: { maxTokens: 2000 },
     }))
@@ -126,35 +148,35 @@ export function createKanbanFullPipeline() {
 
     .on('ServerGenerated')
     .emit('GenerateIA', () => ({
-      modelPath: './.context/schema.json',
-      outputDir: './.context',
+      modelPath: resolvePath('./.context/schema.json'),
+      outputDir: resolvePath('./.context'),
     }))
     .emit('StartServer', () => ({
-      serverDirectory: './server',
+      serverDirectory: resolvePath('./server'),
     }))
 
     .on('IAGenerated')
     .emit('GenerateClient', () => ({
-      targetDir: './client',
-      iaSchemaPath: './.context/auto-ia-scheme.json',
-      gqlSchemaPath: './.context/schema.graphql',
-      figmaVariablesPath: './.context/figma-file.json',
+      targetDir: resolvePath('./client'),
+      iaSchemaPath: resolvePath('./.context/auto-ia-scheme.json'),
+      gqlSchemaPath: resolvePath('./.context/schema.graphql'),
+      figmaVariablesPath: resolvePath('./.context/figma-file.json'),
     }))
 
     .on('ClientGenerated')
     .when(hasValidComponents)
     .emit('StartClient', () => ({
-      clientDirectory: './client',
+      clientDirectory: resolvePath('./client'),
     }))
 
     .on('ClientGenerated')
     .when(hasInvalidComponents)
     .emit('ImplementComponent', () => ({
-      projectDir: './client',
-      iaSchemeDir: './.context',
-      designSystemPath: './.context/design-system.md',
+      projectDir: resolvePath('./client'),
+      iaSchemeDir: resolvePath('./.context'),
+      designSystemPath: resolvePath('./.context/design-system.md'),
       componentType: 'molecule',
-      filePath: 'client/src/components/molecules/Example.tsx',
+      filePath: resolvePath('client/src/components/molecules/Example.tsx'),
       componentName: 'Example.tsx',
       aiOptions: { maxTokens: 3000 },
     }))
@@ -164,11 +186,11 @@ export function createKanbanFullPipeline() {
     .forEach((e: { data: ClientGeneratedData }) => e.data.components)
     .groupInto(['molecule', 'organism', 'page'], (c) => c.type)
     .process('ImplementComponent', (c: Component) => ({
-      projectDir: './client',
-      iaSchemeDir: './.context',
-      designSystemPath: './.context/design-system.md',
+      projectDir: resolvePath('./client'),
+      iaSchemeDir: resolvePath('./.context'),
+      designSystemPath: resolvePath('./.context/design-system.md'),
       componentType: c.type ?? 'molecule',
-      filePath: c.filePath ?? '',
+      filePath: resolvePath(c.filePath ?? ''),
       componentName: (c.filePath ?? '').split('/').pop()?.replace('.tsx', '') ?? '',
       aiOptions: { maxTokens: 3000 },
     }))
@@ -183,4 +205,5 @@ export function createKanbanFullPipeline() {
 
 export function resetKanbanState(): void {
   sliceRetryState.clear();
+  projectRoot = '';
 }
