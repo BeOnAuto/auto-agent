@@ -28,8 +28,14 @@ interface HandlerInstance {
   commandTrackers: Map<string, CommandTracker>;
 }
 
+interface SettledErrorContext {
+  commandTypes: readonly string[];
+  correlationId: string;
+}
+
 interface SettledTrackerOptions {
   onDispatch?: (commandType: string, data: unknown, correlationId: string) => void;
+  onError?: (error: unknown, context: SettledErrorContext) => void;
 }
 
 export class SettledTracker {
@@ -37,9 +43,11 @@ export class SettledTracker {
   private handlerInstances = new Map<string, HandlerInstance>();
   private commandToTemplateIds = new Map<string, Set<string>>();
   private readonly onDispatch?: (commandType: string, data: unknown, correlationId: string) => void;
+  private readonly onError?: (error: unknown, context: SettledErrorContext) => void;
 
   constructor(options?: SettledTrackerOptions) {
     this.onDispatch = options?.onDispatch;
+    this.onError = options?.onError;
   }
 
   registerHandler(registration: SettledHandlerRegistration): void {
@@ -192,7 +200,11 @@ export class SettledTracker {
       } else {
         this.handlerInstances.delete(instanceId);
       }
-    } catch {
+    } catch (error) {
+      this.onError?.(error, {
+        commandTypes: instance.registration.commandTypes,
+        correlationId: instance.correlationId,
+      });
       this.handlerInstances.delete(instanceId);
     }
   }

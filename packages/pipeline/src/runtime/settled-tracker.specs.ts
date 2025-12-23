@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { SettledTracker } from './settled-tracker';
 import type { Command, Event } from '@auto-engineer/message-bus';
 
@@ -363,6 +363,39 @@ describe('SettledTracker', () => {
       }).not.toThrow();
 
       expect(tracker.getActiveInstanceCount()).toBe(0);
+    });
+  });
+
+  describe('error callback', () => {
+    it('should accept onError callback in options', () => {
+      const onError = vi.fn();
+
+      tracker = new SettledTracker({ onError });
+
+      expect(tracker).toBeInstanceOf(SettledTracker);
+    });
+
+    it('should call onError when handler throws', () => {
+      const onError = vi.fn();
+      const thrownError = new Error('Handler failed');
+
+      tracker = new SettledTracker({ onError });
+
+      tracker.registerHandler({
+        commandTypes: ['A'],
+        handler: () => {
+          throw thrownError;
+        },
+      });
+
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
+      tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
+
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError).toHaveBeenCalledWith(thrownError, {
+        commandTypes: ['A'],
+        correlationId: 'c1',
+      });
     });
   });
 
