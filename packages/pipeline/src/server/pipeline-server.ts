@@ -321,17 +321,19 @@ export class PipelineServer {
   private buildMermaidDiagram(): string {
     const graph = this.buildCombinedGraph();
     const commandToEvents = this.buildCommandToEvents();
-    const lines: string[] = ['flowchart TD'];
+    const lines: string[] = ['flowchart LR'];
 
     const eventNodes = new Set<string>();
     const commandNodes = new Set<string>();
+    const settledNodes = new Set<string>();
 
-    this.addGraphNodesToMermaid(graph, lines, eventNodes, commandNodes);
+    this.addGraphNodesToMermaid(graph, lines, eventNodes, commandNodes, settledNodes);
     const pipelineCommands = new Set(commandNodes);
     this.addCommandEventNodesToMermaid(commandToEvents, pipelineCommands, lines, eventNodes, commandNodes);
-    this.addGraphEdgesToMermaid(graph, lines);
+    this.addSettledEventNodesToMermaid(graph, commandToEvents, lines, eventNodes);
+    this.addGraphEdgesToMermaid(graph, commandToEvents, lines);
     this.addCommandEventEdgesToMermaid(commandToEvents, pipelineCommands, lines);
-    this.addMermaidStyles(lines, eventNodes, commandNodes);
+    this.addMermaidStyles(lines, eventNodes, commandNodes, settledNodes);
 
     return lines.join('\n');
   }
@@ -341,6 +343,7 @@ export class PipelineServer {
     lines: string[],
     eventNodes: Set<string>,
     commandNodes: Set<string>,
+    settledNodes: Set<string>,
   ): void {
     for (const node of graph.nodes) {
       if (node.id.startsWith('evt:')) {
@@ -353,8 +356,10 @@ export class PipelineServer {
         commandNodes.add(commandName);
         lines.push(`  ${commandName}[${commandName}]`);
       } else if (node.id.startsWith('settled:')) {
-        const safeId = node.id.replace(/:/g, '_');
-        lines.push(`  ${safeId}{{${node.id.replace('settled:', '')}}}`);
+        const commandTypes = node.id.replace('settled:', '').split(',');
+        const safeId = `settled_${commandTypes.join('_')}`;
+        settledNodes.add(safeId);
+        lines.push(`  ${safeId}{{${commandTypes.join(', ')}}}`);
       } else {
         const safeId = node.id.replace(/:/g, '_');
         lines.push(`  ${safeId}[${node.id}]`);
@@ -387,8 +392,43 @@ export class PipelineServer {
     }
   }
 
-  private addGraphEdgesToMermaid(graph: GraphIR, lines: string[]): void {
+  private addSettledEventNodesToMermaid(
+    graph: GraphIR,
+    commandToEvents: Record<string, string[]>,
+    lines: string[],
+    eventNodes: Set<string>,
+  ): void {
+    for (const node of graph.nodes) {
+      if (!node.id.startsWith('settled:')) continue;
+      const commandTypes = node.id.replace('settled:', '').split(',');
+      for (const commandType of commandTypes) {
+        const events = commandToEvents[commandType];
+        if (events === undefined) continue;
+        for (const eventName of events) {
+          const safeEventId = `evt_${eventName}`;
+          if (!eventNodes.has(safeEventId)) {
+            eventNodes.add(safeEventId);
+            lines.push(`  ${safeEventId}([${eventName}])`);
+          }
+        }
+      }
+    }
+  }
+
+  private addGraphEdgesToMermaid(graph: GraphIR, commandToEvents: Record<string, string[]>, lines: string[]): void {
     for (const edge of graph.edges) {
+      if (edge.from.startsWith('cmd:') && edge.to.startsWith('settled:')) {
+        const commandType = edge.from.replace('cmd:', '');
+        const commandTypes = edge.to.replace('settled:', '').split(',');
+        const settledId = `settled_${commandTypes.join('_')}`;
+        const events = commandToEvents[commandType];
+        if (events !== undefined) {
+          for (const eventName of events) {
+            lines.push(`  evt_${eventName} --> ${settledId}`);
+          }
+        }
+        continue;
+      }
       const from = this.normalizeNodeId(edge.from);
       const to = this.normalizeNodeId(edge.to);
       lines.push(`  ${from} --> ${to}`);
@@ -420,7 +460,12 @@ export class PipelineServer {
     }
   }
 
-  private addMermaidStyles(lines: string[], eventNodes: Set<string>, commandNodes: Set<string>): void {
+  private addMermaidStyles(
+    lines: string[],
+    eventNodes: Set<string>,
+    commandNodes: Set<string>,
+    settledNodes: Set<string>,
+  ): void {
     const failedEvents = [...eventNodes].filter((id) => id.toLowerCase().includes('failed'));
     const normalEvents = [...eventNodes].filter((id) => !id.toLowerCase().includes('failed'));
 
@@ -438,6 +483,9 @@ export class PipelineServer {
     }
     if (commandNodes.size > 0) {
       lines.push(`  class ${[...commandNodes].join(',')} command`);
+    }
+    if (settledNodes.size > 0) {
+      lines.push(`  class ${[...settledNodes].join(',')} settled`);
     }
   }
 

@@ -363,7 +363,7 @@ describe('PipelineServer', () => {
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
       expect(res.headers.get('content-type')).toContain('text/plain');
       const mermaid = await res.text();
-      expect(mermaid).toContain('flowchart TD');
+      expect(mermaid).toContain('flowchart LR');
       await server.stop();
     });
 
@@ -493,6 +493,39 @@ describe('PipelineServer', () => {
       expect(mermaid).not.toContain('AnotherUnusedEvent');
       await server.stop();
     });
+
+    it('should show edges from command events to settled node, not from commands', async () => {
+      const checkAHandler = {
+        name: 'CheckA',
+        events: ['CheckAPassed', 'CheckAFailed'],
+        handle: async () => ({ type: 'CheckAPassed', data: {} }),
+      };
+      const checkBHandler = {
+        name: 'CheckB',
+        events: ['CheckBPassed', 'CheckBFailed'],
+        handle: async () => ({ type: 'CheckBPassed', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('Start')
+        .emit('CheckA', {})
+        .emit('CheckB', {})
+        .settled(['CheckA', 'CheckB'])
+        .dispatch(() => {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([checkAHandler, checkBHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('evt_CheckAPassed --> settled_CheckA_CheckB');
+      expect(mermaid).toContain('evt_CheckAFailed --> settled_CheckA_CheckB');
+      expect(mermaid).toContain('evt_CheckBPassed --> settled_CheckA_CheckB');
+      expect(mermaid).toContain('evt_CheckBFailed --> settled_CheckA_CheckB');
+      expect(mermaid).not.toMatch(/CheckA --> settled_/);
+      expect(mermaid).not.toMatch(/CheckB --> settled_/);
+      await server.stop();
+    });
   });
 
   describe('GET /pipeline/diagram', () => {
@@ -524,7 +557,7 @@ describe('PipelineServer', () => {
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/diagram`);
       const html = await res.text();
-      expect(html).toContain('flowchart TD');
+      expect(html).toContain('flowchart LR');
       expect(html).toContain('evt_Start');
       await server.stop();
     });
