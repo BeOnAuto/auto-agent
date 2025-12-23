@@ -32,8 +32,12 @@ export interface PipelineBuilder {
   build(): Pipeline;
 }
 
+export interface DispatchOptions {
+  dispatches?: string[];
+}
+
 export interface SettledBuilder {
-  dispatch(handler: SettledHandler): SettledChain;
+  dispatch(handler: SettledHandler, options?: DispatchOptions): SettledChain;
 }
 
 export interface SettledChain {
@@ -640,8 +644,8 @@ class SettledBuilderImpl implements SettledBuilder {
     private readonly commandTypes: readonly string[],
   ) {}
 
-  dispatch(handler: SettledHandler): SettledChain {
-    return new SettledChainImpl(this.parent, this.commandTypes, handler);
+  dispatch(handler: SettledHandler, options?: DispatchOptions): SettledChain {
+    return new SettledChainImpl(this.parent, this.commandTypes, handler, options?.dispatches);
   }
 }
 
@@ -650,6 +654,7 @@ class SettledChainImpl implements SettledChain {
     private readonly parent: PipelineBuilderImpl,
     private readonly commandTypes: readonly string[],
     private readonly handler: SettledHandler,
+    private readonly dispatches?: readonly string[],
   ) {}
 
   on(eventType: string): TriggerBuilder {
@@ -672,6 +677,7 @@ class SettledChainImpl implements SettledChain {
       type: 'settled',
       commandTypes: this.commandTypes,
       handler: this.handler,
+      dispatches: this.dispatches,
     };
     this.parent.addHandler(descriptor);
   }
