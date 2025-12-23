@@ -442,6 +442,10 @@ export class PipelineServer {
     if (nodeId.startsWith('cmd:')) {
       return nodeId.replace('cmd:', '');
     }
+    if (nodeId.startsWith('settled:')) {
+      const commandTypes = nodeId.replace('settled:', '').split(',');
+      return `settled_${commandTypes.join('_')}`;
+    }
     return nodeId.replace(/:/g, '_');
   }
 
