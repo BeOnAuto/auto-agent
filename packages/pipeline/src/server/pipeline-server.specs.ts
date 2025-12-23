@@ -418,8 +418,10 @@ describe('PipelineServer', () => {
         events: ['GenDone', 'GenFailed'],
         handle: async () => ({ type: 'GenDone', data: {} }),
       };
+      const pipeline = define('test').on('Start').emit('Gen', {}).build();
       const server = new PipelineServer({ port: 0 });
       server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
       const mermaid = await res.text();
@@ -428,14 +430,16 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
-    it('should include edges from commands to their declared events', async () => {
+    it('should include edges from commands to their declared events when command is in pipeline', async () => {
       const handler = {
         name: 'Gen',
         events: ['GenDone', 'GenFailed'],
         handle: async () => ({ type: 'GenDone', data: {} }),
       };
+      const pipeline = define('test').on('Start').emit('Gen', {}).build();
       const server = new PipelineServer({ port: 0 });
       server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
       const mermaid = await res.text();
@@ -444,12 +448,7 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
-    it('should show complete flow from command through event to next command', async () => {
-      const exportHandler = {
-        name: 'ExportSchema',
-        events: ['SchemaExported'],
-        handle: async () => ({ type: 'SchemaExported', data: {} }),
-      };
+    it('should show complete flow from event to command with command events', async () => {
       const genHandler = {
         name: 'GenerateServer',
         events: ['ServerGenerated', 'SliceGenerated'],
@@ -457,15 +456,41 @@ describe('PipelineServer', () => {
       };
       const pipeline = define('test').on('SchemaExported').emit('GenerateServer', {}).build();
       const server = new PipelineServer({ port: 0 });
-      server.registerCommandHandlers([exportHandler, genHandler]);
+      server.registerCommandHandlers([genHandler]);
       server.registerPipeline(pipeline);
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
       const mermaid = await res.text();
-      expect(mermaid).toContain('ExportSchema --> evt_SchemaExported');
       expect(mermaid).toContain('evt_SchemaExported --> GenerateServer');
       expect(mermaid).toContain('GenerateServer --> evt_ServerGenerated');
       expect(mermaid).toContain('GenerateServer --> evt_SliceGenerated');
+      await server.stop();
+    });
+
+    it('should only show commands and events that are used in the pipeline', async () => {
+      const usedHandler = {
+        name: 'UsedCommand',
+        events: ['UsedEvent'],
+        handle: async () => ({ type: 'UsedEvent', data: {} }),
+      };
+      const unusedHandler = {
+        name: 'UnusedCommand',
+        events: ['UnusedEvent', 'AnotherUnusedEvent'],
+        handle: async () => ({ type: 'UnusedEvent', data: {} }),
+      };
+      const pipeline = define('test').on('TriggerEvent').emit('UsedCommand', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([usedHandler, unusedHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('evt_TriggerEvent');
+      expect(mermaid).toContain('UsedCommand');
+      expect(mermaid).toContain('evt_UsedEvent');
+      expect(mermaid).not.toContain('UnusedCommand');
+      expect(mermaid).not.toContain('UnusedEvent');
+      expect(mermaid).not.toContain('AnotherUnusedEvent');
       await server.stop();
     });
   });

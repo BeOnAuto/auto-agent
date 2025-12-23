@@ -327,9 +327,10 @@ export class PipelineServer {
     const commandNodes = new Set<string>();
 
     this.addGraphNodesToMermaid(graph, lines, eventNodes, commandNodes);
-    this.addCommandEventNodesToMermaid(commandToEvents, lines, eventNodes, commandNodes);
+    const pipelineCommands = new Set(commandNodes);
+    this.addCommandEventNodesToMermaid(commandToEvents, pipelineCommands, lines, eventNodes, commandNodes);
     this.addGraphEdgesToMermaid(graph, lines);
-    this.addCommandEventEdgesToMermaid(commandToEvents, lines);
+    this.addCommandEventEdgesToMermaid(commandToEvents, pipelineCommands, lines);
     this.addMermaidStyles(lines, eventNodes, commandNodes);
 
     return lines.join('\n');
@@ -363,11 +364,15 @@ export class PipelineServer {
 
   private addCommandEventNodesToMermaid(
     commandToEvents: Record<string, string[]>,
+    pipelineCommands: Set<string>,
     lines: string[],
     eventNodes: Set<string>,
     commandNodes: Set<string>,
   ): void {
     for (const [commandName, events] of Object.entries(commandToEvents)) {
+      if (!pipelineCommands.has(commandName)) {
+        continue;
+      }
       if (!commandNodes.has(commandName)) {
         commandNodes.add(commandName);
         lines.push(`  ${commandName}[${commandName}]`);
@@ -400,8 +405,15 @@ export class PipelineServer {
     return nodeId.replace(/:/g, '_');
   }
 
-  private addCommandEventEdgesToMermaid(commandToEvents: Record<string, string[]>, lines: string[]): void {
+  private addCommandEventEdgesToMermaid(
+    commandToEvents: Record<string, string[]>,
+    pipelineCommands: Set<string>,
+    lines: string[],
+  ): void {
     for (const [commandName, events] of Object.entries(commandToEvents)) {
+      if (!pipelineCommands.has(commandName)) {
+        continue;
+      }
       for (const eventName of events) {
         lines.push(`  ${commandName} --> evt_${eventName}`);
       }
