@@ -253,7 +253,7 @@ function processSettledHandler(ctx: GraphBuilderContext, handler: SettledHandler
   if (handler.dispatches) {
     for (const dispatchedCommand of handler.dispatches) {
       addNode(ctx, `cmd:${dispatchedCommand}`, 'command', dispatchedCommand);
-      ctx.edges.push({ from: settledNodeId, to: `cmd:${dispatchedCommand}` });
+      ctx.edges.push({ from: settledNodeId, to: `cmd:${dispatchedCommand}`, backLink: true });
     }
   }
 }

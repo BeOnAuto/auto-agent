@@ -10,6 +10,7 @@ export interface GraphEdge {
   from: string;
   to: string;
   label?: string;
+  backLink?: boolean;
 }
 
 export interface GraphIR {

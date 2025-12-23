@@ -327,6 +327,7 @@ export class PipelineServer {
     const eventNodes = new Set<string>();
     const commandNodes = new Set<string>();
     const settledNodes = new Set<string>();
+    const edgeContext = { index: 0, backLinkIndices: [] as number[] };
 
     this.addGraphNodesToMermaid(graph, lines, eventNodes, commandNodes, settledNodes);
     const pipelineCommands = new Set(commandNodes);
@@ -339,9 +340,9 @@ export class PipelineServer {
       commandNodes,
     );
     this.addSettledEventNodesToMermaid(graph, commandToEvents, lines, eventNodes);
-    this.addGraphEdgesToMermaid(graph, commandToEvents, lines);
-    this.addCommandEventEdgesToMermaid(commandToEvents, pipelineCommands, pipelineEvents, lines);
-    this.addMermaidStyles(lines, eventNodes, commandNodes, settledNodes);
+    this.addGraphEdgesToMermaid(graph, commandToEvents, lines, edgeContext);
+    this.addCommandEventEdgesToMermaid(commandToEvents, pipelineCommands, pipelineEvents, lines, edgeContext);
+    this.addMermaidStyles(lines, eventNodes, commandNodes, settledNodes, edgeContext.backLinkIndices);
 
     return lines.join('\n');
   }
@@ -450,7 +451,12 @@ export class PipelineServer {
     }
   }
 
-  private addGraphEdgesToMermaid(graph: GraphIR, commandToEvents: Record<string, string[]>, lines: string[]): void {
+  private addGraphEdgesToMermaid(
+    graph: GraphIR,
+    commandToEvents: Record<string, string[]>,
+    lines: string[],
+    edgeContext: { index: number; backLinkIndices: number[] },
+  ): void {
     for (const edge of graph.edges) {
       if (edge.from.startsWith('cmd:') && edge.to.startsWith('settled:')) {
         const commandType = edge.from.replace('cmd:', '');
@@ -460,6 +466,7 @@ export class PipelineServer {
         if (events !== undefined) {
           for (const eventName of events) {
             lines.push(`  evt_${eventName} --> ${settledId}`);
+            edgeContext.index++;
           }
         }
         continue;
@@ -467,6 +474,10 @@ export class PipelineServer {
       const from = this.normalizeNodeId(edge.from);
       const to = this.normalizeNodeId(edge.to);
       lines.push(`  ${from} --> ${to}`);
+      if (edge.backLink === true) {
+        edgeContext.backLinkIndices.push(edgeContext.index);
+      }
+      edgeContext.index++;
     }
   }
 
@@ -489,6 +500,7 @@ export class PipelineServer {
     pipelineCommands: Set<string>,
     pipelineEvents: Set<string>,
     lines: string[],
+    edgeContext: { index: number; backLinkIndices: number[] },
   ): void {
     for (const [commandName, events] of Object.entries(commandToEvents)) {
       if (!pipelineCommands.has(commandName)) {
@@ -499,6 +511,7 @@ export class PipelineServer {
           continue;
         }
         lines.push(`  ${commandName} --> evt_${eventName}`);
+        edgeContext.index++;
       }
     }
   }
@@ -508,6 +521,7 @@ export class PipelineServer {
     eventNodes: Set<string>,
     commandNodes: Set<string>,
     settledNodes: Set<string>,
+    backLinkIndices: number[],
   ): void {
     const failedEvents = [...eventNodes].filter((id) => id.toLowerCase().includes('failed'));
     const normalEvents = [...eventNodes].filter((id) => !id.toLowerCase().includes('failed'));
@@ -529,6 +543,9 @@ export class PipelineServer {
     }
     if (settledNodes.size > 0) {
       lines.push(`  class ${[...settledNodes].join(',')} settled`);
+    }
+    if (backLinkIndices.length > 0) {
+      lines.push(`  linkStyle ${backLinkIndices.join(',')} stroke:#d32f2f,stroke-width:2px`);
     }
   }
 

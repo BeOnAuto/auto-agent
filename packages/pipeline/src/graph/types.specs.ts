@@ -144,4 +144,33 @@ describe('Pipeline.toGraph()', () => {
     expect(settledNode).toBeDefined();
     expect(settledNode?.type).toBe('settled');
   });
+
+  it('should mark edges from settled nodes to dispatched commands as backLink', () => {
+    const pipeline = define('test')
+      .on('Start')
+      .emit('CheckA', {})
+      .settled(['CheckA'])
+      .dispatch({ dispatches: ['RetryCommand'] }, () => {})
+      .build();
+
+    const graph = pipeline.toGraph();
+    const backEdge = graph.edges.find((e) => e.from.startsWith('settled:') && e.to === 'cmd:RetryCommand');
+    expect(backEdge).toBeDefined();
+    expect(backEdge?.backLink).toBe(true);
+  });
+
+  it('should not mark forward edges as backLink', () => {
+    const pipeline = define('test')
+      .on('Start')
+      .emit('CheckA', {})
+      .settled(['CheckA'])
+      .dispatch({ dispatches: ['RetryCommand'] }, () => {})
+      .build();
+
+    const graph = pipeline.toGraph();
+    const forwardEdges = graph.edges.filter((e) => !e.from.startsWith('settled:'));
+    for (const edge of forwardEdges) {
+      expect(edge.backLink).not.toBe(true);
+    }
+  });
 });

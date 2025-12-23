@@ -619,6 +619,34 @@ describe('PipelineServer', () => {
       expect(mermaid).toContain('settled_CheckA --> RetryCommand');
       await server.stop();
     });
+
+    it('should style backLink edges in red', async () => {
+      const checkHandler = {
+        name: 'CheckA',
+        events: ['CheckAPassed', 'CheckAFailed'],
+        handle: async () => ({ type: 'CheckAPassed', data: {} }),
+      };
+      const retryHandler = {
+        name: 'RetryCommand',
+        events: ['RetryDone'],
+        handle: async () => ({ type: 'RetryDone', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('Start')
+        .emit('CheckA', {})
+        .settled(['CheckA'])
+        .dispatch({ dispatches: ['RetryCommand'] }, () => {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([checkHandler, retryHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('linkStyle');
+      expect(mermaid).toMatch(/stroke:#[a-fA-F0-9]{6}|stroke:red/);
+      await server.stop();
+    });
   });
 
   describe('GET /pipeline/diagram', () => {
