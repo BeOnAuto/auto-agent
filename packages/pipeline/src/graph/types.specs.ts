@@ -76,6 +76,22 @@ describe('Pipeline.toGraph()', () => {
     expect(graph.nodes.some((n) => n.id === 'evt:SomeFailed')).toBe(true);
   });
 
+  it('should include edges from command to onComplete success/failure events', () => {
+    const pipeline = define('test')
+      .on('ItemsReady')
+      .forEach(() => [])
+      .groupInto(['phase1'], () => 'phase1')
+      .process('ProcessItem', () => ({}))
+      .onComplete({ success: 'AllDone', failure: 'SomeFailed', itemKey: () => '' })
+      .build();
+
+    const graph = pipeline.toGraph();
+    const hasSuccessEdge = graph.edges.some((e) => e.from === 'cmd:ProcessItem' && e.to === 'evt:AllDone');
+    const hasFailureEdge = graph.edges.some((e) => e.from === 'cmd:ProcessItem' && e.to === 'evt:SomeFailed');
+    expect(hasSuccessEdge).toBe(true);
+    expect(hasFailureEdge).toBe(true);
+  });
+
   it('should extract graph from custom handler using declaredEmits', () => {
     const pipeline = define('test')
       .on('CustomEvent')

@@ -217,6 +217,8 @@ function processForEachPhasedHandler(ctx: GraphBuilderContext, handler: ForEachP
   ctx.edges.push({ from: `evt:${handler.eventType}`, to: `cmd:${sampleCmd.commandType}` });
   addNode(ctx, `evt:${handler.completion.successEvent}`, 'event', handler.completion.successEvent);
   addNode(ctx, `evt:${handler.completion.failureEvent}`, 'event', handler.completion.failureEvent);
+  ctx.edges.push({ from: `cmd:${sampleCmd.commandType}`, to: `evt:${handler.completion.successEvent}` });
+  ctx.edges.push({ from: `cmd:${sampleCmd.commandType}`, to: `evt:${handler.completion.failureEvent}` });
 }
 
 function processCustomHandler(ctx: GraphBuilderContext, handler: CustomHandlerDescriptor): void {
