@@ -130,4 +130,18 @@ describe('Pipeline.toGraph()', () => {
     const startNodes = graph.nodes.filter((n) => n.id === 'evt:Start');
     expect(startNodes).toHaveLength(1);
   });
+
+  it('should create settled node with type settled', () => {
+    const pipeline = define('test')
+      .on('Start')
+      .emit('CheckA', {})
+      .settled(['CheckA'])
+      .dispatch(() => {})
+      .build();
+
+    const graph = pipeline.toGraph();
+    const settledNode = graph.nodes.find((n) => n.id.startsWith('settled:'));
+    expect(settledNode).toBeDefined();
+    expect(settledNode?.type).toBe('settled');
+  });
 });

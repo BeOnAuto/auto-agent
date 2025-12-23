@@ -181,7 +181,7 @@ type GraphBuilderContext = {
   edges: GraphEdge[];
 };
 
-function addNode(ctx: GraphBuilderContext, id: string, type: 'event' | 'command', label: string): void {
+function addNode(ctx: GraphBuilderContext, id: string, type: 'event' | 'command' | 'settled', label: string): void {
   if (!ctx.nodeMap.has(id)) {
     ctx.nodeMap.set(id, { id, type, label });
   }
@@ -233,7 +233,7 @@ function processCustomHandler(ctx: GraphBuilderContext, handler: CustomHandlerDe
 
 function processSettledHandler(ctx: GraphBuilderContext, handler: SettledHandlerDescriptor): void {
   const settledNodeId = `settled:${handler.commandTypes.join(',')}`;
-  addNode(ctx, settledNodeId, 'command', `settled(${handler.commandTypes.join(', ')})`);
+  addNode(ctx, settledNodeId, 'settled', `settled(${handler.commandTypes.join(', ')})`);
 
   for (const commandType of handler.commandTypes) {
     addNode(ctx, `cmd:${commandType}`, 'command', commandType);

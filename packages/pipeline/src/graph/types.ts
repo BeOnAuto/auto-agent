@@ -1,4 +1,4 @@
-export type NodeType = 'event' | 'command';
+export type NodeType = 'event' | 'command' | 'settled';
 
 export interface GraphNode {
   id: string;
