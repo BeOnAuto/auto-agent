@@ -138,6 +138,58 @@ describe('SSEManager', () => {
     });
   });
 
+  describe('broadcast error handling', () => {
+    it('should not throw when client.response.write fails', () => {
+      const res = createMockResponse();
+      manager.addClient('c1', res);
+
+      vi.mocked(res.write).mockImplementation(() => {
+        throw new Error('Connection reset');
+      });
+
+      const event: Event = { type: 'TestEvent', data: {} };
+
+      expect(() => manager.broadcast(event)).not.toThrow();
+    });
+
+    it('should remove failed client from clients map', () => {
+      const res = createMockResponse();
+      vi.mocked(res.write)
+        .mockImplementationOnce(() => true)
+        .mockImplementation(() => {
+          throw new Error('Connection reset');
+        });
+
+      manager.addClient('c1', res);
+      expect(manager.clientCount).toBe(1);
+
+      const event: Event = { type: 'TestEvent', data: {} };
+      manager.broadcast(event);
+
+      expect(manager.clientCount).toBe(0);
+    });
+
+    it('should continue broadcasting to other clients after one fails', () => {
+      const failingRes = createMockResponse();
+      const workingRes = createMockResponse();
+
+      vi.mocked(failingRes.write)
+        .mockImplementationOnce(() => true)
+        .mockImplementation(() => {
+          throw new Error('Connection reset');
+        });
+
+      manager.addClient('c1', failingRes);
+      manager.addClient('c2', workingRes);
+
+      const event: Event = { type: 'TestEvent', data: {} };
+      manager.broadcast(event);
+
+      expect(workingRes.written).toContainEqual(`data: ${JSON.stringify(event)}\n\n`);
+      expect(manager.clientCount).toBe(1);
+    });
+  });
+
   describe('closeAll', () => {
     it('should close all clients', () => {
       const res1 = createMockResponse();

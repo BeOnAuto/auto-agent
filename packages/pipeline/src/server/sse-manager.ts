@@ -46,11 +46,20 @@ export class SSEManager {
   broadcast(event: Event): void {
     const data = JSON.stringify(event);
     const message = `data: ${data}\n\n`;
+    const failedClientIds: string[] = [];
 
     for (const client of this.clients.values()) {
       if (this.shouldSendToClient(client, event)) {
-        client.response.write(message);
+        try {
+          client.response.write(message);
+        } catch {
+          failedClientIds.push(client.id);
+        }
       }
+    }
+
+    for (const id of failedClientIds) {
+      this.removeClient(id);
     }
   }
 
