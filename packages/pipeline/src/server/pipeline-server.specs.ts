@@ -418,9 +418,14 @@ describe('PipelineServer', () => {
         events: ['GenDone', 'GenFailed'],
         handle: async () => ({ type: 'GenDone', data: {} }),
       };
-      const pipeline = define('test').on('Start').emit('Gen', {}).build();
+      const retryHandler = {
+        name: 'Retry',
+        events: ['RetryDone'],
+        handle: async () => ({ type: 'RetryDone', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('Gen', {}).on('GenFailed').emit('Retry', {}).build();
       const server = new PipelineServer({ port: 0 });
-      server.registerCommandHandlers([handler]);
+      server.registerCommandHandlers([handler, retryHandler]);
       server.registerPipeline(pipeline);
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
@@ -430,21 +435,26 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
-    it('should include edges from commands to their declared events when command is in pipeline', async () => {
+    it('should include edges from commands to their pipeline events only', async () => {
       const handler = {
         name: 'Gen',
         events: ['GenDone', 'GenFailed'],
         handle: async () => ({ type: 'GenDone', data: {} }),
       };
-      const pipeline = define('test').on('Start').emit('Gen', {}).build();
+      const nextHandler = {
+        name: 'Next',
+        events: ['NextDone'],
+        handle: async () => ({ type: 'NextDone', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('Gen', {}).on('GenDone').emit('Next', {}).build();
       const server = new PipelineServer({ port: 0 });
-      server.registerCommandHandlers([handler]);
+      server.registerCommandHandlers([handler, nextHandler]);
       server.registerPipeline(pipeline);
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
       const mermaid = await res.text();
       expect(mermaid).toContain('Gen --> evt_GenDone');
-      expect(mermaid).toContain('Gen --> evt_GenFailed');
+      expect(mermaid).not.toContain('GenFailed');
       await server.stop();
     });
 
@@ -454,9 +464,26 @@ describe('PipelineServer', () => {
         events: ['ServerGenerated', 'SliceGenerated'],
         handle: async () => ({ type: 'ServerGenerated', data: {} }),
       };
-      const pipeline = define('test').on('SchemaExported').emit('GenerateServer', {}).build();
+      const iaHandler = {
+        name: 'GenerateIA',
+        events: ['IAGenerated'],
+        handle: async () => ({ type: 'IAGenerated', data: {} }),
+      };
+      const implHandler = {
+        name: 'ImplementSlice',
+        events: ['SliceImplemented'],
+        handle: async () => ({ type: 'SliceImplemented', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('SchemaExported')
+        .emit('GenerateServer', {})
+        .on('ServerGenerated')
+        .emit('GenerateIA', {})
+        .on('SliceGenerated')
+        .emit('ImplementSlice', {})
+        .build();
       const server = new PipelineServer({ port: 0 });
-      server.registerCommandHandlers([genHandler]);
+      server.registerCommandHandlers([genHandler, iaHandler, implHandler]);
       server.registerPipeline(pipeline);
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
@@ -478,9 +505,19 @@ describe('PipelineServer', () => {
         events: ['UnusedEvent', 'AnotherUnusedEvent'],
         handle: async () => ({ type: 'UnusedEvent', data: {} }),
       };
-      const pipeline = define('test').on('TriggerEvent').emit('UsedCommand', {}).build();
+      const nextHandler = {
+        name: 'NextCommand',
+        events: ['NextDone'],
+        handle: async () => ({ type: 'NextDone', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('TriggerEvent')
+        .emit('UsedCommand', {})
+        .on('UsedEvent')
+        .emit('NextCommand', {})
+        .build();
       const server = new PipelineServer({ port: 0 });
-      server.registerCommandHandlers([usedHandler, unusedHandler]);
+      server.registerCommandHandlers([usedHandler, unusedHandler, nextHandler]);
       server.registerPipeline(pipeline);
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
@@ -491,6 +528,35 @@ describe('PipelineServer', () => {
       expect(mermaid).not.toContain('UnusedCommand');
       expect(mermaid).not.toContain('UnusedEvent');
       expect(mermaid).not.toContain('AnotherUnusedEvent');
+      await server.stop();
+    });
+
+    it('should only show events that have handlers in the pipeline, not unhandled command events', async () => {
+      const startHandler = {
+        name: 'StartServer',
+        events: ['ServerStarted', 'ServerStartFailed'],
+        handle: async () => ({ type: 'ServerStarted', data: {} }),
+      };
+      const processHandler = {
+        name: 'ProcessRequest',
+        events: ['RequestProcessed'],
+        handle: async () => ({ type: 'RequestProcessed', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('TriggerEvent')
+        .emit('StartServer', {})
+        .on('ServerStarted')
+        .emit('ProcessRequest', {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([startHandler, processHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('evt_ServerStarted');
+      expect(mermaid).toContain('StartServer --> evt_ServerStarted');
+      expect(mermaid).not.toContain('ServerStartFailed');
       await server.stop();
     });
 
