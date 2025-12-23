@@ -400,15 +400,31 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
-    it('should style event and command nodes differently', async () => {
+    it('should style commands as blue and events as orange', async () => {
       const pipeline = define('test').on('Start').emit('Process', {}).build();
       const server = new PipelineServer({ port: 0 });
       server.registerPipeline(pipeline);
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
       const mermaid = await res.text();
-      expect(mermaid).toContain('classDef event');
-      expect(mermaid).toContain('classDef command');
+      expect(mermaid).toContain('classDef event fill:#fff3e0,stroke:#e65100');
+      expect(mermaid).toContain('classDef command fill:#e3f2fd,stroke:#1565c0');
+      await server.stop();
+    });
+
+    it('should style failed events with red text', async () => {
+      const handler = {
+        name: 'Gen',
+        events: ['GenDone', 'GenFailed'],
+        handle: async () => ({ type: 'GenDone', data: {} }),
+      };
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('classDef eventFailed fill:#fff3e0,stroke:#e65100,color:#d32f2f');
+      expect(mermaid).toContain('class evt_GenFailed eventFailed');
       await server.stop();
     });
 

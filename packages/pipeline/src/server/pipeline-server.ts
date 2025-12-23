@@ -409,13 +409,20 @@ export class PipelineServer {
   }
 
   private addMermaidStyles(lines: string[], eventNodes: Set<string>, commandNodes: Set<string>): void {
+    const failedEvents = [...eventNodes].filter((id) => id.toLowerCase().includes('failed'));
+    const normalEvents = [...eventNodes].filter((id) => !id.toLowerCase().includes('failed'));
+
     lines.push('');
-    lines.push('  classDef event fill:#e1f5fe,stroke:#01579b');
-    lines.push('  classDef command fill:#fff3e0,stroke:#e65100');
+    lines.push('  classDef event fill:#fff3e0,stroke:#e65100');
+    lines.push('  classDef eventFailed fill:#fff3e0,stroke:#e65100,color:#d32f2f');
+    lines.push('  classDef command fill:#e3f2fd,stroke:#1565c0');
     lines.push('  classDef settled fill:#f3e5f5,stroke:#7b1fa2');
 
-    if (eventNodes.size > 0) {
-      lines.push(`  class ${[...eventNodes].join(',')} event`);
+    if (normalEvents.length > 0) {
+      lines.push(`  class ${normalEvents.join(',')} event`);
+    }
+    if (failedEvents.length > 0) {
+      lines.push(`  class ${failedEvents.join(',')} eventFailed`);
     }
     if (commandNodes.size > 0) {
       lines.push(`  class ${[...commandNodes].join(',')} command`);
