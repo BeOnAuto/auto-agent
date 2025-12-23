@@ -320,35 +320,95 @@ export class PipelineServer {
 
   private buildMermaidDiagram(): string {
     const graph = this.buildCombinedGraph();
+    const commandToEvents = this.buildCommandToEvents();
     const lines: string[] = ['flowchart TD'];
 
     const eventNodes = new Set<string>();
     const commandNodes = new Set<string>();
 
+    this.addGraphNodesToMermaid(graph, lines, eventNodes, commandNodes);
+    this.addCommandEventNodesToMermaid(commandToEvents, lines, eventNodes, commandNodes);
+    this.addGraphEdgesToMermaid(graph, lines);
+    this.addCommandEventEdgesToMermaid(commandToEvents, lines);
+    this.addMermaidStyles(lines, eventNodes, commandNodes);
+
+    return lines.join('\n');
+  }
+
+  private addGraphNodesToMermaid(
+    graph: GraphIR,
+    lines: string[],
+    eventNodes: Set<string>,
+    commandNodes: Set<string>,
+  ): void {
     for (const node of graph.nodes) {
-      const safeId = node.id.replace(/:/g, '_');
       if (node.id.startsWith('evt:')) {
+        const eventName = node.id.replace('evt:', '');
+        const safeId = `evt_${eventName}`;
         eventNodes.add(safeId);
-        const label = node.id.replace('evt:', '');
-        lines.push(`  ${safeId}([${label}])`);
+        lines.push(`  ${safeId}([${eventName}])`);
       } else if (node.id.startsWith('cmd:')) {
-        commandNodes.add(safeId);
-        const label = node.id.replace('cmd:', '');
-        lines.push(`  ${safeId}[${label}]`);
+        const commandName = node.id.replace('cmd:', '');
+        commandNodes.add(commandName);
+        lines.push(`  ${commandName}[${commandName}]`);
       } else if (node.id.startsWith('settled:')) {
-        const label = node.id.replace('settled:', '');
-        lines.push(`  ${safeId}{{${label}}}`);
+        const safeId = node.id.replace(/:/g, '_');
+        lines.push(`  ${safeId}{{${node.id.replace('settled:', '')}}}`);
       } else {
+        const safeId = node.id.replace(/:/g, '_');
         lines.push(`  ${safeId}[${node.id}]`);
       }
     }
+  }
 
+  private addCommandEventNodesToMermaid(
+    commandToEvents: Record<string, string[]>,
+    lines: string[],
+    eventNodes: Set<string>,
+    commandNodes: Set<string>,
+  ): void {
+    for (const [commandName, events] of Object.entries(commandToEvents)) {
+      if (!commandNodes.has(commandName)) {
+        commandNodes.add(commandName);
+        lines.push(`  ${commandName}[${commandName}]`);
+      }
+      for (const eventName of events) {
+        const safeEventId = `evt_${eventName}`;
+        if (!eventNodes.has(safeEventId)) {
+          eventNodes.add(safeEventId);
+          lines.push(`  ${safeEventId}([${eventName}])`);
+        }
+      }
+    }
+  }
+
+  private addGraphEdgesToMermaid(graph: GraphIR, lines: string[]): void {
     for (const edge of graph.edges) {
-      const from = edge.from.replace(/:/g, '_');
-      const to = edge.to.replace(/:/g, '_');
+      const from = this.normalizeNodeId(edge.from);
+      const to = this.normalizeNodeId(edge.to);
       lines.push(`  ${from} --> ${to}`);
     }
+  }
 
+  private normalizeNodeId(nodeId: string): string {
+    if (nodeId.startsWith('evt:')) {
+      return `evt_${nodeId.replace('evt:', '')}`;
+    }
+    if (nodeId.startsWith('cmd:')) {
+      return nodeId.replace('cmd:', '');
+    }
+    return nodeId.replace(/:/g, '_');
+  }
+
+  private addCommandEventEdgesToMermaid(commandToEvents: Record<string, string[]>, lines: string[]): void {
+    for (const [commandName, events] of Object.entries(commandToEvents)) {
+      for (const eventName of events) {
+        lines.push(`  ${commandName} --> evt_${eventName}`);
+      }
+    }
+  }
+
+  private addMermaidStyles(lines: string[], eventNodes: Set<string>, commandNodes: Set<string>): void {
     lines.push('');
     lines.push('  classDef event fill:#e1f5fe,stroke:#01579b');
     lines.push('  classDef command fill:#fff3e0,stroke:#e65100');
@@ -360,8 +420,6 @@ export class PipelineServer {
     if (commandNodes.size > 0) {
       lines.push(`  class ${[...commandNodes].join(',')} command`);
     }
-
-    return lines.join('\n');
   }
 
   private async processCommand(command: Command & { correlationId: string; requestId: string }): Promise<void> {

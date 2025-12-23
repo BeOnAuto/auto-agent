@@ -385,7 +385,7 @@ describe('PipelineServer', () => {
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
       const mermaid = await res.text();
-      expect(mermaid).toContain('cmd_Process');
+      expect(mermaid).toContain('Process[Process]');
       await server.stop();
     });
 
@@ -409,6 +409,47 @@ describe('PipelineServer', () => {
       const mermaid = await res.text();
       expect(mermaid).toContain('classDef event');
       expect(mermaid).toContain('classDef command');
+      await server.stop();
+    });
+
+    it('should include edges from commands to their declared events', async () => {
+      const handler = {
+        name: 'Gen',
+        events: ['GenDone', 'GenFailed'],
+        handle: async () => ({ type: 'GenDone', data: {} }),
+      };
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('Gen --> evt_GenDone');
+      expect(mermaid).toContain('Gen --> evt_GenFailed');
+      await server.stop();
+    });
+
+    it('should show complete flow from command through event to next command', async () => {
+      const exportHandler = {
+        name: 'ExportSchema',
+        events: ['SchemaExported'],
+        handle: async () => ({ type: 'SchemaExported', data: {} }),
+      };
+      const genHandler = {
+        name: 'GenerateServer',
+        events: ['ServerGenerated', 'SliceGenerated'],
+        handle: async () => ({ type: 'ServerGenerated', data: {} }),
+      };
+      const pipeline = define('test').on('SchemaExported').emit('GenerateServer', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([exportHandler, genHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('ExportSchema --> evt_SchemaExported');
+      expect(mermaid).toContain('evt_SchemaExported --> GenerateServer');
+      expect(mermaid).toContain('GenerateServer --> evt_ServerGenerated');
+      expect(mermaid).toContain('GenerateServer --> evt_SliceGenerated');
       await server.stop();
     });
   });
