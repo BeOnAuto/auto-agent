@@ -73,7 +73,7 @@ export function createKanbanPipeline() {
     .emit('CheckLint', (e: { data: SliceImplementedData }) => ({ target: e.data.slicePath }))
 
     .settled(['CheckTests', 'CheckTypes', 'CheckLint'])
-    .dispatch((events, send) => {
+    .dispatch({ dispatches: ['ImplementSlice'] }, (events, send) => {
       const allEvents = gatherAllCheckEvents(events);
 
       if (!hasAnyFailures(allEvents)) {

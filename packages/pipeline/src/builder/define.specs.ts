@@ -97,7 +97,10 @@ describe('when() predicate', () => {
 describe('settled()', () => {
   it('should create a SettledHandlerDescriptor', () => {
     const handler = vi.fn();
-    const pipeline = define('test').settled(['CheckTests', 'CheckTypes', 'CheckLint']).dispatch(handler).build();
+    const pipeline = define('test')
+      .settled(['CheckTests', 'CheckTypes', 'CheckLint'])
+      .dispatch({ dispatches: [] }, handler)
+      .build();
 
     const descriptor = pipeline.descriptor.handlers[0] as SettledHandlerDescriptor;
     expect(descriptor.type).toBe('settled');
@@ -111,9 +114,9 @@ describe('settled()', () => {
 
     const pipeline = define('test')
       .settled(['A', 'B'])
-      .dispatch(handler1)
+      .dispatch({ dispatches: [] }, handler1)
       .settled(['C', 'D'])
-      .dispatch(handler2)
+      .dispatch({ dispatches: [] }, handler2)
       .build();
 
     expect(pipeline.descriptor.handlers).toHaveLength(2);
@@ -126,7 +129,7 @@ describe('settled()', () => {
 
     const pipeline = define('test')
       .settled(['CheckTests', 'CheckTypes'])
-      .dispatch(settledHandler)
+      .dispatch({ dispatches: [] }, settledHandler)
       .on('ServerGenerated')
       .emit('GenerateIA', {})
       .build();
@@ -139,13 +142,23 @@ describe('settled()', () => {
   it('should include settled handler in graph', () => {
     const pipeline = define('test')
       .settled(['CheckTests', 'CheckTypes'])
-      .dispatch(() => {})
+      .dispatch({ dispatches: [] }, () => {})
       .build();
 
     const graph = pipeline.toGraph();
     const settledNode = graph.nodes.find((n) => n.id.startsWith('settled:'));
     expect(settledNode).toBeDefined();
     expect(settledNode?.label).toBe('settled(CheckTests, CheckTypes)');
+  });
+
+  it('should accept options-first dispatch with dispatches array', () => {
+    const pipeline = define('test')
+      .settled(['CheckA'])
+      .dispatch({ dispatches: ['RetryCommand'] }, () => {})
+      .build();
+
+    const descriptor = pipeline.descriptor.handlers[0] as SettledHandlerDescriptor;
+    expect(descriptor.dispatches).toEqual(['RetryCommand']);
   });
 });
 

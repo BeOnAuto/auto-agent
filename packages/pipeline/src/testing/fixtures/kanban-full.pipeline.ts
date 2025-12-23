@@ -121,7 +121,7 @@ export function createKanbanFullPipeline() {
     }))
 
     .settled(['CheckTests', 'CheckTypes', 'CheckLint'])
-    .dispatch((events, send) => {
+    .dispatch({ dispatches: ['ImplementSlice'] }, (events, send) => {
       const allEvents = gatherAllCheckEvents(events);
 
       if (!hasAnyFailures(allEvents)) {

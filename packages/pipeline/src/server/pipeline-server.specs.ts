@@ -510,7 +510,7 @@ describe('PipelineServer', () => {
         .emit('CheckA', {})
         .emit('CheckB', {})
         .settled(['CheckA', 'CheckB'])
-        .dispatch(() => {})
+        .dispatch({ dispatches: [] }, () => {})
         .build();
       const server = new PipelineServer({ port: 0 });
       server.registerCommandHandlers([checkAHandler, checkBHandler]);
@@ -542,7 +542,7 @@ describe('PipelineServer', () => {
         .on('Start')
         .emit('CheckA', {})
         .settled(['CheckA'])
-        .dispatch(() => {}, { dispatches: ['RetryCommand'] })
+        .dispatch({ dispatches: ['RetryCommand'] }, () => {})
         .build();
       const server = new PipelineServer({ port: 0 });
       server.registerCommandHandlers([checkHandler, retryHandler]);

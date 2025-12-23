@@ -136,7 +136,7 @@ describe('Pipeline.toGraph()', () => {
       .on('Start')
       .emit('CheckA', {})
       .settled(['CheckA'])
-      .dispatch(() => {})
+      .dispatch({ dispatches: [] }, () => {})
       .build();
 
     const graph = pipeline.toGraph();

@@ -278,7 +278,7 @@ describe('PipelineServer E2E', () => {
         .emit('CheckTypes', { target: './src' })
         .emit('CheckLint', { target: './src' })
         .settled(['CheckTests', 'CheckTypes', 'CheckLint'])
-        .dispatch((events) => {
+        .dispatch({ dispatches: [] }, (events) => {
           settledHandlerCalled = true;
           receivedEvents = events as Record<string, Array<{ type: string }>>;
         })
@@ -337,7 +337,7 @@ describe('PipelineServer E2E', () => {
         .emit('CheckA', {})
         .emit('CheckB', {})
         .settled(['CheckA', 'CheckB'])
-        .dispatch((_events, send) => {
+        .dispatch({ dispatches: ['FollowUp'] }, (_events, send) => {
           send('FollowUp', { reason: 'all checks passed' });
         })
         .build();
@@ -393,7 +393,7 @@ describe('PipelineServer E2E', () => {
         .on('Started')
         .emit('RunCheck', {})
         .settled(['RunCheck'])
-        .dispatch((events, send) => {
+        .dispatch({ dispatches: ['RunCheck'] }, (events, send) => {
           settledCallCount++;
           const checkEvents = events.RunCheck;
           const hasFailure = checkEvents.some((e) => e.type === 'CheckFailed');

@@ -32,12 +32,18 @@ export interface PipelineBuilder {
   build(): Pipeline;
 }
 
-export interface DispatchOptions {
-  dispatches?: string[];
+export interface DispatchOptions<D extends readonly string[] = readonly string[]> {
+  dispatches: D;
 }
 
 export interface SettledBuilder {
-  dispatch(handler: SettledHandler, options?: DispatchOptions): SettledChain;
+  dispatch<const D extends readonly string[]>(
+    options: DispatchOptions<D>,
+    handler: (
+      events: Record<string, Event[]>,
+      send: (commandType: D[number], data: unknown) => void,
+    ) => void | { persist: boolean },
+  ): SettledChain;
 }
 
 export interface SettledChain {
@@ -644,8 +650,14 @@ class SettledBuilderImpl implements SettledBuilder {
     private readonly commandTypes: readonly string[],
   ) {}
 
-  dispatch(handler: SettledHandler, options?: DispatchOptions): SettledChain {
-    return new SettledChainImpl(this.parent, this.commandTypes, handler, options?.dispatches);
+  dispatch<const D extends readonly string[]>(
+    options: DispatchOptions<D>,
+    handler: (
+      events: Record<string, Event[]>,
+      send: (commandType: D[number], data: unknown) => void,
+    ) => void | { persist: boolean },
+  ): SettledChain {
+    return new SettledChainImpl(this.parent, this.commandTypes, handler as SettledHandler, options.dispatches);
   }
 }
 

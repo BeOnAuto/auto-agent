@@ -92,7 +92,7 @@ describe('Full Orchestration E2E', () => {
         .emit('CheckB', {})
         .emit('CheckC', {})
         .settled(['CheckA', 'CheckB', 'CheckC'])
-        .dispatch((events) => {
+        .dispatch({ dispatches: [] }, (events) => {
           settledCalled = true;
           checkEvents = events;
         })
@@ -148,7 +148,7 @@ describe('Full Orchestration E2E', () => {
         .on('Started')
         .emit('RunCheck', (e: { data: { target: string } }) => ({ target: e.data.target }))
         .settled(['RunCheck'])
-        .dispatch((events, send) => {
+        .dispatch({ dispatches: ['RunCheck'] }, (events, send) => {
           settledCallCount++;
           const hasFailure = (events.RunCheck ?? []).some((e) => e.type === 'CheckFailed');
 
