@@ -40,10 +40,6 @@ export class EventLogger {
     return this.entries.map((e) => e.event.type);
   }
 
-  getEventSequence(): string[] {
-    return this.entries.map((e) => e.event.type);
-  }
-
   clear(): void {
     this.entries = [];
   }

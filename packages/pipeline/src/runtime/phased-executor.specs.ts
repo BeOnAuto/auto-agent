@@ -158,6 +158,62 @@ describe('PhasedExecutor', () => {
       expect(executor.isPhaseComplete('c1', 'molecule')).toBe(true);
       expect(executor.isPhaseComplete('c1', 'organism')).toBe(false);
     });
+
+    it('should return false for unknown correlationId', () => {
+      expect(executor.isPhaseComplete('unknown', 'molecule')).toBe(false);
+    });
+
+    it('should return false for unknown phase name', () => {
+      const items: TestItem[] = [{ id: 'm1', type: 'molecule' }];
+      const handler = createHandler(items);
+      const event: Event = { type: 'ClientGenerated', correlationId: 'c1', data: { components: items } };
+
+      executor.startPhased(handler, event, 'c1');
+
+      expect(executor.isPhaseComplete('c1', 'nonexistent-phase')).toBe(false);
+    });
+
+    it('should return false for future phase when current phase is earlier', () => {
+      const items: TestItem[] = [
+        { id: 'm1', type: 'molecule' },
+        { id: 'p1', type: 'page' },
+      ];
+      const handler = createHandler(items);
+      const event: Event = { type: 'ClientGenerated', correlationId: 'c1', data: { components: items } };
+
+      executor.startPhased(handler, event, 'c1');
+
+      expect(executor.isPhaseComplete('c1', 'page')).toBe(false);
+    });
+
+    it('should check correct session when multiple sessions exist with different correlationIds', () => {
+      const items1: TestItem[] = [
+        { id: 'm1', type: 'molecule' },
+        { id: 'o1', type: 'organism' },
+      ];
+      const items2: TestItem[] = [
+        { id: 'm2', type: 'molecule' },
+        { id: 'o2', type: 'organism' },
+      ];
+      const handler1 = createHandler(items1);
+      const handler2 = createHandler(items2);
+
+      executor.startPhased(
+        handler1,
+        { type: 'ClientGenerated', correlationId: 'c1', data: { components: items1 } },
+        'c1',
+      );
+      executor.startPhased(
+        handler2,
+        { type: 'ClientGenerated', correlationId: 'c2', data: { components: items2 } },
+        'c2',
+      );
+
+      executor.onEventReceived({ type: 'ComponentImplemented', correlationId: 'c1', data: { filePath: 'm1' } }, 'm1');
+
+      expect(executor.isPhaseComplete('c1', 'molecule')).toBe(true);
+      expect(executor.isPhaseComplete('c2', 'molecule')).toBe(false);
+    });
   });
 
   describe('failure handling', () => {
@@ -227,6 +283,76 @@ describe('PhasedExecutor', () => {
       expect(executor.getActiveSessionCount()).toBe(1);
       expect(completed).toHaveLength(1);
       expect(completed[0].correlationId).toBe('c1');
+    });
+  });
+
+  describe('event deduplication', () => {
+    it('should ignore duplicate events for already completed items', () => {
+      const items: TestItem[] = [
+        { id: 'm1', type: 'molecule' },
+        { id: 'm2', type: 'molecule' },
+        { id: 'o1', type: 'organism' },
+      ];
+      const handler = createHandler(items);
+      const event: Event = { type: 'ClientGenerated', correlationId: 'c1', data: { components: items } };
+
+      executor.startPhased(handler, event, 'c1');
+
+      executor.onEventReceived({ type: 'ComponentImplemented', correlationId: 'c1', data: { filePath: 'm1' } }, 'm1');
+
+      expect(dispatched).toHaveLength(2);
+
+      executor.onEventReceived({ type: 'ComponentImplemented', correlationId: 'c1', data: { filePath: 'm1' } }, 'm1');
+
+      expect(dispatched).toHaveLength(2);
+    });
+  });
+
+  describe('event edge cases', () => {
+    it('should ignore events with undefined correlationId', () => {
+      const items: TestItem[] = [{ id: 'm1', type: 'molecule' }];
+      const handler = createHandler(items);
+      const event: Event = { type: 'ClientGenerated', correlationId: 'c1', data: { components: items } };
+
+      executor.startPhased(handler, event, 'c1');
+
+      expect(dispatched).toHaveLength(1);
+
+      executor.onEventReceived({ type: 'ComponentImplemented', data: { filePath: 'm1' } }, 'm1');
+
+      expect(dispatched).toHaveLength(1);
+      expect(executor.getActiveSessionCount()).toBe(1);
+    });
+
+    it('should ignore events with empty correlationId', () => {
+      const items: TestItem[] = [{ id: 'm1', type: 'molecule' }];
+      const handler = createHandler(items);
+      const event: Event = { type: 'ClientGenerated', correlationId: 'c1', data: { components: items } };
+
+      executor.startPhased(handler, event, 'c1');
+
+      expect(dispatched).toHaveLength(1);
+
+      executor.onEventReceived({ type: 'ComponentImplemented', correlationId: '', data: { filePath: 'm1' } }, 'm1');
+
+      expect(dispatched).toHaveLength(1);
+      expect(executor.getActiveSessionCount()).toBe(1);
+    });
+
+    it('should ignore events with unknown itemKey', () => {
+      const items: TestItem[] = [{ id: 'm1', type: 'molecule' }];
+      const handler = createHandler(items);
+      const event: Event = { type: 'ClientGenerated', correlationId: 'c1', data: { components: items } };
+
+      executor.startPhased(handler, event, 'c1');
+
+      executor.onEventReceived(
+        { type: 'ComponentImplemented', correlationId: 'c1', data: { filePath: 'unknown' } },
+        'unknown',
+      );
+
+      expect(dispatched).toHaveLength(1);
+      expect(executor.getActiveSessionCount()).toBe(1);
     });
   });
 });

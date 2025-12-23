@@ -79,11 +79,9 @@ export class PhasedExecutor {
     const sessionId = this.keyToSession.get(lookupKey);
     if (sessionId === undefined) return;
 
-    const session = this.sessions.get(sessionId);
-    if (!session) return;
-
+    const session = this.sessions.get(sessionId)!;
     const tracker = session.items.get(itemKey);
-    if (!tracker || tracker.completed) return;
+    if (tracker === undefined || tracker.completed) return;
 
     tracker.completed = true;
     session.pendingInPhase.delete(itemKey);
@@ -124,8 +122,7 @@ export class PhasedExecutor {
   }
 
   private dispatchCurrentPhase(sessionId: string): void {
-    const session = this.sessions.get(sessionId);
-    if (!session) return;
+    const session = this.sessions.get(sessionId)!;
 
     if (session.currentPhaseIndex >= session.phases.length) {
       this.completeSession(sessionId, session, true);

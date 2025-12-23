@@ -1,10 +1,49 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createKanbanFullPipeline, resetKanbanState } from './kanban-full.pipeline';
+import {
+  createKanbanFullPipeline,
+  resetKanbanState,
+  setProjectRoot,
+  testResolvePath,
+  setSliceRetryCount,
+  testShouldRetry,
+} from './kanban-full.pipeline';
 import type { EmitHandlerDescriptor, ForEachPhasedDescriptor } from '../../core/descriptors';
 
 describe('kanban-full.pipeline', () => {
   beforeEach(() => {
     resetKanbanState();
+  });
+
+  describe('resolvePath', () => {
+    it('should return relativePath when projectRoot is empty', () => {
+      expect(testResolvePath('./foo/bar')).toBe('./foo/bar');
+    });
+
+    it('should return absolute path unchanged', () => {
+      setProjectRoot('/my/project');
+      expect(testResolvePath('/absolute/path')).toBe('/absolute/path');
+    });
+
+    it('should resolve ./ relative paths', () => {
+      setProjectRoot('/my/project');
+      expect(testResolvePath('./foo/bar')).toBe('/my/project/foo/bar');
+    });
+
+    it('should resolve bare relative paths', () => {
+      setProjectRoot('/my/project');
+      expect(testResolvePath('foo/bar')).toBe('/my/project/foo/bar');
+    });
+  });
+
+  describe('shouldRetry', () => {
+    it('should return true when retry count is below max', () => {
+      expect(testShouldRetry('./slice-path')).toBe(true);
+    });
+
+    it('should return false when retry count reaches max', () => {
+      setSliceRetryCount('./slice-path', 4);
+      expect(testShouldRetry('./slice-path')).toBe(false);
+    });
   });
 
   describe('pipeline structure', () => {

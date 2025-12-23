@@ -331,15 +331,7 @@ export class PipelineServer {
 
     this.addGraphNodesToMermaid(graph, lines, eventNodes, commandNodes, settledNodes);
     const pipelineCommands = new Set(commandNodes);
-    this.addCommandEventNodesToMermaid(
-      commandToEvents,
-      pipelineCommands,
-      pipelineEvents,
-      lines,
-      eventNodes,
-      commandNodes,
-    );
-    this.addSettledEventNodesToMermaid(graph, commandToEvents, lines, eventNodes);
+    this.addCommandEventNodesToMermaid(commandToEvents, pipelineCommands, pipelineEvents, lines, eventNodes);
     this.addGraphEdgesToMermaid(graph, commandToEvents, lines, edgeContext);
     this.addCommandEventEdgesToMermaid(commandToEvents, pipelineCommands, pipelineEvents, lines, edgeContext);
     this.addMermaidStyles(lines, eventNodes, commandNodes, settledNodes, edgeContext.backLinkIndices);
@@ -392,9 +384,6 @@ export class PipelineServer {
         const safeId = `settled_${commandTypes.join('_')}`;
         settledNodes.add(safeId);
         lines.push(`  ${safeId}{{${commandTypes.join(', ')}}}`);
-      } else {
-        const safeId = node.id.replace(/:/g, '_');
-        lines.push(`  ${safeId}[${node.id}]`);
       }
     }
   }
@@ -405,15 +394,10 @@ export class PipelineServer {
     pipelineEvents: Set<string>,
     lines: string[],
     eventNodes: Set<string>,
-    commandNodes: Set<string>,
   ): void {
     for (const [commandName, events] of Object.entries(commandToEvents)) {
       if (!pipelineCommands.has(commandName)) {
         continue;
-      }
-      if (!commandNodes.has(commandName)) {
-        commandNodes.add(commandName);
-        lines.push(`  ${commandName}[${commandName}]`);
       }
       for (const eventName of events) {
         if (!pipelineEvents.has(eventName)) {
@@ -423,29 +407,6 @@ export class PipelineServer {
         if (!eventNodes.has(safeEventId)) {
           eventNodes.add(safeEventId);
           lines.push(`  ${safeEventId}([${eventName}])`);
-        }
-      }
-    }
-  }
-
-  private addSettledEventNodesToMermaid(
-    graph: GraphIR,
-    commandToEvents: Record<string, string[]>,
-    lines: string[],
-    eventNodes: Set<string>,
-  ): void {
-    for (const node of graph.nodes) {
-      if (!node.id.startsWith('settled:')) continue;
-      const commandTypes = node.id.replace('settled:', '').split(',');
-      for (const commandType of commandTypes) {
-        const events = commandToEvents[commandType];
-        if (events === undefined) continue;
-        for (const eventName of events) {
-          const safeEventId = `evt_${eventName}`;
-          if (!eventNodes.has(safeEventId)) {
-            eventNodes.add(safeEventId);
-            lines.push(`  ${safeEventId}([${eventName}])`);
-          }
         }
       }
     }
@@ -488,11 +449,8 @@ export class PipelineServer {
     if (nodeId.startsWith('cmd:')) {
       return nodeId.replace('cmd:', '');
     }
-    if (nodeId.startsWith('settled:')) {
-      const commandTypes = nodeId.replace('settled:', '').split(',');
-      return `settled_${commandTypes.join('_')}`;
-    }
-    return nodeId.replace(/:/g, '_');
+    const commandTypes = nodeId.replace('settled:', '').split(',');
+    return `settled_${commandTypes.join('_')}`;
   }
 
   private addCommandEventEdgesToMermaid(

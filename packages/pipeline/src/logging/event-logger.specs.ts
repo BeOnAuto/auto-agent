@@ -64,12 +64,12 @@ describe('EventLogger', () => {
       expect(logger.getEventTypes()).toEqual(['A', 'B', 'C']);
     });
 
-    it('should return event sequence', () => {
+    it('should preserve event type order', () => {
       logger.log({ type: 'Started', data: {} });
       logger.log({ type: 'Processing', data: {} });
       logger.log({ type: 'Completed', data: {} });
 
-      expect(logger.getEventSequence()).toEqual(['Started', 'Processing', 'Completed']);
+      expect(logger.getEventTypes()).toEqual(['Started', 'Processing', 'Completed']);
     });
   });
 

@@ -114,3 +114,11 @@ export function createKanbanPipeline() {
 export function resetRetryState(): void {
   retryState.clear();
 }
+
+export function setRetryCount(slicePath: string, count: number): void {
+  retryState.set(slicePath, count);
+}
+
+export function testShouldRetry(slicePath: string): boolean {
+  return shouldRetry(slicePath);
+}

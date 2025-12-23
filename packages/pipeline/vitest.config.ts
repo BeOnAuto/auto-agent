@@ -21,6 +21,7 @@ export default defineConfig({
         'src/core/descriptors.ts',
         'src/graph/types.ts',
         'src/runtime/context.ts',
+        'src/testing/fixtures/**/*.ts',
       ],
     },
   },

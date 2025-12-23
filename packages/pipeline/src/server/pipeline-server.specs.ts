@@ -647,6 +647,37 @@ describe('PipelineServer', () => {
       expect(mermaid).toMatch(/stroke:#[a-fA-F0-9]{6}|stroke:red/);
       await server.stop();
     });
+
+    it('should add event nodes from settled handler commandToEvents when not already added', async () => {
+      const checkAHandler = {
+        name: 'CheckA',
+        events: ['CheckAPassed', 'CheckAFailed'],
+        handle: async () => ({ type: 'CheckAPassed', data: {} }),
+      };
+      const checkBHandler = {
+        name: 'CheckB',
+        events: ['CheckBPassed', 'CheckBFailed'],
+        handle: async () => ({ type: 'CheckBPassed', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('Start')
+        .emit('CheckA', {})
+        .emit('CheckB', {})
+        .settled(['CheckA', 'CheckB'])
+        .dispatch({ dispatches: [] }, () => {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([checkAHandler, checkBHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('evt_CheckAPassed');
+      expect(mermaid).toContain('evt_CheckAFailed');
+      expect(mermaid).toContain('evt_CheckBPassed');
+      expect(mermaid).toContain('evt_CheckBFailed');
+      await server.stop();
+    });
   });
 
   describe('GET /pipeline/diagram', () => {

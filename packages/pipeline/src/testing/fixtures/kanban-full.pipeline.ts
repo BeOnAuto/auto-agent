@@ -207,3 +207,19 @@ export function resetKanbanState(): void {
   sliceRetryState.clear();
   projectRoot = '';
 }
+
+export function setProjectRoot(root: string): void {
+  projectRoot = root;
+}
+
+export function testResolvePath(relativePath: string): string {
+  return resolvePath(relativePath);
+}
+
+export function setSliceRetryCount(slicePath: string, count: number): void {
+  sliceRetryState.set(slicePath, count);
+}
+
+export function testShouldRetry(slicePath: string): boolean {
+  return shouldRetry(slicePath);
+}

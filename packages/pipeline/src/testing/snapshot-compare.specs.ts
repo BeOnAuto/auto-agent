@@ -120,5 +120,17 @@ describe('snapshot-compare', () => {
       expect(formatted).toContain('Expected "B"');
       expect(formatted).toContain('got "X"');
     });
+
+    it('should format missing events', () => {
+      const result = compareEventSequence(['A', 'B', 'C'], ['A', 'B']);
+      const formatted = formatSnapshotDiff(result);
+      expect(formatted).toContain('Missing "C"');
+    });
+
+    it('should format extra events', () => {
+      const result = compareEventSequence(['A', 'B'], ['A', 'B', 'C']);
+      const formatted = formatSnapshotDiff(result);
+      expect(formatted).toContain('Unexpected "C"');
+    });
   });
 });
