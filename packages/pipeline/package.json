@@ -13,7 +13,7 @@
     "format:fix": "prettier --write \"**/*.{js,ts,json,md,yml,yaml}\" --ignore-path ../../.prettierignore --log-level warn",
     "prepublishOnly": "npm run build",
     "e2e:kanban": "tsx scripts/run-kanban-e2e.ts",
-    "serve": "tsx scripts/start-server.ts"
+    "serve": "tsx --watch scripts/start-server.ts"
   },
   "dependencies": {
     "@auto-engineer/message-bus": "workspace:*",

@@ -3,17 +3,15 @@
 ## Pomodoro + TDD + TCR + 100% Coverage
 
 ```
-╔═══════════════════════════════════════════════════════════════════════╗
-║                                                                       ║
-║   Red ───► Green ───►[TCR]───► Refactor ───►[TCR]───► Done           ║
-║                                                                       ║
-║   [TCR] = test ──┬── pass ──► commit ──► continue                    ║
-║                  └── fail ──► REVERT ──► rethink                     ║
-║                                                                       ║
-║   REVERT means STOP. Don't fix in place. Rethink:                    ║
-║     • Same approach, smaller step  OR  • Different approach          ║
-║                                                                       ║
-╚═══════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════╗
+║   Red ───► Green ───►[TCR]───► Refactor ───►[TCR]───► Done          ║
+║                                                                     ║
+║   [TCR] = test ──┬── pass ──► commit ──► continue                   ║
+║                  └── fail ──► REVERT ──► RETHINK                    ║
+║                                                                     ║
+║   REVERT means STOP. Don't fix in place.                            ║
+║   RETHINK means try again with SMALLER STEPS OR try a NEW DESIGN    ║
+╚═════════════════════════════════════════════════════════════════════╝
 ```
 
 ---
@@ -34,36 +32,18 @@ One atomic test + implementation per cycle (5-15 min).
 
 1. Write ONE failing test (Red)
 2. Write MINIMAL code to pass (Green)
-3. Run TCR — this verifies and commits in one step
+3. TCR: `test && commit || revert` (include plan update)
 4. Refactor if needed
-5. Run TCR
+5. TCR: `test && commit || revert`
 6. Move pomodoro to DONE in the `pomodoro-plan.md`, commit with TCR
 
 **TCR Command:**
 
-Do NOT run tests or checks separately before TCR. TCR _is_ the verification — that's the T.
-
 ```bash
-pnpm test --run && pnpm -w run check 2>&1 | tail -30 && \
+pnpm test --run && \
   git add -A && git commit -m "<COMMITIZEN FORMAT>" || \
   git checkout -- packages/<package>/
 ```
-
-**CRITICAL: Revert Means Rethink**
-
-When you notice your implementation is broken:
-
-- **DO NOT** continue down the same path trying to patch errors
-- **DO NOT** add more code to fix the code you just wrote
-- **DO** execute the revert immediately
-- **DO** ask: was the approach wrong, or was the step too big?
-
-After reverting, choose one:
-
-1. **Same approach, smaller step** — the idea was sound, but you skipped TDD discipline. Break it into tinier increments.
-2. **Different approach** — the design itself was flawed. Try a fundamentally different angle.
-
-The revert is not a punishment—it is the process. Patching broken code compounds the mistake.
 
 ---
 
@@ -81,11 +61,11 @@ All thresholds enforced at 100%. Tests drive the code.
 **NEVER Exclude Files to Dodge Coverage**
 
 ```
-╔═══════════════════════════════════════════════════════════════════════╗
+╔══════════════════════════════════════════════════════════════════════╗
 ║  Excluding a file from coverage to avoid testing it is FORBIDDEN.    ║
 ║  "Hard to test" code (file system, dynamic imports, network, etc.)   ║
-║  → Use mocks/stubs at boundaries. That's what they're for.           ║
-╚═══════════════════════════════════════════════════════════════════════╝
+║  → Inject dependencies and mock them. That's what mocks are for.     ║
+╚══════════════════════════════════════════════════════════════════════╝
 ```
 
 Coverage exclusions are ONLY for:
@@ -94,7 +74,7 @@ Coverage exclusions are ONLY for:
 - Barrel exports (index.ts re-exports)
 - Files that are genuinely 0% logic (pure declarations)
 
-If you're tempted to exclude a file because it's "infrastructure" or "integration-focused" — STOP. Inject dependencies and mock them. The coverage requirement exists precisely to force testable design.
+If you're tempted to exclude a file because it's "infrastructure" or "integration-focused" — STOP. The coverage requirement exists precisely to force testable design.
 
 ---
 
@@ -178,5 +158,3 @@ it('does too many things', () => {
   expect(updated.modified).toBe(true); // second verify
 });
 ```
-
----
