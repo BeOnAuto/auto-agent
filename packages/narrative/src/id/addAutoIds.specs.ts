@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import type { Model } from '../index';
 import { addAutoIds } from './';
-import { Model } from '../index';
 
 describe('addAutoIds', () => {
   const flows: Model = {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { getNarratives } from '../src';
+import path from 'node:path';
 import { NodeFileStore } from '@auto-engineer/file-store/node';
-import path from 'path';
+import { getNarratives } from '../src';
 
 const main = async () => {
   try {

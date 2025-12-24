@@ -1,4 +1,4 @@
-import { Field, MessageDefinition } from '../types';
+import type { Field, MessageDefinition } from '../types';
 
 export function extractFieldsFromMessage(
   messageName: string,

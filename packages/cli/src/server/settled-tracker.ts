@@ -1,9 +1,8 @@
-import type { Event, Command } from '@auto-engineer/message-bus';
-import type { SettledRegistration, DispatchAction } from '../dsl/types';
-import { getPendingDispatches } from '../dsl';
-import { buildEventToCommandMapping } from '../dsl';
-import type { CommandMetadataService } from './command-metadata-service';
+import type { Command, Event } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
+import { buildEventToCommandMapping, getPendingDispatches } from '../dsl';
+import type { DispatchAction, SettledRegistration } from '../dsl/types';
+import type { CommandMetadataService } from './command-metadata-service';
 
 const debug = createDebug('auto-engineer:server:settled-tracker');
 
@@ -32,7 +31,7 @@ export class SettledTracker {
   private runningCommands: Map<string, { commandType: string; correlationId: string }> = new Map();
   private onDispatchAction?: (action: DispatchAction, parentCorrelationId?: string) => void;
   private metadataService?: CommandMetadataService;
-  private eventToCommandMapping: Record<string, string> = {};
+  private eventToCommandMapping: Record<string, string>;
 
   constructor(
     onDispatchAction?: (action: DispatchAction, parentCorrelationId?: string) => void,
@@ -57,7 +56,7 @@ export class SettledTracker {
       if (!this.commandToHandlerIds.has(commandType)) {
         this.commandToHandlerIds.set(commandType, new Set());
       }
-      this.commandToHandlerIds.get(commandType)!.add(templateId);
+      this.commandToHandlerIds.get(commandType)?.add(templateId);
     }
   }
 

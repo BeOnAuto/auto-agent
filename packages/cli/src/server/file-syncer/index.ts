@@ -1,15 +1,15 @@
-import chokidar from 'chokidar';
-import path from 'path';
-import type { Server as SocketIOServer } from 'socket.io';
-import createDebug from 'debug';
+import path from 'node:path';
 import { NodeFileStore } from '@auto-engineer/file-store/node';
-import { resolveSyncFileSet } from './sync/resolveSyncFileSet';
+import chokidar from 'chokidar';
+import createDebug from 'debug';
+import type { Server as SocketIOServer } from 'socket.io';
 import { loadAutoConfig } from '../config-loader';
-import { md5, readBase64, statSize } from './utils/hash';
-import { toWirePath, fromWirePath, rebuildWirePathCache } from './utils/path';
-import type { WireChange, WireInitial } from './types/wire';
 import { createJWE } from './crypto/jwe-encryptor';
 import { getActiveProvider, getProviderEnvHash } from './crypto/provider-resolver';
+import { resolveSyncFileSet } from './sync/resolveSyncFileSet';
+import type { WireChange, WireInitial } from './types/wire';
+import { md5, readBase64, statSize } from './utils/hash';
+import { fromWirePath, rebuildWirePathCache, toWirePath } from './utils/path';
 
 const debug = createDebug('auto:cli:file-syncer');
 
@@ -69,7 +69,7 @@ export class FileSyncer {
 
       return JSON.stringify(
         configWithCreds,
-        (key: string, value: unknown) => {
+        (_key: string, value: unknown) => {
           if (typeof value === 'function') {
             const funcName = (value as { name?: string }).name;
             return `[Function: ${funcName != null ? funcName : 'anonymous'}]`;

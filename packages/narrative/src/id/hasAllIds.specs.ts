@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { hasAllIds, addAutoIds } from './index';
 import type { Model } from '../index';
+import { addAutoIds, hasAllIds } from './index';
 
 describe('hasAllIds', () => {
   const createModelWithoutIds = (): Model => ({

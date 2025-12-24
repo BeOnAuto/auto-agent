@@ -1,15 +1,15 @@
+import createDebug from 'debug';
 import { nanoid } from 'nanoid';
+import type { ILocalMessageStore } from '../interfaces/IMessageStore';
 import type {
   Message,
-  PositionalMessage,
   MessageFilter,
-  StreamInfo,
-  SessionInfo,
   MessageStoreStats,
   MessageType,
+  PositionalMessage,
+  SessionInfo,
+  StreamInfo,
 } from '../interfaces/types';
-import type { ILocalMessageStore } from '../interfaces/IMessageStore';
-import createDebug from 'debug';
 
 const debug = createDebug('auto:message-store:memory');
 
@@ -181,7 +181,7 @@ export class MemoryMessageStore implements ILocalMessageStore {
       messages = messages.filter((m) => m.revision >= fromRevision);
     }
 
-    if (count !== undefined && count !== null && !isNaN(count) && count > 0) {
+    if (count !== undefined && count !== null && !Number.isNaN(count) && count > 0) {
       messages = messages.slice(-count); // Get the most recent N messages
     }
 
@@ -200,7 +200,7 @@ export class MemoryMessageStore implements ILocalMessageStore {
 
     let filtered = this.applyFilter(allMessages, filter);
 
-    if (count !== undefined && count !== null && !isNaN(count) && count > 0) {
+    if (count !== undefined && count !== null && !Number.isNaN(count) && count > 0) {
       filtered = filtered.slice(-count); // Get the most recent N messages
     }
 

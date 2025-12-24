@@ -1,14 +1,14 @@
-import { Narrative, Message, Model, Slice } from '../../index';
-import { globalIntegrationRegistry } from '../../integration-registry';
+import type { Message, Model, Narrative, Slice } from '../../index';
 import { integrationExportRegistry } from '../../integration-export-registry';
-import { TypeInfo } from '../../loader/ts-utils';
-import { resolveInferredType } from './type-inference';
-import { inlineAllMessageFieldTypes } from './inlining';
-import { ExampleShapeHints, applyExampleShapeHints } from './example-shapes';
-import { extractMessagesFromIntegrations, processDataItemIntegrations } from './integrations';
-import { matchesNarrativePattern } from './strings';
+import { globalIntegrationRegistry } from '../../integration-registry';
+import type { TypeInfo } from '../../loader/ts-utils';
 import { assembleSpecs } from './assemble';
-import { processGiven, processWhen, processThen } from './spec-processors';
+import { applyExampleShapeHints, type ExampleShapeHints } from './example-shapes';
+import { inlineAllMessageFieldTypes } from './inlining';
+import { extractMessagesFromIntegrations, processDataItemIntegrations } from './integrations';
+import { processGiven, processThen, processWhen } from './spec-processors';
+import { matchesNarrativePattern } from './strings';
+import { resolveInferredType } from './type-inference';
 
 type TypeResolver = (
   t: string,

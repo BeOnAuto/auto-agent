@@ -3,7 +3,7 @@ import type { Command, Event } from '@auto-engineer/message-bus';
 export interface EventRegistration {
   type: 'on';
   eventType: string;
-  handler: (event: Event) => Command | Command[] | DispatchAction | void;
+  handler: (event: Event) => Command | Command[] | DispatchAction | undefined;
 }
 
 export interface DispatchAction {

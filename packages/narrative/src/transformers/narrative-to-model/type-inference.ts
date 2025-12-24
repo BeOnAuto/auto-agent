@@ -1,4 +1,4 @@
-import { TypeInfo } from '../../loader/ts-utils';
+import type { TypeInfo } from '../../loader/ts-utils';
 
 function tryDataFieldMatch(typeInfo: TypeInfo, dataKeys: Set<string>): boolean {
   const dataField = typeInfo.dataFields?.find((f) => f.name === 'data');
@@ -9,7 +9,7 @@ function tryDataFieldMatch(typeInfo: TypeInfo, dataKeys: Set<string>): boolean {
     dataField.type.endsWith('}')
   ) {
     const bodyMatch = dataField.type.match(/^\{\s*([^}]*)\s*\}$/);
-    if (bodyMatch && bodyMatch[1]) {
+    if (bodyMatch?.[1]) {
       const body = bodyMatch[1];
       const innerKeys = new Set<string>();
       const re = /(\w+)(\?)?\s*:\s*([^;,]+)(?=[;,]|$)/g;

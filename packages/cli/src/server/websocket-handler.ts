@@ -1,7 +1,7 @@
-import { Server as SocketIOServer } from 'socket.io';
-import type { MessageBus, Command } from '@auto-engineer/message-bus';
-import type { StateManager } from './state-manager';
+import type { Command, MessageBus } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
+import type { Server as SocketIOServer } from 'socket.io';
+import type { StateManager } from './state-manager';
 
 const debugWs = createDebug('auto:cli:server:ws');
 

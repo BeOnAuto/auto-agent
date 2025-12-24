@@ -1,7 +1,7 @@
-import { type Command, type Event, defineCommandHandler } from '@auto-engineer/message-bus';
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
+import { promises as fs } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
 
 const debug = createDebug('auto:frontend-generator-react-graphql:copy-example');

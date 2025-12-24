@@ -1,21 +1,20 @@
 #!/usr/bin/env node
-import { Command } from 'commander';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
-import * as fs from 'fs';
-import { fileURLToPath } from 'url';
+import { Command } from 'commander';
 import Debug from 'debug';
-
+import * as dotenv from 'dotenv';
+import getPort, { portNumbers } from 'get-port';
+import { PluginLoader } from './plugin-loader';
+import { Analytics } from './utils/analytics';
 import { loadConfig, validateConfig } from './utils/config';
 import { handleError } from './utils/errors';
 import { createOutput } from './utils/terminal';
-import { Analytics } from './utils/analytics';
-import { PluginLoader } from './plugin-loader';
-import getPort, { portNumbers } from 'get-port';
 
 // Export DSL functions for use in auto.config.ts
-export { on, dispatch, fold, autoConfig } from './dsl/index';
+export { autoConfig, dispatch, fold, on } from './dsl/index';
 
 const debug = Debug('auto-engineer:cli');
 
@@ -53,7 +52,7 @@ const VERSION = getVersion();
 
 const checkNodeVersion = () => {
   const nodeVersion = process.version;
-  const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0]);
+  const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0], 10);
 
   if (majorVersion < 18) {
     console.error(chalk.red(`Error: Node.js version ${nodeVersion} is not supported.`));
@@ -66,28 +65,28 @@ const checkNodeVersion = () => {
 const setupSignalHandlers = () => {
   process.on('SIGINT', () => {
     if (serverInstance !== null && serverInstance !== undefined) {
-      console.log('\n' + chalk.yellow('Shutting down server...'));
+      console.log(`\n${chalk.yellow('Shutting down server...')}`);
       try {
         void serverInstance.stop();
       } catch (error) {
         console.error('Error stopping server:', error);
       }
     } else {
-      console.log('\n' + chalk.yellow('Operation cancelled by user'));
+      console.log(`\n${chalk.yellow('Operation cancelled by user')}`);
     }
     process.exit(0);
   });
 
   process.on('SIGTERM', () => {
     if (serverInstance !== null && serverInstance !== undefined) {
-      console.log('\n' + chalk.yellow('Shutting down server...'));
+      console.log(`\n${chalk.yellow('Shutting down server...')}`);
       try {
         void serverInstance.stop();
       } catch (error) {
         console.error('Error stopping server:', error);
       }
     } else {
-      console.log('\n' + chalk.yellow('Process terminated'));
+      console.log(`\n${chalk.yellow('Process terminated')}`);
     }
     process.exit(0);
   });
@@ -165,7 +164,7 @@ const filterNonEmptyArgs = (args: unknown[]): (string | string[])[] => {
 };
 
 const debugCommandExecution = (args: unknown[], cmdArgs: unknown[], options: Record<string, unknown>): void => {
-  if (process.env.DEBUG !== undefined && process.env.DEBUG.includes('cli:')) {
+  if (process.env.DEBUG?.includes('cli:')) {
     console.error('DEBUG cli: Raw args:', args);
     console.error('DEBUG cli: Command args:', cmdArgs);
     console.error('DEBUG cli: Options:', options);
@@ -173,7 +172,7 @@ const debugCommandExecution = (args: unknown[], cmdArgs: unknown[], options: Rec
 };
 
 const debugCommandData = (commandData: CommandData): void => {
-  if (process.env.DEBUG !== undefined && process.env.DEBUG.includes('cli:')) {
+  if (process.env.DEBUG?.includes('cli:')) {
     console.error('DEBUG cli: Prepared command data:', commandData);
   }
 };
@@ -281,7 +280,7 @@ const setupProgram = async (config: ReturnType<typeof loadConfig>) => {
 
       // Usage
       const commandUsage = helper.commandUsage(cmd);
-      output.push('Usage: ' + commandUsage, '');
+      output.push(`Usage: ${commandUsage}`, '');
 
       // Description
       const commandDescription = helper.commandDescription(cmd);
@@ -414,7 +413,7 @@ export default {
       if (!categories.has(category)) {
         categories.set(category, []);
       }
-      categories.get(category)!.push({ alias, command });
+      categories.get(category)?.push({ alias, command });
     });
 
     const helpText: string[] = [];

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Command, Event } from '@auto-engineer/message-bus';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { on } from './index';
 
 interface TestCommandA extends Command<'TestCommandA', { payload: string }> {
@@ -162,7 +162,7 @@ describe('on.settled', () => {
 
       // Should allow dispatching declared commands
       expect(() => {
-        capturedDispatch!({
+        capturedDispatch?.({
           type: 'ImplementClient',
           data: { clientId: 'test' },
         });
@@ -170,7 +170,7 @@ describe('on.settled', () => {
 
       // Should throw error for undeclared commands
       expect(() => {
-        capturedDispatch!({
+        capturedDispatch?.({
           type: 'UndeclaredCommand',
           data: { test: 'value' },
         });

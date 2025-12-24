@@ -1,9 +1,9 @@
-import { type Command, type Event, defineCommandHandler } from '@auto-engineer/message-bus';
-import path from 'path';
+import { access } from 'node:fs/promises';
+import path from 'node:path';
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
+import createDebug from 'debug';
 import { execa } from 'execa';
 import fg from 'fast-glob';
-import { access } from 'fs/promises';
-import createDebug from 'debug';
 
 const debug = createDebug('auto:server-checks:lint');
 const debugHandler = createDebug('auto:server-checks:lint:handler');

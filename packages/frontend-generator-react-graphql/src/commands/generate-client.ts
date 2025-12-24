@@ -1,15 +1,15 @@
-import { type Command, type Event, defineCommandHandler } from '@auto-engineer/message-bus';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { FrontendScaffoldBuilder } from '../builder';
-import { generateComponents } from '../generator/generateComponents';
-import { writeGqlOperationsToFolder } from '../scaffold-gql-operations';
-import { generateSchemaFile } from '../write-graphql-schema';
-import { runCodegen } from '../run-codegen';
-import { ComponentType, IAScheme } from '../types';
-import { configureStarter } from '../configure-starter';
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
+import { FrontendScaffoldBuilder } from '../builder';
+import { configureStarter } from '../configure-starter';
+import { generateComponents } from '../generator/generateComponents';
+import { runCodegen } from '../run-codegen';
+import { writeGqlOperationsToFolder } from '../scaffold-gql-operations';
+import type { ComponentType, IAScheme } from '../types';
+import { generateSchemaFile } from '../write-graphql-schema';
 
 const debug = createDebug('auto:frontend-generator-react-graphql:command');
 const debugBuilder = createDebug('auto:frontend-generator-react-graphql:command:builder');

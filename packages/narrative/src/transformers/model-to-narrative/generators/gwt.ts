@@ -1,5 +1,5 @@
-import tsNS from 'typescript';
-import { jsonToExpr, type FieldTypeInfo } from '../ast/emit-helpers';
+import type tsNS from 'typescript';
+import { type FieldTypeInfo, jsonToExpr } from '../ast/emit-helpers';
 
 /**
  * Build a single specs() block for a GWT entry, adapting to slice type:

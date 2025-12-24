@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { createKanbanPipeline, resetRetryState, setRetryCount, testShouldRetry } from './kanban.pipeline';
 
 describe('kanban.pipeline', () => {

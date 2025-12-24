@@ -1,5 +1,5 @@
-import { collectTypeDeclarations } from '../analysis/type-decls';
 import { findCodeBoundaries, reconstructCode } from '../analysis/lint-helpers';
+import { collectTypeDeclarations } from '../analysis/type-decls';
 
 /**
  * Sorts TypeScript type declarations alphabetically, adds line breaks between them, and removes unused types.

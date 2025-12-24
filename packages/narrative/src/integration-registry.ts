@@ -1,6 +1,7 @@
 // integration-helper.ts - Add this to your flow package
-import { Integration } from './types';
+
 import createDebug from 'debug';
+import type { Integration } from './types';
 
 const debug = createDebug('auto:flow:integrations');
 if ('color' in debug && typeof debug === 'object') {

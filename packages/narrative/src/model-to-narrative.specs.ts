@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import type { Model } from './index';
 import schema from './samples/seasonal-assistant.schema.json';
 import { modelToNarrative } from './transformers/model-to-narrative';
-import { Model } from './index';
 
 describe('modelToNarrative', () => {
   it('should create a full flow DSL from a model', async () => {
@@ -613,8 +613,9 @@ narrative('Test Flow with IDs', 'FLOW-123', () => {
 
     const code = await modelToNarrative(modelWithRuleIds);
 
-    expect(code)
-      .toEqual(`import { command, example, narrative, rule, specs, then, when } from '@auto-engineer/narrative';
+    expect(
+      code,
+    ).toEqual(`import { command, example, narrative, rule, specs, then, when } from '@auto-engineer/narrative';
 import type { Command, Event } from '@auto-engineer/narrative';
 type ProcessCommand = Command<
   'ProcessCommand',
@@ -1184,8 +1185,9 @@ narrative('Questionnaires', 'Q9m2Kp4Lx', () => {
 
     const code = await modelToNarrative(modelWithDuplicateRules);
 
-    expect(code)
-      .toEqual(`import { example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
+    expect(
+      code,
+    ).toEqual(`import { example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type QuestionnaireLinkSent = Event<
   'QuestionnaireLinkSent',
@@ -1391,8 +1393,9 @@ narrative('Test Flow', 'TEST-FLOW', () => {
 
     const code = await modelToNarrative(modelWithMultiGiven);
 
-    expect(code)
-      .toEqual(`import { and, example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
+    expect(
+      code,
+    ).toEqual(`import { and, example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type QuestionnaireConfig = State<
   'QuestionnaireConfig',
@@ -1604,8 +1607,9 @@ narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
 
     const code = await modelToNarrative(modelWithReferencedStates);
 
-    expect(code)
-      .toEqual(`import { data, example, given, narrative, query, rule, source, specs, then } from '@auto-engineer/narrative';
+    expect(
+      code,
+    ).toEqual(`import { data, example, given, narrative, query, rule, source, specs, then } from '@auto-engineer/narrative';
 import type { State } from '@auto-engineer/narrative';
 type QuestionnaireProgress = State<
   'QuestionnaireProgress',
@@ -1758,8 +1762,9 @@ narrative('Referenced States Flow', 'REF-STATES', () => {
 
     const code = await modelToNarrative(modelWithDateFields);
 
-    expect(code)
-      .toEqual(`import { example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
+    expect(
+      code,
+    ).toEqual(`import { example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type TimestampedEvent = Event<
   'TimestampedEvent',
@@ -2025,8 +2030,9 @@ narrative('Response Analytics', () => {
 
     const code = await modelToNarrative(modelWithEmptyWhen);
 
-    expect(code)
-      .toEqual(`import { and, example, given, narrative, query, rule, specs, then } from '@auto-engineer/narrative';
+    expect(
+      code,
+    ).toEqual(`import { and, example, given, narrative, query, rule, specs, then } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type TodoAdded = Event<
   'TodoAdded',

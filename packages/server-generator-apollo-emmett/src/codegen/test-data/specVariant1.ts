@@ -1,4 +1,4 @@
-import { Model as SpecsSchema } from '@auto-engineer/narrative';
+import type { Model as SpecsSchema } from '@auto-engineer/narrative';
 
 const specVariant1: SpecsSchema = {
   variant: 'specs',

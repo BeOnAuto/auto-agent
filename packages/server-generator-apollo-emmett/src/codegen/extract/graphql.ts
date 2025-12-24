@@ -1,4 +1,4 @@
-import { parse, OperationDefinitionNode, TypeNode, print } from 'graphql';
+import { type OperationDefinitionNode, parse, print, type TypeNode } from 'graphql';
 
 export interface ParsedArg {
   name: string;
@@ -88,7 +88,7 @@ export function parseGraphQlRequest(request: string): ParsedGraphQlQuery {
   }
 
   const baseName = field.name.value;
-  const returnType = pascalCase(baseName) + 'View';
+  const returnType = `${pascalCase(baseName)}View`;
 
   return {
     queryName: baseName,

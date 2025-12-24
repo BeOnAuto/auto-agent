@@ -1,11 +1,11 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { performance } from 'node:perf_hooks';
 import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import * as ts from 'typescript';
 import createDebug from 'debug';
-import { callAI, loadScheme } from '../agent';
 import { execa } from 'execa';
-import { performance } from 'perf_hooks';
+import * as ts from 'typescript';
+import { callAI, loadScheme } from '../agent';
 
 const debug = createDebug('auto:client-implementer:component');
 const debugTypeCheck = createDebug('auto:client-implementer:component:typecheck');
@@ -1403,8 +1403,7 @@ function validateImports(code: string, registry: ComponentRegistry): { valid: bo
   const errors: string[] = [];
 
   const componentImportPattern = /import\s+[^'"]*from\s+['"]@\/components\/([^/]+)\/([^'"]+)['"]/g;
-  let match;
-  while ((match = componentImportPattern.exec(code)) !== null) {
+  for (const match of code.matchAll(componentImportPattern)) {
     const error = validateComponentImport(match[1], match[2], registry);
     if (error !== null) {
       errors.push(error);
@@ -1412,7 +1411,7 @@ function validateImports(code: string, registry: ComponentRegistry): { valid: bo
   }
 
   const allImportPattern = /import\s+[^'"]*from\s+['"](@\/[^'"]+)['"]/g;
-  while ((match = allImportPattern.exec(code)) !== null) {
+  for (const match of code.matchAll(allImportPattern)) {
     const error = validateNonComponentImport(match[1]);
     if (error !== null) {
       errors.push(error);

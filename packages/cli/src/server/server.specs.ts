@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { MessageBusServer } from './server';
-import { on, dispatch, fold, getRegistrations } from '../dsl';
 import type { Command, Event } from '@auto-engineer/message-bus';
 import getPort from 'get-port';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { dispatch, fold, getRegistrations, on } from '../dsl';
+import { MessageBusServer } from './server';
 
 describe('Message Bus Server Integration', async () => {
   let server: MessageBusServer;
@@ -41,7 +41,7 @@ describe('Message Bus Server Integration', async () => {
     server.registerCommandHandlers([
       {
         name: 'TestCommand',
-        handle: async (command: Command) => {
+        handle: async (_command: Command) => {
           return {
             type: 'TestResult',
             data: { success: true },

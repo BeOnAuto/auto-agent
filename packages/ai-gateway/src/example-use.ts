@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { registerTool, registerTools, startServer, isServerStarted, type ToolHandler } from '.';
+import { isServerStarted, registerTool, registerTools, startServer, type ToolHandler } from '.';
 
 // Example 1: Simple tool with basic types
 interface GreetingParams extends Record<string, unknown> {
@@ -133,7 +133,7 @@ registerTool<DateFormatterParams>(
   async ({ date, format }) => {
     const dateObj = new Date(date);
 
-    if (isNaN(dateObj.getTime())) {
+    if (Number.isNaN(dateObj.getTime())) {
       return {
         content: [
           {

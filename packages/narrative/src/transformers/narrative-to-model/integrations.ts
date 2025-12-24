@@ -1,10 +1,10 @@
-import { Integration } from '../../types';
-import { Message } from '../../index';
-import { zodSchemaToFields } from './zod-adapter';
+import type { Message } from '../../index';
+import { integrationExportRegistry } from '../../integration-export-registry';
+import type { Integration } from '../../types';
 import { debugIntegrations } from './debug';
 import { hasDestination, hasOrigin, hasWithState, isValidIntegration } from './guards';
 import { processDestinationMessage } from './messages';
-import { integrationExportRegistry } from '../../integration-export-registry';
+import { zodSchemaToFields } from './zod-adapter';
 
 const integrationImportPaths = new Map<string, string>();
 
@@ -103,7 +103,7 @@ function flattenStateEnvelope(fields: Message['fields']): Message['fields'] {
   if (dataIdx !== -1) {
     const src = fields[dataIdx].type; // "{ a: T, b?: U }" or "{ a: T; b?: U }"
     const bodyMatch = src.match(/^\{\s*([^}]*)\s*\}$/);
-    if (bodyMatch && bodyMatch[1]) {
+    if (bodyMatch?.[1]) {
       const body = bodyMatch[1];
       const inner: { name: string; type: string; required: boolean }[] = [];
       // support comma OR semicolon separators

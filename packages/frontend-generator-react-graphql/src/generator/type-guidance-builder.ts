@@ -1,11 +1,11 @@
-import { MoleculeSpec, OrganismSpec, PageSpec, DataRequirement, IAScheme } from '../types';
+import createDebug from 'debug';
 import {
-  TypeMapping,
-  extractQueryFieldFromGQL,
   extractMutationFieldFromGQL,
   extractOperationNameFromGQL,
+  extractQueryFieldFromGQL,
+  type TypeMapping,
 } from '../graphql-type-extractor';
-import createDebug from 'debug';
+import type { DataRequirement, IAScheme, MoleculeSpec, OrganismSpec, PageSpec } from '../types';
 
 const debug = createDebug('auto:frontend-generator-react-graphql:type-guidance-builder');
 
@@ -161,7 +161,7 @@ function processQuery(
 
 function processMutation(
   requirement: DataRequirement,
-  typeMappings: TypeMapping,
+  _typeMappings: TypeMapping,
   imports: Set<string>,
   mutationGuidance: string[],
 ): void {

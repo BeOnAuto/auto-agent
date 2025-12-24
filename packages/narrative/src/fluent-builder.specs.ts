@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { command, react } from './fluent-builder';
+import { clearCurrentNarrative, startNarrative } from './narrative-context';
 import { createIntegration } from './types';
-import { startNarrative, clearCurrentNarrative } from './narrative-context';
 
 // Test integrations
 const MailChimp = createIntegration('mailchimp', 'MailChimp');

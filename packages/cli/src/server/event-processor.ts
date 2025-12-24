@@ -1,11 +1,11 @@
-import type { MessageBus, Event, Command } from '@auto-engineer/message-bus';
+import type { Command, Event, MessageBus } from '@auto-engineer/message-bus';
 import type { IMessageStore } from '@auto-engineer/message-store';
-import type { StateManager } from './state-manager';
-import type { EventRegistration, DispatchAction } from '../dsl/types';
-import type { SettledTracker } from './settled-tracker';
-import { nanoid } from 'nanoid';
-import { generateChildCorrelationId, generateCorrelationId } from '../utils/correlation-id';
 import createDebug from 'debug';
+import { nanoid } from 'nanoid';
+import type { DispatchAction, EventRegistration } from '../dsl/types';
+import { generateChildCorrelationId, generateCorrelationId } from '../utils/correlation-id';
+import type { SettledTracker } from './settled-tracker';
+import type { StateManager } from './state-manager';
 
 const debugBus = createDebug('auto-engineer:server:bus');
 
@@ -118,7 +118,7 @@ export class EventProcessor {
     if (!this.eventHandlers.has(registration.eventType)) {
       this.eventHandlers.set(registration.eventType, []);
     }
-    this.eventHandlers.get(registration.eventType)!.push(handler);
+    this.eventHandlers.get(registration.eventType)?.push(handler);
   }
 
   private async processHandlerResult(result: unknown, parentCorrelationId?: string): Promise<void> {

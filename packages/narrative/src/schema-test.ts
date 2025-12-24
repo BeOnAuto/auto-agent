@@ -1,5 +1,5 @@
-import { DataSinkSchema, DataSourceSchema, MessageTargetSchema } from './schema';
 import { sink, source } from './data-narrative-builders';
+import { DataSinkSchema, DataSourceSchema, MessageTargetSchema } from './schema';
 
 // Test that the builders produce output compatible with the schema
 const testSink = sink().event('TestEvent').fields({ id: true }).toStream('test-${id}');

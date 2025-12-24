@@ -1,6 +1,6 @@
+import createDebug from 'debug';
 import * as dotenv from 'dotenv';
 import * as Figma from 'figma-api';
-import createDebug from 'debug';
 
 dotenv.config();
 

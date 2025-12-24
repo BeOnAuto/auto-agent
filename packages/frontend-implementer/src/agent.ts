@@ -1,8 +1,8 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { generateTextWithAI } from '@auto-engineer/ai-gateway';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import * as ts from 'typescript';
 import createDebug from 'debug';
+import * as ts from 'typescript';
 
 const debug = createDebug('auto:frontend-implementer:agent');
 const debugPlan = createDebug('auto:frontend-implementer:agent:plan');
@@ -102,7 +102,7 @@ const provider = undefined;
 function extractJsonArray(text: string): string {
   debugAI('Extracting JSON array from text of length: %d', text.length);
   const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-  if (codeBlockMatch && codeBlockMatch[1]) {
+  if (codeBlockMatch?.[1]) {
     debugAI('Found JSON in code block');
     return codeBlockMatch[1].trim();
   }
@@ -250,7 +250,7 @@ async function getTheme(designSystem: string): Promise<string> {
   debugContext('Extracting theme from design system, content length: %d', designSystem.length);
   try {
     const themeMatch = designSystem.match(/## Theme\s*\n([\s\S]*?)(?=\n## |\n# |\n*$)/);
-    if (themeMatch && themeMatch[1]) {
+    if (themeMatch?.[1]) {
       const theme = themeMatch[1].trim();
       debugContext('Theme extracted, length: %d', theme.length);
       return theme;

@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import type { Model as SpecsSchema } from '@auto-engineer/narrative';
+import { describe, expect, it } from 'vitest';
 import { generateScaffoldFilePlans } from '../../scaffoldFromSchema';
-import { Model as SpecsSchema } from '@auto-engineer/narrative';
 
 describe('state.ts.ejs', () => {
   it('should generate a valid state definition file for a query slice with a state message', async () => {

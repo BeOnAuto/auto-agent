@@ -1,6 +1,6 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import { CustomProviderConfig } from '../constants';
 import createDebug from 'debug';
+import type { CustomProviderConfig } from '../constants';
 
 const debug = createDebug('auto:ai-gateway:custom');
 

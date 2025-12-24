@@ -1,24 +1,24 @@
-import { registry } from './narrative-registry';
-import {
-  startNarrative,
-  clearCurrentNarrative,
-  getCurrentSlice,
-  startClientBlock,
-  endClientBlock,
-  startServerBlock,
-  endServerBlock,
-  pushSpec,
-  pushDescribe,
-  popDescribe,
-  recordIt,
-  setSliceData,
-  recordRule,
-  recordExample,
-  recordStep,
-  recordErrorStep,
-} from './narrative-context';
-import type { DataItem } from './types';
 import createDebug from 'debug';
+import {
+  clearCurrentNarrative,
+  endClientBlock,
+  endServerBlock,
+  getCurrentSlice,
+  popDescribe,
+  pushDescribe,
+  pushSpec,
+  recordErrorStep,
+  recordExample,
+  recordIt,
+  recordRule,
+  recordStep,
+  setSliceData,
+  startClientBlock,
+  startNarrative,
+  startServerBlock,
+} from './narrative-context';
+import { registry } from './narrative-registry';
+import type { DataItem } from './types';
 
 const debug = createDebug('auto:narrative:narrative');
 if ('color' in debug && typeof debug === 'object') {

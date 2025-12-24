@@ -1,4 +1,4 @@
-import type { Message, MessageDefinition, EventRef, ErrorRef } from '../types';
+import type { ErrorRef, EventRef, Message, MessageDefinition } from '../types';
 import { extractFieldsFromMessage } from './fields';
 import type { ReactGwtSpec } from './messages';
 

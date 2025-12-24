@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import type { Model as SpecsSchema } from '@auto-engineer/narrative';
+import { describe, expect, it } from 'vitest';
 import { generateScaffoldFilePlans } from '../../scaffoldFromSchema';
-import { Model as SpecsSchema } from '@auto-engineer/narrative';
 
 describe('query.resolver.ts.ejs', () => {
   it('should generate a valid query resolver from request field', async () => {

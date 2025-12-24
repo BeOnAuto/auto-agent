@@ -1,13 +1,13 @@
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import {
   CommandSliceSchema,
-  NarrativeSchema,
   IntegrationSchema,
   MessageSchema,
+  NarrativeSchema,
   QuerySliceSchema,
   ReactSliceSchema,
 } from '../src';
 
-import { zodToJsonSchema } from 'zod-to-json-schema';
 const schemas = Object.fromEntries(
   Object.entries({
     narrative: NarrativeSchema,

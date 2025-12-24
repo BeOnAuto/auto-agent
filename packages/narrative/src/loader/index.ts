@@ -1,12 +1,12 @@
 import createDebug from 'debug';
-import type { ExecuteOptions } from './types';
-import { registry } from '../narrative-registry';
-import { integrationRegistry } from '../integration-registry';
 import { integrationExportRegistry } from '../integration-export-registry';
-import { buildGraph, type BuildGraphResult } from './graph';
-import { runGraph } from './runtime-cjs';
-import { createEnhancedImportMap } from './importmap';
+import { integrationRegistry } from '../integration-registry';
 import { setGivenTypesByFile } from '../narrative-context';
+import { registry } from '../narrative-registry';
+import { type BuildGraphResult, buildGraph } from './graph';
+import { createEnhancedImportMap } from './importmap';
+import { runGraph } from './runtime-cjs';
+import type { ExecuteOptions } from './types';
 
 const debug = createDebug('auto:flow:ast-loader:index');
 
@@ -42,7 +42,7 @@ export async function executeAST(
   // auto-map any externals we can load
   const autoMapped: Record<string, unknown> = {};
   for (const spec of first.externals) {
-    if (Object.prototype.hasOwnProperty.call(enhanced, spec)) continue;
+    if (Object.hasOwn(enhanced, spec)) continue;
     try {
       const mod = (await import(spec)) as Record<string, unknown>;
       autoMapped[spec] = interopDefault(mod); // <<< IMPORTANT

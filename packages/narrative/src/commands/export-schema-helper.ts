@@ -1,6 +1,6 @@
+import { type IExtendedFileStore, NodeFileStore } from '@auto-engineer/file-store/node';
 import createDebug from 'debug';
 import { getFs } from './filestore.node';
-import { IExtendedFileStore, NodeFileStore } from '@auto-engineer/file-store/node';
 
 const debug = createDebug('auto:narrative:export-schema-helper');
 if ('color' in debug && typeof debug === 'object') {
@@ -25,7 +25,7 @@ const main = async () => {
     );
     debug('Importing getNarratives from: %s', projectNarrativePath);
 
-    const { pathToFileURL } = await import('url');
+    const { pathToFileURL } = await import('node:url');
     const narrativeModule = (await import(pathToFileURL(projectNarrativePath).href)) as {
       getNarratives: typeof import('../getNarratives').getNarratives;
     };

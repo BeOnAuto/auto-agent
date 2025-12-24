@@ -1,5 +1,5 @@
-import { TypeInfo } from '../../loader/ts-utils';
-import { Message } from '../../index';
+import type { Message } from '../../index';
+import type { TypeInfo } from '../../loader/ts-utils';
 
 function inlineIdentifier(name: string, lookup: Map<string, TypeInfo>, seen = new Set<string>()): string | undefined {
   // avoid infinite recursion on cyclical type graphs

@@ -1,7 +1,7 @@
-import * as fsp from 'fs/promises';
-import * as path from 'path';
-import * as url from 'url';
-import type { Dirent } from 'fs';
+import type { Dirent } from 'node:fs';
+import * as fsp from 'node:fs/promises';
+import * as path from 'node:path';
+import * as url from 'node:url';
 import { toPosix } from './path';
 import type { IExtendedFileStore } from './types';
 

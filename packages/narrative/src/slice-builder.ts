@@ -1,6 +1,6 @@
-import type { Integration } from './types';
-import { getCurrentNarrative, addSlice } from './narrative-context';
 import type { CommandSlice, QuerySlice, ReactSlice } from './index';
+import { addSlice, getCurrentNarrative } from './narrative-context';
+import type { Integration } from './types';
 
 export interface SliceConfig {
   integration?: Integration;

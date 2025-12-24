@@ -1,6 +1,6 @@
-import { generateTypeScriptCode } from './generators/compose';
+import type { Model } from '../../index';
 import { formatWithPrettier } from './formatting/prettier';
-import { Model } from '../../index';
+import { generateTypeScriptCode } from './generators/compose';
 
 /**
  * Converts a schema specification to TypeScript flow DSL code.

@@ -1,17 +1,17 @@
 import { generateText as aiGenerateText, streamText as aiStreamText, generateObject, streamObject } from 'ai';
+import { getDefaultModel, getDefaultProvider, getModel } from './context';
 import {
-  AIContext,
-  AIOptions,
-  StructuredAIOptions,
-  StreamStructuredAIOptions,
+  type AIContext,
+  type AIOptions,
   AIProvider,
-  RegisteredToolForAI,
-  AIToolValidationError,
+  type AIToolValidationError,
+  type RegisteredToolForAI,
+  type StreamStructuredAIOptions,
+  type StructuredAIOptions,
 } from './types';
-import { getModel, getDefaultProvider, getDefaultModel } from './context';
 import { extractAndLogError } from './utils/errors';
-import { getEnhancedPrompt, handleFailedRequest } from './utils/validation';
 import { makeLogger } from './utils/log';
+import { getEnhancedPrompt, handleFailedRequest } from './utils/validation';
 
 const debugAPI = makeLogger('auto:ai-gateway:api');
 const debugStream = makeLogger('auto:ai-gateway:stream');

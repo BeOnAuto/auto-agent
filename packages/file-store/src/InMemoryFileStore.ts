@@ -1,4 +1,4 @@
-import { IFileStore } from './types';
+import type { IFileStore } from './types';
 
 export class InMemoryFileStore implements IFileStore {
   private files = new Map<string, Uint8Array>();
@@ -20,7 +20,7 @@ export class InMemoryFileStore implements IFileStore {
   async remove(path: string): Promise<void> {
     const prefix = this.norm(path);
     for (const key of Array.from(this.files.keys())) {
-      if (key === prefix || key.startsWith(prefix.endsWith('/') ? prefix : prefix + '/')) {
+      if (key === prefix || key.startsWith(prefix.endsWith('/') ? prefix : `${prefix}/`)) {
         this.files.delete(key);
       }
     }
@@ -30,7 +30,7 @@ export class InMemoryFileStore implements IFileStore {
     const p = this.norm(path);
     if (this.files.has(p)) return true;
     for (const key of this.files.keys()) {
-      if (key.startsWith(p.endsWith('/') ? p : p + '/')) return true;
+      if (key.startsWith(p.endsWith('/') ? p : `${p}/`)) return true;
     }
     return false;
   }
@@ -38,7 +38,7 @@ export class InMemoryFileStore implements IFileStore {
   async listTree(root: string = '/'): Promise<Array<{ path: string; type: 'file' | 'dir'; size: number }>> {
     const r = this.norm(root);
     const files = Array.from(this.files.entries()).filter(
-      ([p]) => p === r || p.startsWith(r.endsWith('/') ? r : r + '/'),
+      ([p]) => p === r || p.startsWith(r.endsWith('/') ? r : `${r}/`),
     );
 
     const dirs = new Set<string>(['/']);
@@ -46,14 +46,14 @@ export class InMemoryFileStore implements IFileStore {
       const parts = p.split('/').filter(Boolean);
       let cur = '';
       for (let i = 0; i < parts.length - 1; i++) {
-        cur += '/' + parts[i];
+        cur += `/${parts[i]}`;
         dirs.add(cur || '/');
       }
     }
 
     const out: Array<{ path: string; type: 'file' | 'dir'; size: number }> = [];
     for (const d of Array.from(dirs)) {
-      if (d === '/' || d.startsWith(r.endsWith('/') ? r : r + '/')) {
+      if (d === '/' || d.startsWith(r.endsWith('/') ? r : `${r}/`)) {
         out.push({ path: d, type: 'dir', size: 0 });
       }
     }

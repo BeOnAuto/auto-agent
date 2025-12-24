@@ -1,13 +1,13 @@
 import type { Slice, Spec } from '@auto-engineer/narrative';
 import {
   type CommandRef,
-  type EventRef,
-  type StateRef,
   type ErrorRef,
-  type SliceType,
-  getSliceType,
+  type EventRef,
   extractGwtFromSpecs,
   type GwtConditionWithRule,
+  getSliceType,
+  type SliceType,
+  type StateRef,
 } from './step-converter';
 
 interface NormalizedExample {

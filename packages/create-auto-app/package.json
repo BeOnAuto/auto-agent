@@ -20,9 +20,7 @@
     "build": "npm run copy-templates && tsc && chmod +x dist/src/index.js",
     "prepublishOnly": "npm run build",
     "test": "vitest run --reporter=dot",
-    "type-check": "tsc --noEmit",
-    "lint": "eslint 'src/**/*.ts' --max-warnings 0 --config ../../eslint.config.ts --ignore-pattern 'templates/**'",
-    "format": "prettier --write \"**/*.{js,ts,json,md,yml,yaml}\" --ignore-path ../../.prettierignore --log-level warn"
+    "type-check": "tsc --noEmit"
   },
   "keywords": [
     "auto-engineer",

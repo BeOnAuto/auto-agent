@@ -1,11 +1,11 @@
 import type {
   Message,
-  PositionalMessage,
   MessageFilter,
-  StreamInfo,
-  SessionInfo,
   MessageStoreStats,
   MessageType,
+  PositionalMessage,
+  SessionInfo,
+  StreamInfo,
 } from './types';
 
 export interface IMessageStore {

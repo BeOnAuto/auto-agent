@@ -1,4 +1,5 @@
-import { experience, narrative, it } from '@auto-engineer/narrative';
+import { experience, it, narrative } from '@auto-engineer/narrative';
+
 narrative('Home Screen', 'cDAZP41Kb', () => {
   experience('Active Surveys Summary', 'aifPcU3hw').client(() => {
     it('show active surveys summary and response rate overview');

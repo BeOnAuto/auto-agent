@@ -1,12 +1,12 @@
-import { type Command, type Event, defineCommandHandler } from '@auto-engineer/message-bus';
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
-import { processFlowsWithAI } from '../index';
-import { type UXSchema } from '../types';
+import { promises as fs } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
+import type { Model } from '@auto-engineer/narrative';
 import createDebug from 'debug';
-import { Model } from '@auto-engineer/narrative';
+import { processFlowsWithAI } from '../index';
 import { flattenClientSpecs } from '../spec-utils';
+import type { UXSchema } from '../types';
 
 const debug = createDebug('auto:information-architect:generate-command');
 const debugSchema = createDebug('auto:information-architect:generate-command:schema');

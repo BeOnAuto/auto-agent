@@ -1,7 +1,7 @@
 import type { Pipeline } from '../builder/define';
-import type { CommandHandlerWithMetadata } from '../server/pipeline-server';
-import { PluginLoader } from '../plugins/plugin-loader';
 import { adaptHandlers } from '../plugins/handler-adapter';
+import { PluginLoader } from '../plugins/plugin-loader';
+import type { CommandHandlerWithMetadata } from '../server/pipeline-server';
 
 export interface PipelineConfig {
   plugins: string[];

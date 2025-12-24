@@ -1,4 +1,4 @@
-import { NodeFileStore } from '@auto-engineer/file-store/node';
+import type { NodeFileStore } from '@auto-engineer/file-store/node';
 import createDebug from 'debug';
 import { posix } from '../utils/path';
 

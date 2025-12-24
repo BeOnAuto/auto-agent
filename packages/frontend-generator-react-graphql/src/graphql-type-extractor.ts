@@ -1,5 +1,5 @@
-import { parse, DocumentNode, ObjectTypeDefinitionNode, TypeNode } from 'graphql';
 import createDebug from 'debug';
+import { type DocumentNode, type ObjectTypeDefinitionNode, parse, type TypeNode } from 'graphql';
 
 const debug = createDebug('auto:frontend-generator-react-graphql:graphql-type-extractor');
 

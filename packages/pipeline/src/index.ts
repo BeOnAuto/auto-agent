@@ -1,4 +1,3 @@
-export { define } from './builder/define';
 export type {
   CompletionConfig,
   EmitChain,
@@ -15,10 +14,7 @@ export type {
   RunBuilder,
   TriggerBuilder,
 } from './builder/define';
-
-export { dispatch } from './core/types';
-export type { Command, CommandDispatch, Event } from './core/types';
-
+export { define } from './builder/define';
 export type {
   CustomHandlerDescriptor,
   EmitHandlerDescriptor,
@@ -32,25 +28,23 @@ export type {
   RunAwaitHandlerDescriptor,
   SuccessContext,
 } from './core/descriptors';
+export type { Command, CommandDispatch, Event } from './core/types';
+export { dispatch } from './core/types';
 
 export type { GraphEdge, GraphIR, GraphNode, NodeType } from './graph/types';
-
-export { PipelineRuntime } from './runtime/pipeline-runtime';
-export type { PipelineContext, RuntimeConfig } from './runtime/context';
+export type { EventLoggerOptions, LogEntry } from './logging/event-logger';
+export { EventLogger } from './logging/event-logger';
 
 export { AwaitTracker } from './runtime/await-tracker';
-
-export { PipelineServer } from './server/pipeline-server';
-export type { PipelineServerConfig, CommandHandlerWithMetadata } from './server/pipeline-server';
-
-export { SettledTracker } from './runtime/settled-tracker';
+export type { PipelineContext, RuntimeConfig } from './runtime/context';
 export { EventCommandMapper } from './runtime/event-command-map';
 export { PhasedExecutor } from './runtime/phased-executor';
+export { PipelineRuntime } from './runtime/pipeline-runtime';
+export { SettledTracker } from './runtime/settled-tracker';
+export type { CommandHandlerWithMetadata, PipelineServerConfig } from './server/pipeline-server';
+export { PipelineServer } from './server/pipeline-server';
 export { SSEManager } from './server/sse-manager';
-
-export { EventLogger } from './logging/event-logger';
-export type { LogEntry, EventLoggerOptions } from './logging/event-logger';
-
+export type { SnapshotDiff, SnapshotResult } from './testing/snapshot-compare';
 export {
   compareEventSequence,
   containsSubsequence,
@@ -58,4 +52,3 @@ export {
   findUnexpectedEvents,
   formatSnapshotDiff,
 } from './testing/snapshot-compare';
-export type { SnapshotDiff, SnapshotResult } from './testing/snapshot-compare';

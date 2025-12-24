@@ -1,20 +1,20 @@
 import type tsNS from 'typescript';
 import type { z } from 'zod';
-import { jsonToExpr } from '../ast/emit-helpers';
-import { buildConsolidatedGwtSpecBlock, type GWTBlock } from './gwt';
-import {
+import type {
+  ClientSpecNode,
   CommandSliceSchema,
-  QuerySliceSchema,
-  ReactSliceSchema,
-  ExperienceSliceSchema,
-  ExampleSchema,
-  NarrativeSchema,
   DataSinkSchema,
   DataSourceSchema,
   DestinationSchema,
+  ExampleSchema,
+  ExperienceSliceSchema,
+  NarrativeSchema,
   OriginSchema,
-  type ClientSpecNode,
+  QuerySliceSchema,
+  ReactSliceSchema,
 } from '../../../schema';
+import { jsonToExpr } from '../ast/emit-helpers';
+import { buildConsolidatedGwtSpecBlock, type GWTBlock } from './gwt';
 
 type CommandSlice = z.infer<typeof CommandSliceSchema>;
 type QuerySlice = z.infer<typeof QuerySliceSchema>;

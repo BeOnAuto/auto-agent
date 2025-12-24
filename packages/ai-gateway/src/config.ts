@@ -1,8 +1,8 @@
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import createDebug from 'debug';
-import { CustomProviderConfig } from './constants';
+import dotenv from 'dotenv';
+import type { CustomProviderConfig } from './constants';
 
 const debug = createDebug('auto:ai-gateway:config');
 const debugEnv = createDebug('auto:ai-gateway:config:env');

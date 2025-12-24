@@ -1,7 +1,7 @@
-import * as path from 'path';
-import * as fs from 'fs/promises';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import createDebug from 'debug';
-import { type FilterFunctionType } from './FigmaComponentsBuilder.js';
+import type { FilterFunctionType } from './FigmaComponentsBuilder.js';
 import { generateMarkdownFromComponents } from './markdown-generator.js';
 
 const debug = createDebug('auto:design-system-importer');

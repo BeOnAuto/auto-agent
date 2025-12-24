@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { narrativesToModel } from './index';
+import { describe, expect, it } from 'vitest';
 import type { Narrative } from '../../index';
+import { narrativesToModel } from './index';
 
 describe('Type inference in narrative-to-model transformer', () => {
   it('should correctly extract command types from when clauses', () => {

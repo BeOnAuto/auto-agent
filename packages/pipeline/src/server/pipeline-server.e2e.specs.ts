@@ -1,5 +1,5 @@
 import { define } from '../builder/define';
-import { PipelineServer, type CommandHandlerWithMetadata } from './pipeline-server';
+import { type CommandHandlerWithMetadata, PipelineServer } from './pipeline-server';
 
 interface RegistryResponse {
   eventHandlers: string[];

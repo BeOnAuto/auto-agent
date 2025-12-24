@@ -1,16 +1,16 @@
-import { spawn, ChildProcess } from 'child_process';
-import path from 'path';
-import fs from 'fs/promises';
+import { type ChildProcess, spawn } from 'node:child_process';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import type {
+  CommandAck,
+  GoldenMaster,
   PipelineResponse,
   PipelineSnapshot,
   PositionalMessage,
   RegistryResponse,
+  SanitizedEvent,
   SessionInfo,
   StatsResponse,
-  CommandAck,
-  GoldenMaster,
-  SanitizedEvent,
 } from './types';
 
 export interface ServerContext {

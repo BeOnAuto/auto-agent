@@ -4,7 +4,7 @@ import { commandHandler as implementComponentHandler } from './commands/implemen
 export const COMMANDS = [implementComponentHandler];
 
 export type {
-  ImplementComponentCommand,
-  ComponentImplementedEvent,
   ComponentImplementationFailedEvent,
+  ComponentImplementedEvent,
+  ImplementComponentCommand,
 } from './commands/implement-component.js';

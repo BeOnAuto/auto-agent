@@ -1,4 +1,4 @@
-import { exec, execSync } from 'child_process';
+import { exec, execSync } from 'node:child_process';
 import createDebug from 'debug';
 
 // Type imports don't trigger module loading

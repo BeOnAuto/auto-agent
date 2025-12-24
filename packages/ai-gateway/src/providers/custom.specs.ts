@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createCustomProvider } from '../core/providers/custom';
-import { CustomProviderConfig } from '../core/types';
+import type { CustomProviderConfig } from '../core/types';
 
 interface MockConfig {
   name: string;

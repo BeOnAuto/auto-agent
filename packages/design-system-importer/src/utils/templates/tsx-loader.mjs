@@ -1,13 +1,12 @@
-import { register } from 'node:module';
+import { createRequire, register } from 'node:module';
 import { pathToFileURL } from 'node:url';
-import { createRequire } from 'node:module';
 
 // Try to find and register tsx
 try {
   // First try to find tsx in the project's node_modules
   const require = createRequire(import.meta.url);
   let tsxPath;
-  
+
   try {
     // Try to resolve tsx from the current working directory
     tsxPath = require.resolve('tsx/esm/api', { paths: [process.cwd()] });
@@ -20,7 +19,7 @@ try {
       tsxPath = require.resolve('tsx');
     }
   }
-  
+
   // Import tsx and register it
   const tsx = await import(tsxPath);
   if (tsx.register) {

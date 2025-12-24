@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { PipelineServer } from '../server/pipeline-server';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { loadPipelineConfig } from '../config/pipeline-config';
-import kanbanTodoConfig from './fixtures/kanban-todo.config';
+import { PipelineServer } from '../server/pipeline-server';
 import { resetKanbanState } from './fixtures/kanban-full.pipeline';
+import kanbanTodoConfig from './fixtures/kanban-todo.config';
 
 describe('Real Plugin E2E', () => {
   beforeEach(() => {

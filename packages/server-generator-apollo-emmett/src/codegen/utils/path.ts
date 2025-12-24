@@ -1,6 +1,6 @@
-import path from 'path';
-import { mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
+import { existsSync } from 'node:fs';
+import { mkdir } from 'node:fs/promises';
+import path from 'node:path';
 
 export function toKebabCase(str: string): string {
   return str

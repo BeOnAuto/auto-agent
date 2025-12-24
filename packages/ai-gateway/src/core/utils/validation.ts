@@ -1,4 +1,4 @@
-import { AIToolValidationError } from '../types';
+import type { AIToolValidationError } from '../types';
 import { makeLogger } from './log';
 
 const debugValidation = makeLogger('auto:ai-gateway:validation');

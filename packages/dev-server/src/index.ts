@@ -1,20 +1,19 @@
-import { commandHandler as startServerHandler } from './commands/start-server';
 import { commandHandler as startClientHandler } from './commands/start-client';
+import { commandHandler as startServerHandler } from './commands/start-server';
 
 export const COMMANDS = [startServerHandler, startClientHandler];
 
 export {
-  commandHandler as startServerCommandHandler,
-  type StartServerCommand,
-  type StartServerEvents,
-  type ServerStartedEvent,
-  type ServerStartFailedEvent,
-} from './commands/start-server';
-
-export {
+  type ClientStartedEvent,
+  type ClientStartFailedEvent,
   commandHandler as startClientCommandHandler,
   type StartClientCommand,
   type StartClientEvents,
-  type ClientStartedEvent,
-  type ClientStartFailedEvent,
 } from './commands/start-client';
+export {
+  commandHandler as startServerCommandHandler,
+  type ServerStartedEvent,
+  type ServerStartFailedEvent,
+  type StartServerCommand,
+  type StartServerEvents,
+} from './commands/start-server';

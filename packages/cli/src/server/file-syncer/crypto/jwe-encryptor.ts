@@ -1,6 +1,6 @@
-import { EncryptJWT, importJWK, JWK, type KeyLike } from 'jose';
-import fetch from 'node-fetch';
 import createDebug from 'debug';
+import { EncryptJWT, importJWK, type JWK, type KeyLike } from 'jose';
+import fetch from 'node-fetch';
 
 const debug = createDebug('auto:cli:jwe-encryptor');
 

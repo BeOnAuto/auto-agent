@@ -1,4 +1,5 @@
-import { experience, narrative, it } from '@auto-engineer/narrative';
+import { experience, it, narrative } from '@auto-engineer/narrative';
+
 narrative('App Structure', 'A8u1Ee4Sz', () => {
   experience('Application Layout', 'L9v2Ff5Tz').client(() => {
     it('display clean top navigation bar spanning full width');

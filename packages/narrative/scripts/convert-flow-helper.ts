@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-import { spawn } from 'child_process';
-import { resolve, dirname } from 'path';
-import { writeFileSync, unlinkSync } from 'fs';
-import { join } from 'path';
+import { spawn } from 'node:child_process';
+import { unlinkSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 
 const main = async () => {
   const flowPath = process.argv[2];

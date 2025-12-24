@@ -1,12 +1,12 @@
-import { extractCommandsFromGwt, extractCommandsFromThen } from './commands';
 import type { Slice } from '@auto-engineer/narrative';
-import type { Message, MessageDefinition, EventRef, CommandRef } from '../types';
+import createDebug from 'debug';
+import type { CommandRef, EventRef, Message, MessageDefinition } from '../types';
+import { extractCommandsFromGwt, extractCommandsFromThen } from './commands';
 import { extractEventsFromGiven, extractEventsFromThen, extractEventsFromWhen } from './events';
 import { extractFieldsFromMessage } from './fields';
 import { extractProjectionIdField, extractProjectionSingleton } from './projection';
 import { extractStatesFromData, extractStatesFromTarget } from './states';
 import { extractGwtFromSpecs } from './step-converter';
-import createDebug from 'debug';
 
 const debug = createDebug('auto:server-generator-apollo-emmett:extract:messages');
 const debugCommand = createDebug('auto:server-generator-apollo-emmett:extract:messages:command');

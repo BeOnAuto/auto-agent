@@ -36,19 +36,7 @@
       "cache": false,
       "persistent": true
     },
-    "lint": {
-      "outputs": []
-    },
     "type-check": {
-      "outputs": []
-    },
-    "format": {
-      "outputs": []
-    },
-    "format:check": {
-      "outputs": []
-    },
-    "format:fix": {
       "outputs": []
     },
     "install": {
@@ -64,9 +52,6 @@
     },
     "clean": {
       "cache": false
-    },
-    "lint:fix": {
-      "outputs": []
     }
   }
 }

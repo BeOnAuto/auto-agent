@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import fs from 'fs-extra';
-import path from 'path';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
+import path from 'node:path';
+import fs from 'fs-extra';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 describe('Template Discovery Integration Tests', () => {
   let testDir: string;
@@ -252,7 +252,7 @@ export default autoConfig({
       const fileIdMatch = copiedContent.match(/fileId:\s*'([^']+)'/);
       expect(fileIdMatch).toBeTruthy();
 
-      const newFileId = fileIdMatch![1];
+      const newFileId = fileIdMatch?.[1];
 
       expect(newFileId).toHaveLength(9);
       expect(newFileId).toMatch(/^[A-Za-z0-9]+$/);
@@ -285,7 +285,7 @@ export default autoConfig({
       const fileIdMatch = copiedContent.match(/fileId:\s*'([^']+)'/);
       expect(fileIdMatch).toBeTruthy();
 
-      const newFileId = fileIdMatch![1];
+      const newFileId = fileIdMatch?.[1];
       expect(newFileId).toHaveLength(9);
       expect(newFileId).not.toBe('todoK4nB2');
     });
@@ -317,7 +317,7 @@ export default autoConfig({
       const fileIdMatch = copiedContent.match(/fileId:\s*'([^']+)'/);
       expect(fileIdMatch).toBeTruthy();
 
-      const newFileId = fileIdMatch![1];
+      const newFileId = fileIdMatch?.[1];
       expect(newFileId).toHaveLength(9);
       expect(newFileId).not.toBe(validId);
     });

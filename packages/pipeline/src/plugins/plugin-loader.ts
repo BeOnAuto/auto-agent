@@ -1,6 +1,6 @@
-import { existsSync as fsExistsSync } from 'fs';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { existsSync as fsExistsSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export interface CommandHandlerMetadata {
   name: string;

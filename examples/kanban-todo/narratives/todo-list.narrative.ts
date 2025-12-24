@@ -1,18 +1,19 @@
+import type { Command, Event, State } from '@auto-engineer/narrative';
 import {
   command,
   data,
+  describe,
   example,
   gql,
+  it,
   narrative,
   query,
   rule,
-  describe,
-  it,
   sink,
   source,
   specs,
 } from '@auto-engineer/narrative';
-import type { Command, Event, State } from '@auto-engineer/narrative';
+
 type AddTodo = Command<
   'AddTodo',
   {

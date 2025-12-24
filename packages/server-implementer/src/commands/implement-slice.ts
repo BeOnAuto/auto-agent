@@ -1,10 +1,10 @@
-import { type Command, type Event, defineCommandHandler } from '@auto-engineer/message-bus';
+import { existsSync } from 'node:fs';
+import { readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 import { generateTextWithAI } from '@auto-engineer/ai-gateway';
-import path from 'path';
-import { existsSync } from 'fs';
-import { readFile, writeFile } from 'fs/promises';
-import fg from 'fast-glob';
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
+import fg from 'fast-glob';
 
 const debug = createDebug('auto:server-implementer:slice');
 const debugHandler = createDebug('auto:server-implementer:slice:handler');

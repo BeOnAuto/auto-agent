@@ -1,5 +1,5 @@
-import type { Event } from './types';
 import type { KeyExtractor, PipelineDescriptor } from './descriptors';
+import type { Event } from './types';
 
 describe('PipelineDescriptor', () => {
   it('should create PipelineDescriptor', () => {

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-import { program } from 'commander';
-import inquirer from 'inquirer';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { generateId } from '@auto-engineer/id';
 import chalk from 'chalk';
-import ora from 'ora';
+import { program } from 'commander';
 import { execa } from 'execa';
 import fs from 'fs-extra';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { generateId } from '@auto-engineer/id';
+import inquirer from 'inquirer';
+import ora from 'ora';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -1,10 +1,10 @@
-import createDebug from 'debug';
-import { registry } from './narrative-registry';
-import type { Narrative, Model } from './index';
-import { narrativesToModel } from './transformers/narrative-to-model';
 import type { IFileStore } from '@auto-engineer/file-store';
-import { executeAST } from './loader';
+import createDebug from 'debug';
 import { sha256 } from 'js-sha256';
+import type { Model, Narrative } from './index';
+import { executeAST } from './loader';
+import { registry } from './narrative-registry';
+import { narrativesToModel } from './transformers/narrative-to-model';
 
 const dirnamePosix = (p: string) => {
   const s = p.replace(/\/+$/, '');
@@ -22,7 +22,15 @@ const CACHE_VERSION = 'v1';
 
 function stableStringify(obj: Record<string, unknown>) {
   const keys = Object.keys(obj).sort();
-  return JSON.stringify(keys.reduce((a, k) => ((a[k] = obj[k]), a), {} as Record<string, unknown>));
+  return JSON.stringify(
+    keys.reduce(
+      (acc, key) => {
+        acc[key] = obj[key];
+        return acc;
+      },
+      {} as Record<string, unknown>,
+    ),
+  );
 }
 
 function toUint8(view: ArrayBuffer | Uint8Array): Uint8Array {

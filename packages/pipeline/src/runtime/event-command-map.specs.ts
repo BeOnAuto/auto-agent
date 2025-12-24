@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { EventCommandMapper } from './event-command-map';
 import type { CommandHandler } from '@auto-engineer/message-bus';
+import { describe, expect, it } from 'vitest';
+import { EventCommandMapper } from './event-command-map';
 
 interface CommandHandlerWithEvents extends CommandHandler {
   events?: readonly string[];

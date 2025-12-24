@@ -1,16 +1,15 @@
+import { existsSync } from 'node:fs';
+import { readFile, writeFile } from 'node:fs/promises';
+import * as path from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
+import type { Model } from '@auto-engineer/narrative';
+import createDebug from 'debug';
+import { execa } from 'execa';
 import fs from 'fs-extra';
-import * as path from 'path';
-import { readFile, writeFile } from 'fs/promises';
-import { resolve, join } from 'path';
-import { existsSync } from 'fs';
 import { generateScaffoldFilePlans, writeScaffoldFilePlans } from '../codegen/scaffoldFromSchema';
 import { ensureDirExists, ensureDirPath, toKebabCase } from '../codegen/utils/path';
-import { Model } from '@auto-engineer/narrative';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { execa } from 'execa';
-import createDebug from 'debug';
-import { defineCommandHandler, Command, Event } from '@auto-engineer/message-bus';
 
 const debug = createDebug('auto:server-generator-apollo-emmett');
 const debugModel = createDebug('auto:server-generator-apollo-emmett:schema');
@@ -346,7 +345,7 @@ async function copyRootFilesFromSrc(from: string, to: string): Promise<void> {
 
   // If "from" is a file, copy it directly to directory "to" maintaining filename
   const fromStat = await fs.stat(from).catch(() => undefined);
-  if (fromStat !== undefined && fromStat.isFile()) {
+  if (fromStat?.isFile()) {
     debugFiles('  Source is a file, copying directly');
     await fs.ensureDir(to);
     const destFile = path.join(to, path.basename(from));

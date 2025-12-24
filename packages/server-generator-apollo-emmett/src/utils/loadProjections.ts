@@ -1,6 +1,6 @@
-import fg from 'fast-glob';
-import path from 'path';
+import path from 'node:path';
 import type { ProjectionDefinition } from '@event-driven-io/emmett';
+import fg from 'fast-glob';
 
 export async function loadProjections(source: string): Promise<ProjectionDefinition[]> {
   const files = await fg(source, { absolute: true });

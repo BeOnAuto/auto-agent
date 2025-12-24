@@ -1,4 +1,4 @@
-import { type Command, type Event, defineCommandHandler } from '@auto-engineer/message-bus';
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
 
 const debug = createDebug('auto:narrative:export-schema');
@@ -71,7 +71,7 @@ export async function handleExportSchemaCommand(
 
     const resultPath = fs.join(directory, '.context', '.export-result.json');
 
-    const { spawnSync } = await import('child_process');
+    const { spawnSync } = await import('node:child_process');
     spawnSync('node', [helperScript, directory], {
       cwd: directory,
       encoding: 'utf-8',

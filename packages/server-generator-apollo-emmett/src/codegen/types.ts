@@ -1,4 +1,4 @@
-import type { CommandRef, EventRef, StateRef, ErrorRef } from './extract/step-types';
+import type { CommandRef, ErrorRef, EventRef, StateRef } from './extract/step-types';
 
 export type { CommandRef, EventRef, StateRef, ErrorRef };
 

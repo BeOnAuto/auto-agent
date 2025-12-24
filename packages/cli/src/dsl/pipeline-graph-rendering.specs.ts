@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { MessageBusServer } from '../server/server';
-import { on, dispatch, getRegistrations, getPipelineGraph } from './index';
+import path from 'node:path';
+import getPort from 'get-port';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { PluginLoader } from '../plugin-loader';
 import type { CommandMetadataService } from '../server/command-metadata-service';
-import getPort from 'get-port';
-import path from 'path';
+import { MessageBusServer } from '../server/server';
+import { dispatch, getPipelineGraph, getRegistrations, on } from './index';
 
 /**
  * Integration test to verify pipeline graph generation from various DSL configurations
@@ -407,8 +407,8 @@ describe.skip('Pipeline Graph Rendering Integration', () => {
     }));
 
     // Find commands specifically
-    const commands = allMessages.filter((m) => m.messageType === 'command');
-    const events = allMessages.filter((m) => m.messageType === 'event');
+    const _commands = allMessages.filter((m) => m.messageType === 'command');
+    const _events = allMessages.filter((m) => m.messageType === 'event');
 
     // Generate pipeline graph with message store
     const graph = await getPipelineGraph({ metadataService, messageStore });

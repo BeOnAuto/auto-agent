@@ -1,11 +1,11 @@
 import { ApolloProvider } from '@apollo/client';
+import type React from 'react';
 // import { Toaster } from '@/components/atoms/toaster';
 // import { Toaster as Sonner } from '@/components/atoms/sonner';
 // import { TooltipProvider } from '@/components/atoms/tooltip';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { NotFound } from '@/pages/NotFound';
 import { apolloClient } from '@/apolloClient';
-import React from 'react';
+import { NotFound } from '@/pages/NotFound';
 
 // Type assertion workaround for React component type issues
 const ApolloProviderTyped = ApolloProvider as any;

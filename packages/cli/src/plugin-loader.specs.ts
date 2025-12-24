@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import getPort from 'get-port';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PluginLoader } from './plugin-loader';
 import { MessageBusServer } from './server/server';
-import getPort from 'get-port';
 
 describe('PluginLoader --host functionality', () => {
   let server: MessageBusServer;

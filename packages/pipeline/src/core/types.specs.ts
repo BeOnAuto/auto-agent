@@ -1,4 +1,4 @@
-import { Command, CommandDispatch, dispatch, Event } from './types';
+import { type Command, type CommandDispatch, dispatch, type Event } from './types';
 
 describe('Core Types', () => {
   it('should re-export Command and Event from message-bus', () => {

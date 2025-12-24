@@ -1,8 +1,8 @@
-import { describe, it } from 'vitest';
+import { mkdir, readdir, rm } from 'node:fs/promises';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execa } from 'execa';
-import * as path from 'path';
-import { mkdir, readdir, rm } from 'fs/promises';
-import { fileURLToPath } from 'url';
+import { describe, it } from 'vitest';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -53,7 +53,7 @@ describe.skip('generateServer integration test', { timeout: 20000 }, () => {
     const testResult = await execa('npx', ['vitest', 'run', '--dir', serverDir], {
       reject: false,
     });
-    const output = testResult.stdout + '\n' + testResult.stderr;
+    const output = `${testResult.stdout}\n${testResult.stderr}`;
 
     const notYetImplementedMatches = output.match(/Not yet implemented: \w+/g) ?? [];
     const otherFailures = output.includes('FAIL') && !output.includes('Not yet implemented') ? output : '';

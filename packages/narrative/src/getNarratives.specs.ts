@@ -1,11 +1,11 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { modelSchema } from './schema';
-import { DataSource, Example, Narrative, Model, modelToNarrative, QuerySlice } from './index';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { InMemoryFileStore } from '@auto-engineer/file-store';
 import { NodeFileStore } from '@auto-engineer/file-store/node';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { getNarratives } from './getNarratives';
+import { type DataSource, type Example, type Model, modelToNarrative, type Narrative, type QuerySlice } from './index';
+import { modelSchema } from './schema';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -688,7 +688,7 @@ flow('questionnaires-test', () => {
     validateQuestionnaireBugFix(model);
   });
 
-  it('should convert all given events to eventRef', async function (): Promise<void> {
+  it('should convert all given events to eventRef', async (): Promise<void> => {
     const memoryVfs = new InMemoryFileStore();
     const todoSummaryFlowContent = `
 import { flow, query, specs, rule, example, type Event, type State } from '@auto-engineer/narrative';

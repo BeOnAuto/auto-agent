@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { sanitizeEvent, sanitizeEvents, type SanitizedEvent } from './snapshot-sanitize';
 import type { Event } from '@auto-engineer/message-bus';
+import { describe, expect, it } from 'vitest';
+import { type SanitizedEvent, sanitizeEvent, sanitizeEvents } from './snapshot-sanitize';
 
 describe('snapshot-sanitize', () => {
   describe('sanitizeEvent', () => {

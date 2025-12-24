@@ -1,4 +1,5 @@
-import { experience, narrative, it } from '@auto-engineer/narrative';
+import { experience, it, narrative } from '@auto-engineer/narrative';
+
 narrative('App Structure', 'vLkxrmhz6', () => {
   experience('App Structure', 'k6JkQZQnc').client(() => {
     it('display persistent sidebar on left for navigation');

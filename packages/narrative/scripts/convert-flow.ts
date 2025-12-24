@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { resolve, dirname, relative, join } from 'path';
-import { existsSync, writeFileSync, statSync } from 'fs';
-import { spawn } from 'child_process';
-import { fileURLToPath } from 'url';
+import { spawn } from 'node:child_process';
+import { existsSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const runInContext = (flowPath: string, projectRoot: string): Promise<string> => {
   return new Promise((resolve, reject) => {

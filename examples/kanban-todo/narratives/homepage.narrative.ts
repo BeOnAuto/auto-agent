@@ -1,4 +1,5 @@
-import { experience, narrative, it, describe } from '@auto-engineer/narrative';
+import { describe, experience, it, narrative } from '@auto-engineer/narrative';
+
 narrative('Todo Dashboard', 'H6i9Rs2Gz', () => {
   experience('Kanban Board View', 'K7j0St3Hz').client(() => {
     it('display three distinct columns: To Do, In Progress, and Done');

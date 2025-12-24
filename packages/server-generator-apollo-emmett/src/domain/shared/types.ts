@@ -1,7 +1,7 @@
 import { registerEnumType } from 'type-graphql';
 
 import 'reflect-metadata';
-import { CommandSender, EventStore, type InMemoryDatabase } from '@event-driven-io/emmett';
+import type { CommandSender, EventStore, InMemoryDatabase } from '@event-driven-io/emmett';
 
 export interface ReactorContext {
   eventStore: EventStore;

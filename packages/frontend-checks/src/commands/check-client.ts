@@ -1,9 +1,9 @@
-import { type Command, type Event, defineCommandHandler } from '@auto-engineer/message-bus';
-import path from 'path';
-import { existsSync } from 'fs';
-import { getTsErrors, getBuildErrors, getConsoleErrors, closeBrowser } from '../index';
-import { spawn, ChildProcess } from 'child_process';
+import { type ChildProcess, spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
+import { closeBrowser, getBuildErrors, getConsoleErrors, getTsErrors } from '../index';
 
 const debug = createDebug('frontend-checks:command');
 const debugHandler = createDebug('frontend-checks:command:handler');

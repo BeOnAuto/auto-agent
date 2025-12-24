@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { Model as SpecsSchema } from '@auto-engineer/narrative';
+import type { Model as SpecsSchema } from '@auto-engineer/narrative';
+import { describe, expect, it } from 'vitest';
 import { generateScaffoldFilePlans } from '../../scaffoldFromSchema';
 
 describe('events.ts.ejs', () => {

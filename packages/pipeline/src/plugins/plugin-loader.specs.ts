@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { PluginLoader, type PluginLoaderDeps } from './plugin-loader';
 
 function createMockDeps(overrides?: Partial<PluginLoaderDeps>): PluginLoaderDeps {

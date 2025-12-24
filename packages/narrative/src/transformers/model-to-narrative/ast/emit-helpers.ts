@@ -1,4 +1,4 @@
-import tsNS from 'typescript';
+import type tsNS from 'typescript';
 
 /**
  * Type information for converting JSON values with proper Date handling

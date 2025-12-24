@@ -1,27 +1,27 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { ServerContext } from './helpers';
 import {
+  compareEventSets,
+  createGoldenMaster,
+  delay,
+  dispatchCommand,
+  extractEventSequence,
+  extractEventTypes,
+  fetchMessages,
+  fetchPipeline,
+  fetchRegistry,
+  fetchSessions,
+  fetchStats,
+  recordStatusProgression,
   startServer,
   stopServer,
-  fetchRegistry,
-  fetchPipeline,
-  fetchSessions,
-  fetchMessages,
-  fetchStats,
-  dispatchCommand,
-  waitForPipelineCompletion,
-  recordStatusProgression,
-  extractEventSequence,
-  writeSnapshot,
-  createGoldenMaster,
-  extractEventTypes,
-  compareEventSets,
   validateSequentialDependencies,
-  delay,
+  waitForPipelineCompletion,
+  writeSnapshot,
 } from './helpers';
-import type { PositionalMessage, GoldenMaster } from './types';
+import type { GoldenMaster } from './types';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const KANBAN_TODO_DIR = path.resolve(__dirname, '..', '..', '..', '..', '..', 'examples', 'kanban-todo');

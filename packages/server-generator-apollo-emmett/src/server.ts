@@ -1,9 +1,9 @@
 import 'reflect-metadata';
+import { getInMemoryDatabase, getInMemoryMessageBus, handleInMemoryProjections } from '@event-driven-io/emmett';
+import { getSQLiteEventStore } from '@event-driven-io/emmett-sqlite';
 import { ApolloServer } from 'apollo-server';
 import { buildSchema } from 'type-graphql';
 import { loadProjections, loadRegisterFiles, loadResolvers } from './utils';
-import { getInMemoryMessageBus, getInMemoryDatabase, handleInMemoryProjections } from '@event-driven-io/emmett';
-import { getSQLiteEventStore } from '@event-driven-io/emmett-sqlite';
 
 async function start() {
   const loadedProjections = await loadProjections('src/domain/flows/**/projection.{ts,js}');

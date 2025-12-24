@@ -1,10 +1,10 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { config } from 'dotenv';
-import { PipelineServer } from '../src/server/pipeline-server';
 import { loadPipelineConfig } from '../src/config/pipeline-config';
-import kanbanTodoConfig from '../src/testing/fixtures/kanban-todo.config';
+import { PipelineServer } from '../src/server/pipeline-server';
 import { resetKanbanState } from '../src/testing/fixtures/kanban-full.pipeline';
+import kanbanTodoConfig from '../src/testing/fixtures/kanban-todo.config';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PIPELINE_ROOT = path.resolve(__dirname, '..');

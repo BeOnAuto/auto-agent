@@ -1,11 +1,11 @@
-import * as path from 'path';
-import * as fs from 'fs';
-import { pathToFileURL } from 'url';
-import createJiti from 'jiti';
-import createDebug from 'debug';
-import chalk from 'chalk';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import type { Command, CommandHandler, Event, UnifiedCommandHandler } from '@auto-engineer/message-bus';
 import { createMessageBus, type MessageBus } from '@auto-engineer/message-bus';
-import type { CommandHandler, Command, Event, UnifiedCommandHandler } from '@auto-engineer/message-bus';
+import chalk from 'chalk';
+import createDebug from 'debug';
+import createJiti from 'jiti';
 
 const debug = createDebug('auto:cli:plugin-loader');
 const debugConfig = createDebug('auto:cli:plugin-loader:config');
@@ -413,7 +413,7 @@ export class PluginLoader {
       if (!aliasMap.has(alias)) {
         aliasMap.set(alias, []);
       }
-      aliasMap.get(alias)!.push({
+      aliasMap.get(alias)?.push({
         packageName,
         command: cliCommand,
       });
@@ -435,7 +435,7 @@ export class PluginLoader {
         debugPlugins('Loaded from default export: %s', packageName);
       } catch (defaultError) {
         try {
-          pkg = (await this.loadPlugin(packageName + '/node')) as {
+          pkg = (await this.loadPlugin(`${packageName}/node`)) as {
             COMMANDS?: UnifiedCommandHandler<Command>[];
           };
           debugPlugins('Loaded from /node export: %s', packageName);
@@ -600,7 +600,7 @@ export class PluginLoader {
     for (const [alias, packages] of this.conflicts.entries()) {
       console.error(`// For "${alias}", import from one of: ${packages.join(', ')}`);
       const examplePkg = packages[0];
-      const handlerName = alias.replace(/[:-]/g, '_') + 'Handler';
+      const handlerName = `${alias.replace(/[:-]/g, '_')}Handler`;
       console.error(`import { ${handlerName} } from '${examplePkg}';`);
     }
     console.error('');
@@ -613,7 +613,7 @@ export class PluginLoader {
     console.error('  aliases: {');
 
     for (const [alias] of this.conflicts.entries()) {
-      const handlerName = alias.replace(/[:-]/g, '_') + 'Handler';
+      const handlerName = `${alias.replace(/[:-]/g, '_')}Handler`;
       console.error(`    '${alias}': ${handlerName},`);
     }
 
@@ -811,35 +811,7 @@ export class PluginLoader {
     }
   }
 
-  private formatFieldKey(key: string): string {
-    return key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
-  }
-
-  private displayArrayValue(value: unknown[], logFn: (msg: string) => void): void {
-    logFn(`   ${value.length} items`);
-    if (typeof value[0] === 'string') {
-      value.slice(0, 3).forEach((item) => logFn(`     - ${String(item)}`));
-      if (value.length > 3) {
-        logFn(`     ... and ${value.length - 3} more`);
-      }
-    }
-  }
-
-  private displayFieldValue(key: string, value: unknown, isError: boolean): void {
-    const formattedKey = this.formatFieldKey(key);
-    const logFn = isError ? console.error : console.log;
-
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      logFn(`   ${formattedKey}: ${String(value)}`);
-    } else if (Array.isArray(value) && value.length > 0) {
-      logFn(`   ${formattedKey}:`);
-      this.displayArrayValue(value, logFn);
-    } else if (typeof value === 'object' && value !== null) {
-      logFn(`   ${formattedKey}: [object]`);
-    }
-  }
-
-  private handleCommandEvent(eventType: string, event: Event): void {
+  private handleCommandEvent(_eventType: string, event: Event): void {
     // For all command/event types, use minimal display - no verbose data
     this.displayMinimalMessage(event);
   }
@@ -850,7 +822,7 @@ export class PluginLoader {
     debugBus('Event data: %O', message.data);
 
     const date = new Date(message.timestamp || Date.now());
-    const timestamp = date.toTimeString().split(' ')[0] + '.' + date.getMilliseconds().toString().padStart(3, '0');
+    const timestamp = `${date.toTimeString().split(' ')[0]}.${date.getMilliseconds().toString().padStart(3, '0')}`;
 
     const isCommand = 'type' in message && !('correlationId' in message);
     const backgroundColor = isCommand ? '#00CED1' : '#FF6B35';
@@ -861,72 +833,6 @@ export class PluginLoader {
   private displayMessage(message: Event | Command): void {
     // Redirect all messages to minimal display - verbose data only available via debug
     this.displayMinimalMessage(message);
-  }
-
-  private highlightYaml(yamlStr: string): string {
-    // Apply syntax highlighting and indentation
-    const highlightedYaml = yamlStr
-      .split('\n')
-      .filter((line) => line.trim()) // Remove empty lines
-      .map((line) => {
-        // Apply syntax highlighting
-        let highlighted = line;
-
-        // Highlight keys (word before colon)
-        highlighted = highlighted.replace(/^(\s*)([a-zA-Z0-9_-]+)(:)/g, (match, indent, key, colon) => {
-          return indent + chalk.cyanBright(key) + chalk.gray(colon);
-        });
-
-        // Highlight string values (in quotes)
-        highlighted = highlighted.replace(/(["'])((?:\\.|(?!\1).)*?)\1/g, (match, quote, content) => {
-          return chalk.gray(quote) + chalk.green(content) + chalk.gray(quote);
-        });
-
-        // Highlight numbers
-        highlighted = highlighted.replace(/:\s*(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\s*$/g, (match, num) => {
-          return chalk.gray(':') + ' ' + chalk.yellow(num);
-        });
-
-        // Highlight booleans
-        highlighted = highlighted.replace(/:\s*(true|false)\s*$/g, (match, bool) => {
-          return chalk.gray(':') + ' ' + chalk.magenta(bool);
-        });
-
-        // Highlight null
-        highlighted = highlighted.replace(/:\s*(null)\s*$/g, (match, nullVal) => {
-          return chalk.gray(':') + ' ' + chalk.gray(nullVal);
-        });
-
-        // Highlight array markers
-        highlighted = highlighted.replace(/^(\s*)(- )/g, (match, indent, marker) => {
-          return indent + chalk.gray(marker);
-        });
-
-        return `   ${highlighted}`;
-      })
-      .join('\n');
-
-    return highlightedYaml;
-  }
-
-  private displayErrorField(data: Record<string, unknown>): void {
-    if (data.error !== undefined && data.error !== null) {
-      console.error(`   Error: ${String(data.error)}`);
-    }
-  }
-
-  private displayErrorsField(data: Record<string, unknown>): void {
-    if (data.errors === undefined || data.errors === null) return;
-
-    if (typeof data.errors === 'string') {
-      console.error(`   Errors: ${data.errors}`);
-    } else if (Array.isArray(data.errors)) {
-      console.error(`   Errors: ${data.errors.length}`);
-      data.errors.slice(0, 3).forEach((err) => console.error(`     - ${String(err)}`));
-      if (data.errors.length > 3) {
-        console.error(`     ... and ${data.errors.length - 3} more`);
-      }
-    }
   }
 
   async executeCommand(commandAlias: string, data: unknown): Promise<void> {

@@ -1,9 +1,9 @@
 import createDebug from 'debug';
-import type { Graph } from './types';
-import { dirname, toPosix } from './fs-path';
 import { integrationRegistry } from '../integration-registry';
 import { registry } from '../narrative-registry';
 import type { Integration } from '../types';
+import { dirname, toPosix } from './fs-path';
+import type { Graph } from './types';
 
 const debug = createDebug('auto:flow:runtime');
 const dImp = createDebug('auto:flow:runtime:require');
@@ -119,7 +119,7 @@ export function runGraph(entryFiles: string[], graph: Graph): void {
     };
 
     try {
-      const codeWithShim = 'var r = require; var __require = require;\n' + mod.js;
+      const codeWithShim = `var r = require; var __require = require;\n${mod.js}`;
       // eslint-disable-next-line @typescript-eslint/no-implied-eval
       const fn = new Function('require', 'module', 'exports', '__filename', '__dirname', codeWithShim) as (
         req: (s: string) => unknown,

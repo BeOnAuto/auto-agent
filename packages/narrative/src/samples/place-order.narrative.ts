@@ -1,5 +1,5 @@
-import { flow, describe, it, specs, rule, example } from '../narrative';
 import { command } from '../fluent-builder';
+import { describe, example, flow, it, rule, specs } from '../narrative';
 
 export interface OrderPlaced {
   type: 'OrderPlaced';

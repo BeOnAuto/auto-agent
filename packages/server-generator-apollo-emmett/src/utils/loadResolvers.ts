@@ -1,8 +1,6 @@
 import fg from 'fast-glob';
 
-export interface Resolver {
-  (...args: unknown[]): unknown;
-}
+export type Resolver = (...args: unknown[]) => unknown;
 
 export async function loadResolvers(source: string): Promise<Resolver[]> {
   const files = await fg(source, {

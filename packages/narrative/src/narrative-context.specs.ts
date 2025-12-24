@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { flow, example, rule, specs } from './narrative';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { command } from './fluent-builder';
-import { type Event, type State } from './types';
+import { example, flow, rule, specs } from './narrative';
+import type { Event, State } from './types';
 
 type QuestionnaireLinkSent = Event<
   'QuestionnaireLinkSent',

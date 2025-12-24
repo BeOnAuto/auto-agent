@@ -1,6 +1,6 @@
-import { flow, specs, rule, example, thenError } from '../narrative';
 import { command, query, react } from '../fluent-builder';
-import { type Event, type Command, type State } from '../types';
+import { example, flow, rule, specs, thenError } from '../narrative';
+import type { Command, Event, State } from '../types';
 
 type TestItemCreated = Event<
   'TestItemCreated',

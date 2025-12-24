@@ -1,4 +1,4 @@
-import type { Command, Event, CommandHandler } from './types';
+import type { Command, CommandHandler, Event } from './types';
 
 // Helper types to extract command details
 type CommandData<C> = C extends Command<string, infer D> ? D : never;

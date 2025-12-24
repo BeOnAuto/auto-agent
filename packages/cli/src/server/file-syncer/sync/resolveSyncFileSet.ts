@@ -1,8 +1,8 @@
-import { NodeFileStore } from '@auto-engineer/file-store/node';
+import type { NodeFileStore } from '@auto-engineer/file-store/node';
+import createDebug from 'debug';
 import { collectBareImportsFromFiles } from '../discovery/bareImports';
 import { nmRootsForBases, probeEntryDtsForPackagesFromRoots } from '../discovery/dts';
 import { dirOf, logArray, pkgNameFromPath, scorePathForDedupe, uniq } from '../utils/path';
-import createDebug from 'debug';
 
 function flattenPaths(x: string[] | Record<string, string[]> | undefined): string[] {
   if (!x) return [];
@@ -47,7 +47,7 @@ function isNarrativeModule(mod: unknown): mod is {
     return false;
   }
   const modWithMethod = mod as Record<string, unknown>;
-  return typeof modWithMethod['getNarratives'] === 'function';
+  return typeof modWithMethod.getNarratives === 'function';
 }
 
 export async function resolveSyncFileSet(opts: { vfs: NodeFileStore; watchDir: string; projectRoot: string }) {

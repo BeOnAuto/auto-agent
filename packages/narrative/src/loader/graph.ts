@@ -1,21 +1,21 @@
-import createDebug from 'debug';
-import type { Graph } from './types';
 import type { IFileStore } from '@auto-engineer/file-store';
-import {
-  parseImports,
-  parseTypeDefinitions,
-  parseIntegrationExports,
-  parseIntegrationImports,
-  parseGivenTypeArguments,
-  parseWhenTypeArguments,
-  parseThenTypeArguments,
-  patchImportMeta,
-  transpileToCjs,
-  TypeInfo,
-} from './ts-utils';
+import createDebug from 'debug';
+import { integrationExportRegistry } from '../integration-export-registry';
 import { toPosix } from './fs-path';
 import { resolveSpecifier } from './resolver';
-import { integrationExportRegistry } from '../integration-export-registry';
+import {
+  parseGivenTypeArguments,
+  parseImports,
+  parseIntegrationExports,
+  parseIntegrationImports,
+  parseThenTypeArguments,
+  parseTypeDefinitions,
+  parseWhenTypeArguments,
+  patchImportMeta,
+  type TypeInfo,
+  transpileToCjs,
+} from './ts-utils';
+import type { Graph } from './types';
 import { createVfsCompilerHost } from './vfs-compiler-host';
 
 const debug = createDebug('auto:flow:graph');

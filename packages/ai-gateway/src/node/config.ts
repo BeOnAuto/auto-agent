@@ -1,7 +1,7 @@
-import dotenv from 'dotenv';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 import createDebug from 'debug';
-import { CustomProviderConfig, AIConfig } from '../core/types';
+import dotenv from 'dotenv';
+import type { AIConfig, CustomProviderConfig } from '../core/types';
 
 const debug = createDebug('auto:ai-gateway:config');
 const debugEnv = createDebug('auto:ai-gateway:config:env');

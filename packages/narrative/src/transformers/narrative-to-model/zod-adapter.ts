@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { Message } from '../../index';
+import type { z } from 'zod';
+import type { Message } from '../../index';
 
 function hasZodDef(obj: unknown): obj is { _def: unknown } {
   return typeof obj === 'object' && obj !== null && '_def' in obj;

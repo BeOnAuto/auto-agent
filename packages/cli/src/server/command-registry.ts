@@ -1,8 +1,8 @@
-import type { MessageBus, Command, Event } from '@auto-engineer/message-bus';
-import type { FoldRegistration } from '../dsl/types';
-import type { StateManager, FoldFunction } from './state-manager';
-import { CommandMetadataService, type CommandMetadata } from './command-metadata-service';
+import type { Command, Event, MessageBus } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
+import type { FoldRegistration } from '../dsl/types';
+import { type CommandMetadata, CommandMetadataService } from './command-metadata-service';
+import type { FoldFunction, StateManager } from './state-manager';
 
 const debugBus = createDebug('auto:cli:server:bus');
 

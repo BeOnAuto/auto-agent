@@ -1,15 +1,15 @@
-import type { Example, Spec, Slice } from '@auto-engineer/narrative';
+import type { Example, Slice, Spec } from '@auto-engineer/narrative';
 import {
-  type SliceType,
-  type MajorKeyword,
   type CommandRef,
-  type EventRef,
-  type StateRef,
   type ErrorRef,
+  type EventRef,
+  getSliceType,
   isStepWithDocString,
   isStepWithError,
+  type MajorKeyword,
   resolveMajorKeyword,
-  getSliceType,
+  type SliceType,
+  type StateRef,
 } from './step-types';
 
 export type { CommandRef, EventRef, StateRef, ErrorRef, SliceType };

@@ -1,12 +1,12 @@
-import express from 'express';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import type { MessageBus, Command, Event } from '@auto-engineer/message-bus';
-import type { IMessageStore, ILocalMessageStore, MessageFilter } from '@auto-engineer/message-store';
-import type { StateManager, FoldFunction } from './state-manager';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import type { Command, Event, MessageBus } from '@auto-engineer/message-bus';
+import type { ILocalMessageStore, IMessageStore, MessageFilter } from '@auto-engineer/message-store';
+import createDebug from 'debug';
+import type express from 'express';
 import { getPipelineGraph } from '../dsl';
 import type { CommandMetadataService } from './command-metadata-service';
-import createDebug from 'debug';
+import type { FoldFunction, StateManager } from './state-manager';
 
 const debugHttp = createDebug('auto-engineer:server:http');
 
@@ -229,7 +229,7 @@ export function setupHttpRoutes(
       }
 
       const count =
-        req.query.count !== undefined && req.query.count !== null ? parseInt(req.query.count as string) : 1000;
+        req.query.count !== undefined && req.query.count !== null ? parseInt(req.query.count as string, 10) : 1000;
       // Read only from the global $all stream to avoid duplicates, but still apply filters
       const allStreamMessages = await config.messageStore.getMessages('$all', undefined);
 
@@ -243,7 +243,7 @@ export function setupHttpRoutes(
 
       // Apply other filters as needed
       if (filter.messageNames && filter.messageNames.length > 0) {
-        filteredMessages = filteredMessages.filter((msg) => filter.messageNames!.includes(msg.message.type));
+        filteredMessages = filteredMessages.filter((msg) => filter.messageNames?.includes(msg.message.type));
       }
 
       if (filter.sessionId !== undefined && filter.sessionId !== null && filter.sessionId !== '') {
@@ -286,7 +286,7 @@ export function setupHttpRoutes(
     (async () => {
       try {
         const count =
-          req.query.count !== undefined && req.query.count !== null ? parseInt(req.query.count as string) : 1000;
+          req.query.count !== undefined && req.query.count !== null ? parseInt(req.query.count as string, 10) : 1000;
         const commands = await config.messageStore.getAllCommands(undefined, count);
 
         // Convert BigInt fields to strings for JSON serialization
@@ -314,7 +314,7 @@ export function setupHttpRoutes(
   app.get('/events', async (req, res) => {
     try {
       const count =
-        req.query.count !== undefined && req.query.count !== null ? parseInt(req.query.count as string) : 1000;
+        req.query.count !== undefined && req.query.count !== null ? parseInt(req.query.count as string, 10) : 1000;
       const events = await config.messageStore.getAllEvents(undefined, count);
 
       // Transform to legacy format for backward compatibility
@@ -377,7 +377,7 @@ export function setupHttpRoutes(
       try {
         const streamId = req.params.streamId;
         const count =
-          req.query.count !== undefined && req.query.count !== null ? parseInt(req.query.count as string) : 1000;
+          req.query.count !== undefined && req.query.count !== null ? parseInt(req.query.count as string, 10) : 1000;
         const messages = await config.messageStore.getMessages(streamId, undefined, count);
 
         // Convert BigInt fields to strings for JSON serialization

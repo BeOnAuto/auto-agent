@@ -1,5 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import { CustomProviderConfig } from '../types';
+import type { CustomProviderConfig } from '../types';
 
 export function createCustomProvider(config: CustomProviderConfig) {
   return createOpenAI({

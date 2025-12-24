@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { PipelineServer } from '../server/pipeline-server';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { loadPipelineConfig } from '../config/pipeline-config';
-import kanbanTodoConfig from './fixtures/kanban-todo.config';
+import { PipelineServer } from '../server/pipeline-server';
 import { resetKanbanState } from './fixtures/kanban-full.pipeline';
+import kanbanTodoConfig from './fixtures/kanban-todo.config';
 
 interface StoredMessage {
   message: {

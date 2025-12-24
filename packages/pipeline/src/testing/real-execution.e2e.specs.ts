@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { readFileSync, existsSync } from 'fs';
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { config } from 'dotenv';
-import { PipelineServer } from '../server/pipeline-server';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { loadPipelineConfig } from '../config/pipeline-config';
-import kanbanTodoConfig from './fixtures/kanban-todo.config';
+import { PipelineServer } from '../server/pipeline-server';
 import { resetKanbanState } from './fixtures/kanban-full.pipeline';
+import kanbanTodoConfig from './fixtures/kanban-todo.config';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PIPELINE_ROOT = path.resolve(__dirname, '../..');

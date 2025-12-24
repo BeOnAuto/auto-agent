@@ -1,7 +1,7 @@
-import { type Command, type Event, defineCommandHandler } from '@auto-engineer/message-bus';
-import { importDesignSystemComponentsFromFigma, ImportStrategy, type FilterFunctionType } from '../index';
-import { FilterLoader } from '../utils/FilterLoader';
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
+import { type FilterFunctionType, ImportStrategy, importDesignSystemComponentsFromFigma } from '../index';
+import { FilterLoader } from '../utils/FilterLoader';
 
 const debug = createDebug('auto:design-system-importer:command');
 const debugFilter = createDebug('auto:design-system-importer:command:filter');

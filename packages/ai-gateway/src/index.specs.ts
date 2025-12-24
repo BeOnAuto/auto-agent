@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { getAvailableProviders, getDefaultAIProvider, getDefaultModel, resetGlobalContext } from './index';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_MODELS } from './core/constants';
-import { AIProvider } from './core/types';
 import type { AIConfig } from './core/types';
+import { AIProvider } from './core/types';
+import { getAvailableProviders, getDefaultAIProvider, getDefaultModel, resetGlobalContext } from './index';
 
 // Mock the config module
 vi.mock('./node/config', () => ({

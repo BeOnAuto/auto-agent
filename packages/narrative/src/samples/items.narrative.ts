@@ -1,8 +1,8 @@
-import { data, flow, describe, it, specs, rule, example } from '../narrative';
-import { command, query } from '../fluent-builder';
 import gql from 'graphql-tag';
 import { source } from '../data-narrative-builders';
-import { type Event, type Command, type State } from '../types';
+import { command, query } from '../fluent-builder';
+import { data, describe, example, flow, it, rule, specs } from '../narrative';
+import type { Command, Event, State } from '../types';
 
 type ItemCreated = Event<
   'ItemCreated',

@@ -1,13 +1,13 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import type { EmitHandlerDescriptor, ForEachPhasedDescriptor } from '../../core/descriptors';
 import {
   createKanbanFullPipeline,
   resetKanbanState,
   setProjectRoot,
-  testResolvePath,
   setSliceRetryCount,
+  testResolvePath,
   testShouldRetry,
 } from './kanban-full.pipeline';
-import type { EmitHandlerDescriptor, ForEachPhasedDescriptor } from '../../core/descriptors';
 
 describe('kanban-full.pipeline', () => {
   beforeEach(() => {

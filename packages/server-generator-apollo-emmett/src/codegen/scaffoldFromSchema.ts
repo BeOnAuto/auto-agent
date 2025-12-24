@@ -1,13 +1,12 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import ejs from 'ejs';
-import { ensureDirExists, ensureDirPath, toKebabCase } from './utils/path';
+import fs from 'node:fs/promises';
+import path, { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import type { Model, Narrative, Slice } from '@auto-engineer/narrative';
 import { camelCase, pascalCase } from 'change-case';
-import prettier from 'prettier';
-import { Narrative, Slice, Model } from '@auto-engineer/narrative';
 import createDebug from 'debug';
+import ejs from 'ejs';
+import prettier from 'prettier';
+import { ensureDirExists, ensureDirPath, toKebabCase } from './utils/path';
 
 const debug = createDebug('auto:server-generator-apollo-emmett:scaffold');
 const debugTemplate = createDebug('auto:server-generator-apollo-emmett:scaffold:template');
@@ -16,29 +15,30 @@ const debugFlow = createDebug('auto:server-generator-apollo-emmett:scaffold:flow
 const debugSlice = createDebug('auto:server-generator-apollo-emmett:scaffold:slice');
 const debugPlan = createDebug('auto:server-generator-apollo-emmett:scaffold:plan');
 const debugFormat = createDebug('auto:server-generator-apollo-emmett:scaffold:format');
+
 import {
+  baseTs,
   buildCommandGwtMapping,
   buildQueryGwtMapping,
+  createCollectEnumNames,
+  createEventUnionType,
+  createFieldUsesDate,
+  createFieldUsesFloat,
+  createFieldUsesJSON,
+  createIsEnumType,
   extractMessagesFromSpecs,
   extractProjectionName,
-  groupEventImports,
   getAllEventTypes,
   getLocalEvents,
-  createEventUnionType,
-  isInlineObject as isInlineObjectHelper,
+  groupEventImports,
   isInlineObjectArray as isInlineObjectArrayHelper,
-  baseTs,
-  createIsEnumType,
-  createFieldUsesDate,
-  createFieldUsesJSON,
-  createFieldUsesFloat,
-  createCollectEnumNames,
+  isInlineObject as isInlineObjectHelper,
 } from './extract';
-import { extractGwtSpecsFromSlice, type GwtResult } from './extract/step-converter';
-import { normalizeSliceForTemplate } from './extract/slice-normalizer';
-import { Message, MessageDefinition, GwtCondition } from './types';
-import { parseGraphQlRequest } from './extract/graphql';
 import { getStreamFromSink } from './extract/data-sink';
+import { parseGraphQlRequest } from './extract/graphql';
+import { normalizeSliceForTemplate } from './extract/slice-normalizer';
+import { extractGwtSpecsFromSlice, type GwtResult } from './extract/step-converter';
+import type { GwtCondition, Message, MessageDefinition } from './types';
 
 const defaultFilesByType: Record<string, string[]> = {
   command: [
@@ -242,11 +242,13 @@ async function appendEnumsToSharedTypes(baseDir: string, enums: EnumDefinition[]
     }
   }
 
-  const prettierConfig = await prettier.resolveConfig(sharedTypesPath);
   const formatted = await prettier.format(newContent, {
-    ...prettierConfig,
     parser: 'typescript',
     filepath: sharedTypesPath,
+    singleQuote: true,
+    trailingComma: 'all',
+    printWidth: 120,
+    tabWidth: 2,
   });
 
   await fs.mkdir(path.dirname(sharedTypesPath), { recursive: true });
@@ -435,11 +437,13 @@ async function generateFileForTemplate(
   debugFiles('  Rendered content size: %d bytes', contents.length);
 
   debugFiles('  Formatting with Prettier...');
-  const prettierConfig = await prettier.resolveConfig(outputPath);
   const formattedContents = await prettier.format(contents, {
-    ...prettierConfig,
     parser: 'typescript',
     filepath: outputPath,
+    singleQuote: true,
+    trailingComma: 'all',
+    printWidth: 120,
+    tabWidth: 2,
   });
   debugFiles('  Formatted content size: %d bytes', formattedContents.length);
 

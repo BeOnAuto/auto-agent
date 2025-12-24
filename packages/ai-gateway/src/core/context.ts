@@ -1,11 +1,11 @@
-import { createOpenAI } from '@ai-sdk/openai';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { createXai } from '@ai-sdk/xai';
+import { createOpenAI } from '@ai-sdk/openai';
 import type { LanguageModelV2 } from '@ai-sdk/provider';
-import { AIProvider, AIContext, AIConfig } from './types';
+import { createXai } from '@ai-sdk/xai';
 import { DEFAULT_MODELS } from './constants';
 import { createCustomProvider } from './providers/custom';
+import { type AIConfig, type AIContext, AIProvider } from './types';
 import { makeLogger } from './utils/log';
 
 const debugConfig = makeLogger('auto:ai-gateway:config');

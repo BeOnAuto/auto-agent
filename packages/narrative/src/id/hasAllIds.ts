@@ -1,4 +1,4 @@
-import { Model, Slice, Spec, Rule, Example, Step, ClientSpecNode } from '../index';
+import type { ClientSpecNode, Example, Model, Rule, Slice, Spec, Step } from '../index';
 
 function hasValidId(item: { id?: string }): boolean {
   return item.id !== undefined && item.id !== '';

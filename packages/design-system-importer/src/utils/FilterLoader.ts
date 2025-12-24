@@ -1,10 +1,10 @@
-import { extname, resolve as resolvePath, dirname, join } from 'path';
-import { pathToFileURL, fileURLToPath } from 'url';
-import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'fs';
-import { spawnSync } from 'child_process';
-import { tmpdir } from 'os';
-import type { FilterFunctionType } from '../FigmaComponentsBuilder';
+import { spawnSync } from 'node:child_process';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, extname, join, resolve as resolvePath } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import createDebug from 'debug';
+import type { FilterFunctionType } from '../FigmaComponentsBuilder';
 
 const debug = createDebug('auto:design-system-importer:filter-loader');
 const debugLoad = createDebug('auto:design-system-importer:filter-loader:load');
@@ -181,7 +181,7 @@ export class FilterLoader {
           debugStrategy('Successfully parsed filter code, creating function');
           // Create a function from the filter code
           // eslint-disable-next-line @typescript-eslint/no-implied-eval, @typescript-eslint/no-unsafe-call
-          const filter = new Function('return ' + output.filterCode)() as FilterFunctionType;
+          const filter = new Function(`return ${output.filterCode}`)() as FilterFunctionType;
           debugStrategy('Filter function created successfully');
           return filter;
         }

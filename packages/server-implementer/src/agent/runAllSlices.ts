@@ -1,6 +1,6 @@
+import path from 'node:path';
 import fg from 'fast-glob';
 import { runSlice } from './runSlice';
-import path from 'path';
 
 export async function runAllSlices(flowDir: string): Promise<void> {
   const flowName = path.basename(flowDir);

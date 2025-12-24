@@ -3,7 +3,7 @@
 import { spawn } from 'node:child_process';
 import { promises as fs } from 'node:fs';
 
-const CORE_PACKAGES = ['@auto-engineer/message-bus', '@auto-engineer/ai-gateway'];
+const _CORE_PACKAGES = ['@auto-engineer/message-bus', '@auto-engineer/ai-gateway'];
 const STARTUP_DELAY = 3000; // Wait 3 seconds for core packages to start
 
 function log(message: string) {

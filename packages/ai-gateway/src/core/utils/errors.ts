@@ -1,4 +1,4 @@
-import { AIProvider } from '../types';
+import type { AIProvider } from '../types';
 import { makeLogger } from './log';
 
 const debugError = makeLogger('auto:ai-gateway:error');

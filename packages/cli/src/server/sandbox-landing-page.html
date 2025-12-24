@@ -301,9 +301,9 @@
               </div>
               <span class="badge" id="hostnameBadge"></span>
               <script>
-                document.addEventListener('DOMContentLoaded', function () {
+                document.addEventListener('DOMContentLoaded', () => {
                   var badge = document.getElementById('hostnameBadge');
-                  badge.textContent = window.location.hostname + ':' + window.location.port;
+                  badge.textContent = `${window.location.hostname}:${window.location.port}`;
                 });
               </script>
               <h1 class="headline">Visualize & Collaborate</h1>
@@ -333,14 +333,14 @@
     </div>
 
     <script>
-      (function () {
+      (() => {
         var STORAGE_KEY = 'onauto_shell_skipLanding';
 
         var hostedUrl = 'https://sandbox.on.auto';
         var skip = false;
         try {
           skip = localStorage.getItem(STORAGE_KEY) === 'true';
-        } catch (e) {}
+        } catch (_e) {}
 
         if (skip) {
           window.location.replace(hostedUrl);
@@ -348,17 +348,17 @@
         }
 
         var openBtn = document.getElementById('openBtn');
-        var hint = document.getElementById('hint');
+        var _hint = document.getElementById('hint');
         var dontShowAgain = document.getElementById('dontShowAgain');
 
-        openBtn.addEventListener('click', function () {
+        openBtn.addEventListener('click', () => {
           try {
-            if (dontShowAgain && dontShowAgain.checked) {
+            if (dontShowAgain?.checked) {
               localStorage.setItem(STORAGE_KEY, 'true');
               window.location.replace(hostedUrl);
               return;
             }
-          } catch (e) {}
+          } catch (_e) {}
           window.location.assign(hostedUrl);
         });
       })();

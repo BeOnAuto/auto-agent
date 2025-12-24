@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
-import type { Response } from 'express';
-import { SSEManager } from './sse-manager';
 import type { Event } from '@auto-engineer/message-bus';
+import type { Response } from 'express';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { SSEManager } from './sse-manager';
 
 interface MockResponse extends Response {
   written: string[];
@@ -37,7 +37,7 @@ function createMockResponse(): MockResponse {
       listeners[event].push(handler);
     }),
     triggerClose: () => {
-      listeners['close']?.forEach((h) => h());
+      listeners.close?.forEach((h) => h());
     },
   } as unknown as MockResponse;
 }

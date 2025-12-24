@@ -1,5 +1,5 @@
+import type { ClientSpecNode, Example, Model, Rule, Slice, Spec, Step } from '../index';
 import { generateAutoId } from './generators';
-import { Model, Slice, Spec, Rule, Example, Step, ClientSpecNode } from '../index';
 
 function ensureId(item: { id?: string }): void {
   if (item.id === undefined || item.id === '') {

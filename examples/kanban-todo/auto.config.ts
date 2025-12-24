@@ -1,30 +1,30 @@
-import { autoConfig, on, dispatch } from '@auto-engineer/cli';
+import * as path from 'node:path';
+import { autoConfig, dispatch, on } from '@auto-engineer/cli';
+import type {
+  ComponentImplementationFailedEvent,
+  ComponentImplementedEvent,
+  ImplementComponentCommand,
+} from '@auto-engineer/component-implementer';
+import type { StartClientCommand, StartServerCommand } from '@auto-engineer/dev-server';
+import type { CheckClientEvents } from '@auto-engineer/frontend-checks';
+import type { GenerateClientCommand, GenerateClientEvents } from '@auto-engineer/frontend-generator-react-graphql';
+import type { ImplementClientCommand } from '@auto-engineer/frontend-implementer';
+import type { GenerateIACommand, GenerateIAEvents } from '@auto-engineer/information-architect';
 import type { ExportSchemaEvents } from '@auto-engineer/narrative';
+import type {
+  CheckLintCommand,
+  CheckTestsCommand,
+  CheckTypesCommand,
+  LintCheckFailedEvent,
+  TestsCheckFailedEvent,
+  TypeCheckFailedEvent,
+} from '@auto-engineer/server-checks';
 import type {
   GenerateServerCommand,
   GenerateServerEvents,
   SliceGeneratedEvent,
 } from '@auto-engineer/server-generator-apollo-emmett';
-import type { ImplementSliceEvents, ImplementSliceCommand } from '@auto-engineer/server-implementer';
-import type {
-  CheckTestsCommand,
-  CheckTypesCommand,
-  CheckLintCommand,
-  TestsCheckFailedEvent,
-  TypeCheckFailedEvent,
-  LintCheckFailedEvent,
-} from '@auto-engineer/server-checks';
-import type { GenerateIACommand, GenerateIAEvents } from '@auto-engineer/information-architect';
-import type { ImplementClientCommand } from '@auto-engineer/frontend-implementer';
-import type { GenerateClientCommand, GenerateClientEvents } from '@auto-engineer/frontend-generator-react-graphql';
-import type { CheckClientEvents } from '@auto-engineer/frontend-checks';
-import type {
-  ImplementComponentCommand,
-  ComponentImplementedEvent,
-  ComponentImplementationFailedEvent,
-} from '@auto-engineer/component-implementer';
-import type { StartServerCommand, StartClientCommand } from '@auto-engineer/dev-server';
-import * as path from 'path';
+import type { ImplementSliceCommand, ImplementSliceEvents } from '@auto-engineer/server-implementer';
 import createDebug from 'debug';
 
 const debug = createDebug('auto:config:component');

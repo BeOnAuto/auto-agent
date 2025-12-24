@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
-import { readdirSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const dirs = ['packages', 'apps', 'examples', 'integrations'];
 const outputPath = join(process.cwd(), 'CHANGELOG.md');
@@ -36,12 +36,12 @@ function combineChangelogs(changelogs: Map<string, string>): string {
   for (const [, changelog] of changelogs) {
     content += `${changelog}\n\n`;
   }
-  return content.trim() + '\n';
+  return `${content.trim()}\n`;
 }
 
 try {
   const changelogs = collectChangelogs();
-  const combined = changelogs.size ? combineChangelogs(changelogs) : header.trim() + '\n';
+  const combined = changelogs.size ? combineChangelogs(changelogs) : `${header.trim()}\n`;
   writeFileSync(outputPath, combined);
   console.log(`Combined changelog written to ${outputPath}`);
 } catch (error) {

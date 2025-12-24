@@ -1,19 +1,15 @@
 import {
-  CommandSender,
-  isErrorConstructor,
-  type ErrorConstructor,
   AssertionError,
   assertTrue,
+  type CommandSender,
+  type ErrorConstructor,
+  isErrorConstructor,
   type MessageProcessor,
 } from '@event-driven-io/emmett';
 
-interface CommandCheck<CommandType> {
-  (command: CommandType): boolean;
-}
+type CommandCheck<CommandType> = (command: CommandType) => boolean;
 
-interface ErrorCheck<ErrorType> {
-  (error: ErrorType): boolean;
-}
+type ErrorCheck<ErrorType> = (error: ErrorType) => boolean;
 
 export type ThenThrows<ErrorType extends Error> =
   | (() => void)
@@ -32,13 +28,11 @@ interface ReactorSpecificationReturn<Event, Command, Context> {
   };
 }
 
-export interface ReactorSpecification<
+export type ReactorSpecification<
   Event,
   Command,
   Context extends { commandSender: CommandSender } = { commandSender: CommandSender },
-> {
-  (givenEvents: Event | Event[]): ReactorSpecificationReturn<Event, Command, Context>;
-}
+> = (givenEvents: Event | Event[]) => ReactorSpecificationReturn<Event, Command, Context>;
 
 export const ReactorSpecification = {
   for: reactorSpecificationFor,

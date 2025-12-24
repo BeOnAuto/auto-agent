@@ -1,4 +1,4 @@
-import { ZodTypeAny } from 'zod';
+import type { ZodTypeAny } from 'zod';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type IntegrationHandler = (...args: any[]) => Promise<any>;

@@ -1,10 +1,9 @@
-import path from 'path';
-import fg from 'fast-glob';
+import { existsSync } from 'node:fs';
+import { readFile, unlink } from 'node:fs/promises';
+import path from 'node:path';
 import { execa } from 'execa';
-import { existsSync } from 'fs';
-import { unlink } from 'fs/promises';
-import { readFile } from 'fs/promises';
-import { VitestAssertionResult, VitestTestResult } from './runSlice';
+import fg from 'fast-glob';
+import type { VitestAssertionResult, VitestTestResult } from './runSlice';
 
 type VitestReport = {
   testResults?: VitestTestResult[];

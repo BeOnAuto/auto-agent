@@ -1,8 +1,8 @@
-import { processFlowsWithAI } from './index';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import type { Model } from '@auto-engineer/narrative';
 import uxSchema from './auto-ux-schema.json';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { type Model } from '@auto-engineer/narrative';
+import { processFlowsWithAI } from './index';
 
 interface DesignSystemItem {
   name: string;
@@ -101,7 +101,7 @@ async function getUniqueSchemaPath(
   await fs.mkdir(outputDir, { recursive: true });
   const baseFileName = 'auto-ia-scheme';
   const basePath = path.join(outputDir, baseFileName);
-  let existingSchema: object | undefined = undefined;
+  let existingSchema: object | undefined;
 
   try {
     existingSchema = JSON.parse(await fs.readFile(`${basePath}.json`, 'utf-8')) as object;

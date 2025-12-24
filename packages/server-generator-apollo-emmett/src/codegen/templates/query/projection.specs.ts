@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import type { Model } from '@auto-engineer/narrative';
+import { describe, expect, it } from 'vitest';
 import { generateScaffoldFilePlans } from '../../scaffoldFromSchema';
-import { Model } from '@auto-engineer/narrative';
 
 describe('projection.ts.ejs', () => {
   it('should generate a valid projection file with correct relative event import path from producing slice', async () => {

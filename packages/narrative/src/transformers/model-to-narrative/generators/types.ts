@@ -1,4 +1,4 @@
-import tsNS from 'typescript';
+import type tsNS from 'typescript';
 import { typeFromString } from '../ast/emit-helpers';
 
 type Message = {

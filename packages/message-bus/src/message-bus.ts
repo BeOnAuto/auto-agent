@@ -1,5 +1,5 @@
-import { Command, Event, CommandHandler, EventHandler, EventSubscription } from './types';
 import createDebug from 'debug';
+import type { Command, CommandHandler, Event, EventHandler, EventSubscription } from './types';
 
 const debug = createDebug('auto:message-bus');
 const debugCommand = createDebug('auto:message-bus:command');

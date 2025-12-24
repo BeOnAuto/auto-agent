@@ -1,6 +1,6 @@
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import type { UserConfig } from '@commitlint/types';
-import { readdirSync } from 'fs';
-import { join } from 'path';
 
 const getPackages = (dir: string) => {
   try {

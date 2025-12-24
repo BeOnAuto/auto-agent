@@ -1,5 +1,5 @@
-import { TypeInfo } from '../../loader/ts-utils';
-import { Message } from '../../index';
+import type { Message } from '../../index';
+import type { TypeInfo } from '../../loader/ts-utils';
 
 function mapKindToMessageType(k: 'command' | 'query' | 'reaction'): 'command' | 'event' | 'state' {
   if (k === 'command') return 'command';
@@ -20,7 +20,7 @@ function buildInitialFields(typeInfo: TypeInfo | undefined) {
 function parseEnvelopeFields(src: string) {
   const inner: { name: string; type: string; required: boolean }[] = [];
   const m = src.match(/^\{\s*([^}]*)\s*\}$/);
-  if (m && m[1]) {
+  if (m?.[1]) {
     const body = m[1];
     const re = /(\w+)(\?)?\s*:\s*([^;,]+)(?=[;,]|$)/g;
     let match: RegExpExecArray | null;

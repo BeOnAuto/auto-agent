@@ -1,6 +1,6 @@
+import createDebug from 'debug';
 import * as dotenv from 'dotenv';
 import * as Figma from 'figma-api';
-import createDebug from 'debug';
 
 const debug = createDebug('auto:design-system-importer:figma-builder');
 const debugComponents = createDebug('auto:design-system-importer:figma-builder:components');

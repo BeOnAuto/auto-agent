@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { createMockHandlers, getHandlerCallCount, resetCallCounts, createStatefulHandler } from './mock-handlers';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { createMockHandlers, createStatefulHandler, getHandlerCallCount, resetCallCounts } from './mock-handlers';
 
 describe('mock-handlers', () => {
   beforeEach(() => {

@@ -1,6 +1,6 @@
-import { generateTextWithAI, AIProvider } from '@auto-engineer/ai-gateway';
-import { type UXSchema, type AIAgentOutput } from './types.js';
-import { type Model } from '@auto-engineer/narrative';
+import { type AIProvider, generateTextWithAI } from '@auto-engineer/ai-gateway';
+import type { Model } from '@auto-engineer/narrative';
+import type { AIAgentOutput, UXSchema } from './types.js';
 
 function extractJsonFromMarkdown(text: string): string {
   return text.replace(/```(?:json)?\s*([\s\S]*?)\s*```/, '$1').trim();
@@ -40,7 +40,7 @@ export class InformationArchitectAgent {
       }
       const clean = extractJsonFromMarkdown(response);
       if (!isJsonString(clean)) {
-        throw new Error('AI did not return valid JSON. Got: ' + clean.slice(0, 100));
+        throw new Error(`AI did not return valid JSON. Got: ${clean.slice(0, 100)}`);
       }
       return JSON.parse(clean) as AIAgentOutput;
     } catch (error) {

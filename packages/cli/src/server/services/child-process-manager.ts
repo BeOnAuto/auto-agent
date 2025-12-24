@@ -1,7 +1,7 @@
-import kill from 'tree-kill';
+import type { Event, EventSubscription, MessageBus } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
+import kill from 'tree-kill';
 import type { ServerService } from './interface';
-import type { MessageBus, Event, EventSubscription } from '@auto-engineer/message-bus';
 
 const debug = createDebug('auto:cli:child-process-manager');
 

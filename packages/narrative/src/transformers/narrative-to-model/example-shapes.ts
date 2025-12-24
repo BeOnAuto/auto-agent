@@ -1,4 +1,4 @@
-import { Message } from '../../index';
+import type { Message } from '../../index';
 
 export type ExampleShapeHints = Map<
   string, // message name, e.g. "Products"

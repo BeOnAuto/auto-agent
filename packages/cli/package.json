@@ -35,12 +35,8 @@
     "build": "tsc && tsx ../../scripts/fix-esm-imports.ts && chmod +x dist/bin/auto.js && cp -r src/server/*.html src/server/*.svg dist/src/server/ 2>/dev/null || true",
     "test": "vitest run --reporter=dot",
     "test:watch": "vitest",
-    "lint": "eslint 'src/**/*.ts' --ignore-pattern '**/*.specs.ts' --max-warnings 0 --config ../../eslint.config.ts",
     "type-check": "tsc --noEmit",
     "prepublishOnly": "npm run build",
-    "format": "prettier --write \"**/*.{js,ts,json,md,yml,yaml}\" --ignore-path ../../.prettierignore --log-level warn",
-    "lint:fix": "eslint 'src/**/*.ts' --fix --config ../../eslint.config.ts",
-    "format:fix": "prettier --write \"**/*.{js,ts,json,md,yml,yaml}\" --ignore-path ../../.prettierignore --log-level warn",
     "link:dev": "pnpm build && pnpm link --global",
     "unlink:dev": "pnpm unlink --global"
   },

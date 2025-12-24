@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { EventLogger } from './event-logger';
 import type { Event } from '@auto-engineer/message-bus';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { EventLogger } from './event-logger';
 
 describe('EventLogger', () => {
   let logger: EventLogger;

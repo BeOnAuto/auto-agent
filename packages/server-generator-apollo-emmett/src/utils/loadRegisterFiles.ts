@@ -1,9 +1,9 @@
-import fg from 'fast-glob';
-import path from 'path';
+import path from 'node:path';
 import type { CommandProcessor, EventStore } from '@event-driven-io/emmett';
+import fg from 'fast-glob';
 
 export interface SliceRegistration {
-  register: (messageBus: CommandProcessor, eventStore: EventStore) => Promise<unknown> | void;
+  register: (messageBus: CommandProcessor, eventStore: EventStore) => Promise<unknown> | undefined;
 }
 
 export async function loadRegisterFiles(source: string): Promise<SliceRegistration[]> {

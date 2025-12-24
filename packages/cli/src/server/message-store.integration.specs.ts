@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { MessageBusServer } from './server';
-import { MemoryMessageStore, type SessionInfo, type MessageStoreStats } from '@auto-engineer/message-store';
-import fetch from 'node-fetch';
 import type { Command, Event } from '@auto-engineer/message-bus';
+import { MemoryMessageStore, type MessageStoreStats, type SessionInfo } from '@auto-engineer/message-store';
 import getPort from 'get-port';
+import fetch from 'node-fetch';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { MessageBusServer } from './server';
 
 interface CommandResponse {
   status: string;
@@ -114,21 +114,21 @@ describe('Message Store Integration', async () => {
         m.messageType === 'command' && m.message.type === 'test-command' && m.message.requestId === 'test-req-123',
     );
     expect(storedCommand).toBeDefined();
-    expect(storedCommand!.message.data.message).toBe('Hello World');
-    expect(storedCommand!.message.data.userId).toBe('test-user');
-    expect(storedCommand!.message.correlationId).toBeDefined();
+    expect(storedCommand?.message.data.message).toBe('Hello World');
+    expect(storedCommand?.message.data.userId).toBe('test-user');
+    expect(storedCommand?.message.correlationId).toBeDefined();
 
     const storedEvent = messages.find(
       (m: HttpPositionalMessage) => m.messageType === 'event' && m.message.type === 'test-event',
     );
     expect(storedEvent).toBeDefined();
-    expect(storedEvent!.message.data.commandId).toBe('test-req-123');
-    expect((storedEvent!.message.data as { originalData: { message: string } }).originalData.message).toBe(
+    expect(storedEvent?.message.data.commandId).toBe('test-req-123');
+    expect((storedEvent?.message.data as { originalData: { message: string } }).originalData.message).toBe(
       'Hello World',
     );
-    expect(storedEvent!.message.correlationId).toBeDefined();
+    expect(storedEvent?.message.correlationId).toBeDefined();
 
-    expect(storedEvent!.message.correlationId).toBe(storedCommand!.message.correlationId);
+    expect(storedEvent?.message.correlationId).toBe(storedCommand?.message.correlationId);
 
     const commandsResponse = await fetch(`${baseUrl}/commands`);
     expect(commandsResponse.ok).toBe(true);
@@ -283,10 +283,10 @@ describe('Message Store Integration', async () => {
     );
 
     expect(testCommand).toBeDefined();
-    expect(testCommand!.message.correlationId).toBeDefined();
-    expect(testCommand!.message.correlationId).toMatch(/^corr-/);
-    expect(testCommand!.message.requestId).toBeDefined();
-    expect(testCommand!.message.requestId).toMatch(/^req-/);
+    expect(testCommand?.message.correlationId).toBeDefined();
+    expect(testCommand?.message.correlationId).toMatch(/^corr-/);
+    expect(testCommand?.message.requestId).toBeDefined();
+    expect(testCommand?.message.requestId).toMatch(/^req-/);
   });
 
   it('should process and emit commands and events in interleaved order', async () => {
@@ -345,7 +345,7 @@ describe('Message Store Integration', async () => {
     // In the new architecture, all messages are in the $all stream, so we filter by sessionId
     const sessionMessages = messages.filter((m: HttpPositionalMessage) => m.streamId === '$all');
 
-    sessionMessages.sort((a, b) => parseInt(a.position) - parseInt(b.position));
+    sessionMessages.sort((a, b) => parseInt(a.position, 10) - parseInt(b.position, 10));
 
     const uniqueMessages = sessionMessages.filter((msg, index, arr) => {
       if (index === 0) return true;

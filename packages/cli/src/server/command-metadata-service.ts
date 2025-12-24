@@ -1,4 +1,4 @@
-import type { UnifiedCommandHandler, Command } from '@auto-engineer/message-bus';
+import type { Command, UnifiedCommandHandler } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
 
 const debug = createDebug('auto-engineer:server:metadata');

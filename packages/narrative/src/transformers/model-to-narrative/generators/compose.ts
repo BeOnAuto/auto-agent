@@ -1,11 +1,11 @@
 import ts from 'typescript';
-import { buildImports, ALL_FLOW_FUNCTION_NAMES } from './imports';
-import { buildTypeAliases } from './types';
-import { buildFlowStatements } from './flow';
+import type { Model } from '../../../index';
+import { analyzeCodeUsage } from '../analysis/usage';
 import { extractTypeIntegrationNames } from '../utils/integration-extractor';
 import { integrationNameToPascalCase } from '../utils/strings';
-import { analyzeCodeUsage } from '../analysis/usage';
-import { Model } from '../../../index';
+import { buildFlowStatements } from './flow';
+import { ALL_FLOW_FUNCTION_NAMES, buildImports } from './imports';
+import { buildTypeAliases } from './types';
 
 export function generateTypeScriptCode(schema: Model, opts: { flowImport: string; integrationImport: string }): string {
   const f = ts.factory;

@@ -1,6 +1,6 @@
-import { flow, specs, rule, example } from '../narrative';
 import { query } from '../fluent-builder';
-import { type Event, type State } from '../types';
+import { example, flow, rule, specs } from '../narrative';
+import type { Event, State } from '../types';
 
 type ConfigState = State<
   'ConfigState',

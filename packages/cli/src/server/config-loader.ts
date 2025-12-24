@@ -1,10 +1,10 @@
-import createJiti from 'jiti';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import createDebug from 'debug';
-import { getRegistrations, getPendingDispatches } from '../dsl';
+import createJiti from 'jiti';
+import { getPendingDispatches, getRegistrations } from '../dsl';
 import type { ConfigDefinition } from '../dsl/types';
 import type { MessageBusServer } from './server';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 
 const debug = createDebug('auto:cli:server:config');
 

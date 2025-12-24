@@ -1,7 +1,15 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { parse, print, DocumentNode, OperationDefinitionNode, SelectionSetNode, FieldNode, Kind } from 'graphql';
-import { IAScheme } from './types';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import {
+  type DocumentNode,
+  type FieldNode,
+  Kind,
+  type OperationDefinitionNode,
+  parse,
+  print,
+  type SelectionSetNode,
+} from 'graphql';
+import type { IAScheme } from './types';
 
 interface GqlOperation {
   operationType: 'query' | 'mutation';
@@ -9,10 +17,10 @@ interface GqlOperation {
   raw: string;
 }
 
-interface DataRequirement {
+interface ValidDataRequirement {
   type: 'query' | 'mutation';
-  details?: {
-    gql?: string;
+  details: {
+    gql: string;
   };
 }
 
@@ -21,7 +29,7 @@ function extractOperationName(gql: string): string {
   return match ? match[2] : 'UnknownOperation';
 }
 
-function isValidDataRequirement(req: unknown): req is DataRequirement {
+function isValidDataRequirement(req: unknown): req is ValidDataRequirement {
   return (
     typeof req === 'object' &&
     req !== null &&
@@ -36,15 +44,15 @@ function isValidDataRequirement(req: unknown): req is DataRequirement {
 }
 
 function processDataRequirements(record: Record<string, unknown>, operations: GqlOperation[]): void {
-  const dataRequirements = record['data_requirements'];
+  const dataRequirements = record.data_requirements;
   if (!Array.isArray(dataRequirements)) return;
 
   for (const req of dataRequirements) {
     if (isValidDataRequirement(req)) {
       operations.push({
         operationType: req.type,
-        operationName: extractOperationName(req.details!.gql!),
-        raw: req.details!.gql!.trim(),
+        operationName: extractOperationName(req.details.gql),
+        raw: req.details.gql.trim(),
       });
     }
   }
@@ -157,7 +165,7 @@ export function mergeGraphQLQueries(operations: GqlOperation[]): GqlOperation[] 
       if (!operationGroups.has(signature)) {
         operationGroups.set(signature, []);
       }
-      operationGroups.get(signature)!.push(op);
+      operationGroups.get(signature)?.push(op);
     } catch {
       // If parsing fails, keep the original operation
       const fallbackSignature = `${op.operationType}:${op.operationName}:fallback:${Math.random()}`;

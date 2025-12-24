@@ -1,9 +1,9 @@
-import { TypeInfo } from '../../loader/ts-utils';
-import { Message } from '../../index';
+import debug from 'debug';
+import type { Message } from '../../index';
+import type { TypeInfo } from '../../loader/ts-utils';
+import { collectExampleHintsForData, type ExampleShapeHints } from './example-shapes';
 import { createMessage } from './messages';
 import { preferNewFields } from './normalize';
-import { ExampleShapeHints, collectExampleHintsForData } from './example-shapes';
-import debug from 'debug';
 
 const log = debug('auto:flow:spec-processors');
 

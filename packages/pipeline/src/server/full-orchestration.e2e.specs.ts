@@ -1,14 +1,14 @@
 import type { Command, Event } from '@auto-engineer/message-bus';
 import { define } from '../builder/define';
-import { PipelineServer, type CommandHandlerWithMetadata } from './pipeline-server';
 import { createKanbanPipeline, resetRetryState } from '../testing/fixtures/kanban.pipeline';
 import {
   createMockHandlers,
-  resetCallCounts,
-  getHandlerCallCount,
   createStatefulHandler,
+  getHandlerCallCount,
+  resetCallCounts,
 } from '../testing/mock-handlers';
 import { containsSubsequence, findMissingEvents } from '../testing/snapshot-compare';
+import { type CommandHandlerWithMetadata, PipelineServer } from './pipeline-server';
 
 interface StoredMessage {
   message: { type: string; data?: Record<string, unknown> };

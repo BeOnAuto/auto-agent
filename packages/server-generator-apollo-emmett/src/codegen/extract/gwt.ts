@@ -1,5 +1,5 @@
 import type { Slice } from '@auto-engineer/narrative';
-import type { GwtCondition, CommandRef, EventRef } from '../types';
+import type { CommandRef, EventRef, GwtCondition } from '../types';
 import { extractGwtSpecsFromSlice, type GwtConditionWithRule } from './step-converter';
 
 export function buildCommandGwtMapping(slice: Slice): Record<string, (GwtCondition & { failingFields?: string[] })[]> {

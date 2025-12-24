@@ -8,7 +8,7 @@ export async function resolveSpecifier(
   parent: string,
   importMap: Record<string, unknown>,
 ): Promise<Resolved> {
-  if (Object.prototype.hasOwnProperty.call(importMap, spec)) {
+  if (Object.hasOwn(importMap, spec)) {
     return { kind: 'mapped', value: importMap[spec] };
   }
   if (spec.startsWith('./') || spec.startsWith('../')) {

@@ -490,7 +490,7 @@ class GatherBuilderImpl implements GatherBuilder {
 class GatherChainImpl implements GatherChain {
   constructor(
     private readonly gatherBuilder: GatherBuilderImpl,
-    private readonly parent: PipelineBuilderImpl,
+    readonly _parent: PipelineBuilderImpl,
   ) {}
 
   onSuccess<T = unknown>(
@@ -655,7 +655,7 @@ class SettledBuilderImpl implements SettledBuilder {
     handler: (
       events: Record<string, Event[]>,
       send: (commandType: D[number], data: unknown) => void,
-    ) => void | { persist: boolean },
+    ) => undefined | { persist: boolean },
   ): SettledChain {
     return new SettledChainImpl(this.parent, this.commandTypes, handler as SettledHandler, options.dispatches);
   }

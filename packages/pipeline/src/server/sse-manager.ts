@@ -1,5 +1,5 @@
-import type { Response } from 'express';
 import type { Event } from '@auto-engineer/message-bus';
+import type { Response } from 'express';
 
 interface SSEClient {
   id: string;

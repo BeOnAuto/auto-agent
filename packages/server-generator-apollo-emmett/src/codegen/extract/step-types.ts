@@ -1,5 +1,4 @@
-import type { Step, Slice } from '@auto-engineer/narrative';
-import type { StepWithDocStringSchema, StepWithErrorSchema } from '@auto-engineer/narrative';
+import type { Slice, Step, StepWithDocStringSchema, StepWithErrorSchema } from '@auto-engineer/narrative';
 import type { z } from 'zod';
 
 export type StepWithDocString = z.infer<typeof StepWithDocStringSchema>;

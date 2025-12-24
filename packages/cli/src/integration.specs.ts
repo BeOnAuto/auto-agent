@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { spawn, ChildProcess } from 'child_process';
+import { type ChildProcess, spawn } from 'node:child_process';
+import path from 'node:path';
 import axios from 'axios';
-import path from 'path';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 interface MessageData {
   messageType: string;

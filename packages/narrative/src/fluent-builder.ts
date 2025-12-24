@@ -1,15 +1,15 @@
-import type { Integration } from './types';
+import createDebug from 'debug';
+import { type ASTNode, print } from 'graphql';
+import type { CommandSlice, ExperienceSlice, QuerySlice, ReactSlice } from './index';
 import {
   addSlice,
-  startClientBlock,
   endClientBlock,
-  startServerBlock,
   endServerBlock,
   getCurrentSlice,
+  startClientBlock,
+  startServerBlock,
 } from './narrative-context';
-import { CommandSlice, QuerySlice, ReactSlice, ExperienceSlice } from './index';
-import { print, ASTNode } from 'graphql';
-import createDebug from 'debug';
+import type { Integration } from './types';
 
 const debug = createDebug('auto:narrative:fluent-builder');
 if ('color' in debug && typeof debug === 'object') {

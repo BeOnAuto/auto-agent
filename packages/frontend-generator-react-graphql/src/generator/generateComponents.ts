@@ -1,11 +1,11 @@
-import fs from 'fs';
-import path from 'path';
-import ejs from 'ejs';
-import { fileURLToPath } from 'url';
-import { GeneratedFile, IAScheme } from '../types';
-import { extractTypeMappings, TypeMapping } from '../graphql-type-extractor';
-import { buildTypeGuidance, aggregateOrganismGuidance } from './type-guidance-builder';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import createDebug from 'debug';
+import ejs from 'ejs';
+import { extractTypeMappings, type TypeMapping } from '../graphql-type-extractor';
+import type { GeneratedFile, IAScheme } from '../types';
+import { aggregateOrganismGuidance, buildTypeGuidance } from './type-guidance-builder';
 
 const debug = createDebug('auto:frontend-generator-react-graphql:generateComponents');
 const debugTemplates = createDebug('auto:frontend-generator-react-graphql:generateComponents:templates');

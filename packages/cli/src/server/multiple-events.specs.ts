@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { MessageBusServer } from './server';
 import type { Command, Event } from '@auto-engineer/message-bus';
 import getPort from 'get-port';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { MessageBusServer } from './server';
 
 describe('Message Bus Multiple Events Integration', () => {
   let server: MessageBusServer;

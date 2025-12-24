@@ -1,6 +1,6 @@
 // Barrel exports
 export { InformationArchitectAgent, processFlowsWithAI } from './ia-agent.js';
-export type { UXSchema, AIAgentOutput } from './types.js';
+export type { AIAgentOutput, UXSchema } from './types.js';
 
 import { commandHandler as generateIAHandler } from './commands/generate-ia';
 export const COMMANDS = [generateIAHandler];

@@ -1,8 +1,8 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import ejs from 'ejs';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { generateTextWithAI } from '@auto-engineer/ai-gateway';
-import { flattenFigmaVariables, VariableCollection } from '../figma-helpers';
+import ejs from 'ejs';
+import { flattenFigmaVariables, type VariableCollection } from '../figma-helpers';
 
 export type TemplateProps = Record<string, unknown>;
 

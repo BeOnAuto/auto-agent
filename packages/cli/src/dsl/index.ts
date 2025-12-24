@@ -1,16 +1,16 @@
 import type { Command, Event } from '@auto-engineer/message-bus';
-import type {
-  EventRegistration,
-  DispatchAction,
-  FoldRegistration,
-  DslRegistration,
-  ConfigDefinition,
-  SettledRegistration,
-  SettledHandlerConfig,
-} from './types';
-import type { CommandMetadataService } from '../server/command-metadata-service';
 import type { ILocalMessageStore } from '@auto-engineer/message-store';
 import createDebug from 'debug';
+import type { CommandMetadataService } from '../server/command-metadata-service';
+import type {
+  ConfigDefinition,
+  DispatchAction,
+  DslRegistration,
+  EventRegistration,
+  FoldRegistration,
+  SettledHandlerConfig,
+  SettledRegistration,
+} from './types';
 
 const debug = createDebug('auto:cli:dsl:pipeline-graph');
 
@@ -54,13 +54,13 @@ export interface PipelineGraphConfig {
 
 export function on<T extends Event>(
   eventType: string | ((event: T) => void),
-  handler?: (event: T) => Command | Command[] | DispatchAction | void,
-): EventRegistration | void {
+  handler?: (event: T) => Command | Command[] | DispatchAction | undefined,
+): EventRegistration | undefined {
   if (typeof eventType === 'function') {
     const registration: EventRegistration = {
       type: 'on',
       eventType: '',
-      handler: eventType as (event: Event) => Command | Command[] | DispatchAction | void,
+      handler: eventType as (event: Event) => Command | Command[] | DispatchAction | undefined,
     };
     registrations.push(registration as unknown as DslRegistration);
     return registration;
@@ -70,7 +70,7 @@ export function on<T extends Event>(
     const registration: EventRegistration = {
       type: 'on',
       eventType,
-      handler: handler as (event: Event) => Command | Command[] | DispatchAction | void,
+      handler: handler as (event: Event) => Command | Command[] | DispatchAction | undefined,
     };
     registrations.push(registration as unknown as DslRegistration);
     return registration;
@@ -255,7 +255,7 @@ dispatch.custom = <T extends Command>(commandFactory: () => T | T[]): DispatchAc
 export function fold<S, E extends Event>(
   eventType: string | ((state: S, event: E) => S),
   reducer?: (state: S, event: E) => S,
-): FoldRegistration<S, E> | void {
+): FoldRegistration<S, E> | undefined {
   // Support both forms: fold('EventName', reducer) and fold<State, Event>((state, event) => ...)
   if (typeof eventType === 'function') {
     const registration: FoldRegistration<S, E> = {

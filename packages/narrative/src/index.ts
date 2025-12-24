@@ -1,25 +1,24 @@
-import { z } from 'zod';
-
-// Core types and utilities
-export type {
-  Integration,
-  DataSink,
-  DataSource,
-  DataSinkItem,
-  DataSourceItem,
-  DataItem,
-  MessageTarget,
-  Destination,
-  Origin,
-  State,
-  Command,
-  Event,
-} from './types';
-export { MessageTargetSchema, DataSinkSchema, DataSourceSchema } from './schema';
-export { createIntegration } from './types';
+import type { z } from 'zod';
 
 // Apollo GraphQL
 export { gql } from 'graphql-tag';
+export { DataSinkSchema, DataSourceSchema, MessageTargetSchema } from './schema';
+// Core types and utilities
+export type {
+  Command,
+  DataItem,
+  DataSink,
+  DataSinkItem,
+  DataSource,
+  DataSourceItem,
+  Destination,
+  Event,
+  Integration,
+  MessageTarget,
+  Origin,
+  State,
+} from './types';
+export { createIntegration } from './types';
 
 // HTTP GET template literal function
 export const get = (strings: TemplateStringsArray, ...values: unknown[]) => {
@@ -29,75 +28,83 @@ export const get = (strings: TemplateStringsArray, ...values: unknown[]) => {
   }, '');
 };
 
-// Fluent API
-export type {
-  FluentCommandSliceBuilder,
-  FluentQuerySliceBuilder,
-  FluentReactionSliceBuilder,
-  FluentExperienceSliceBuilder,
-} from './fluent-builder';
-export { command, query, react, experience, decide, evolve } from './fluent-builder';
+export type { ExportSchemaEvents } from './commands/export-schema';
+export type { FieldSelector } from './data-narrative-builders';
 
 // Data narrative builders
 export { sink, source } from './data-narrative-builders';
-export type { FieldSelector } from './data-narrative-builders';
-
-// Narrative language functions
-export { narrative, narrative as flow } from './narrative';
-export { client, server, specs, describe, it, should, request, data, rule, example, thenError } from './narrative';
-export type { ExampleBuilder, GivenBuilder, WhenBuilder, ThenBuilder } from './narrative';
-export type { SliceTypeValueInterface } from './narrative';
-export { SliceType } from './narrative';
-
+// Fluent API
+export type {
+  FluentCommandSliceBuilder,
+  FluentExperienceSliceBuilder,
+  FluentQuerySliceBuilder,
+  FluentReactionSliceBuilder,
+} from './fluent-builder';
+export { command, decide, evolve, experience, query, react } from './fluent-builder';
 // Narrative conversion utilities
 export { getNarratives } from './getNarratives';
-export { modelToNarrative } from './transformers/model-to-narrative';
-
-export type { ExportSchemaEvents } from './commands/export-schema';
-
-// Testing helpers
-export { createNarrativeSpec, given as testGiven, when as testWhen } from './testing';
-
+export type { ExampleBuilder, GivenBuilder, SliceTypeValueInterface, ThenBuilder, WhenBuilder } from './narrative';
+// Narrative language functions
+export {
+  client,
+  data,
+  describe,
+  example,
+  it,
+  narrative,
+  narrative as flow,
+  request,
+  rule,
+  SliceType,
+  server,
+  should,
+  specs,
+  thenError,
+} from './narrative';
 // Schema definitions for progressive narrative creation
 export {
-  NarrativeNamesSchema as NarrativeNamesSystemSchema,
-  SliceNamesSchema as SliceNamesSystemSchema,
   ClientServerNamesSchema as ClientServerNamesSystemSchema,
-  modelSchema as SpecsSystemSchema,
+  CommandSchema,
+  CommandSliceSchema,
+  EventSchema,
+  ExampleSchema,
+  ExperienceSliceSchema,
+  IntegrationSchema,
   MessageFieldSchema,
   MessageSchema,
-  CommandSchema,
-  EventSchema,
-  StateSchema,
-  IntegrationSchema,
-  CommandSliceSchema,
+  modelSchema as SpecsSystemSchema,
+  modelSchema,
+  NarrativeNamesSchema as NarrativeNamesSystemSchema,
+  NarrativeSchema,
   QuerySliceSchema,
   ReactSliceSchema,
-  ExperienceSliceSchema,
-  SliceSchema,
-  NarrativeSchema,
-  modelSchema,
-  ExampleSchema,
   RuleSchema,
+  SliceNamesSchema as SliceNamesSystemSchema,
+  SliceSchema,
   SpecSchema,
-  StepSchema,
+  StateSchema,
   StepErrorSchema,
+  StepSchema,
   StepWithDocStringSchema,
   StepWithErrorSchema,
 } from './schema';
 
-import {
-  NarrativeSchema,
-  SliceSchema,
-  modelSchema,
-  QuerySliceSchema,
-  ReactSliceSchema,
-  ExperienceSliceSchema,
-  MessageSchema,
-  MessageFieldSchema,
+// Testing helpers
+export { createNarrativeSpec, given as testGiven, when as testWhen } from './testing';
+export { modelToNarrative } from './transformers/model-to-narrative';
+
+import type {
   CommandSliceSchema,
   ExampleSchema,
+  ExperienceSliceSchema,
+  MessageFieldSchema,
+  MessageSchema,
+  modelSchema,
+  NarrativeSchema,
+  QuerySliceSchema,
+  ReactSliceSchema,
   RuleSchema,
+  SliceSchema,
   SpecSchema,
   StepSchema,
 } from './schema';
@@ -114,7 +121,7 @@ export type MessageField = z.infer<typeof MessageFieldSchema>;
 export type Rule = z.infer<typeof RuleSchema>;
 export type Spec = z.infer<typeof SpecSchema>;
 export type Step = z.infer<typeof StepSchema>;
-export type { ClientSpecNode } from './schema';
 
 // ID assignment utilities
 export { addAutoIds, hasAllIds } from './id';
+export type { ClientSpecNode } from './schema';

@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { EventCapture } from './event-capture';
 import type { Event } from '@auto-engineer/message-bus';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { EventCapture } from './event-capture';
 
 describe('EventCapture', () => {
   let capture: EventCapture;

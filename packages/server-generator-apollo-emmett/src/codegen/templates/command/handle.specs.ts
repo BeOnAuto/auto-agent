@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import type { Model as SpecsSchema } from '@auto-engineer/narrative';
+import { describe, expect, it } from 'vitest';
 import { generateScaffoldFilePlans } from '../../scaffoldFromSchema';
-import { Model as SpecsSchema } from '@auto-engineer/narrative';
 
 describe('generateScaffoldFilePlans', () => {
   it('should generate a valid handle file', async () => {

@@ -9,7 +9,7 @@ export function dirname(p: string) {
 export function join(a: string, b: string) {
   const aa = toPosix(a).replace(/\/+$/, '');
   const bb = toPosix(b).replace(/^\/+/, '');
-  return (aa ? aa + '/' : '/') + bb;
+  return (aa ? `${aa}/` : '/') + bb;
 }
 
 export function normalize(path: string): string {
@@ -23,7 +23,7 @@ export function normalize(path: string): string {
     }
     out.push(part);
   }
-  return '/' + out.join('/');
+  return `/${out.join('/')}`;
 }
 
 export const CANDIDATE_EXTS = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'];

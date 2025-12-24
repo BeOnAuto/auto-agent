@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { MessageBusServer } from '../server/server';
-import { on, dispatch, getRegistrations } from './index';
 import type { Command, Event } from '@auto-engineer/message-bus';
 import getPort from 'get-port';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { MessageBusServer } from '../server/server';
+import { dispatch, getRegistrations, on } from './index';
 
 interface CheckTestsCommand extends Command {
   type: 'CheckTests';

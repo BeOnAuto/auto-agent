@@ -1,3 +1,3 @@
-export * from './loadResolvers';
-export * from './loadRegisterFiles';
 export * from './loadProjections';
+export * from './loadRegisterFiles';
+export * from './loadResolvers';

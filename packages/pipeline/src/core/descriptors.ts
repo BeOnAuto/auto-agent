@@ -1,6 +1,6 @@
 import type { Event } from '@auto-engineer/message-bus';
-import type { CommandDispatch } from './types';
 import type { PipelineContext } from '../runtime/context';
+import type { CommandDispatch } from './types';
 
 export type KeyExtractor = (event: Event) => string;
 

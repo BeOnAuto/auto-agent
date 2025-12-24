@@ -1,4 +1,4 @@
-import { Message } from '../../index';
+import type { Message } from '../../index';
 
 function hasEnvelope(fields: { name: string }[] = []): boolean {
   const names = new Set(fields.map((f) => f.name));

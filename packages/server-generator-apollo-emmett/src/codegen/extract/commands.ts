@@ -1,4 +1,4 @@
-import type { Message, MessageDefinition, EventRef, CommandRef, ErrorRef } from '../types';
+import type { CommandRef, ErrorRef, EventRef, Message, MessageDefinition } from '../types';
 import { extractFieldsFromMessage } from './fields';
 
 function createCommandMessage(

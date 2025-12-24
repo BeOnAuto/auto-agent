@@ -9,7 +9,7 @@ interface NodeProcess {
   versions?: ProcessVersions;
 }
 
-let debugFactory: DebugFactory | null | undefined = undefined;
+let debugFactory: DebugFactory | null | undefined;
 let debugPromise: Promise<void> | null = null;
 
 function isNodeEnvironment(): boolean {

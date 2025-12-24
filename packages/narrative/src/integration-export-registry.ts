@@ -1,5 +1,5 @@
-import { Integration } from './types';
-import { IntegrationExport } from './loader/ts-utils';
+import type { IntegrationExport } from './loader/ts-utils';
+import type { Integration } from './types';
 
 /**
  * Global registry to map integration internal names to their export names and source paths

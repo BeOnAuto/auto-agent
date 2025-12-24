@@ -1,6 +1,6 @@
-import type { DataSinkItem, DataSourceItem, MessageTarget, Integration, DefaultRecord } from './types';
-import { createIntegrationOrigin } from './types';
 import { integrationExportRegistry } from './integration-export-registry';
+import type { DataSinkItem, DataSourceItem, DefaultRecord, Integration, MessageTarget } from './types';
+import { createIntegrationOrigin } from './types';
 
 // Extended interfaces that add chainable methods
 export interface ChainableSinkMethods {
@@ -19,19 +19,17 @@ export type ChainableSource = DataSourceItem & ChainableSourceMethods;
 function createChainableSink(sinkItem: DataSinkItem): ChainableSink {
   const chainable = sinkItem as ChainableSink;
 
-  (chainable as ChainableSinkMethods).additionalInstructions = function (instructions: string): ChainableSink {
-    return createChainableSink({
+  (chainable as ChainableSinkMethods).additionalInstructions = (instructions: string): ChainableSink =>
+    createChainableSink({
       ...sinkItem,
       _additionalInstructions: instructions,
     });
-  };
 
-  (chainable as ChainableSinkMethods).withState = function (source: DataSourceItem | ChainableSource): ChainableSink {
-    return createChainableSink({
+  (chainable as ChainableSinkMethods).withState = (source: DataSourceItem | ChainableSource): ChainableSink =>
+    createChainableSink({
       ...sinkItem,
       _withState: source,
     });
-  };
 
   return chainable;
 }
@@ -39,12 +37,11 @@ function createChainableSink(sinkItem: DataSinkItem): ChainableSink {
 function createChainableSource(sourceItem: DataSourceItem): ChainableSource {
   const chainable = sourceItem as ChainableSource;
 
-  (chainable as ChainableSourceMethods).additionalInstructions = function (instructions: string): ChainableSource {
-    return createChainableSource({
+  (chainable as ChainableSourceMethods).additionalInstructions = (instructions: string): ChainableSource =>
+    createChainableSource({
       ...sourceItem,
       _additionalInstructions: instructions,
     });
-  };
 
   return chainable;
 }

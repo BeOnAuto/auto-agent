@@ -1,32 +1,23 @@
-import { autoConfig, on, dispatch } from '@auto-engineer/cli';
-import type { ExportSchemaCommand, ExportSchemaEvents } from '@auto-engineer/narrative';
-import type { GenerateServerCommand, GenerateServerEvents } from '@auto-engineer/server-generator-apollo-emmett';
+import { autoConfig, dispatch, on } from '@auto-engineer/cli';
+import type { GenerateClientCommand, GenerateClientEvents } from '@auto-engineer/frontend-generator-react-graphql';
+import type { ImplementClientCommand } from '@auto-engineer/frontend-implementer';
+import type { GenerateIACommand, GenerateIAEvents } from '@auto-engineer/information-architect';
+import type { ExportSchemaEvents } from '@auto-engineer/narrative';
 import type {
-  ImplementServerCommand,
-  ImplementServerEvents,
-  ImplementSliceEvents,
-  ImplementSliceCommand,
-} from '@auto-engineer/server-implementer';
-import type {
+  CheckLintCommand,
+  CheckLintEvents,
   CheckTestsCommand,
   CheckTestsEvents,
   CheckTypesCommand,
   CheckTypesEvents,
-  CheckLintCommand,
-  CheckLintEvents,
+  LintCheckFailedEvent,
   TestsCheckFailedEvent,
   TypeCheckFailedEvent,
-  LintCheckFailedEvent,
 } from '@auto-engineer/server-checks';
-import type { GenerateIACommand, GenerateIAEvents } from '@auto-engineer/information-architect';
-import type { ImplementClientCommand, ImplementClientEvents } from '@auto-engineer/frontend-implementer';
-import type { GenerateClientCommand, GenerateClientEvents } from '@auto-engineer/frontend-generator-react-graphql';
-import {
-  CheckClientCommand,
-  CheckClientEvents,
-  ClientCheckFailedEvent,
-} from '../../packages/frontend-checks/dist/src/commands/check-client';
-import { SliceGeneratedEvent } from '../../packages/server-generator-apollo-emmett/dist/src/commands/generate-server';
+import type { GenerateServerCommand, GenerateServerEvents } from '@auto-engineer/server-generator-apollo-emmett';
+import type { ImplementSliceCommand, ImplementSliceEvents } from '@auto-engineer/server-implementer';
+import type { CheckClientEvents } from '../../packages/frontend-checks/dist/src/commands/check-client';
+import type { SliceGeneratedEvent } from '../../packages/server-generator-apollo-emmett/dist/src/commands/generate-server';
 
 export default autoConfig({
   fileId: 'test44444', // unique 9-character base62 canvas file id where all flows in this project will be shown

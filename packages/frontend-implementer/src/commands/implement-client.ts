@@ -1,6 +1,6 @@
-import { type Command, type Event, defineCommandHandler } from '@auto-engineer/message-bus';
-import { runAIAgent } from '../agent';
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
+import { runAIAgent } from '../agent';
 
 const debug = createDebug('auto:frontend-implementer:implement-client');
 

@@ -1,6 +1,6 @@
 import type { IFileStore } from '@auto-engineer/file-store';
-import { CANDIDATE_EXTS, dirname, join, normalize } from './fs-path';
 import createDebug from 'debug';
+import { CANDIDATE_EXTS, dirname, join, normalize } from './fs-path';
 
 const debug = createDebug('auto:flow:when-types');
 
@@ -16,7 +16,7 @@ export async function resolveRelative(vfs: IFileStore, spec: string, parent: str
   if (await fileExists(vfs, raw)) return raw;
   for (const ext of CANDIDATE_EXTS) if (await fileExists(vfs, raw + ext)) return raw + ext;
   for (const ext of CANDIDATE_EXTS) {
-    const idx = normalize(join(raw, 'index' + ext));
+    const idx = normalize(join(raw, `index${ext}`));
     if (await fileExists(vfs, idx)) return idx;
   }
   return null;
@@ -28,7 +28,7 @@ export async function resolveAbsolute(vfs: IFileStore, spec: string): Promise<st
   if (await fileExists(vfs, raw)) return raw;
   for (const ext of CANDIDATE_EXTS) if (await fileExists(vfs, raw + ext)) return raw + ext;
   for (const ext of CANDIDATE_EXTS) {
-    const idx = normalize(join(raw, 'index' + ext));
+    const idx = normalize(join(raw, `index${ext}`));
     if (await fileExists(vfs, idx)) return idx;
   }
   return null;
@@ -36,7 +36,7 @@ export async function resolveAbsolute(vfs: IFileStore, spec: string): Promise<st
 
 /** Shim import.meta in user code (we only provide a url). */
 export function patchImportMeta(src: string, absPath: string): string {
-  return src.replace(/\bimport\.meta\b/g, `({ url: ${JSON.stringify('file://' + absPath)} })`);
+  return src.replace(/\bimport\.meta\b/g, `({ url: ${JSON.stringify(`file://${absPath}`)} })`);
 }
 
 export function parseImports(ts: typeof import('typescript'), fileName: string, source: string): string[] {
@@ -546,7 +546,7 @@ function findTypeInfo(
     }
   }
 
-  return ti && ti.classification ? ti : null;
+  return ti?.classification ? ti : null;
 }
 
 function createGivenTypeInfo(

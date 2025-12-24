@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import createDebug from 'debug';
 
 const debug = createDebug('cli:file-syncer:path');
@@ -34,7 +34,7 @@ export function toWirePath(abs: string, projectRoot: string) {
   }
 
   // Normal case: path is within project root
-  const wire = ('/' + rel).split(path.sep).join('/');
+  const wire = `/${rel}`.split(path.sep).join('/');
   return wire;
 }
 

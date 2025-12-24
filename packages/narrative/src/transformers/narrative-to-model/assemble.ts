@@ -1,4 +1,4 @@
-import { Narrative, Model } from '../../index';
+import type { Model, Narrative } from '../../index';
 
 export function assembleSpecs(narratives: Narrative[], messages: unknown[], integrations: unknown[]): Model {
   return {

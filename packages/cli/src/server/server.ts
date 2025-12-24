@@ -1,20 +1,20 @@
-import express from 'express';
+import { createServer } from 'node:http';
+import { type Command, createMessageBus, type Event, type MessageBus } from '@auto-engineer/message-bus';
+import { type ILocalMessageStore, MemoryMessageStore } from '@auto-engineer/message-store';
 import cors from 'cors';
-import { createServer } from 'http';
-import { Server as SocketIOServer } from 'socket.io';
-import { createMessageBus, type MessageBus, type Event, type Command } from '@auto-engineer/message-bus';
-import { MemoryMessageStore, type ILocalMessageStore } from '@auto-engineer/message-store';
 import createDebug from 'debug';
-import { StateManager } from './state-manager';
-import { FileSyncer } from './file-syncer';
+import express from 'express';
+import { Server as SocketIOServer } from 'socket.io';
 import type { EventRegistration, FoldRegistration, SettledRegistration } from '../dsl/types';
-import { setupHttpRoutes } from './http-routes';
-import { setupWebSocketHandlers } from './websocket-handler';
-import { EventProcessor } from './event-processor';
+import type { CommandMetadataService } from './command-metadata-service';
 import { CommandRegistry } from './command-registry';
-import { CommandMetadataService } from './command-metadata-service';
+import { EventProcessor } from './event-processor';
+import { FileSyncer } from './file-syncer';
+import { setupHttpRoutes } from './http-routes';
+import { ChildProcessManager, type ServerService } from './services';
 import { SettledTracker } from './settled-tracker';
-import { type ServerService, ChildProcessManager } from './services';
+import { StateManager } from './state-manager';
+import { setupWebSocketHandlers } from './websocket-handler';
 
 const debug = createDebug('auto:cli:server');
 

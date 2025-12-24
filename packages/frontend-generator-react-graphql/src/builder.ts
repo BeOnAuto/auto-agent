@@ -1,5 +1,5 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import createDebug from 'debug';
 
 const debug = createDebug('auto:frontend-generator-react-graphql:builder');

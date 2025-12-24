@@ -1,6 +1,6 @@
-import { NarrativeSchema } from './schema';
-import { Narrative } from './index';
 import createDebug from 'debug';
+import type { Narrative } from './index';
+import { NarrativeSchema } from './schema';
 
 const debug = createDebug('auto:narrative:registry');
 // Set non-error-like colors for debug namespace

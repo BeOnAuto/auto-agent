@@ -1,8 +1,8 @@
-import path from 'path';
-import fg from 'fast-glob';
+import { access, readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 import { generateTextWithAI } from '@auto-engineer/ai-gateway';
-import { readFile, writeFile, access } from 'fs/promises';
 import { execa } from 'execa';
+import fg from 'fast-glob';
 import { SYSTEM_PROMPT } from '../prompts/systemPrompt';
 import { extractCodeBlock } from '../utils/extractCodeBlock';
 import { runTests } from './runTests';
