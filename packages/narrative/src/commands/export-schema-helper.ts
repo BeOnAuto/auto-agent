@@ -50,12 +50,17 @@ const main = async () => {
     await fs.ensureDir(contextDir);
     await fs.writeText(outPath, json);
     debug('Schema written to: %s', outPath);
-    console.log(JSON.stringify({ success: true, outputPath: outPath }));
+
+    const resultPath = fs.join(contextDir, '.export-result.json');
+    await fs.writeText(resultPath, JSON.stringify({ success: true, outputPath: outPath }));
   } catch (error) {
     debug('Error occurred: %o', error);
-
-    // Output error as JSON for parent process
-    console.log(
+    const getFileStore = getFs as () => Promise<IExtendedFileStore>;
+    const fss: IExtendedFileStore = await getFileStore();
+    const resultPath = fss.join(process.argv[2] || process.cwd(), '.context', '.export-result.json');
+    await fss.ensureDir(fss.dirname(resultPath));
+    await fss.writeText(
+      resultPath,
       JSON.stringify({
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred',

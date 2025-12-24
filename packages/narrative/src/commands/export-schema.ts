@@ -68,76 +68,52 @@ export async function handleExportSchemaCommand(
     const fs = await getFs();
     const __dirname = fs.dirname(new URL(import.meta.url).href);
     const helperScript = fs.join(__dirname, 'export-schema-helper.js');
-    const { spawn } = await import('child_process');
 
-    return new Promise((resolve) => {
-      const child = spawn('npx', ['tsx', helperScript, directory], {
-        cwd: directory,
-        stdio: ['inherit', 'pipe', 'inherit'], // Let stderr go directly to parent process
-        env: {
-          ...process.env,
-          NODE_ENV: process.env.NODE_ENV ?? 'development',
-          DEBUG: process.env.DEBUG, // Explicitly pass DEBUG env var
-          DEBUG_COLORS: process.env.DEBUG_COLORS, // Pass color settings
-          DEBUG_HIDE_DATE: 'true', // Always hide timestamps in child process to match parent
-        },
-        shell: true,
-      });
+    const resultPath = fs.join(directory, '.context', '.export-result.json');
 
-      let stdout = '';
-
-      child.stdout.on('data', (data: Buffer) => {
-        stdout += data.toString();
-      });
-
-      child.on('close', (code) => {
-        try {
-          // Extract JSON from stdout - look for the last line that starts with '{'
-          const lines = stdout.trim().split('\n');
-          const jsonLine = lines.reverse().find((line) => line.trim().startsWith('{'));
-
-          if (jsonLine == null) {
-            throw new Error('No JSON output found');
-          }
-
-          const result = JSON.parse(jsonLine) as { success?: boolean; outputPath?: string; error?: string };
-          if (result.success === true) {
-            resolve({
-              type: 'SchemaExported',
-              data: {
-                directory,
-                outputPath: result.outputPath ?? '',
-              },
-              timestamp: new Date(),
-              requestId: command.requestId,
-              correlationId: command.correlationId,
-            });
-          } else {
-            resolve({
-              type: 'SchemaExportFailed',
-              data: {
-                directory,
-                error: result.error ?? 'Unknown error',
-              },
-              timestamp: new Date(),
-              requestId: command.requestId,
-              correlationId: command.correlationId,
-            });
-          }
-        } catch {
-          resolve({
-            type: 'SchemaExportFailed',
-            data: {
-              directory,
-              error: code === 0 ? 'Failed to parse result' : `Process failed with code ${code}`,
-            },
-            timestamp: new Date(),
-            requestId: command.requestId,
-            correlationId: command.correlationId,
-          });
-        }
-      });
+    const { spawnSync } = await import('child_process');
+    spawnSync('node', [helperScript, directory], {
+      cwd: directory,
+      encoding: 'utf-8',
+      stdio: 'ignore',
+      env: {
+        ...process.env,
+        NODE_ENV: process.env.NODE_ENV ?? 'development',
+        DEBUG: process.env.DEBUG,
+        DEBUG_COLORS: process.env.DEBUG_COLORS,
+        DEBUG_HIDE_DATE: 'true',
+      },
     });
+
+    const resultJson = await fs.readText(resultPath);
+    if (resultJson == null) {
+      return {
+        type: 'SchemaExportFailed',
+        data: { directory, error: 'No result file found' },
+        timestamp: new Date(),
+        requestId: command.requestId,
+        correlationId: command.correlationId,
+      };
+    }
+
+    const parsed = JSON.parse(resultJson) as { success?: boolean; outputPath?: string; error?: string };
+    if (parsed.success === true) {
+      return {
+        type: 'SchemaExported',
+        data: { directory, outputPath: parsed.outputPath ?? '' },
+        timestamp: new Date(),
+        requestId: command.requestId,
+        correlationId: command.correlationId,
+      };
+    } else {
+      return {
+        type: 'SchemaExportFailed',
+        data: { directory, error: parsed.error ?? 'Unknown error' },
+        timestamp: new Date(),
+        requestId: command.requestId,
+        correlationId: command.correlationId,
+      };
+    }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     return {
