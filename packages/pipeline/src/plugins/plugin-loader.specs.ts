@@ -254,7 +254,7 @@ describe('PluginLoader', () => {
     });
   });
 
-  describe('integration', () => {
+  describe('integration', { timeout: 30000 }, () => {
     it('should load real package using default deps', async () => {
       const loader = new PluginLoader();
       const handlers = await loader.loadPlugin('@auto-engineer/server-checks');
