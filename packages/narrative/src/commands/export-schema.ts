@@ -40,7 +40,7 @@ export const commandHandler = defineCommandHandler({
   events: ['SchemaExported', 'SchemaExportFailed'],
   fields: {
     directory: {
-      description: 'Context directory path',
+      description: 'Context directory path (defaults to current working directory)',
       required: true,
     },
   },
@@ -60,7 +60,7 @@ export const commandHandler = defineCommandHandler({
 export async function handleExportSchemaCommand(
   command: ExportSchemaCommand,
 ): Promise<SchemaExportedEvent | SchemaExportFailedEvent> {
-  const { directory } = command.data;
+  const directory = command.data.directory ?? process.cwd();
 
   try {
     // Run the helper script with tsx
