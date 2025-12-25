@@ -1,4 +1,4 @@
-name: 'Build & Test'
+name: "Build & Test"
 
 on:
   pull_request:
@@ -17,9 +17,9 @@ jobs:
     env:
       NEXT_PUBLIC_V0_URL: https://v0.dev
       NEXT_PUBLIC_APP_URL: http://localhost:4000
-      NPM_CONFIG_FETCH_RETRIES: '5'
-      NPM_CONFIG_FETCH_RETRY_MINTIMEOUT: '30000'
-      NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: '120000'
+      NPM_CONFIG_FETCH_RETRIES: "5"
+      NPM_CONFIG_FETCH_RETRY_MINTIMEOUT: "30000"
+      NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: "120000"
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
     steps:
@@ -31,15 +31,27 @@ jobs:
           version: 10.15.0
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
-          cache: 'pnpm'
-          registry-url: 'https://registry.npmjs.org'
-          scope: '@auto-engineer'
+          node-version: "20.x"
+          cache: "pnpm"
+          registry-url: "https://registry.npmjs.org"
+          scope: "@auto-engineer"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Pre-fetch deps
         run: pnpm fetch --network-concurrency=8
+
+      - name: Debug Turbo Remote Cache
+        run: |
+          echo "=== Turbo Remote Cache Debug ==="
+          echo "TURBO_TOKEN length: ${#TURBO_TOKEN}"
+          echo "TURBO_TOKEN starts with: ${TURBO_TOKEN:0:8}..."
+          echo "TURBO_TEAM length: ${#TURBO_TEAM}"
+          echo "TURBO_TEAM starts with: ${TURBO_TEAM:0:8}..."
+          echo "teamId from config: $(cat .turbo/config.json)"
+          echo ""
+          echo "=== Testing Vercel API connectivity ==="
+          curl -s --max-time 10 https://api.vercel.com/v8/artifacts/status -H "Authorization: Bearer $TURBO_TOKEN" || echo "curl failed"
 
       - name: Install dependencies
         run: |
@@ -52,15 +64,15 @@ jobs:
 
       - name: Build all workspaces
         env:
-          NODE_OPTIONS: '--max-old-space-size=8192'
+          NODE_OPTIONS: "--max-old-space-size=8192"
         run: pnpm build
 
       - name: Send build failure notification
         if: failure()
         uses: ./.github/actions/slack-notification
         with:
-          job-name: 'Build'
-          job-status: 'failure'
+          job-name: "Build"
+          job-status: "failure"
           slack-channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
 
@@ -70,9 +82,9 @@ jobs:
     env:
       NEXT_PUBLIC_V0_URL: https://v0.dev
       NEXT_PUBLIC_APP_URL: http://localhost:4000
-      NPM_CONFIG_FETCH_RETRIES: '5'
-      NPM_CONFIG_FETCH_RETRY_MINTIMEOUT: '30000'
-      NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: '120000'
+      NPM_CONFIG_FETCH_RETRIES: "5"
+      NPM_CONFIG_FETCH_RETRY_MINTIMEOUT: "30000"
+      NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: "120000"
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
     steps:
@@ -84,10 +96,10 @@ jobs:
           version: 10.15.0
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
-          cache: 'pnpm'
-          registry-url: 'https://registry.npmjs.org'
-          scope: '@auto-engineer'
+          node-version: "20.x"
+          cache: "pnpm"
+          registry-url: "https://registry.npmjs.org"
+          scope: "@auto-engineer"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -110,8 +122,8 @@ jobs:
         if: failure()
         uses: ./.github/actions/slack-notification
         with:
-          job-name: 'Tests'
-          job-status: 'failure'
+          job-name: "Tests"
+          job-status: "failure"
           slack-channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
 
@@ -125,7 +137,7 @@ jobs:
       - name: Send success notification
         uses: ./.github/actions/slack-notification
         with:
-          job-name: 'Build & Test'
-          job-status: 'success'
+          job-name: "Build & Test"
+          job-status: "success"
           slack-channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
