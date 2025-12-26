@@ -132,7 +132,7 @@ async function loadComponentDataForImplementation(
   const componentDef = items[componentName] as Record<string, unknown> | undefined;
   if (!componentDef) throw new Error(`Component ${componentType}:${componentName} not found in IA schema`);
 
-  const outPath = path.join(projectDir, '..', filePath);
+  const outPath = path.isAbsolute(filePath) ? filePath : path.join(projectDir, '..', filePath);
 
   const t2 = performance.now();
   let existingScaffold = '';

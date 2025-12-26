@@ -13,12 +13,15 @@
     "serve": "tsx --watch scripts/start-server.ts"
   },
   "dependencies": {
+    "@auto-engineer/file-store": "workspace:*",
     "@auto-engineer/message-bus": "workspace:*",
     "@auto-engineer/message-store": "workspace:*",
+    "chokidar": "^3.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.18.0",
     "get-port": "^7.1.0",
+    "jose": "^5.9.6",
     "nanoid": "^5.0.0"
   },
   "devDependencies": {

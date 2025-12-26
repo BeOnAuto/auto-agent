@@ -87,6 +87,67 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@20.19.11)(jsdom@26.1.0)
 
+  examples/kanban-new:
+    dependencies:
+      '@auto-engineer/cli-new':
+        specifier: workspace:*
+        version: link:../../packages/cli-new
+      '@auto-engineer/component-implementer':
+        specifier: workspace:*
+        version: link:../../packages/component-implementer
+      '@auto-engineer/design-system-importer':
+        specifier: workspace:*
+        version: link:../../packages/design-system-importer
+      '@auto-engineer/dev-server':
+        specifier: workspace:*
+        version: link:../../packages/dev-server
+      '@auto-engineer/frontend-checks':
+        specifier: workspace:*
+        version: link:../../packages/frontend-checks
+      '@auto-engineer/frontend-generator-react-graphql':
+        specifier: workspace:*
+        version: link:../../packages/frontend-generator-react-graphql
+      '@auto-engineer/frontend-implementer':
+        specifier: workspace:*
+        version: link:../../packages/frontend-implementer
+      '@auto-engineer/information-architect':
+        specifier: workspace:*
+        version: link:../../packages/information-architect
+      '@auto-engineer/message-bus':
+        specifier: workspace:*
+        version: link:../../packages/message-bus
+      '@auto-engineer/narrative':
+        specifier: workspace:*
+        version: link:../../packages/narrative
+      '@auto-engineer/pipeline':
+        specifier: workspace:*
+        version: link:../../packages/pipeline
+      '@auto-engineer/server-checks':
+        specifier: workspace:*
+        version: link:../../packages/server-checks
+      '@auto-engineer/server-generator-apollo-emmett':
+        specifier: workspace:*
+        version: link:../../packages/server-generator-apollo-emmett
+      '@auto-engineer/server-implementer':
+        specifier: workspace:*
+        version: link:../../packages/server-implementer
+    devDependencies:
+      '@types/node':
+        specifier: ^24.3.1
+        version: 24.3.1
+      chokidar:
+        specifier: ^3.6.0
+        version: 3.6.0
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.6.1
+      dotenv-cli:
+        specifier: ^9.0.0
+        version: 9.0.0
+      tsx:
+        specifier: ^3.12.7
+        version: 3.14.0
+
   examples/kanban-todo:
     dependencies:
       '@auto-engineer/cli':
@@ -342,6 +403,34 @@ importers:
       tsx:
         specifier: ^4.20.3
         version: 4.20.5
+
+  packages/cli-new:
+    dependencies:
+      '@auto-engineer/pipeline':
+        specifier: workspace:*
+        version: link:../pipeline
+      chalk:
+        specifier: ^5.3.0
+        version: 5.6.0
+      commander:
+        specifier: ^12.0.0
+        version: 12.1.0
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.6.1
+      get-port:
+        specifier: ^7.1.0
+        version: 7.1.0
+      jiti:
+        specifier: ^2.4.2
+        version: 2.5.1
+      ora:
+        specifier: ^8.0.1
+        version: 8.2.0
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.18.0
 
   packages/component-implementer:
     dependencies:
@@ -650,12 +739,18 @@ importers:
 
   packages/pipeline:
     dependencies:
+      '@auto-engineer/file-store':
+        specifier: workspace:*
+        version: link:../file-store
       '@auto-engineer/message-bus':
         specifier: workspace:*
         version: link:../message-bus
       '@auto-engineer/message-store':
         specifier: workspace:*
         version: link:../message-store
+      chokidar:
+        specifier: ^3.6.0
+        version: 3.6.0
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -668,6 +763,9 @@ importers:
       get-port:
         specifier: ^7.1.0
         version: 7.1.0
+      jose:
+        specifier: ^5.9.6
+        version: 5.10.0
       nanoid:
         specifier: ^5.0.0
         version: 5.1.5

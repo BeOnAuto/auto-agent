@@ -30,11 +30,11 @@ export type {
 } from './core/descriptors';
 export type { Command, CommandDispatch, Event } from './core/types';
 export { dispatch } from './core/types';
-
+export type { ActiveProvider, FileSyncerConfig, TokenPayload, WireChange, WireInitial } from './file-syncer';
+export { AIProvider, createJWE, FileSyncer, getActiveProvider, getProviderEnvHash } from './file-syncer';
 export type { GraphEdge, GraphIR, GraphNode, NodeType } from './graph/types';
 export type { EventLoggerOptions, LogEntry } from './logging/event-logger';
 export { EventLogger } from './logging/event-logger';
-
 export { AwaitTracker } from './runtime/await-tracker';
 export type { PipelineContext, RuntimeConfig } from './runtime/context';
 export { EventCommandMapper } from './runtime/event-command-map';
