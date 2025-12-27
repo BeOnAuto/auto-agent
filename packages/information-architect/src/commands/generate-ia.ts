@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import type { Model } from '@auto-engineer/narrative';
 import createDebug from 'debug';
-import { processFlowsWithAI } from '../index';
+import { processFlowsWithAI, type ValidationError, validateCompositionReferences } from '../index';
 import { flattenClientSpecs } from '../spec-utils';
 import type { UXSchema } from '../types';
 
@@ -22,6 +22,7 @@ export type GenerateIACommand = Command<
   {
     modelPath: string;
     outputDir: string;
+    previousErrors?: string;
   }
 >;
 
@@ -41,18 +42,27 @@ export type IAGenerationFailedEvent = Event<
   }
 >;
 
-export type GenerateIAEvents = IAGeneratedEvent | IAGenerationFailedEvent;
+export type IAValidationFailedEvent = Event<
+  'IAValidationFailed',
+  {
+    errors: ValidationError[];
+    outputDir: string;
+    modelPath: string;
+  }
+>;
+
+export type GenerateIAEvents = IAGeneratedEvent | IAGenerationFailedEvent | IAValidationFailedEvent;
 
 export const commandHandler = defineCommandHandler<
   GenerateIACommand,
-  (command: GenerateIACommand) => Promise<IAGeneratedEvent | IAGenerationFailedEvent>
+  (command: GenerateIACommand) => Promise<IAGeneratedEvent | IAGenerationFailedEvent | IAValidationFailedEvent>
 >({
   name: 'GenerateIA',
   alias: 'generate:ia',
   description: 'Generate Information Architecture',
   category: 'generate',
   icon: 'building',
-  events: ['IAGenerated', 'IAGenerationFailed'],
+  events: ['IAGenerated', 'IAGenerationFailed', 'IAValidationFailed'],
   fields: {
     outputDir: {
       description: 'Context directory',
@@ -64,10 +74,14 @@ export const commandHandler = defineCommandHandler<
     },
   },
   examples: ['$ auto generate:ia --output-dir=./.context --model-path=./.context/schema.json'],
-  handle: async (command: GenerateIACommand): Promise<IAGeneratedEvent | IAGenerationFailedEvent> => {
+  handle: async (
+    command: GenerateIACommand,
+  ): Promise<IAGeneratedEvent | IAGenerationFailedEvent | IAValidationFailedEvent> => {
     const result = await handleGenerateIACommandInternal(command);
     if (result.type === 'IAGenerated') {
       debug('IA schema generated successfully');
+    } else if (result.type === 'IAValidationFailed') {
+      debug('Validation failed with %d errors', result.data.errors.length);
     } else {
       debug('Failed: %s', result.data.error);
     }
@@ -154,8 +168,8 @@ async function getUniqueSchemaPath(
 
 async function handleGenerateIACommandInternal(
   command: GenerateIACommand,
-): Promise<IAGeneratedEvent | IAGenerationFailedEvent> {
-  const { outputDir, modelPath } = command.data;
+): Promise<IAGeneratedEvent | IAGenerationFailedEvent | IAValidationFailedEvent> {
+  const { outputDir, modelPath, previousErrors } = command.data;
 
   debug('Handling GenerateIA command');
   debug('  Output directory: %s', outputDir);
@@ -190,8 +204,30 @@ async function handleGenerateIACommandInternal(
     debug('  Existing schema: %s', existingSchema ? 'yes' : 'no');
     debug('  Atom count: %d', atoms.length);
 
-    const iaSchema = await processFlowsWithAI(processedModel, uxSchema, existingSchema, atoms);
+    const iaSchema = await processFlowsWithAI(processedModel, uxSchema, existingSchema, atoms, previousErrors);
     debug('AI processing complete');
+
+    const validationErrors = validateCompositionReferences(iaSchema, atomNames);
+    if (validationErrors.length > 0) {
+      debug('Validation failed with %d errors', validationErrors.length);
+      for (const err of validationErrors) {
+        debug('  - %s', err.message);
+      }
+
+      const validationFailedEvent: IAValidationFailedEvent = {
+        type: 'IAValidationFailed',
+        data: {
+          errors: validationErrors,
+          outputDir,
+          modelPath,
+        },
+        timestamp: new Date(),
+        requestId: command.requestId,
+        correlationId: command.correlationId,
+      };
+
+      return validationFailedEvent;
+    }
 
     // Write the schema to file
     debugResult('Writing IA schema to: %s', filePath);

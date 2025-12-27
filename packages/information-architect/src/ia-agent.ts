@@ -15,6 +15,91 @@ function isJsonString(str: string): boolean {
   }
 }
 
+interface CompositionSection {
+  atoms?: string[];
+  molecules?: string[];
+  organisms?: string[];
+}
+
+interface ComponentDefinition {
+  composition?: CompositionSection;
+}
+
+interface ItemsContainer {
+  items?: Record<string, ComponentDefinition>;
+}
+
+interface IASchema {
+  atoms?: ItemsContainer;
+  molecules?: ItemsContainer;
+  organisms?: ItemsContainer;
+  pages?: Record<string, unknown>;
+}
+
+export interface ValidationError {
+  component: string;
+  type: 'molecule' | 'organism';
+  field: string;
+  invalidReferences: string[];
+  message: string;
+}
+
+export function validateCompositionReferences(schema: unknown, designSystemAtoms: string[] = []): ValidationError[] {
+  const s = schema as IASchema;
+  const errors: ValidationError[] = [];
+
+  const schemaAtoms = Object.keys(s.atoms?.items ?? {});
+  const atomNames = new Set([...schemaAtoms, ...designSystemAtoms]);
+  const moleculeNames = new Set(Object.keys(s.molecules?.items ?? {}));
+  const organismNames = new Set(Object.keys(s.organisms?.items ?? {}));
+
+  for (const [name, def] of Object.entries(s.molecules?.items ?? {})) {
+    const referencedAtoms = def.composition?.atoms ?? [];
+    const invalidAtoms = referencedAtoms.filter((atom: string) => !atomNames.has(atom));
+    if (invalidAtoms.length > 0) {
+      errors.push({
+        component: name,
+        type: 'molecule',
+        field: 'composition.atoms',
+        invalidReferences: invalidAtoms,
+        message: `Molecule "${name}" references non-existent atoms: ${invalidAtoms.join(', ')}`,
+      });
+    }
+  }
+
+  for (const [name, def] of Object.entries(s.organisms?.items ?? {})) {
+    const referencedMolecules = def.composition?.molecules ?? [];
+
+    const nonExistentMolecules = referencedMolecules.filter(
+      (mol: string) => !moleculeNames.has(mol) && !organismNames.has(mol),
+    );
+    if (nonExistentMolecules.length > 0) {
+      errors.push({
+        component: name,
+        type: 'organism',
+        field: 'composition.molecules',
+        invalidReferences: nonExistentMolecules,
+        message: `Organism "${name}" references non-existent molecules: ${nonExistentMolecules.join(', ')}`,
+      });
+    }
+
+    const organismsAsMolecules = referencedMolecules.filter(
+      (mol: string) => organismNames.has(mol) && !moleculeNames.has(mol),
+    );
+    if (organismsAsMolecules.length > 0) {
+      errors.push({
+        component: name,
+        type: 'organism',
+        field: 'composition.molecules',
+        invalidReferences: organismsAsMolecules,
+        message: `Organism "${name}" incorrectly references organisms as molecules: ${organismsAsMolecules.join(', ')}. These should be in molecules.items, not organisms.items.`,
+      });
+    }
+  }
+
+  return errors;
+}
+
 export class InformationArchitectAgent {
   private provider?: AIProvider;
 
@@ -27,8 +112,9 @@ export class InformationArchitectAgent {
     uxSchema: UXSchema,
     existingSchema?: object,
     atoms?: { name: string; props: { name: string; type: string }[] }[],
+    previousErrors?: string,
   ): Promise<AIAgentOutput> {
-    const prompt = this.constructPrompt(model, uxSchema, existingSchema, atoms);
+    const prompt = this.constructPrompt(model, uxSchema, existingSchema, atoms, previousErrors);
     try {
       const response = await generateTextWithAI(prompt, {
         provider: this.provider,
@@ -54,12 +140,34 @@ export class InformationArchitectAgent {
     uxSchema: UXSchema,
     existingSchema?: object,
     atoms?: { name: string; props: { name: string; type: string }[] }[],
+    previousErrors?: string,
   ): string {
+    const errorContext = previousErrors
+      ? `
+PREVIOUS ATTEMPT FAILED VALIDATION. You MUST fix these errors:
+${previousErrors}
+
+The schema was rejected because of the composition errors above. Please regenerate the schema with these issues corrected.
+`
+      : '';
+
     return `
 You are an expert UI architect and product designer. Given the following model (containing flows, messages, and integrations) and UX schema, generate a detailed JSON specification for the application's UI components and pages.
-
+${errorContext}
 IMPORTANT: Only generate pages and components that are directly referenced in the provided model's flows. Do NOT add any extra pages or components, and do NOT make assumptions outside the flows. If something is not mentioned in the flows, it should NOT appear in the output.
 IMPORTANT: try your best to reuse the existing atoms, and try not to generate atoms with context: like Submit Button, because the submit part is mainly irrelevant, instead just use the Button atom if provided.
+
+CRITICAL COMPOSITION RULES - THESE ARE STRICT AND MUST BE FOLLOWED:
+1. Atoms: Basic UI primitives (Button, Text, Input, Icon, etc.). Atoms do NOT compose other atoms.
+2. Molecules: Composed ONLY of atoms. A molecule's "composition.atoms" array must ONLY reference items that exist in "atoms.items".
+3. Organisms: Composed of atoms AND molecules. An organism's "composition.molecules" array must ONLY reference items that exist in "molecules.items". An organism MUST NOT reference other organisms.
+4. Pages: Can reference organisms, molecules, and atoms.
+
+VALIDATION CHECKLIST (the schema will be rejected if these rules are violated):
+- Every item in a molecule's "composition.atoms" MUST exist in "atoms.items"
+- Every item in an organism's "composition.molecules" MUST exist in "molecules.items"
+- An organism's "composition.molecules" MUST NOT contain names that only exist in "organisms.items"
+- Cross-check all composition references before finalizing the output
 
 $${atoms ? `Here is a list of available atomic components (atoms) from the design system. Use these atoms and their props as much as possible. Only create new atoms if absolutely necessary. And only put the new atoms created into the schema. \n\nAtoms:\n${JSON.stringify(atoms, null, 2)}\n` : ''}
 System Model (flows, messages, integrations):
@@ -152,7 +260,8 @@ export async function processFlowsWithAI(
   uxSchema: UXSchema,
   existingSchema?: object,
   atoms?: { name: string; props: { name: string; type: string }[] }[],
+  previousErrors?: string,
 ): Promise<AIAgentOutput> {
   const agent = new InformationArchitectAgent();
-  return agent.generateUXComponents(model, uxSchema, existingSchema, atoms);
+  return agent.generateUXComponents(model, uxSchema, existingSchema, atoms, previousErrors);
 }

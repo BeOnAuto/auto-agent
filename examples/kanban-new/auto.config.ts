@@ -30,8 +30,24 @@ interface CheckEventData {
   errors?: string;
 }
 
+interface ValidationError {
+  component: string;
+  type: 'molecule' | 'organism';
+  field: string;
+  invalidReferences: string[];
+  message: string;
+}
+
+interface IAValidationFailedData {
+  errors: ValidationError[];
+  outputDir: string;
+  modelPath: string;
+}
+
 const MAX_RETRIES = 4;
+const MAX_IA_RETRIES = 3;
 const sliceRetryState = new Map<string, number>();
+let iaRetryCount = 0;
 let projectRoot = '';
 
 function hasAnyFailures(events: Event[]): boolean {
@@ -163,13 +179,33 @@ export const pipeline = define('kanban-todo')
   })
 
   .on('ServerGenerated')
-  .emit('GenerateIA', () => ({
-    modelPath: resolvePath('./.context/schema.json'),
-    outputDir: resolvePath('./.context'),
-  }))
+  .emit('GenerateIA', () => {
+    iaRetryCount = 0;
+    return {
+      modelPath: resolvePath('./.context/schema.json'),
+      outputDir: resolvePath('./.context'),
+    };
+  })
   .emit('StartServer', () => ({
     serverDirectory: resolvePath('./server'),
   }))
+
+  .on('IAValidationFailed')
+  .emit('GenerateIA', (e: { data: IAValidationFailedData }) => {
+    iaRetryCount += 1;
+    if (iaRetryCount > MAX_IA_RETRIES) {
+      console.error('IA validation failed after max retries. Errors:', e.data.errors);
+      return null;
+    }
+    const errorSummary = e.data.errors.map((err) => err.message).join('\n');
+    console.log(`IA validation failed (attempt ${iaRetryCount}/${MAX_IA_RETRIES}). Retrying...`);
+    console.log('Errors:\n', errorSummary);
+    return {
+      modelPath: e.data.modelPath,
+      outputDir: e.data.outputDir,
+      previousErrors: errorSummary,
+    };
+  })
 
   .on('IAGenerated')
   .emit('GenerateClient', () => ({
@@ -227,6 +263,7 @@ export const pipeline = define('kanban-todo')
 
 export function resetState(): void {
   sliceRetryState.clear();
+  iaRetryCount = 0;
   projectRoot = '';
 }
 
