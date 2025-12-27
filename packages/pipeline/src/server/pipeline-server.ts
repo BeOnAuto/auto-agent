@@ -184,7 +184,6 @@ export class PipelineServer {
       const completeGraph = this.addCommandEventEdgesToGraph(rawGraph, commandToEvents, pipelineEvents);
       const filterOptions = this.parseFilterOptions(req.query);
       const filteredGraph = filterGraph(completeGraph, filterOptions);
-      const eventToCommand = this.buildEventToCommand();
       const allPipelineNodes = this.buildPipelineNodes();
       const connectedCommandIds = this.extractConnectedCommandIds(filteredGraph);
       const pipelineNodes = allPipelineNodes.filter((node) => connectedCommandIds.has(node.name));
@@ -193,8 +192,6 @@ export class PipelineServer {
         nodes: filteredGraph.nodes,
         edges: filteredGraph.edges,
         pipelineNodes,
-        commandToEvents,
-        eventToCommand,
       });
     });
 
@@ -302,20 +299,6 @@ export class PipelineServer {
       }
     }
     return commandToEvents;
-  }
-
-  private buildEventToCommand(): Record<string, string> {
-    const eventToCommand: Record<string, string> = {};
-    for (const pipeline of this.pipelines.values()) {
-      for (const handler of pipeline.descriptor.handlers) {
-        if (handler.type === 'emit') {
-          for (const cmd of handler.commands) {
-            eventToCommand[handler.eventType] = cmd.commandType;
-          }
-        }
-      }
-    }
-    return eventToCommand;
   }
 
   private buildPipelineNodes(): Array<{ id: string; name: string; title: string; alias?: string; status: 'None' }> {

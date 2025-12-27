@@ -20,11 +20,16 @@ interface PipelineNode {
   status?: string;
 }
 
+interface GraphNode {
+  id: string;
+  type: string;
+  label: string;
+}
+
 interface PipelineResponse {
-  nodes: PipelineNode[];
+  nodes: GraphNode[];
   edges: Array<{ from: string; to: string }>;
-  commandToEvents: Record<string, string[]>;
-  eventToCommand: Record<string, string>;
+  pipelineNodes: PipelineNode[];
 }
 
 interface CommandAck {
@@ -97,10 +102,9 @@ describe('PipelineServer E2E', () => {
 
       const pipelineRes = await fetchJson<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
 
-      expect(pipelineRes.commandToEvents).toEqual({ ExportSchema: ['SchemaExported'] });
-      expect(pipelineRes.eventToCommand).toEqual({ SchemaExported: 'GenerateServer' });
-      expect(pipelineRes.nodes.some((n) => n.id === 'ExportSchema')).toBe(true);
       expect(pipelineRes.nodes.some((n) => n.id === 'evt:SchemaExported')).toBe(true);
+      expect(pipelineRes.nodes.some((n) => n.id === 'cmd:GenerateServer')).toBe(true);
+      expect(pipelineRes.pipelineNodes.some((n) => n.id === 'ExportSchema')).toBe(true);
 
       await server.stop();
     });

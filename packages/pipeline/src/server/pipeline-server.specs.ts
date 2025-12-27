@@ -176,30 +176,6 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
-    it('should return pipeline response with commandToEvents', async () => {
-      const handler = {
-        name: 'Gen',
-        events: ['GenDone', 'GenProgress'],
-        handle: async () => ({ type: 'GenDone', data: {} }),
-      };
-      const server = new PipelineServer({ port: 0 });
-      server.registerCommandHandlers([handler]);
-      await server.start();
-      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
-      expect(data.commandToEvents).toEqual({ Gen: ['GenDone', 'GenProgress'] });
-      await server.stop();
-    });
-
-    it('should return pipeline response with eventToCommand', async () => {
-      const pipeline = define('test').on('Start').emit('Process', {}).build();
-      const server = new PipelineServer({ port: 0 });
-      server.registerPipeline(pipeline);
-      await server.start();
-      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
-      expect(data.eventToCommand).toEqual({ Start: 'Process' });
-      await server.stop();
-    });
-
     it('should return pipeline nodes with name, title, and status', async () => {
       const handler = {
         name: 'Cmd',
@@ -299,6 +275,23 @@ describe('PipelineServer', () => {
       const pipelineNodeNames = data.pipelineNodes?.map((n) => n.name) ?? [];
       expect(pipelineNodeNames).toContain('Connected');
       expect(pipelineNodeNames).not.toContain('Orphan');
+      await server.stop();
+    });
+
+    it('should not include deprecated commandToEvents and eventToCommand fields', async () => {
+      const handler = {
+        name: 'Cmd',
+        events: ['Done'],
+        handle: async () => ({ type: 'Done', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('Cmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      expect(data.commandToEvents).toBeUndefined();
+      expect(data.eventToCommand).toBeUndefined();
       await server.stop();
     });
   });
