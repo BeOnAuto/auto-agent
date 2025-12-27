@@ -12,12 +12,10 @@ export interface AnalyticsData {
 }
 
 export class Analytics {
-  private config: Config;
   private output: ReturnType<typeof createOutput>;
   private optedIn: boolean | null = null;
 
   constructor(config: Config) {
-    this.config = config;
     this.output = createOutput(config);
   }
 

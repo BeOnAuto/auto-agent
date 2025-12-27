@@ -114,17 +114,21 @@ function settled<
   const commandTypesArray = commandTypes as readonly string[];
 
   if (typeof callbackOrConfig === 'function') {
+    const originalHandler = callbackOrConfig as (events: Record<string, Event[]>) => void;
     const registration: SettledRegistration = {
       type: 'on-settled',
       commandTypes: commandTypesArray,
-      handler: callbackOrConfig as (events: Record<string, Event[]>) => void,
+      handler: (events: Record<string, Event[]>) => {
+        originalHandler(events);
+        return undefined;
+      },
     };
     registrations.push(registration as unknown as DslRegistration);
     return registration;
   } else {
     const { dispatches, handler } = callbackOrConfig;
 
-    const wrappedHandler = (events: Record<string, Event[]>): void | { persist: boolean } => {
+    const wrappedHandler = (events: Record<string, Event[]>): undefined | { persist: boolean } => {
       const validatedDispatch = <TCommand extends Command>(command: TCommand): void => {
         if (!dispatches.includes(command.type)) {
           throw new Error(`Command type "${command.type}" is not declared in dispatches list`);
@@ -137,7 +141,8 @@ function settled<
         pendingDispatches.push(action);
       };
 
-      return handler(events, validatedDispatch);
+      const result = handler(events, validatedDispatch);
+      return result === undefined ? undefined : result;
     };
 
     const registration: SettledRegistration = {
@@ -174,14 +179,17 @@ export function dispatch<T extends Command>(
   // Array pattern for on.settled
   if (Array.isArray(commandOrTypeOrTypes)) {
     const commandTypes = commandOrTypeOrTypes;
-    const handler = dataOrHandler as (
+    const originalHandler = dataOrHandler as (
       events: Record<string, Event[]>,
       send: <TCommand extends T>(command: TCommand) => void,
     ) => void;
 
     return {
       dispatches: commandTypes,
-      handler,
+      handler: (events: Record<string, Event[]>, dispatch: <TCmd extends T>(command: TCmd) => void) => {
+        originalHandler(events, dispatch);
+        return undefined;
+      },
     };
   }
 

@@ -22,7 +22,7 @@ export interface FoldRegistration<S = unknown, E = Event> {
 export interface SettledRegistration {
   type: 'on-settled';
   commandTypes: readonly string[];
-  handler: (events: Record<string, Event[]>) => void | { persist: boolean };
+  handler: (events: Record<string, Event[]>) => undefined | { persist: boolean };
   dispatches?: readonly string[];
 }
 
@@ -31,7 +31,7 @@ export interface SettledHandlerConfig<TDispatchCommands extends Command = Comman
   handler: (
     events: Record<string, Event[]>,
     dispatch: <T extends TDispatchCommands>(command: T) => void,
-  ) => void | { persist: boolean };
+  ) => undefined | { persist: boolean };
 }
 
 export type DslRegistration = EventRegistration | DispatchAction | FoldRegistration | SettledRegistration;

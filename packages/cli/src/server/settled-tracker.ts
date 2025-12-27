@@ -31,7 +31,6 @@ export class SettledTracker {
   private runningCommands: Map<string, { commandType: string; correlationId: string }> = new Map();
   private onDispatchAction?: (action: DispatchAction, parentCorrelationId?: string) => void;
   private metadataService?: CommandMetadataService;
-  private eventToCommandMapping: Record<string, string>;
 
   constructor(
     onDispatchAction?: (action: DispatchAction, parentCorrelationId?: string) => void,
@@ -39,7 +38,6 @@ export class SettledTracker {
   ) {
     this.onDispatchAction = onDispatchAction;
     this.metadataService = metadataService;
-    this.eventToCommandMapping = buildEventToCommandMapping(metadataService);
   }
 
   registerSettledHandler(registration: SettledRegistration): void {
@@ -199,7 +197,7 @@ export class SettledTracker {
     }
   }
 
-  private shouldPersistHandler(result: void | { persist: boolean }): boolean {
+  private shouldPersistHandler(result: undefined | { persist: boolean }): boolean {
     return (
       result !== null &&
       result !== undefined &&
