@@ -12,7 +12,6 @@ describe('modelToNarrative', () => {
   data,
   describe,
   example,
-  given,
   gql,
   it,
   narrative,
@@ -22,8 +21,6 @@ describe('modelToNarrative', () => {
   sink,
   source,
   specs,
-  then,
-  when,
 } from '@auto-engineer/narrative';
 import type { Command, Event, State } from '@auto-engineer/narrative';
 import { AI, ProductCatalog } from '../server/src/integrations';
@@ -120,36 +117,34 @@ narrative('Seasonal Assistant', () => {
       data([sink().event('ShoppingCriteriaEntered').toStream('shopping-session-\${sessionId}')]);
       specs('When shopper submits criteria, a shopping session is started', () => {
         rule('Valid criteria should start a shopping session', () => {
-          example('User submits shopping criteria for children', () => {
-            when<EnterShoppingCriteria>({
+          example('User submits shopping criteria for children')
+            .when<EnterShoppingCriteria>({
+              sessionId: 'shopper-123',
+              criteria:
+                'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
+            })
+            .then<ShoppingCriteriaEntered>({
               sessionId: 'shopper-123',
               criteria:
                 'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
             });
-            then<ShoppingCriteriaEntered>({
-              sessionId: 'shopper-123',
-              criteria:
-                'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
-            });
-          });
         });
       });
     });
   react('creates a chat session').server(() => {
     specs('When shopping criteria are entered, request wishlist creation', () => {
       rule('Shopping criteria should trigger item suggestion', () => {
-        example('Criteria entered triggers wishlist creation', () => {
-          when<ShoppingCriteriaEntered>({
+        example('Criteria entered triggers wishlist creation')
+          .when<ShoppingCriteriaEntered>({
             sessionId: 'session-abc',
             criteria:
               'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
-          });
-          then<SuggestShoppingItems>({
+          })
+          .then<SuggestShoppingItems>({
             sessionId: 'session-abc',
             prompt:
               'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
           });
-        });
       });
     });
   });
@@ -166,8 +161,8 @@ narrative('Seasonal Assistant', () => {
     ]);
     specs('When chat is triggered, AI suggests items based on product catalog', () => {
       rule('AI should suggest relevant items from available products', () => {
-        example('Product catalog with matching items generates suggestions', () => {
-          given<Products>({
+        example('Product catalog with matching items generates suggestions')
+          .given<Products>({
             products: [
               {
                 productId: 'prod-soccer-ball',
@@ -202,13 +197,13 @@ narrative('Seasonal Assistant', () => {
                 imageUrl: 'https://example.com/mtg-starter.jpg',
               },
             ],
-          });
-          when<SuggestShoppingItems>({
+          })
+          .when<SuggestShoppingItems>({
             sessionId: 'session-abc',
             prompt:
               'I need back-to-school items for my 7-year-old daughter who loves soccer and crafts, and my 12-year-old son who is into computers and Magic the Gathering.',
-          });
-          then<ShoppingItemsSuggested>({
+          })
+          .then<ShoppingItemsSuggested>({
             sessionId: 'session-abc',
             suggestedItems: [
               {
@@ -237,7 +232,6 @@ narrative('Seasonal Assistant', () => {
               },
             ],
           });
-        });
       });
     });
   });
@@ -266,8 +260,8 @@ narrative('Seasonal Assistant', () => {
       data([source().state('SuggestedItems').fromProjection('SuggestedItemsProjection', 'sessionId')]);
       specs('Suggested items are available for viewing', () => {
         rule('Items should be available for viewing after suggestion', () => {
-          example('Item becomes available after AI suggestion event', () => {
-            when<ShoppingItemsSuggested>({
+          example('Item becomes available after AI suggestion event')
+            .when<ShoppingItemsSuggested>({
               sessionId: 'session-abc',
               suggestedItems: [
                 {
@@ -295,8 +289,8 @@ narrative('Seasonal Assistant', () => {
                   reason: 'Ideal starter set for Magic the Gathering enthusiasts',
                 },
               ],
-            });
-            then<SuggestedItems>({
+            })
+            .then<SuggestedItems>({
               sessionId: 'session-abc',
               items: [
                 {
@@ -325,7 +319,6 @@ narrative('Seasonal Assistant', () => {
                 },
               ],
             });
-          });
         });
       });
     });
@@ -341,8 +334,17 @@ narrative('Seasonal Assistant', () => {
       data([sink().event('ItemsAddedToCart').toStream('shopping-session-\${sessionId}')]);
       specs('When shopper accepts items, they are added to cart', () => {
         rule('Accepted items should be added to the shopping cart', () => {
-          example('User selects all suggested items for cart', () => {
-            when<AddItemsToCart>({
+          example('User selects all suggested items for cart')
+            .when<AddItemsToCart>({
+              sessionId: 'session-abc',
+              items: [
+                { productId: 'prod-soccer-ball', quantity: 1 },
+                { productId: 'prod-craft-kit', quantity: 1 },
+                { productId: 'prod-laptop-bag', quantity: 1 },
+                { productId: 'prod-mtg-starter', quantity: 1 },
+              ],
+            })
+            .then<ItemsAddedToCart>({
               sessionId: 'session-abc',
               items: [
                 { productId: 'prod-soccer-ball', quantity: 1 },
@@ -351,16 +353,6 @@ narrative('Seasonal Assistant', () => {
                 { productId: 'prod-mtg-starter', quantity: 1 },
               ],
             });
-            then<ItemsAddedToCart>({
-              sessionId: 'session-abc',
-              items: [
-                { productId: 'prod-soccer-ball', quantity: 1 },
-                { productId: 'prod-craft-kit', quantity: 1 },
-                { productId: 'prod-laptop-bag', quantity: 1 },
-                { productId: 'prod-mtg-starter', quantity: 1 },
-              ],
-            });
-          });
         });
       });
     });
@@ -613,9 +605,7 @@ narrative('Test Flow with IDs', 'FLOW-123', () => {
 
     const code = await modelToNarrative(modelWithRuleIds);
 
-    expect(
-      code,
-    ).toEqual(`import { command, example, narrative, rule, specs, then, when } from '@auto-engineer/narrative';
+    expect(code).toEqual(`import { command, example, narrative, rule, specs } from '@auto-engineer/narrative';
 import type { Command, Event } from '@auto-engineer/narrative';
 type ProcessCommand = Command<
   'ProcessCommand',
@@ -635,10 +625,9 @@ narrative('Test Flow with Rule IDs', 'FLOW-456', () => {
   command('process command', 'SLICE-789').server(() => {
     specs('Command Processing', () => {
       rule('Valid commands should be processed', 'RULE-ABC', () => {
-        example('User submits valid command', () => {
-          when<ProcessCommand>({ id: 'cmd-123', action: 'create' });
-          then<CommandProcessed>({ id: 'cmd-123', status: 'success' });
-        });
+        example('User submits valid command')
+          .when<ProcessCommand>({ id: 'cmd-123', action: 'create' })
+          .then<CommandProcessed>({ id: 'cmd-123', status: 'success' });
       });
     });
   });
@@ -946,7 +935,6 @@ narrative('Questionnaire Flow', 'QUEST-001', () => {});
   describe,
   example,
   experience,
-  given,
   gql,
   it,
   narrative,
@@ -954,8 +942,6 @@ narrative('Questionnaire Flow', 'QUEST-001', () => {});
   rule,
   source,
   specs,
-  then,
-  when,
 } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type QuestionnaireLinkSent = Event<
@@ -1024,21 +1010,21 @@ narrative('Questionnaires', 'Q9m2Kp4Lx', () => {
       data([source().state('QuestionnaireProgress').fromProjection('Questionnaires', 'questionnaire-participantId')]);
       specs(() => {
         rule('questionnaires show current progress', 'r1A3Bp9W', () => {
-          example('a question has already been answered', () => {
-            given<QuestionnaireLinkSent>({
+          example('a question has already been answered')
+            .given<QuestionnaireLinkSent>({
               questionnaireId: 'q-001',
               participantId: 'participant-abc',
               link: 'https://app.example.com/q/q-001?participant=participant-abc',
               sentAt: new Date('2030-01-01T09:00:00.000Z'),
-            });
-            when<QuestionAnswered>({
+            })
+            .when<QuestionAnswered>({
               questionnaireId: 'q-001',
               participantId: 'participant-abc',
               questionId: 'q1',
               answer: 'Yes',
               savedAt: new Date('2030-01-01T09:05:00.000Z'),
-            });
-            then<QuestionnaireProgress>({
+            })
+            .then<QuestionnaireProgress>({
               questionnaireId: 'q-001',
               participantId: 'participant-abc',
               status: 'in_progress',
@@ -1046,7 +1032,6 @@ narrative('Questionnaires', 'Q9m2Kp4Lx', () => {
               remainingQuestions: ['q2', 'q3'],
               answers: [{ questionId: 'q1', value: 'Yes' }],
             });
-          });
         });
       });
     });
@@ -1185,9 +1170,7 @@ narrative('Questionnaires', 'Q9m2Kp4Lx', () => {
 
     const code = await modelToNarrative(modelWithDuplicateRules);
 
-    expect(
-      code,
-    ).toEqual(`import { example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
+    expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type QuestionnaireLinkSent = Event<
   'QuestionnaireLinkSent',
@@ -1215,15 +1198,13 @@ narrative('Test Flow', 'TEST-FLOW', () => {
   query('test slice', 'TEST-SLICE').server(() => {
     specs('Test Rules', () => {
       rule('questionnaires show current progress', 'r1A3Bp9W', () => {
-        example('a question has already been answered', () => {
-          given<QuestionnaireLinkSent>({ questionnaireId: 'q-001', participantId: 'participant-abc' });
-          when<QuestionAnswered>({ questionnaireId: 'q-001', questionId: 'q1', answer: 'Yes' });
-          then<QuestionnaireProgress>({ questionnaireId: 'q-001', status: 'in_progress' });
-        });
-        example('no questions have been answered yet', () => {
-          given<QuestionnaireLinkSent>({ questionnaireId: 'q-001', participantId: 'participant-abc' });
-          then<QuestionnaireProgress>({ questionnaireId: 'q-001', status: 'in_progress' });
-        });
+        example('a question has already been answered')
+          .given<QuestionnaireLinkSent>({ questionnaireId: 'q-001', participantId: 'participant-abc' })
+          .when<QuestionAnswered>({ questionnaireId: 'q-001', questionId: 'q1', answer: 'Yes' })
+          .then<QuestionnaireProgress>({ questionnaireId: 'q-001', status: 'in_progress' });
+        example('no questions have been answered yet')
+          .given<QuestionnaireLinkSent>({ questionnaireId: 'q-001', participantId: 'participant-abc' })
+          .then<QuestionnaireProgress>({ questionnaireId: 'q-001', status: 'in_progress' });
       });
     });
   });
@@ -1393,9 +1374,7 @@ narrative('Test Flow', 'TEST-FLOW', () => {
 
     const code = await modelToNarrative(modelWithMultiGiven);
 
-    expect(
-      code,
-    ).toEqual(`import { and, example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
+    expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type QuestionnaireConfig = State<
   'QuestionnaireConfig',
@@ -1441,36 +1420,36 @@ narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
   query('multi given slice', 'MULTI-SLICE').server(() => {
     specs('Multi Given Rules', () => {
       rule('all questions have been answered', 'MultiGiven', () => {
-        example('questionnaire with multiple events', () => {
-          given<QuestionnaireConfig>({ questionnaireId: 'q-001', numberOfQuestions: 3 });
-          and<QuestionnaireLinkSent>({
+        example('questionnaire with multiple events')
+          .given<QuestionnaireConfig>({ questionnaireId: 'q-001', numberOfQuestions: 3 })
+          .and<QuestionnaireLinkSent>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             link: 'https://example.com/q/q-001',
             sentAt: new Date('2030-01-01T09:00:00.000Z'),
-          });
-          and<QuestionAnswered>({
+          })
+          .and<QuestionAnswered>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             questionId: 'q1',
             answer: 'Yes',
             savedAt: new Date('2030-01-01T09:05:00.000Z'),
-          });
-          and<QuestionAnswered>({
+          })
+          .and<QuestionAnswered>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             questionId: 'q2',
             answer: 'No',
             savedAt: new Date('2030-01-01T09:10:00.000Z'),
-          });
-          when<QuestionAnswered>({
+          })
+          .when<QuestionAnswered>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             questionId: 'q3',
             answer: 'Maybe',
             savedAt: new Date('2030-01-01T09:15:00.000Z'),
-          });
-          then<QuestionnaireProgress>({
+          })
+          .then<QuestionnaireProgress>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             status: 'ready_to_submit',
@@ -1481,7 +1460,6 @@ narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
               { questionId: 'q2', value: 'No' },
             ],
           });
-        });
       });
     });
   });
@@ -1609,7 +1587,7 @@ narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
 
     expect(
       code,
-    ).toEqual(`import { data, example, given, narrative, query, rule, source, specs, then } from '@auto-engineer/narrative';
+    ).toEqual(`import { data, example, narrative, query, rule, source, specs } from '@auto-engineer/narrative';
 import type { State } from '@auto-engineer/narrative';
 type QuestionnaireProgress = State<
   'QuestionnaireProgress',
@@ -1636,19 +1614,18 @@ narrative('Referenced States Flow', 'REF-STATES', () => {
     ]);
     specs('Database State Rules', () => {
       rule('questionnaire config is available when referenced', 'RefState', () => {
-        example('config from database is accessible', () => {
-          given<QuestionnaireConfig>({
+        example('config from database is accessible')
+          .given<QuestionnaireConfig>({
             questionnaireId: 'q-001',
             numberOfQuestions: 5,
             title: 'Customer Satisfaction Survey',
-          });
-          then<QuestionnaireProgress>({
+          })
+          .then<QuestionnaireProgress>({
             questionnaireId: 'q-001',
             participantId: 'participant-abc',
             status: 'in_progress',
             totalQuestions: 5,
           });
-        });
       });
     });
   });
@@ -1762,9 +1739,7 @@ narrative('Referenced States Flow', 'REF-STATES', () => {
 
     const code = await modelToNarrative(modelWithDateFields);
 
-    expect(
-      code,
-    ).toEqual(`import { example, given, narrative, query, rule, specs, then, when } from '@auto-engineer/narrative';
+    expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type TimestampedEvent = Event<
   'TimestampedEvent',
@@ -1794,21 +1769,20 @@ narrative('Date Handling Flow', 'DATE-FLOW', () => {
   query('date handling slice', 'DATE-SLICE').server(() => {
     specs('Date Field Rules', () => {
       rule('handles Date fields correctly', 'DateRule', () => {
-        example('event with Date fields', () => {
-          given<TimestampedEvent>({
+        example('event with Date fields')
+          .given<TimestampedEvent>({
             id: 'event-123',
             sentAt: new Date('2030-01-01T09:00:00.000Z'),
             savedAt: new Date('2030-01-01T09:05:00.000Z'),
             attemptedAt: new Date('2030-01-01T09:10:00.000Z'),
             submittedAt: new Date('2030-01-01T09:15:00.000Z'),
-          });
-          when<ProcessEvent>({ processedAt: new Date('2030-01-01T10:00:00.000Z') });
-          then<ProcessState>({
+          })
+          .when<ProcessEvent>({ processedAt: new Date('2030-01-01T10:00:00.000Z') })
+          .then<ProcessState>({
             id: 'state-123',
             completedAt: new Date('2030-01-01T11:00:00.000Z'),
             status: 'completed',
           });
-        });
       });
     });
   });
@@ -2030,9 +2004,7 @@ narrative('Response Analytics', () => {
 
     const code = await modelToNarrative(modelWithEmptyWhen);
 
-    expect(
-      code,
-    ).toEqual(`import { and, example, given, narrative, query, rule, specs, then } from '@auto-engineer/narrative';
+    expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
 type TodoAdded = Event<
   'TodoAdded',
@@ -2072,22 +2044,22 @@ narrative('Todo List Summary', 'TODO-001', () => {
   query('views completion summary', 'SUMMARY-001').server(() => {
     specs('Summary Statistics', () => {
       rule('summary shows overall todo list statistics', 'RULE-SUMMARY', () => {
-        example('calculates summary from multiple todos', () => {
-          given<TodoAdded>({
+        example('calculates summary from multiple todos')
+          .given<TodoAdded>({
             todoId: 'todo-001',
             description: 'Buy groceries',
             status: 'pending',
             addedAt: new Date('2030-01-01T09:00:00.000Z'),
-          });
-          and<TodoAdded>({
+          })
+          .and<TodoAdded>({
             todoId: 'todo-002',
             description: 'Write report',
             status: 'pending',
             addedAt: new Date('2030-01-01T09:10:00.000Z'),
-          });
-          and<TodoMarkedInProgress>({ todoId: 'todo-001', markedAt: new Date('2030-01-01T10:00:00.000Z') });
-          and<TodoMarkedComplete>({ todoId: 'todo-002', completedAt: new Date('2030-01-01T11:00:00.000Z') });
-          then<TodoListSummary>({
+          })
+          .and<TodoMarkedInProgress>({ todoId: 'todo-001', markedAt: new Date('2030-01-01T10:00:00.000Z') })
+          .and<TodoMarkedComplete>({ todoId: 'todo-002', completedAt: new Date('2030-01-01T11:00:00.000Z') })
+          .then<TodoListSummary>({
             summaryId: 'main-summary',
             totalTodos: 2,
             pendingCount: 0,
@@ -2095,7 +2067,6 @@ narrative('Todo List Summary', 'TODO-001', () => {
             completedCount: 1,
             completionPercentage: 50,
           });
-        });
       });
     });
   });
