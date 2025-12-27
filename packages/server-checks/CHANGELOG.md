@@ -1,5 +1,17 @@
 # @auto-engineer/server-checks
 
+## 0.14.0
+
+### Minor Changes
+
+- Rewrite CLI and Pipeline
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/cli@0.14.0
+  - @auto-engineer/message-bus@0.14.0
+
 ## 0.13.3
 
 ### Patch Changes

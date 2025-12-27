@@ -1,5 +1,16 @@
 # create-auto-app
 
+## 0.14.0
+
+### Minor Changes
+
+- Rewrite CLI and Pipeline
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/id@0.14.0
+
 ## 0.13.3
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @auto-engineer/id
 
+## 0.14.0
+
+### Minor Changes
+
+- Rewrite CLI and Pipeline
+
 ## 0.13.3
 
 ## 0.13.2
