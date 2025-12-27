@@ -1,6 +1,9 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
 import { command } from './fluent-builder';
-import { example, flow, rule, specs } from './narrative';
+import type { CommandSlice } from './index';
+import { example, flow, describe as narrativeDescribe, it as narrativeIt, rule, should, specs } from './narrative';
+import { registry } from './narrative-registry';
 import type { Event, State } from './types';
 
 type QuestionnaireLinkSent = Event<
@@ -36,9 +39,140 @@ type QuestionnaireProgress = State<
   }
 >;
 
+describe('it and should with id parameter', () => {
+  afterEach(() => {
+    registry.clearAll();
+  });
+
+  it('should record it with title only', () => {
+    flow('test it title only', () => {
+      command('test command').client(() => {
+        narrativeDescribe('Test Section', () => {
+          narrativeIt('displays todo list');
+        });
+      });
+    });
+
+    const narratives = registry.getAllNarratives();
+    const slice = narratives[0].slices[0] as CommandSlice;
+    const describeNode = slice.client.specs[0];
+
+    expect(describeNode.type).toBe('describe');
+    if (describeNode.type !== 'describe') throw new Error('Expected describe node');
+    expect(describeNode.children).toHaveLength(1);
+
+    const itNode = describeNode.children![0];
+    expect(itNode.type).toBe('it');
+    expect(itNode.title).toBe('displays todo list');
+    expect(itNode.id).toBeUndefined();
+  });
+
+  it('should record it with title and id (id at end)', () => {
+    flow('test it with id', () => {
+      command('test command').client(() => {
+        narrativeDescribe('Test Section', () => {
+          narrativeIt('displays todo list', 'IT-001');
+        });
+      });
+    });
+
+    const narratives = registry.getAllNarratives();
+    const slice = narratives[0].slices[0] as CommandSlice;
+    const describeNode = slice.client.specs[0];
+    if (describeNode.type !== 'describe') throw new Error('Expected describe node');
+    const itNode = describeNode.children![0];
+
+    expect(itNode.type).toBe('it');
+    expect(itNode.title).toBe('displays todo list');
+    expect(itNode.id).toBe('IT-001');
+  });
+
+  it('should record should with title only', () => {
+    flow('test should title only', () => {
+      command('test command').client(() => {
+        narrativeDescribe('Test Section', () => {
+          should('display todo list');
+        });
+      });
+    });
+
+    const narratives = registry.getAllNarratives();
+    const slice = narratives[0].slices[0] as CommandSlice;
+    const describeNode = slice.client.specs[0];
+    if (describeNode.type !== 'describe') throw new Error('Expected describe node');
+    const itNode = describeNode.children![0];
+
+    expect(itNode.type).toBe('it');
+    expect(itNode.title).toBe('display todo list');
+    expect(itNode.id).toBeUndefined();
+  });
+
+  it('should record should with title and id (id at end)', () => {
+    flow('test should with id', () => {
+      command('test command').client(() => {
+        narrativeDescribe('Test Section', () => {
+          should('display todo list', 'SH-001');
+        });
+      });
+    });
+
+    const narratives = registry.getAllNarratives();
+    const slice = narratives[0].slices[0] as CommandSlice;
+    const describeNode = slice.client.specs[0];
+    if (describeNode.type !== 'describe') throw new Error('Expected describe node');
+    const itNode = describeNode.children![0];
+
+    expect(itNode.type).toBe('it');
+    expect(itNode.title).toBe('display todo list');
+    expect(itNode.id).toBe('SH-001');
+  });
+});
+
+describe('describe with id parameter', () => {
+  afterEach(() => {
+    registry.clearAll();
+  });
+
+  it('should record describe with title and callback', () => {
+    flow('test describe title', () => {
+      command('test command').client(() => {
+        narrativeDescribe('Todo List', () => {
+          narrativeIt('shows items');
+        });
+      });
+    });
+
+    const narratives = registry.getAllNarratives();
+    const slice = narratives[0].slices[0] as CommandSlice;
+    const describeNode = slice.client.specs[0];
+
+    expect(describeNode.type).toBe('describe');
+    expect(describeNode.title).toBe('Todo List');
+    expect(describeNode.id).toBeUndefined();
+  });
+
+  it('should record describe with title, id, and callback (id at end)', () => {
+    flow('test describe with id', () => {
+      command('test command').client(() => {
+        narrativeDescribe('Todo List', 'DESC-001', () => {
+          narrativeIt('shows items');
+        });
+      });
+    });
+
+    const narratives = registry.getAllNarratives();
+    const slice = narratives[0].slices[0] as CommandSlice;
+    const describeNode = slice.client.specs[0];
+
+    expect(describeNode.type).toBe('describe');
+    expect(describeNode.title).toBe('Todo List');
+    expect(describeNode.id).toBe('DESC-001');
+  });
+});
+
 describe('Narrative DSL', () => {
   beforeEach(async () => {
-    // Clean test state before each test
+    registry.clearAll();
   });
 
   it('should support given() method in builder', () => {

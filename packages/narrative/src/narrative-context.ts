@@ -212,7 +212,7 @@ export function pushSpec(feature: string): void {
   }
 }
 
-export function pushDescribe(id?: string, title?: string): void {
+export function pushDescribe(title?: string, id?: string): void {
   if (!context) throw new Error('No active narrative context');
 
   const describeNode: ClientSpecNode = {
@@ -259,7 +259,7 @@ export function popDescribe(): void {
   addNodeToParentOrRoot(completedDescribe, slice as CommandSlice | QuerySlice | ExperienceSlice);
 }
 
-export function recordIt(id?: string, title: string = ''): void {
+export function recordIt(title: string, id?: string): void {
   if (!context) throw new Error('No active narrative context');
 
   const itNode: ClientSpecNode = {

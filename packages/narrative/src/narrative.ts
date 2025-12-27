@@ -65,43 +65,37 @@ export const request = (_query: unknown) => ({
 
 export function describe(fn: () => void): void;
 export function describe(title: string, fn: () => void): void;
-export function describe(id: string, title: string, fn: () => void): void;
-export function describe(
-  idOrTitleOrFn: string | (() => void),
-  titleOrFn?: string | (() => void),
-  fn?: () => void,
-): void {
-  if (typeof idOrTitleOrFn === 'function') {
+export function describe(title: string, id: string, fn: () => void): void;
+export function describe(titleOrFn: string | (() => void), idOrFn?: string | (() => void), fn?: () => void): void {
+  if (typeof titleOrFn === 'function') {
     const slice = getCurrentSlice();
     const inferredTitle = slice?.name ?? '';
-    pushDescribe(undefined, inferredTitle);
-    idOrTitleOrFn();
+    pushDescribe(inferredTitle, undefined);
+    titleOrFn();
     popDescribe();
     return;
   }
 
-  const hasId = typeof titleOrFn === 'string';
-  const id = hasId ? idOrTitleOrFn : undefined;
-  const title = hasId ? titleOrFn : idOrTitleOrFn;
-  const callback = hasId ? fn! : (titleOrFn as () => void);
+  const title = titleOrFn;
+  const hasId = typeof idOrFn === 'string';
+  const id = hasId ? idOrFn : undefined;
+  const callback = hasId ? fn! : (idOrFn as () => void);
 
-  pushDescribe(id, title);
+  pushDescribe(title, id);
   callback();
   popDescribe();
 }
 
 export function it(title: string): void;
-export function it(id: string, title: string): void;
-export function it(idOrTitle: string, title?: string): void {
-  const hasId = title !== undefined;
-  recordIt(hasId ? idOrTitle : undefined, hasId ? title : idOrTitle);
+export function it(title: string, id: string): void;
+export function it(title: string, id?: string): void {
+  recordIt(title, id);
 }
 
 export function should(title: string): void;
-export function should(id: string, title: string): void;
-export function should(idOrTitle: string, title?: string): void {
-  const hasId = title !== undefined;
-  recordIt(hasId ? idOrTitle : undefined, hasId ? title : idOrTitle);
+export function should(title: string, id: string): void;
+export function should(title: string, id?: string): void {
+  recordIt(title, id);
 }
 
 export function specs(feature: string, fn: () => void): void;
