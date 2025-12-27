@@ -1,7 +1,8 @@
 import type { NodeFileStore } from '@auto-engineer/file-store/node';
-import { collectBareImportsFromFiles } from '../discovery/bareImports';
-import { nmRootsForBases, probeEntryDtsForPackagesFromRoots } from '../discovery/dts';
-import { dirOf, pkgNameFromPath, scorePathForDedupe, uniq } from '../utils/path';
+import createDebug from 'debug';
+import { collectBareImportsFromFiles } from '../discovery/bareImports.js';
+import { nmRootsForBases, probeEntryDtsForPackagesFromRoots } from '../discovery/dts.js';
+import { dirOf, logArray, pkgNameFromPath, scorePathForDedupe, uniq } from '../utils/path.js';
 
 function flattenPaths(x: string[] | Record<string, string[]> | undefined): string[] {
   if (!x) return [];
@@ -9,10 +10,17 @@ function flattenPaths(x: string[] | Record<string, string[]> | undefined): strin
   return Object.values(x).flat();
 }
 
+const debug = createDebug('auto-engineer:file-syncer:resolve');
+
+/**
+ * Stable fallback node_modules roots derived from projectRoot and common monorepo layouts.
+ * Ensures deterministic probing even when there are no/very few source files.
+ */
 function stableCandidateNmRoots(projectRoot: string): string[] {
   const roots = new Set<string>();
   let cur = projectRoot.replace(/\\/g, '/');
 
+  // Ancestors (cap to 8)
   for (let i = 0; i < 8; i++) {
     roots.add(`${cur}/node_modules`);
     const parent = cur.replace(/\/+$/, '').split('/').slice(0, -1).join('/') || '/';
@@ -42,24 +50,7 @@ function isNarrativeModule(mod: unknown): mod is {
   return typeof modWithMethod.getNarratives === 'function';
 }
 
-function dedupeTypeDefinitionsByPackage(allDts: string[]): string[] {
-  const bestByPkg = new Map<string, string>();
-  for (const p of allDts) {
-    const pkg = pkgNameFromPath(p);
-    if (pkg === null) continue;
-    const prev = bestByPkg.get(pkg);
-    if (prev === undefined || scorePathForDedupe(p) < scorePathForDedupe(prev)) {
-      bestByPkg.set(pkg, p);
-    }
-  }
-  return [...bestByPkg.values()];
-}
-
-export async function resolveSyncFileSet(opts: {
-  vfs: NodeFileStore;
-  watchDir: string;
-  projectRoot: string;
-}): Promise<Set<string>> {
+export async function resolveSyncFileSet(opts: { vfs: NodeFileStore; watchDir: string; projectRoot: string }) {
   const { vfs, watchDir, projectRoot } = opts;
   try {
     let flows: NarrativeResult | null = null;
@@ -68,9 +59,11 @@ export async function resolveSyncFileSet(opts: {
       const flowModule: unknown = await import(flowPackage);
       if (isNarrativeModule(flowModule)) {
         flows = await flowModule.getNarratives({ vfs, root: watchDir });
+      } else {
+        debug('[sync] getNarratives not found in @auto-engineer/narrative');
       }
-    } catch {
-      // narrative package not available
+    } catch (e) {
+      debug('[sync] @auto-engineer/narrative not available, using fallback mode', e);
     }
 
     const files = flows?.vfsFiles ?? [];
@@ -79,12 +72,14 @@ export async function resolveSyncFileSet(opts: {
     const fallbackRoots = stableCandidateNmRoots(projectRoot);
     const nmRoots = uniq([...dynamicRoots, ...fallbackRoots]);
 
+    // Gather externals from narrative graph + bare imports in source files
     const externalsFromFlows = flows?.externals ?? [];
     const extraPkgs = await collectBareImportsFromFiles(files, vfs);
     const externals = Array.from(new Set([...externalsFromFlows, ...extraPkgs]));
     const dtsFromGraph = flows !== null ? flattenPaths(flows.typings) : [];
     const dtsFromProbe = await probeEntryDtsForPackagesFromRoots(vfs, nmRoots, externals);
 
+    // Merge & prefer non-.pnpm & shorter paths for stability
     const allDts = Array.from(new Set([...dtsFromGraph, ...dtsFromProbe]));
     allDts.sort((a, b) => {
       const pa = a.includes('/.pnpm/') ? 1 : 0;
@@ -95,8 +90,26 @@ export async function resolveSyncFileSet(opts: {
 
     const dts = dedupeTypeDefinitionsByPackage(allDts);
 
+    logArray('files', files);
+    logArray('dts', dts);
+    logArray('externals', externals);
     return new Set<string>([...files, ...dts]);
-  } catch {
+  } catch (err) {
+    console.error('[sync] resolveSyncFileSet FAILED:', err);
     return new Set<string>();
   }
+}
+
+function dedupeTypeDefinitionsByPackage(allDts: string[]): string[] {
+  // Keep only ONE entry .d.ts per npm package (choose best-scoring path)
+  const bestByPkg = new Map<string, string>();
+  for (const p of allDts) {
+    const pkg = pkgNameFromPath(p);
+    if (pkg === null) continue;
+    const prev = bestByPkg.get(pkg);
+    if (prev === undefined || scorePathForDedupe(p) < scorePathForDedupe(prev)) {
+      bestByPkg.set(pkg, p);
+    }
+  }
+  return [...bestByPkg.values()];
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import * as fs from 'node:fs';
+import { createServer } from 'node:http';
 import * as path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CommandHandlerWithMetadata, Pipeline } from '@auto-engineer/pipeline';
@@ -10,6 +11,8 @@ import * as dotenv from 'dotenv';
 import getPort, { portNumbers } from 'get-port';
 import createJiti from 'jiti';
 import ora from 'ora';
+import { Server as SocketIOServer } from 'socket.io';
+import { FileSyncer } from './file-syncer/index.js';
 
 dotenv.config();
 
@@ -228,9 +231,29 @@ function findConfigFile(): string | null {
   return null;
 }
 
+async function startFileSyncServer(
+  syncPort: number,
+  watchDir: string,
+): Promise<{ fileSyncer: FileSyncer; httpServer: ReturnType<typeof createServer> }> {
+  const httpServer = createServer();
+  const io = new SocketIOServer(httpServer, {
+    cors: { origin: '*' },
+  });
+
+  const fileSyncer = new FileSyncer(io, watchDir);
+  fileSyncer.start();
+
+  return new Promise((resolve) => {
+    httpServer.listen(syncPort, () => {
+      resolve({ fileSyncer, httpServer });
+    });
+  });
+}
+
 async function startServer(opts: { port: string; debug?: boolean; config?: string }): Promise<void> {
   const port = parseInt(opts.port, 10);
   const actualPort = await getPort({ port: portNumbers(port, port + 100) });
+  const syncPort = await getPort({ port: portNumbers(actualPort + 1, actualPort + 100) });
 
   const configPath = opts.config ?? findConfigFile();
   if (!configPath) {
@@ -258,8 +281,13 @@ async function startServer(opts: { port: string; debug?: boolean; config?: strin
     server.registerCommandHandlers(commandHandlers);
     server.registerPipeline(config.pipeline);
 
+    const watchDir = path.dirname(configPath);
+    const { fileSyncer, httpServer: syncHttpServer } = await startFileSyncServer(syncPort, watchDir);
+
     process.on('SIGINT', () => {
-      console.log(chalk.yellow('\nShutting down server...'));
+      console.log(chalk.yellow('\nShutting down servers...'));
+      fileSyncer.stop();
+      syncHttpServer.close();
       void server.stop();
       process.exit(0);
     });
@@ -273,6 +301,7 @@ async function startServer(opts: { port: string; debug?: boolean; config?: strin
     console.log(`  ${chalk.gray('Pipeline:')} http://localhost:${actualPort}/pipeline`);
     console.log(`  ${chalk.gray('Diagram:')}  http://localhost:${actualPort}/pipeline/diagram`);
     console.log(`  ${chalk.gray('Events:')}   http://localhost:${actualPort}/events (SSE)`);
+    console.log(`  ${chalk.gray('FileSync:')} ws://localhost:${syncPort} (Socket.IO)`);
     console.log(chalk.gray('\nPress Ctrl+C to stop'));
   } catch (error) {
     spinner.fail('Failed to start server');

@@ -1,7 +1,11 @@
+import createDebug from 'debug';
 import { EncryptJWT, importJWK, type JWK, type KeyLike } from 'jose';
+import fetch from 'node-fetch';
+
+const debug = createDebug('auto:cli:jwe-encryptor');
 
 const PUBLIC_JWKS_URL = 'https://sync-sandbox.rami-632.workers.dev/.well-known/jwks.json';
-const PUBLIC_KEY_CACHE_TTL_MS = 60 * 60 * 300;
+const PUBLIC_KEY_CACHE_TTL_MS = 60 * 60 * 300; // 1h
 const JWE_TTL_SECONDS = 1800;
 const AUDIENCE = 'cf-worker-ai';
 
@@ -11,6 +15,7 @@ type CachedKey = { keyLike: KeyLike; jwk: JWK; fetchedAt: number };
 let cached: CachedKey | null = null;
 
 async function fetchJWKS(): Promise<JWKS> {
+  debug('Fetching JWKS: %s', PUBLIC_JWKS_URL);
   const res = await fetch(PUBLIC_JWKS_URL, { headers: { accept: 'application/json' } });
   if (!res.ok) throw new Error(`Failed JWKS fetch: ${res.status} ${res.statusText}`);
   return (await res.json()) as JWKS;
@@ -33,6 +38,7 @@ function pickEncryptionKey(jwks: JWKS): JWK {
 async function getCachedPublicKey(): Promise<CachedKey> {
   const now = Date.now();
   if (cached !== null && now - cached.fetchedAt < PUBLIC_KEY_CACHE_TTL_MS) {
+    debug('Using cached JWKS key (kid=%s)', cached.jwk.kid);
     return cached;
   }
   const jwks = await fetchJWKS();
@@ -45,6 +51,7 @@ async function getCachedPublicKey(): Promise<CachedKey> {
   }
   const newCached: CachedKey = { keyLike: keyLike as KeyLike, jwk, fetchedAt: now };
   cached = newCached;
+  debug('Cached new JWKS key (kid=%s, alg=%s)', jwk.kid, alg);
   return newCached;
 }
 
@@ -75,7 +82,9 @@ export async function createJWE(payload: TokenPayload & { roomId: string }): Pro
     .setExpirationTime(now + JWE_TTL_SECONDS)
     .setAudience(AUDIENCE);
 
-  return jwt.encrypt(keyLike);
+  const jwe = await jwt.encrypt(keyLike);
+  debug('Created JWE (kid=%s, exp in %ss)', jwk.kid, JWE_TTL_SECONDS);
+  return jwe;
 }
 
 export function clearPublicKeyCache(): void {

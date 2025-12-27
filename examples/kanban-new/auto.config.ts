@@ -88,6 +88,8 @@ function resolvePath(relativePath: string): string {
   return `${projectRoot}/${relativePath}`;
 }
 
+export const fileId = 'kanbanNew1';
+
 export const plugins = [
   '@auto-engineer/server-checks',
   '@auto-engineer/design-system-importer',
@@ -197,9 +199,16 @@ export const pipeline = define('kanban-todo')
 
   .on('ClientGenerated')
   .when(hasValidComponents)
+
+
+  // build dependency chain
+  // page >> org1 && org 2
+  // org2 >> mol1 && mol2 
+  // process dependency tree
+
   .forEach((e: { data: ClientGeneratedData }) => e.data.components)
-  .groupInto(['molecule', 'organism', 'page'], (c) => c.type)
-  .process('ImplementComponent', (c: Component) => ({
+  .groupInto(['molecule', 'organism', 'page'], (c) => c.type) // group into phased chain
+  .process('ImplementComponent', (c: Component) => ({ // processPhase
     projectDir: resolvePath('./client'),
     iaSchemeDir: resolvePath('./.context'),
     designSystemPath: resolvePath('./.context/design-system.md'),

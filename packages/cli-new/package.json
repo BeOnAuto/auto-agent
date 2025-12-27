@@ -12,13 +12,20 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@auto-engineer/file-store": "workspace:*",
+    "@auto-engineer/narrative": "workspace:*",
     "@auto-engineer/pipeline": "workspace:*",
     "chalk": "^5.3.0",
+    "chokidar": "^3.6.0",
     "commander": "^12.0.0",
+    "debug": "^4.3.4",
     "dotenv": "^16.4.7",
     "get-port": "^7.1.0",
     "jiti": "^2.4.2",
-    "ora": "^8.0.1"
+    "jose": "^5.9.6",
+    "node-fetch": "^3.3.2",
+    "ora": "^8.0.1",
+    "socket.io": "^4.7.5"
   },
   "devDependencies": {
     "@types/node": "^22.0.0"

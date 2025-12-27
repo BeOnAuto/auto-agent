@@ -1,5 +1,8 @@
 import type { NodeFileStore } from '@auto-engineer/file-store/node';
-import { posix } from '../utils/path';
+import createDebug from 'debug';
+import { posix } from '../utils/path.js';
+
+const debug = createDebug('auto-engineer:file-syncer:dts');
 
 export async function readJsonIfExists(vfs: NodeFileStore, p: string): Promise<Record<string, unknown> | null> {
   try {
@@ -28,6 +31,7 @@ export function typesAlias(pkg: string): string {
   return `@types/${pkg}`;
 }
 
+/** From a list of “base directories”, add each ancestor’s node_modules*/
 export function nmRootsForBases(bases: string[], maxUp = 8): string[] {
   const roots = new Set<string>();
   for (const base of bases) {
@@ -42,9 +46,11 @@ export function nmRootsForBases(bases: string[], maxUp = 8): string[] {
   return [...roots].map((p) => p.replace(/\/+/g, '/'));
 }
 
+/** Probe a single package for its entry .d.ts inside a given nm root. */
 export async function probeEntryDtsInRoot(vfs: NodeFileStore, nmRoot: string, pkg: string): Promise<string | null> {
   const pkgDir = `${nmRoot}/${pkg}`.replace(/\/+/g, '/');
 
+  // package.json types/typings
   const pj = await readJsonIfExists(vfs, `${pkgDir}/package.json`);
   if (pj && (typeof pj.types === 'string' || typeof pj.typings === 'string')) {
     const rel = String(pj.types ?? pj.typings);
@@ -52,54 +58,57 @@ export async function probeEntryDtsInRoot(vfs: NodeFileStore, nmRoot: string, pk
     if (await exists(vfs, abs)) return abs;
   }
 
+  // index.d.ts at root
   const idx = posix(`${pkgDir}/index.d.ts`);
   if (await exists(vfs, idx)) return idx;
 
+  // dist/index.d.ts (very common)
   const distIdx = posix(`${pkgDir}/dist/index.d.ts`);
   if (await exists(vfs, distIdx)) return distIdx;
 
   return null;
 }
 
-function scorePath(p: string): number {
-  let s = 0;
-  const pathPosix = p.replace(/\\/g, '/');
-  if (pathPosix.includes('/server/node_modules/')) s -= 10;
-  if (!pathPosix.includes('/.pnpm/')) s -= 3;
-  if (pathPosix.includes('/node_modules/')) s -= 1;
-  s += pathPosix.length / 1000;
-  return s;
-}
-
-async function findCandidatesForPackage(vfs: NodeFileStore, nmRoots: string[], pkg: string): Promise<string[]> {
-  const candidates: string[] = [];
-  for (const nm of nmRoots) {
-    const hit = await probeEntryDtsInRoot(vfs, nm, pkg);
-    if (hit !== null) candidates.push(hit);
-  }
-  return candidates;
-}
-
-async function findCandidatesWithFallback(vfs: NodeFileStore, nmRoots: string[], pkg: string): Promise<string[]> {
-  const candidates = await findCandidatesForPackage(vfs, nmRoots, pkg);
-  if (candidates.length > 0) return candidates;
-
-  const alias = typesAlias(pkg);
-  return findCandidatesForPackage(vfs, nmRoots, alias);
-}
-
+/** For each external pkg, choose at most ONE entry d.ts by scanning across provided nm roots. */
 export async function probeEntryDtsForPackagesFromRoots(
   vfs: NodeFileStore,
   nmRoots: string[],
   pkgs: string[],
 ): Promise<string[]> {
+  function scorePath(p: string): number {
+    // lower score = better
+    let s = 0;
+    const pathPosix = p.replace(/\\/g, '/');
+    if (pathPosix.includes('/server/node_modules/')) s -= 10;
+    if (!pathPosix.includes('/.pnpm/')) s -= 3;
+    if (pathPosix.includes('/node_modules/')) s -= 1;
+    s += pathPosix.length / 1000;
+    return s;
+  }
+
   const out = new Set<string>();
 
   for (const pkg of pkgs) {
-    const candidates = await findCandidatesWithFallback(vfs, nmRoots, pkg);
-    if (candidates.length > 0) {
+    const candidates: string[] = [];
+
+    for (const nm of nmRoots) {
+      const hit = await probeEntryDtsInRoot(vfs, nm, pkg);
+      if (hit !== null) candidates.push(hit);
+    }
+
+    if (candidates.length === 0) {
+      const alias = typesAlias(pkg);
+      for (const nm of nmRoots) {
+        const hit = await probeEntryDtsInRoot(vfs, nm, alias);
+        if (hit !== null) candidates.push(hit);
+      }
+    }
+
+    if (candidates.length) {
       candidates.sort((a, b) => scorePath(a) - scorePath(b));
       out.add(candidates[0]);
+    } else {
+      debug('dts-probe: ⚠ no entry .d.ts found for %s', pkg);
     }
   }
 

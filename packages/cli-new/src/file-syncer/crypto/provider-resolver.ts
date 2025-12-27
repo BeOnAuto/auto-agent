@@ -20,7 +20,7 @@ export type ActiveProvider =
     };
 
 let envLoaded = false;
-function ensureEnv(): void {
+function ensureEnv() {
   if (envLoaded) return;
   dotenv.config({ path: resolve(process.cwd(), '.env') });
   envLoaded = true;

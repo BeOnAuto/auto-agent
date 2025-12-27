@@ -4,6 +4,7 @@ import type { NodeFileStore } from '@auto-engineer/file-store/node';
 export async function readBase64(vfs: NodeFileStore, abs: string): Promise<string | null> {
   const buf = await vfs.read(abs);
   if (!buf) {
+    console.warn(`[sync] readBase64: missing file in VFS: ${abs}`);
     return null;
   }
   return Buffer.from(buf).toString('base64');
