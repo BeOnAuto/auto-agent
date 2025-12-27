@@ -185,11 +185,14 @@ export class PipelineServer {
       const filterOptions = this.parseFilterOptions(req.query);
       const filteredGraph = filterGraph(completeGraph, filterOptions);
       const eventToCommand = this.buildEventToCommand();
-      const pipelineNodes = this.buildPipelineNodes();
+      const allPipelineNodes = this.buildPipelineNodes();
+      const connectedCommandIds = this.extractConnectedCommandIds(filteredGraph);
+      const pipelineNodes = allPipelineNodes.filter((node) => connectedCommandIds.has(node.name));
 
       res.json({
-        nodes: [...filteredGraph.nodes, ...pipelineNodes],
+        nodes: filteredGraph.nodes,
         edges: filteredGraph.edges,
+        pipelineNodes,
         commandToEvents,
         eventToCommand,
       });
@@ -323,6 +326,16 @@ export class PipelineServer {
       alias: handler.alias,
       status: 'None' as const,
     }));
+  }
+
+  private extractConnectedCommandIds(graph: GraphIR): Set<string> {
+    const commandIds = new Set<string>();
+    for (const node of graph.nodes) {
+      if (node.type === 'command') {
+        commandIds.add(node.label);
+      }
+    }
+    return commandIds;
   }
 
   private parseFilterOptions(query: Record<string, unknown>): FilterOptions {

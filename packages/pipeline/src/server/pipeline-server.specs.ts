@@ -35,10 +35,11 @@ interface PipelineNode {
 }
 
 interface PipelineResponse {
-  nodes: PipelineNode[];
+  nodes: GraphNode[];
   edges: Array<{ from: string; to: string }>;
-  commandToEvents: Record<string, string[]>;
-  eventToCommand: Record<string, string>;
+  pipelineNodes?: PipelineNode[];
+  commandToEvents?: Record<string, string[]>;
+  eventToCommand?: Record<string, string>;
 }
 
 interface GraphResponse {
@@ -206,11 +207,13 @@ describe('PipelineServer', () => {
         description: 'Test command',
         handle: async () => ({ type: 'Done', data: {} }),
       };
+      const pipeline = define('test').on('Start').emit('Cmd', {}).build();
       const server = new PipelineServer({ port: 0 });
       server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
       await server.start();
       const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
-      const cmdNode = data.nodes.find((n) => n.id === 'Cmd');
+      const cmdNode = data.pipelineNodes?.find((n) => n.id === 'Cmd');
       expect(cmdNode).toBeDefined();
       expect(cmdNode?.name).toBe('Cmd');
       expect(cmdNode?.title).toBe('Test command');
@@ -273,6 +276,29 @@ describe('PipelineServer', () => {
       );
       expect(data.nodes.every((n) => n.type !== 'event')).toBe(true);
       expect(data.edges.some((e) => e.from === 'cmd:Generate' && e.to === 'cmd:Process')).toBe(true);
+      await server.stop();
+    });
+
+    it('should filter pipelineNodes to only include commands present in filtered graph', async () => {
+      const connectedHandler = {
+        name: 'Connected',
+        events: ['Done'],
+        handle: async () => ({ type: 'Done', data: {} }),
+      };
+      const orphanHandler = {
+        name: 'Orphan',
+        events: ['OrphanDone'],
+        handle: async () => ({ type: 'OrphanDone', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('Connected', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([connectedHandler, orphanHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      const pipelineNodeNames = data.pipelineNodes?.map((n) => n.name) ?? [];
+      expect(pipelineNodeNames).toContain('Connected');
+      expect(pipelineNodeNames).not.toContain('Orphan');
       await server.stop();
     });
   });
