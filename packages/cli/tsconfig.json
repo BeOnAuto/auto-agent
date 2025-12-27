@@ -1,15 +1,15 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "composite": true,
-    "outDir": "./dist"
+    "outDir": "dist",
+    "rootDir": ".",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true
   },
   "include": ["src/**/*", "bin/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.specs.ts", "**/*.spec.ts", "**/*.test.ts"],
-  "references": [
-    { "path": "../message-bus" },
-    { "path": "../message-store" },
-    { "path": "../narrative" },
-    { "path": "../file-store" }
-  ]
+  "exclude": ["node_modules", "dist", "**/*.specs.ts"]
 }

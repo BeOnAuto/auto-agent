@@ -10,5 +10,5 @@ const srcPath = resolve(__dirname, '..', 'src', 'index.js');
 const node = spawn('node', [srcPath, ...process.argv.slice(2)], { stdio: 'inherit' });
 
 node.on('exit', (code) => {
-  process.exit(code || 0);
+  process.exit(code ?? 0);
 });

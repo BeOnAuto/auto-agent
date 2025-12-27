@@ -1,7 +1,0 @@
-{
-  "name": "questionnaires",
-  "displayName": "Questionnaires App",
-  "description": "Collect user input through a series of questions",
-  "type": "template",
-  "preset": "full"
-}
