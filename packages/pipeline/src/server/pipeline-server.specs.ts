@@ -217,6 +217,64 @@ describe('PipelineServer', () => {
       expect(cmdNode?.status).toBe('None');
       await server.stop();
     });
+
+    it('should filter out event nodes when excludeTypes=event', async () => {
+      const pipeline = define('test').on('Start').emit('Cmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<GraphResponse>(`http://localhost:${server.port}/pipeline?excludeTypes=event`);
+      expect(data.nodes.every((n) => n.type !== 'event')).toBe(true);
+      await server.stop();
+    });
+
+    it('should reconnect edges when maintainEdges=true and filter commands', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<GraphResponse>(
+        `http://localhost:${server.port}/pipeline?excludeTypes=command&maintainEdges=true`,
+      );
+      expect(data.nodes.every((n) => n.type !== 'command')).toBe(true);
+      expect(data.edges).toHaveLength(0);
+      await server.stop();
+    });
+
+    it('should filter multiple node types', async () => {
+      const pipeline = define('test')
+        .on('Start')
+        .emit('CheckA', {})
+        .emit('CheckB', {})
+        .settled(['CheckA', 'CheckB'])
+        .dispatch({ dispatches: [] }, () => {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<GraphResponse>(`http://localhost:${server.port}/pipeline?excludeTypes=event,settled`);
+      expect(data.nodes.every((n) => n.type !== 'event' && n.type !== 'settled')).toBe(true);
+      await server.stop();
+    });
+
+    it('should reconnect commands through events when filtering events with maintainEdges=true', async () => {
+      const generateHandler = {
+        name: 'Generate',
+        events: ['Generated'],
+        handle: async () => ({ type: 'Generated', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('Generate', {}).on('Generated').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([generateHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<GraphResponse>(
+        `http://localhost:${server.port}/pipeline?excludeTypes=event&maintainEdges=true`,
+      );
+      expect(data.nodes.every((n) => n.type !== 'event')).toBe(true);
+      expect(data.edges.some((e) => e.from === 'cmd:Generate' && e.to === 'cmd:Process')).toBe(true);
+      await server.stop();
+    });
   });
 
   describe('POST /command', () => {
@@ -364,6 +422,41 @@ describe('PipelineServer', () => {
       expect(res.headers.get('content-type')).toContain('text/plain');
       const mermaid = await res.text();
       expect(mermaid).toContain('flowchart LR');
+      await server.stop();
+    });
+
+    it('should filter out event nodes when excludeTypes=event', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid?excludeTypes=event`);
+      const mermaid = await res.text();
+      expect(mermaid).not.toContain('evt_Start');
+      expect(mermaid).toContain('Process[Process]');
+      await server.stop();
+    });
+
+    it('should filter out settled nodes when excludeTypes=settled', async () => {
+      const checkAHandler = {
+        name: 'CheckA',
+        events: ['CheckAPassed', 'CheckAFailed'],
+        handle: async () => ({ type: 'CheckAPassed', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('Start')
+        .emit('CheckA', {})
+        .settled(['CheckA'])
+        .dispatch({ dispatches: [] }, () => {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([checkAHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid?excludeTypes=settled`);
+      const mermaid = await res.text();
+      expect(mermaid).not.toContain('settled_');
+      expect(mermaid).toContain('CheckA');
       await server.stop();
     });
 
@@ -560,7 +653,7 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
-    it('should show edges from command events to settled node, not from commands', async () => {
+    it('should show edges from commands to settled node', async () => {
       const checkAHandler = {
         name: 'CheckA',
         events: ['CheckAPassed', 'CheckAFailed'],
@@ -584,12 +677,8 @@ describe('PipelineServer', () => {
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
       const mermaid = await res.text();
-      expect(mermaid).toContain('evt_CheckAPassed --> settled_CheckA_CheckB');
-      expect(mermaid).toContain('evt_CheckAFailed --> settled_CheckA_CheckB');
-      expect(mermaid).toContain('evt_CheckBPassed --> settled_CheckA_CheckB');
-      expect(mermaid).toContain('evt_CheckBFailed --> settled_CheckA_CheckB');
-      expect(mermaid).not.toMatch(/CheckA --> settled_/);
-      expect(mermaid).not.toMatch(/CheckB --> settled_/);
+      expect(mermaid).toContain('CheckA --> settled_CheckA_CheckB');
+      expect(mermaid).toContain('CheckB --> settled_CheckA_CheckB');
       await server.stop();
     });
 
@@ -688,6 +777,18 @@ describe('PipelineServer', () => {
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/diagram`);
       expect(res.headers.get('content-type')).toContain('text/html');
+      await server.stop();
+    });
+
+    it('should filter nodes when excludeTypes is provided', async () => {
+      const pipeline = define('test').on('Start').emit('Process', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/diagram?excludeTypes=event`);
+      const html = await res.text();
+      expect(html).not.toContain('evt_Start');
+      expect(html).toContain('Process');
       await server.stop();
     });
 

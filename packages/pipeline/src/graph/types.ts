@@ -17,3 +17,8 @@ export interface GraphIR {
   nodes: GraphNode[];
   edges: GraphEdge[];
 }
+
+export interface FilterOptions {
+  excludeTypes: NodeType[];
+  maintainEdges: boolean;
+}
