@@ -516,26 +516,26 @@ export class PipelineServer {
     const resultEvent = await handler.handle(command);
     const events = Array.isArray(resultEvent) ? resultEvent : [resultEvent];
 
-    for (const event of events) {
-      const eventWithIds: EventWithCorrelation = {
-        ...event,
-        correlationId: command.correlationId,
-        requestId: command.requestId,
-      };
+    const eventsWithIds: EventWithCorrelation[] = events.map((event) => ({
+      ...event,
+      correlationId: command.correlationId,
+      requestId: command.requestId,
+    }));
 
-      await this.messageStore.saveMessage('$all', eventWithIds, undefined, 'event');
+    await Promise.all(eventsWithIds.map((e) => this.messageStore.saveMessage('$all', e, undefined, 'event')));
 
+    for (const eventWithIds of eventsWithIds) {
       this.sseManager.broadcast(eventWithIds);
 
-      const sourceCommand = this.eventCommandMapper.getSourceCommand(event.type);
+      const sourceCommand = this.eventCommandMapper.getSourceCommand(eventWithIds.type);
       if (sourceCommand !== undefined) {
         this.settledTracker.onEventReceived(eventWithIds, sourceCommand);
       }
 
       this.routeEventToPhasedExecutor(eventWithIds);
-
-      await this.routeEventToPipelines(eventWithIds);
     }
+
+    await Promise.all(eventsWithIds.map((e) => this.routeEventToPipelines(e)));
   }
 
   private async dispatchFromSettled(commandType: string, data: unknown, correlationId: string): Promise<void> {
@@ -561,10 +561,8 @@ export class PipelineServer {
 
   private async routeEventToPipelines(event: EventWithCorrelation): Promise<void> {
     const ctx = this.createContext(event.correlationId);
-
-    for (const runtime of this.runtimes.values()) {
-      await runtime.handleEvent(event, ctx);
-    }
+    const runtimes = Array.from(this.runtimes.values());
+    await Promise.all(runtimes.map((runtime) => runtime.handleEvent(event, ctx)));
   }
 
   private createContext(correlationId: string): PipelineContext {
