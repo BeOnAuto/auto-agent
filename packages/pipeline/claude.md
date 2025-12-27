@@ -78,6 +78,76 @@ If you're tempted to exclude a file because it's "infrastructure" or "integratio
 
 ---
 
+## 🧠 Design Philosophy
+
+### Behavior First, Everything Else Emerges
+
+```
+╔═══════════════════════════════════════════════════════════════════════╗
+║  Start with BEHAVIOR. Always.                                         ║
+║  Types, interfaces, data structures — these emerge to serve behavior. ║
+║  If it doesn't affect runtime outcomes, it's not the design.          ║
+╚═══════════════════════════════════════════════════════════════════════╝
+```
+
+**The Core Insight:**
+
+Software exists to _do things_. A program that compiles perfectly but produces wrong outputs is worthless. A program with ugly types that produces correct outputs is valuable. This tells us where to focus.
+
+Behavior is the only thing that matters at runtime. Everything else — types, interfaces, abstractions, patterns — exists solely to help us write correct behavior more reliably.
+
+**The Wrong Way (Structure-First):**
+
+```
+1. Design the data shapes / types / interfaces
+2. Define the abstractions and relationships
+3. Finally, implement the actual behavior
+```
+
+This is backwards. You're making decisions about shape before you understand what transformations you need. You're building a warehouse before you know what you're storing.
+
+**The Right Way (Behavior-First):**
+
+```
+1. What OUTCOME do I need? (input → output)
+2. Write a test that asserts on that outcome
+3. Implement the simplest code that produces the outcome
+4. Let structure emerge to support the behavior
+```
+
+**Why This Works:**
+
+- You only create structure that's _actually needed_
+- Tests verify behavior, which implicitly validates any supporting structure
+- You discover the real shape of data by _using_ it, not by speculating
+- Refactoring is safe because behavior is locked in by tests
+
+**Practical Rule:**
+
+Your first test for any feature should call a **function** and assert on its **output**. Whatever types, interfaces, or data shapes that function needs will get created _because_ the function needs them — not before, not separately, not speculatively.
+
+```ts
+// ❌ WRONG: Starting with structure
+// "Create User type"
+// "Create UserService interface"
+// "Design the repository pattern"
+
+// ✅ RIGHT: Starting with behavior
+it("creates user with generated id", () => {
+  const result = createUser({ name: "Alice" });
+  expect(result).toEqual({ id: expect.any(String), name: "Alice" });
+});
+// Types, interfaces, whatever — they emerge because this function needs them
+```
+
+**The Mantra:**
+
+> "What should this function return when given this input?"
+
+If you can't answer that question, you're not ready to write code. If you _can_ answer it, write the test first, then make it pass. The rest takes care of itself.
+
+---
+
 ## 📝 Testing Guidelines
 
 ### Test Title = Spec
@@ -86,16 +156,16 @@ The `it('should...')` title defines what you're testing. Body proves exactly tha
 
 ```ts
 // ✅ Title matches body
-it('should reject empty usernames', () => {
-  const result = validate({ username: '' });
+it("should reject empty usernames", () => {
+  const result = validate({ username: "" });
   expect(result.valid).toBe(false);
 });
 
 // ❌ Body does more than title claims
-it('should reject empty usernames', () => {
-  const result = validate({ username: '' });
+it("should reject empty usernames", () => {
+  const result = validate({ username: "" });
   expect(result.valid).toBe(false);
-  expect(result.errors).toContain('Username required'); // second spec
+  expect(result.errors).toContain("Username required"); // second spec
   expect(logger.warn).toHaveBeenCalled(); // third spec
 });
 ```
@@ -111,16 +181,16 @@ function createTestIdGenerator() {
   return () => `test-id-${counter++}`;
 }
 
-it('creates user with generated id', () => {
+it("creates user with generated id", () => {
   const generateId = createTestIdGenerator();
-  const user = createUser({ name: 'Alice' }, generateId);
-  expect(user).toEqual({ id: 'test-id-0', name: 'Alice' });
+  const user = createUser({ name: "Alice" }, generateId);
+  expect(user).toEqual({ id: "test-id-0", name: "Alice" });
 });
 
 // ❌ Mocking couples tests to implementation
-it('creates user with generated id', () => {
-  const mockGenerateId = vi.fn().mockReturnValue('user-123');
-  const user = createUser({ name: 'Alice' }, mockGenerateId);
+it("creates user with generated id", () => {
+  const mockGenerateId = vi.fn().mockReturnValue("user-123");
+  const user = createUser({ name: "Alice" }, mockGenerateId);
   expect(mockGenerateId).toHaveBeenCalled();
 });
 ```
@@ -131,10 +201,10 @@ Catch structural changes. Don't cherry-pick properties.
 
 ```ts
 // ✅ Catches any unexpected changes
-expect(result).toEqual({ type: 'USER', name: 'Alice', processed: true });
+expect(result).toEqual({ type: "USER", name: "Alice", processed: true });
 
 // ❌ Misses if extra properties added/removed
-expect(result.type).toBe('USER');
+expect(result.type).toBe("USER");
 expect(result.processed).toBe(true);
 ```
 
@@ -144,16 +214,16 @@ All tests should look identical when you squint: **SETUP → EXECUTE → VERIFY*
 
 ```ts
 // ✅ Single clear structure
-it('transforms user to uppercase', () => {
-  const input = { type: 'user' }; // SETUP
+it("transforms user to uppercase", () => {
+  const input = { type: "user" }; // SETUP
   const result = transform(input); // EXECUTE
-  expect(result).toEqual({ type: 'USER' }); // VERIFY
+  expect(result).toEqual({ type: "USER" }); // VERIFY
 });
 
 // ❌ Multiple execute/verify = split into separate tests
-it('does too many things', () => {
-  const result = transform({ type: 'user' });
-  expect(result.type).toBe('USER');
+it("does too many things", () => {
+  const result = transform({ type: "user" });
+  expect(result.type).toBe("USER");
   const updated = updateResult(result); // second execute
   expect(updated.modified).toBe(true); // second verify
 });
