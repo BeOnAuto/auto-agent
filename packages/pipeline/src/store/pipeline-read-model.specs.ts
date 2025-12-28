@@ -1,7 +1,9 @@
 import { getInMemoryDatabase, type InMemoryDatabase } from '@event-driven-io/emmett';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { ItemStatusDocument } from '../projections/item-status-projection';
+import type { MessageLogDocument } from '../projections/message-log-projection';
 import type { NodeStatusDocument } from '../projections/node-status-projection';
+import type { StatsDocument } from '../projections/stats-projection';
 import { PipelineReadModel } from './pipeline-read-model';
 
 type WithId<T> = T & { _id: string; _version?: never };
@@ -256,6 +258,96 @@ describe('PipelineReadModel', () => {
       const result = await readModel.hasCorrelation('c2');
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe('getMessages', () => {
+    it('should return empty array when no messages exist', async () => {
+      const result = await readModel.getMessages();
+
+      expect(result).toEqual([]);
+    });
+
+    it('should return all messages from MessageLog collection', async () => {
+      const collection = database.collection<WithId<MessageLogDocument>>('MessageLog');
+      const timestamp = new Date('2025-01-01T00:00:00Z');
+      await collection.insertOne({
+        _id: 'r1',
+        correlationId: 'c1',
+        requestId: 'r1',
+        messageType: 'command',
+        messageName: 'CreateUser',
+        messageData: { name: 'Alice' },
+        timestamp,
+      });
+
+      const result = await readModel.getMessages();
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        correlationId: 'c1',
+        requestId: 'r1',
+        messageType: 'command',
+        messageName: 'CreateUser',
+      });
+    });
+
+    it('should return messages filtered by correlationId', async () => {
+      const collection = database.collection<WithId<MessageLogDocument>>('MessageLog');
+      const timestamp = new Date('2025-01-01T00:00:00Z');
+      await collection.insertOne({
+        _id: 'r1',
+        correlationId: 'c1',
+        requestId: 'r1',
+        messageType: 'command',
+        messageName: 'CreateUser',
+        messageData: {},
+        timestamp,
+      });
+      await collection.insertOne({
+        _id: 'r2',
+        correlationId: 'c2',
+        requestId: 'r2',
+        messageType: 'command',
+        messageName: 'DeleteUser',
+        messageData: {},
+        timestamp,
+      });
+
+      const result = await readModel.getMessages('c1');
+
+      expect(result).toHaveLength(1);
+      expect(result[0].correlationId).toBe('c1');
+    });
+  });
+
+  describe('getStats', () => {
+    it('should return zero stats when no messages exist', async () => {
+      const result = await readModel.getStats();
+
+      expect(result).toEqual({
+        totalMessages: 0,
+        totalCommands: 0,
+        totalEvents: 0,
+      });
+    });
+
+    it('should return stats from Stats collection', async () => {
+      const collection = database.collection<WithId<StatsDocument>>('Stats');
+      await collection.insertOne({
+        _id: 'global',
+        totalMessages: 10,
+        totalCommands: 6,
+        totalEvents: 4,
+      });
+
+      const result = await readModel.getStats();
+
+      expect(result).toEqual({
+        totalMessages: 10,
+        totalCommands: 6,
+        totalEvents: 4,
+      });
     });
   });
 });
