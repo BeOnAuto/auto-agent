@@ -1,6 +1,7 @@
 import type { NodeStatus } from '../graph/types';
 
 export interface NodeStatusDocument {
+  [key: string]: unknown;
   correlationId: string;
   commandName: string;
   status: NodeStatus;

@@ -1,4 +1,5 @@
 export interface LatestRunDocument {
+  [key: string]: unknown;
   latestCorrelationId: string;
   triggerCommand: string;
 }

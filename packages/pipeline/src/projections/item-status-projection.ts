@@ -1,4 +1,5 @@
 export interface ItemStatusDocument {
+  [key: string]: unknown;
   correlationId: string;
   commandType: string;
   itemKey: string;
