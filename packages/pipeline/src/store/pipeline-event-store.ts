@@ -9,9 +9,23 @@ import {
 } from '@event-driven-io/emmett';
 import type { ItemStatusChangedEvent, ItemStatusDocument } from '../projections/item-status-projection';
 import { evolve as evolveItemStatus } from '../projections/item-status-projection';
+import type { LatestRunDocument } from '../projections/latest-run-projection';
+import { evolve as evolveLatestRun } from '../projections/latest-run-projection';
+import type { MessageLogDocument, MessageLogEvent } from '../projections/message-log-projection';
+import { evolve as evolveMessageLog } from '../projections/message-log-projection';
 import type { NodeStatusChangedEvent, NodeStatusDocument } from '../projections/node-status-projection';
 import { evolve as evolveNodeStatus } from '../projections/node-status-projection';
+import type { StatsDocument } from '../projections/stats-projection';
+import { evolve as evolveStats } from '../projections/stats-projection';
 import { PipelineReadModel } from './pipeline-read-model';
+
+interface PipelineRunStartedEvent {
+  type: 'PipelineRunStarted';
+  data: {
+    correlationId: string;
+    triggerCommand: string;
+  };
+}
 
 function createProjections() {
   const itemStatusProjection = inMemorySingleStreamProjection<ItemStatusDocument, ItemStatusChangedEvent>({
@@ -28,9 +42,34 @@ function createProjections() {
     evolve: (document: NodeStatusDocument | null, event: NodeStatusChangedEvent) => evolveNodeStatus(document, event),
   });
 
-  return inlineProjections<InMemoryReadEventMetadata>([itemStatusProjection, nodeStatusProjection] as Parameters<
-    typeof inlineProjections<InMemoryReadEventMetadata>
-  >[0]);
+  const latestRunProjection = inMemorySingleStreamProjection<LatestRunDocument, PipelineRunStartedEvent>({
+    collectionName: 'LatestRun',
+    canHandle: ['PipelineRunStarted'],
+    getDocumentId: () => 'singleton',
+    evolve: (document: LatestRunDocument | null, event: PipelineRunStartedEvent) => evolveLatestRun(document, event),
+  });
+
+  const messageLogProjection = inMemorySingleStreamProjection<MessageLogDocument, MessageLogEvent>({
+    collectionName: 'MessageLog',
+    canHandle: ['CommandDispatched', 'DomainEventEmitted'],
+    getDocumentId: (event) => event.data.requestId,
+    evolve: (document: MessageLogDocument | null, event: MessageLogEvent) => evolveMessageLog(document, event),
+  });
+
+  const statsProjection = inMemorySingleStreamProjection<StatsDocument, MessageLogEvent>({
+    collectionName: 'Stats',
+    canHandle: ['CommandDispatched', 'DomainEventEmitted'],
+    getDocumentId: () => 'global',
+    evolve: (document: StatsDocument | null, event: MessageLogEvent) => evolveStats(document, event),
+  });
+
+  return inlineProjections<InMemoryReadEventMetadata>([
+    itemStatusProjection,
+    nodeStatusProjection,
+    latestRunProjection,
+    messageLogProjection,
+    statsProjection,
+  ] as Parameters<typeof inlineProjections<InMemoryReadEventMetadata>>[0]);
 }
 
 export interface PipelineEventStoreContext {
