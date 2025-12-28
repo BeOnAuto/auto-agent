@@ -20,6 +20,7 @@ import { EventCommandMapper } from '../runtime/event-command-map';
 import { PhasedExecutor } from '../runtime/phased-executor';
 import { PipelineRuntime } from '../runtime/pipeline-runtime';
 import { SettledTracker } from '../runtime/settled-tracker';
+import { createPipelineEventStore, type PipelineEventStoreContext } from '../store/pipeline-event-store';
 import { SSEManager } from './sse-manager';
 
 export type { EventDefinition };
@@ -66,10 +67,9 @@ export class PipelineServer {
   private readonly eventCommandMapper: EventCommandMapper;
   private readonly phasedExecutor: PhasedExecutor;
   private readonly sseManager: SSEManager;
-  private readonly nodeStatusByCorrelation = new Map<string, Map<string, NodeStatus>>();
+  private readonly eventStoreContext: PipelineEventStoreContext;
   private latestCorrelationId?: string;
   private readonly itemKeyExtractors = new Map<string, (data: unknown) => string | undefined>();
-  private readonly itemsByCommand = new Map<string, Map<string, Map<string, ItemStatus>>>();
 
   constructor(config: PipelineServerConfig) {
     this.requestedPort = config.port;
@@ -80,6 +80,7 @@ export class PipelineServer {
     this.httpServer = createServer(this.app);
     this.messageBus = createMessageBus();
     this.messageStore = config.messageStore ?? new MemoryMessageStore();
+    this.eventStoreContext = createPipelineEventStore();
     this.eventCommandMapper = new EventCommandMapper([]);
     this.settledTracker = new SettledTracker({
       onDispatch: (commandType, data, correlationId) => {
@@ -199,22 +200,24 @@ export class PipelineServer {
     });
 
     this.app.get('/pipeline', (req, res) => {
-      const commandToEvents = this.buildCommandToEvents();
-      const rawGraph = this.buildCombinedGraph();
-      const pipelineEvents = this.extractPipelineEvents(rawGraph, commandToEvents);
-      const graphWithEvents = this.addCommandEventEdgesToGraph(rawGraph, commandToEvents, pipelineEvents);
-      const graphWithEnrichedEvents = this.enrichEventLabels(graphWithEvents);
-      const completeGraph = this.markBackLinks(graphWithEnrichedEvents);
-      const filterOptions = this.parseFilterOptions(req.query);
-      const filteredGraph = filterGraph(completeGraph, filterOptions);
-      const correlationId = req.query.correlationId as string | undefined;
-      const graphWithStatus = this.addStatusToCommandNodes(filteredGraph, correlationId);
+      void (async () => {
+        const commandToEvents = this.buildCommandToEvents();
+        const rawGraph = this.buildCombinedGraph();
+        const pipelineEvents = this.extractPipelineEvents(rawGraph, commandToEvents);
+        const graphWithEvents = this.addCommandEventEdgesToGraph(rawGraph, commandToEvents, pipelineEvents);
+        const graphWithEnrichedEvents = this.enrichEventLabels(graphWithEvents);
+        const completeGraph = this.markBackLinks(graphWithEnrichedEvents);
+        const filterOptions = this.parseFilterOptions(req.query);
+        const filteredGraph = filterGraph(completeGraph, filterOptions);
+        const correlationId = req.query.correlationId as string | undefined;
+        const graphWithStatus = await this.addStatusToCommandNodes(filteredGraph, correlationId);
 
-      res.json({
-        nodes: graphWithStatus.nodes,
-        edges: graphWithStatus.edges,
-        latestRun: this.latestCorrelationId,
-      });
+        res.json({
+          nodes: graphWithStatus.nodes,
+          edges: graphWithStatus.edges,
+          latestRun: this.latestCorrelationId,
+        });
+      })();
     });
 
     this.app.get('/pipeline/mermaid', (req, res) => {
@@ -347,9 +350,9 @@ export class PipelineServer {
     };
   }
 
-  private addStatusToCommandNodes(graph: GraphIR, correlationId?: string): GraphIR {
-    return {
-      nodes: graph.nodes.map((node) => {
+  private async addStatusToCommandNodes(graph: GraphIR, correlationId?: string): Promise<GraphIR> {
+    const nodesWithStatus = await Promise.all(
+      graph.nodes.map(async (node) => {
         if (node.type !== 'command') {
           return node;
         }
@@ -357,7 +360,7 @@ export class PipelineServer {
         if (correlationId === undefined) {
           return { ...node, status: 'idle' as NodeStatus, pendingCount: 0, endedCount: 0 };
         }
-        const stats = this.computeCommandStats(correlationId, commandName);
+        const stats = await this.computeCommandStats(correlationId, commandName);
         return {
           ...node,
           status: stats.aggregateStatus,
@@ -365,28 +368,81 @@ export class PipelineServer {
           endedCount: stats.endedCount,
         };
       }),
+    );
+    return {
+      nodes: nodesWithStatus,
       edges: graph.edges,
     };
   }
 
-  private updateNodeStatus(correlationId: string, commandName: string, status: NodeStatus): void {
-    let statusMap = this.nodeStatusByCorrelation.get(correlationId);
-    if (statusMap === undefined) {
-      statusMap = new Map<string, NodeStatus>();
-      this.nodeStatusByCorrelation.set(correlationId, statusMap);
-    }
-    const previousStatus: NodeStatus = statusMap.get(commandName) ?? 'idle';
-    statusMap.set(commandName, status);
-    this.broadcastNodeStatusChanged(correlationId, commandName, status, previousStatus);
+  private async emitItemStatusChanged(
+    correlationId: string,
+    commandType: string,
+    itemKey: string,
+    requestId: string,
+    status: 'running' | 'success' | 'error',
+    attemptCount: number,
+  ): Promise<void> {
+    await this.eventStoreContext.eventStore.appendToStream(`pipeline-${correlationId}`, [
+      {
+        type: 'ItemStatusChanged',
+        data: {
+          correlationId,
+          commandType,
+          itemKey,
+          requestId,
+          status,
+          attemptCount,
+        },
+      },
+    ]);
   }
 
-  private broadcastNodeStatusChanged(
+  private async emitNodeStatusChanged(
     correlationId: string,
     commandName: string,
     status: NodeStatus,
     previousStatus: NodeStatus,
-  ): void {
-    const stats = this.computeCommandStats(correlationId, commandName);
+  ): Promise<void> {
+    const stats = await this.computeCommandStats(correlationId, commandName);
+    await this.eventStoreContext.eventStore.appendToStream(`pipeline-${correlationId}`, [
+      {
+        type: 'NodeStatusChanged',
+        data: {
+          correlationId,
+          commandName,
+          nodeId: `cmd:${commandName}`,
+          status,
+          previousStatus,
+          pendingCount: stats.pendingCount,
+          endedCount: stats.endedCount,
+        },
+      },
+    ]);
+  }
+
+  private nodeStatusCache = new Map<string, Map<string, NodeStatus>>();
+  private itemStatusCache = new Map<string, Map<string, Map<string, ItemStatus>>>();
+
+  private async updateNodeStatus(correlationId: string, commandName: string, status: NodeStatus): Promise<void> {
+    let statusMap = this.nodeStatusCache.get(correlationId);
+    if (statusMap === undefined) {
+      statusMap = new Map<string, NodeStatus>();
+      this.nodeStatusCache.set(correlationId, statusMap);
+    }
+    const previousStatus: NodeStatus = statusMap.get(commandName) ?? 'idle';
+    statusMap.set(commandName, status);
+    await this.emitNodeStatusChanged(correlationId, commandName, status, previousStatus);
+    await this.broadcastNodeStatusChanged(correlationId, commandName, status, previousStatus);
+  }
+
+  private async broadcastNodeStatusChanged(
+    correlationId: string,
+    commandName: string,
+    status: NodeStatus,
+    previousStatus: NodeStatus,
+  ): Promise<void> {
+    const stats = await this.computeCommandStats(correlationId, commandName);
     const event: Event & { correlationId: string } = {
       type: 'NodeStatusChanged',
       data: {
@@ -421,16 +477,16 @@ export class PipelineServer {
     return requestId;
   }
 
-  private getOrCreateItemStatus(
+  private async getOrCreateItemStatus(
     correlationId: string,
     commandType: string,
     itemKey: string,
     requestId: string,
-  ): ItemStatus {
-    let correlationMap = this.itemsByCommand.get(correlationId);
+  ): Promise<ItemStatus> {
+    let correlationMap = this.itemStatusCache.get(correlationId);
     if (correlationMap === undefined) {
       correlationMap = new Map<string, Map<string, ItemStatus>>();
-      this.itemsByCommand.set(correlationId, correlationMap);
+      this.itemStatusCache.set(correlationId, correlationMap);
     }
 
     let commandMap = correlationMap.get(commandType);
@@ -456,16 +512,25 @@ export class PipelineServer {
       itemStatus.attemptCount++;
     }
 
+    await this.emitItemStatusChanged(
+      correlationId,
+      commandType,
+      itemKey,
+      requestId,
+      'running',
+      itemStatus.attemptCount,
+    );
+
     return itemStatus;
   }
 
-  private updateItemStatus(
+  private async updateItemStatus(
     correlationId: string,
     commandType: string,
     itemKey: string,
     status: 'running' | 'success' | 'error',
-  ): void {
-    const correlationMap = this.itemsByCommand.get(correlationId);
+  ): Promise<void> {
+    const correlationMap = this.itemStatusCache.get(correlationId);
     if (correlationMap === undefined) return;
 
     const commandMap = correlationMap.get(commandType);
@@ -474,50 +539,22 @@ export class PipelineServer {
     const itemStatus = commandMap.get(itemKey);
     if (itemStatus !== undefined) {
       itemStatus.status = status;
+      await this.emitItemStatusChanged(
+        correlationId,
+        commandType,
+        itemKey,
+        itemStatus.currentRequestId,
+        status,
+        itemStatus.attemptCount,
+      );
     }
   }
 
-  private computeCommandStats(
+  private async computeCommandStats(
     correlationId: string,
     commandType: string,
-  ): { pendingCount: number; endedCount: number; aggregateStatus: NodeStatus } {
-    const correlationMap = this.itemsByCommand.get(correlationId);
-    if (correlationMap === undefined) {
-      return { pendingCount: 0, endedCount: 0, aggregateStatus: 'idle' };
-    }
-
-    const commandMap = correlationMap.get(commandType);
-    if (commandMap === undefined) {
-      return { pendingCount: 0, endedCount: 0, aggregateStatus: 'idle' };
-    }
-
-    let pendingCount = 0;
-    let endedCount = 0;
-    let hasError = false;
-
-    for (const item of commandMap.values()) {
-      if (item.status === 'running') {
-        pendingCount++;
-      } else {
-        endedCount++;
-        if (item.status === 'error') {
-          hasError = true;
-        }
-      }
-    }
-
-    let aggregateStatus: NodeStatus;
-    if (pendingCount > 0) {
-      aggregateStatus = 'running';
-    } else if (endedCount === 0) {
-      aggregateStatus = 'idle';
-    } else if (hasError) {
-      aggregateStatus = 'error';
-    } else {
-      aggregateStatus = 'success';
-    }
-
-    return { pendingCount, endedCount, aggregateStatus };
+  ): Promise<{ pendingCount: number; endedCount: number; aggregateStatus: NodeStatus }> {
+    return this.eventStoreContext.readModel.computeCommandStats(correlationId, commandType);
   }
 
   private getEventName(event: EventDefinition): string {
@@ -794,16 +831,16 @@ export class PipelineServer {
     const handler = this.commandHandlers.get(command.type);
     if (!handler) return;
 
-    const isNewCorrelationId = !this.nodeStatusByCorrelation.has(command.correlationId);
+    const isNewCorrelationId = !this.nodeStatusCache.has(command.correlationId);
     if (isNewCorrelationId) {
       this.broadcastPipelineRunStarted(command.correlationId, command.type);
       this.latestCorrelationId = command.correlationId;
     }
 
     const itemKey = this.extractItemKey(command.type, command.data, command.requestId);
-    this.getOrCreateItemStatus(command.correlationId, command.type, itemKey, command.requestId);
+    await this.getOrCreateItemStatus(command.correlationId, command.type, itemKey, command.requestId);
 
-    this.updateNodeStatus(command.correlationId, command.type, 'running');
+    await this.updateNodeStatus(command.correlationId, command.type, 'running');
     this.settledTracker.onCommandStarted(command);
 
     const resultEvent = await handler.handle(command);
@@ -811,8 +848,8 @@ export class PipelineServer {
 
     const finalStatus = this.getStatusFromEvents(events);
     const itemFinalStatus = finalStatus === 'idle' ? 'success' : finalStatus;
-    this.updateItemStatus(command.correlationId, command.type, itemKey, itemFinalStatus);
-    this.updateNodeStatus(command.correlationId, command.type, finalStatus);
+    await this.updateItemStatus(command.correlationId, command.type, itemKey, itemFinalStatus);
+    await this.updateNodeStatus(command.correlationId, command.type, finalStatus);
 
     const eventsWithIds: EventWithCorrelation[] = events.map((event) => ({
       ...event,
