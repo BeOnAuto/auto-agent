@@ -31,9 +31,6 @@ interface GraphNode {
 interface PipelineResponse {
   nodes: GraphNode[];
   edges: Array<{ from: string; to: string; backLink?: boolean }>;
-  pipelineNodes?: unknown;
-  commandToEvents?: Record<string, string[]>;
-  eventToCommand?: Record<string, string>;
   latestRun?: string;
 }
 
@@ -259,41 +256,6 @@ describe('PipelineServer', () => {
       );
       expect(data.nodes.every((n) => n.type !== 'event')).toBe(true);
       expect(data.edges.some((e) => e.from === 'cmd:Generate' && e.to === 'cmd:Process')).toBe(true);
-      await server.stop();
-    });
-
-    it('should not include deprecated commandToEvents and eventToCommand fields', async () => {
-      const handler = {
-        name: 'Cmd',
-        events: ['Done'],
-        handle: async () => ({ type: 'Done', data: {} }),
-      };
-      const pipeline = define('test').on('Start').emit('Cmd', {}).build();
-      const server = new PipelineServer({ port: 0 });
-      server.registerCommandHandlers([handler]);
-      server.registerPipeline(pipeline);
-      await server.start();
-      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
-      expect(data.commandToEvents).toBeUndefined();
-      expect(data.eventToCommand).toBeUndefined();
-      await server.stop();
-    });
-
-    it('should not include pipelineNodes in response', async () => {
-      const handler = {
-        name: 'Cmd',
-        events: ['Done'],
-        handle: async () => ({ type: 'Done', data: {} }),
-      };
-      const pipeline = define('test').on('Start').emit('Cmd', {}).build();
-      const server = new PipelineServer({ port: 0 });
-      server.registerCommandHandlers([handler]);
-      server.registerPipeline(pipeline);
-      await server.start();
-      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
-      expect(data.pipelineNodes).toBeUndefined();
-      expect(data.nodes).toBeDefined();
-      expect(data.edges).toBeDefined();
       await server.stop();
     });
 
