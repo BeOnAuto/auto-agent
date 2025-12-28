@@ -31,6 +31,7 @@ interface PipelineNode {
   id: string;
   name: string;
   title: string;
+  displayName: string;
   status: string;
 }
 
@@ -176,11 +177,12 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
-    it('should return pipeline nodes with name, title, and status', async () => {
+    it('should return pipeline nodes with name, title, displayName, and status', async () => {
       const handler = {
         name: 'Cmd',
         alias: 'cmd',
         description: 'Test command',
+        displayName: 'My Command',
         handle: async () => ({ type: 'Done', data: {} }),
       };
       const pipeline = define('test').on('Start').emit('Cmd', {}).build();
@@ -193,7 +195,24 @@ describe('PipelineServer', () => {
       expect(cmdNode).toBeDefined();
       expect(cmdNode?.name).toBe('Cmd');
       expect(cmdNode?.title).toBe('Test command');
+      expect(cmdNode?.displayName).toBe('My Command');
       expect(cmdNode?.status).toBe('None');
+      await server.stop();
+    });
+
+    it('should use command name as displayName when not provided', async () => {
+      const handler = {
+        name: 'SimpleCmd',
+        handle: async () => ({ type: 'Done', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('SimpleCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      const cmdNode = data.pipelineNodes?.find((n) => n.id === 'SimpleCmd');
+      expect(cmdNode?.displayName).toBe('SimpleCmd');
       await server.stop();
     });
 

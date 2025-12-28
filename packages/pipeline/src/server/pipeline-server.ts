@@ -24,6 +24,7 @@ import { SSEManager } from './sse-manager';
 export interface CommandHandlerWithMetadata extends CommandHandler {
   alias?: string;
   description?: string;
+  displayName?: string;
   fields?: Record<string, unknown>;
   examples?: unknown[];
   events?: string[];
@@ -302,11 +303,19 @@ export class PipelineServer {
     return commandToEvents;
   }
 
-  private buildPipelineNodes(): Array<{ id: string; name: string; title: string; alias?: string; status: 'None' }> {
+  private buildPipelineNodes(): Array<{
+    id: string;
+    name: string;
+    title: string;
+    displayName: string;
+    alias?: string;
+    status: 'None';
+  }> {
     return Array.from(this.commandHandlers.entries()).map(([name, handler]) => ({
       id: name,
       name,
       title: handler.description ?? '',
+      displayName: handler.displayName ?? name,
       alias: handler.alias,
       status: 'None' as const,
     }));
