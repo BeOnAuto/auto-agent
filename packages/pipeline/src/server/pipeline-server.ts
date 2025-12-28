@@ -41,15 +41,6 @@ interface EventWithCorrelation extends Event {
   correlationId: string;
 }
 
-interface ItemStatus {
-  itemKey: string;
-  commandType: string;
-  correlationId: string;
-  currentRequestId: string;
-  status: 'running' | 'success' | 'error';
-  attemptCount: number;
-}
-
 export class PipelineServer {
   private app: express.Application;
   private httpServer: HttpServer;
@@ -462,8 +453,6 @@ export class PipelineServer {
     ]);
   }
 
-  private itemStatusCache = new Map<string, Map<string, Map<string, ItemStatus>>>();
-
   private async updateNodeStatus(correlationId: string, commandName: string, status: NodeStatus): Promise<void> {
     const existing = await this.eventStoreContext.readModel.getNodeStatus(correlationId, commandName);
     const previousStatus: NodeStatus = existing?.status ?? 'idle';
@@ -516,46 +505,13 @@ export class PipelineServer {
     commandType: string,
     itemKey: string,
     requestId: string,
-  ): Promise<ItemStatus> {
-    let correlationMap = this.itemStatusCache.get(correlationId);
-    if (correlationMap === undefined) {
-      correlationMap = new Map<string, Map<string, ItemStatus>>();
-      this.itemStatusCache.set(correlationId, correlationMap);
-    }
+  ): Promise<{ attemptCount: number }> {
+    const existing = await this.eventStoreContext.readModel.getItemStatus(correlationId, commandType, itemKey);
+    const attemptCount = (existing?.attemptCount ?? 0) + 1;
 
-    let commandMap = correlationMap.get(commandType);
-    if (commandMap === undefined) {
-      commandMap = new Map<string, ItemStatus>();
-      correlationMap.set(commandType, commandMap);
-    }
+    await this.emitItemStatusChanged(correlationId, commandType, itemKey, requestId, 'running', attemptCount);
 
-    let itemStatus = commandMap.get(itemKey);
-    if (itemStatus === undefined) {
-      itemStatus = {
-        itemKey,
-        commandType,
-        correlationId,
-        currentRequestId: requestId,
-        status: 'running',
-        attemptCount: 1,
-      };
-      commandMap.set(itemKey, itemStatus);
-    } else {
-      itemStatus.currentRequestId = requestId;
-      itemStatus.status = 'running';
-      itemStatus.attemptCount++;
-    }
-
-    await this.emitItemStatusChanged(
-      correlationId,
-      commandType,
-      itemKey,
-      requestId,
-      'running',
-      itemStatus.attemptCount,
-    );
-
-    return itemStatus;
+    return { attemptCount };
   }
 
   private async updateItemStatus(
@@ -564,22 +520,15 @@ export class PipelineServer {
     itemKey: string,
     status: 'running' | 'success' | 'error',
   ): Promise<void> {
-    const correlationMap = this.itemStatusCache.get(correlationId);
-    if (correlationMap === undefined) return;
-
-    const commandMap = correlationMap.get(commandType);
-    if (commandMap === undefined) return;
-
-    const itemStatus = commandMap.get(itemKey);
-    if (itemStatus !== undefined) {
-      itemStatus.status = status;
+    const existing = await this.eventStoreContext.readModel.getItemStatus(correlationId, commandType, itemKey);
+    if (existing !== null) {
       await this.emitItemStatusChanged(
         correlationId,
         commandType,
         itemKey,
-        itemStatus.currentRequestId,
+        existing.currentRequestId,
         status,
-        itemStatus.attemptCount,
+        existing.attemptCount,
       );
     }
   }
