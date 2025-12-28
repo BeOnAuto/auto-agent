@@ -42,6 +42,15 @@ interface EventWithCorrelation extends Event {
   correlationId: string;
 }
 
+interface ItemStatus {
+  itemKey: string;
+  commandType: string;
+  correlationId: string;
+  currentRequestId: string;
+  status: 'running' | 'success' | 'error';
+  attemptCount: number;
+}
+
 export class PipelineServer {
   private app: express.Application;
   private httpServer: HttpServer;
@@ -59,6 +68,8 @@ export class PipelineServer {
   private readonly sseManager: SSEManager;
   private readonly nodeStatusByCorrelation = new Map<string, Map<string, NodeStatus>>();
   private latestCorrelationId?: string;
+  private readonly itemKeyExtractors = new Map<string, (data: unknown) => string | undefined>();
+  private readonly itemsByCommand = new Map<string, Map<string, Map<string, ItemStatus>>>();
 
   constructor(config: PipelineServerConfig) {
     this.requestedPort = config.port;
@@ -101,6 +112,10 @@ export class PipelineServer {
 
   getRegisteredCommands(): string[] {
     return Array.from(this.commandHandlers.keys());
+  }
+
+  registerItemKeyExtractor(commandType: string, extractor: (data: unknown) => string | undefined): void {
+    this.itemKeyExtractors.set(commandType, extractor);
   }
 
   registerPipeline(pipeline: Pipeline): void {
@@ -333,15 +348,22 @@ export class PipelineServer {
   }
 
   private addStatusToCommandNodes(graph: GraphIR, correlationId?: string): GraphIR {
-    const statusMap = correlationId !== undefined ? this.nodeStatusByCorrelation.get(correlationId) : undefined;
     return {
       nodes: graph.nodes.map((node) => {
         if (node.type !== 'command') {
           return node;
         }
         const commandName = node.id.replace(/^cmd:/, '');
-        const status = statusMap?.get(commandName) ?? 'idle';
-        return { ...node, status };
+        if (correlationId === undefined) {
+          return { ...node, status: 'idle' as NodeStatus, pendingCount: 0, endedCount: 0 };
+        }
+        const stats = this.computeCommandStats(correlationId, commandName);
+        return {
+          ...node,
+          status: stats.aggregateStatus,
+          pendingCount: stats.pendingCount,
+          endedCount: stats.endedCount,
+        };
       }),
       edges: graph.edges,
     };
@@ -381,6 +403,114 @@ export class PipelineServer {
     };
     this.sseManager.broadcast(event);
     void this.messageStore.saveMessage('$all', event, undefined, 'event');
+  }
+
+  private extractItemKey(commandType: string, data: unknown, requestId: string): string {
+    const extractor = this.itemKeyExtractors.get(commandType);
+    if (extractor !== undefined) {
+      const key = extractor(data);
+      if (key !== undefined) return key;
+    }
+    return requestId;
+  }
+
+  private getOrCreateItemStatus(
+    correlationId: string,
+    commandType: string,
+    itemKey: string,
+    requestId: string,
+  ): ItemStatus {
+    let correlationMap = this.itemsByCommand.get(correlationId);
+    if (correlationMap === undefined) {
+      correlationMap = new Map<string, Map<string, ItemStatus>>();
+      this.itemsByCommand.set(correlationId, correlationMap);
+    }
+
+    let commandMap = correlationMap.get(commandType);
+    if (commandMap === undefined) {
+      commandMap = new Map<string, ItemStatus>();
+      correlationMap.set(commandType, commandMap);
+    }
+
+    let itemStatus = commandMap.get(itemKey);
+    if (itemStatus === undefined) {
+      itemStatus = {
+        itemKey,
+        commandType,
+        correlationId,
+        currentRequestId: requestId,
+        status: 'running',
+        attemptCount: 1,
+      };
+      commandMap.set(itemKey, itemStatus);
+    } else {
+      itemStatus.currentRequestId = requestId;
+      itemStatus.status = 'running';
+      itemStatus.attemptCount++;
+    }
+
+    return itemStatus;
+  }
+
+  private updateItemStatus(
+    correlationId: string,
+    commandType: string,
+    itemKey: string,
+    status: 'running' | 'success' | 'error',
+  ): void {
+    const correlationMap = this.itemsByCommand.get(correlationId);
+    if (correlationMap === undefined) return;
+
+    const commandMap = correlationMap.get(commandType);
+    if (commandMap === undefined) return;
+
+    const itemStatus = commandMap.get(itemKey);
+    if (itemStatus !== undefined) {
+      itemStatus.status = status;
+    }
+  }
+
+  private computeCommandStats(
+    correlationId: string,
+    commandType: string,
+  ): { pendingCount: number; endedCount: number; aggregateStatus: NodeStatus } {
+    const correlationMap = this.itemsByCommand.get(correlationId);
+    if (correlationMap === undefined) {
+      return { pendingCount: 0, endedCount: 0, aggregateStatus: 'idle' };
+    }
+
+    const commandMap = correlationMap.get(commandType);
+    if (commandMap === undefined) {
+      return { pendingCount: 0, endedCount: 0, aggregateStatus: 'idle' };
+    }
+
+    let pendingCount = 0;
+    let endedCount = 0;
+    let hasError = false;
+
+    for (const item of commandMap.values()) {
+      if (item.status === 'running') {
+        pendingCount++;
+      } else {
+        endedCount++;
+        if (item.status === 'error') {
+          hasError = true;
+        }
+      }
+    }
+
+    let aggregateStatus: NodeStatus;
+    if (pendingCount > 0) {
+      aggregateStatus = 'running';
+    } else if (endedCount === 0) {
+      aggregateStatus = 'idle';
+    } else if (hasError) {
+      aggregateStatus = 'error';
+    } else {
+      aggregateStatus = 'success';
+    }
+
+    return { pendingCount, endedCount, aggregateStatus };
   }
 
   private getEventName(event: EventDefinition): string {
@@ -663,6 +793,9 @@ export class PipelineServer {
       this.latestCorrelationId = command.correlationId;
     }
 
+    const itemKey = this.extractItemKey(command.type, command.data, command.requestId);
+    this.getOrCreateItemStatus(command.correlationId, command.type, itemKey, command.requestId);
+
     this.updateNodeStatus(command.correlationId, command.type, 'running');
     this.settledTracker.onCommandStarted(command);
 
@@ -670,6 +803,8 @@ export class PipelineServer {
     const events = Array.isArray(resultEvent) ? resultEvent : [resultEvent];
 
     const finalStatus = this.getStatusFromEvents(events);
+    const itemFinalStatus = finalStatus === 'idle' ? 'success' : finalStatus;
+    this.updateItemStatus(command.correlationId, command.type, itemKey, itemFinalStatus);
     this.updateNodeStatus(command.correlationId, command.type, finalStatus);
 
     const eventsWithIds: EventWithCorrelation[] = events.map((event) => ({

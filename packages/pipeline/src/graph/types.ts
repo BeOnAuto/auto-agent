@@ -7,6 +7,8 @@ export interface GraphNode {
   type: NodeType;
   label: string;
   status?: NodeStatus;
+  pendingCount?: number;
+  endedCount?: number;
 }
 
 export interface GraphEdge {

@@ -26,6 +26,8 @@ interface GraphNode {
   type: string;
   label: string;
   status?: string;
+  pendingCount?: number;
+  endedCount?: number;
 }
 
 interface PipelineResponse {
@@ -1268,6 +1270,39 @@ describe('PipelineServer', () => {
       expect(html).toContain('<!DOCTYPE html>');
       expect(html).toContain('<html');
       expect(html).toContain('</html>');
+      await server.stop();
+    });
+  });
+
+  describe('item-level tracking', () => {
+    it('should extract itemKey from command data using registered extractor', async () => {
+      const handler = {
+        name: 'ImplementSlice',
+        events: ['SliceImplemented'],
+        handle: async () => ({ type: 'SliceImplemented', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('ImplementSlice', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      server.registerItemKeyExtractor('ImplementSlice', (d) => (d as { slicePath?: string }).slicePath);
+      await server.start();
+
+      const commandResponse = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'ImplementSlice', data: { slicePath: '/server/slice-1' } }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const data = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${commandResponse.correlationId}`,
+      );
+      const cmdNode = data.nodes.find((n) => n.id === 'cmd:ImplementSlice');
+      expect(cmdNode?.pendingCount).toBe(0);
+      expect(cmdNode?.endedCount).toBe(1);
+
       await server.stop();
     });
   });
