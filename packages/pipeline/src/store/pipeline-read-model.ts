@@ -1,6 +1,7 @@
 import type { InMemoryDatabase } from '@event-driven-io/emmett';
 import type { NodeStatus } from '../graph/types';
 import type { ItemStatusDocument } from '../projections/item-status-projection';
+import type { LatestRunDocument } from '../projections/latest-run-projection';
 import type { MessageLogDocument } from '../projections/message-log-projection';
 import type { NodeStatusDocument } from '../projections/node-status-projection';
 import type { StatsDocument } from '../projections/stats-projection';
@@ -22,12 +23,14 @@ export class PipelineReadModel {
   private readonly nodeStatusCollection;
   private readonly messageLogCollection;
   private readonly statsCollection;
+  private readonly latestRunCollection;
 
   constructor(database: InMemoryDatabase) {
     this.itemStatusCollection = database.collection<ItemStatusDocument>('ItemStatus');
     this.nodeStatusCollection = database.collection<NodeStatusDocument>('NodeStatus');
     this.messageLogCollection = database.collection<MessageLogDocument>('MessageLog');
     this.statsCollection = database.collection<StatsDocument>('Stats');
+    this.latestRunCollection = database.collection<LatestRunDocument>('LatestRun');
   }
 
   async computeCommandStats(correlationId: string, commandType: string): Promise<CommandStats> {
@@ -126,5 +129,13 @@ export class PipelineReadModel {
       totalCommands: stats.totalCommands,
       totalEvents: stats.totalEvents,
     };
+  }
+
+  async getLatestCorrelationId(): Promise<string | undefined> {
+    const docs = await this.latestRunCollection.find(() => true);
+    if (docs.length === 0) {
+      return undefined;
+    }
+    return docs[0].latestCorrelationId;
   }
 }

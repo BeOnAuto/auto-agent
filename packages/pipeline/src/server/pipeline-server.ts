@@ -55,7 +55,6 @@ export class PipelineServer {
   private readonly phasedExecutor: PhasedExecutor;
   private readonly sseManager: SSEManager;
   private readonly eventStoreContext: PipelineEventStoreContext;
-  private latestCorrelationId?: string;
   private readonly itemKeyExtractors = new Map<string, (data: unknown) => string | undefined>();
 
   constructor(config: PipelineServerConfig) {
@@ -193,10 +192,11 @@ export class PipelineServer {
         const correlationId = req.query.correlationId as string | undefined;
         const graphWithStatus = await this.addStatusToCommandNodes(filteredGraph, correlationId);
 
+        const latestRun = await this.eventStoreContext.readModel.getLatestCorrelationId();
         res.json({
           nodes: graphWithStatus.nodes,
           edges: graphWithStatus.edges,
-          latestRun: this.latestCorrelationId,
+          latestRun,
         });
       })();
     });
@@ -817,7 +817,6 @@ export class PipelineServer {
     const isNewCorrelationId = !(await this.eventStoreContext.readModel.hasCorrelation(command.correlationId));
     if (isNewCorrelationId) {
       await this.broadcastPipelineRunStarted(command.correlationId, command.type);
-      this.latestCorrelationId = command.correlationId;
     }
 
     const itemKey = this.extractItemKey(command.type, command.data, command.requestId);
