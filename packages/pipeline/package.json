@@ -15,7 +15,6 @@
   "dependencies": {
     "@auto-engineer/file-store": "workspace:*",
     "@auto-engineer/message-bus": "workspace:*",
-    "@auto-engineer/message-store": "workspace:*",
     "@event-driven-io/emmett": "^0.38.2",
     "@event-driven-io/emmett-sqlite": "^0.38.5",
     "chokidar": "^3.6.0",

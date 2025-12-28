@@ -707,16 +707,6 @@ describe('PipelineServer', () => {
     });
   });
 
-  describe('GET /sessions', () => {
-    it('should return sessions', async () => {
-      const server = new PipelineServer({ port: 0 });
-      await server.start();
-      const data = await fetchAs<unknown[]>(`http://localhost:${server.port}/sessions`);
-      expect(Array.isArray(data)).toBe(true);
-      await server.stop();
-    });
-  });
-
   describe('event routing', () => {
     it('should route events through pipeline', async () => {
       const handler = {

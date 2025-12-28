@@ -109,16 +109,6 @@ describe('PipelineServer E2E', () => {
       await server.stop();
     });
 
-    it('should return sessions array', async () => {
-      const server = new PipelineServer({ port: 0 });
-      await server.start();
-
-      const sessions = await fetchJson<unknown[]>(`http://localhost:${server.port}/sessions`);
-      expect(Array.isArray(sessions)).toBe(true);
-
-      await server.stop();
-    });
-
     it('should return messages array', async () => {
       const server = new PipelineServer({ port: 0 });
       await server.start();

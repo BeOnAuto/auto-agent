@@ -6,7 +6,6 @@ import {
   type Event,
   type MessageBus,
 } from '@auto-engineer/message-bus';
-import { type ILocalMessageStore, MemoryMessageStore } from '@auto-engineer/message-store';
 import cors from 'cors';
 import express from 'express';
 import getPort from 'get-port';
@@ -36,7 +35,6 @@ export interface CommandHandlerWithMetadata extends CommandHandler {
 
 export interface PipelineServerConfig {
   port: number;
-  messageStore?: ILocalMessageStore;
 }
 
 interface EventWithCorrelation extends Event {
@@ -56,13 +54,11 @@ export class PipelineServer {
   private app: express.Application;
   private httpServer: HttpServer;
   private messageBus: MessageBus;
-  private messageStore: ILocalMessageStore;
   private readonly commandHandlers: Map<string, CommandHandlerWithMetadata> = new Map();
   private readonly pipelines: Map<string, Pipeline> = new Map();
   private readonly runtimes: Map<string, PipelineRuntime> = new Map();
   private actualPort: number;
   private readonly requestedPort: number;
-  private currentSessionId?: string;
   private readonly settledTracker: SettledTracker;
   private readonly eventCommandMapper: EventCommandMapper;
   private readonly phasedExecutor: PhasedExecutor;
@@ -79,7 +75,6 @@ export class PipelineServer {
     this.app.use(express.json());
     this.httpServer = createServer(this.app);
     this.messageBus = createMessageBus();
-    this.messageStore = config.messageStore ?? new MemoryMessageStore();
     this.eventStoreContext = createPipelineEventStore();
     this.eventCommandMapper = new EventCommandMapper([]);
     this.settledTracker = new SettledTracker({
@@ -142,8 +137,6 @@ export class PipelineServer {
       this.actualPort = await getPort();
     }
 
-    this.currentSessionId = await this.messageStore.createSession();
-
     await new Promise<void>((resolve) => {
       this.httpServer.listen(this.actualPort, () => {
         resolve();
@@ -153,9 +146,6 @@ export class PipelineServer {
 
   async stop(): Promise<void> {
     this.sseManager.closeAll();
-    if (this.currentSessionId !== undefined) {
-      await this.messageStore.endSession(this.currentSessionId);
-    }
     await new Promise<void>((resolve) => {
       this.httpServer.close(() => resolve());
     });
@@ -288,13 +278,6 @@ export class PipelineServer {
       void (async () => {
         const stats = await this.eventStoreContext.readModel.getStats();
         res.json(stats);
-      })();
-    });
-
-    this.app.get('/sessions', (_req, res) => {
-      void (async () => {
-        const sessions = await this.messageStore.getSessions();
-        res.json(sessions);
       })();
     });
 
