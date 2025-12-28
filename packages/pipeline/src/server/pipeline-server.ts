@@ -462,17 +462,11 @@ export class PipelineServer {
     ]);
   }
 
-  private nodeStatusCache = new Map<string, Map<string, NodeStatus>>();
   private itemStatusCache = new Map<string, Map<string, Map<string, ItemStatus>>>();
 
   private async updateNodeStatus(correlationId: string, commandName: string, status: NodeStatus): Promise<void> {
-    let statusMap = this.nodeStatusCache.get(correlationId);
-    if (statusMap === undefined) {
-      statusMap = new Map<string, NodeStatus>();
-      this.nodeStatusCache.set(correlationId, statusMap);
-    }
-    const previousStatus: NodeStatus = statusMap.get(commandName) ?? 'idle';
-    statusMap.set(commandName, status);
+    const existing = await this.eventStoreContext.readModel.getNodeStatus(correlationId, commandName);
+    const previousStatus: NodeStatus = existing?.status ?? 'idle';
     await this.emitNodeStatusChanged(correlationId, commandName, status, previousStatus);
     await this.broadcastNodeStatusChanged(correlationId, commandName, status, previousStatus);
   }
@@ -871,7 +865,7 @@ export class PipelineServer {
     const handler = this.commandHandlers.get(command.type);
     if (!handler) return;
 
-    const isNewCorrelationId = !this.nodeStatusCache.has(command.correlationId);
+    const isNewCorrelationId = !(await this.eventStoreContext.readModel.hasCorrelation(command.correlationId));
     if (isNewCorrelationId) {
       await this.broadcastPipelineRunStarted(command.correlationId, command.type);
       this.latestCorrelationId = command.correlationId;
