@@ -53,10 +53,12 @@ export class PipelineRuntime {
   }
 
   private async executeEmitHandler(handler: EmitHandlerDescriptor, event: Event, ctx: PipelineContext): Promise<void> {
-    for (const command of handler.commands) {
-      const data = typeof command.data === 'function' ? command.data(event) : command.data;
-      await ctx.sendCommand(command.commandType, data);
-    }
+    await Promise.all(
+      handler.commands.map(async (command) => {
+        const data = typeof command.data === 'function' ? command.data(event) : command.data;
+        await ctx.sendCommand(command.commandType, data);
+      }),
+    );
   }
 
   private async executeCustomHandler(

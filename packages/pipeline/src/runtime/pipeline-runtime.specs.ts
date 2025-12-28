@@ -211,4 +211,46 @@ describe('PipelineRuntime', () => {
     );
     expect(sent).toEqual(['2', '3', '1']);
   });
+
+  it('should dispatch multiple emit commands in parallel, not sequentially', async () => {
+    const callOrder: string[] = [];
+    let resolveA: () => void;
+    let resolveB: () => void;
+    const promiseA = new Promise<void>((r) => {
+      resolveA = r;
+    });
+    const promiseB = new Promise<void>((r) => {
+      resolveB = r;
+    });
+
+    const ctx = {
+      sendCommand: async (type: string) => {
+        callOrder.push(`${type}:start`);
+        if (type === 'CmdA') {
+          await promiseA;
+        } else if (type === 'CmdB') {
+          await promiseB;
+        }
+        callOrder.push(`${type}:end`);
+      },
+      emit: async () => {},
+      correlationId: 'test',
+    };
+
+    const pipeline = define('test').on('Start').emit('CmdA', {}).emit('CmdB', {}).build();
+    const runtime = new PipelineRuntime(pipeline.descriptor);
+
+    const handlePromise = runtime.handleEvent({ type: 'Start', data: {} }, ctx);
+
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(callOrder).toContain('CmdA:start');
+    expect(callOrder).toContain('CmdB:start');
+
+    resolveB!();
+    resolveA!();
+    await handlePromise;
+
+    expect(callOrder).toEqual(['CmdA:start', 'CmdB:start', 'CmdB:end', 'CmdA:end']);
+  });
 });
