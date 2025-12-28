@@ -501,9 +501,11 @@ export class PipelineServer {
     for (const edge of graph.edges) {
       const from = this.normalizeNodeId(edge.from);
       const to = this.normalizeNodeId(edge.to);
-      lines.push(`  ${from} --> ${to}`);
       if (edge.backLink === true) {
+        lines.push(`  ${from} -.->|retry| ${to}`);
         edgeContext.backLinkIndices.push(edgeContext.index);
+      } else {
+        lines.push(`  ${from} --> ${to}`);
       }
       edgeContext.index++;
     }

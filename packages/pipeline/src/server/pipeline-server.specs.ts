@@ -724,7 +724,7 @@ describe('PipelineServer', () => {
       await server.start();
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
       const mermaid = await res.text();
-      expect(mermaid).toContain('settled_CheckA --> RetryCommand');
+      expect(mermaid).toContain('settled_CheckA -.->|retry| RetryCommand');
       await server.stop();
     });
 
