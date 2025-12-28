@@ -1527,6 +1527,106 @@ describe('PipelineServer', () => {
 
       await server.stop();
     });
+
+    it('should include pendingCount and endedCount in NodeStatusChanged events', async () => {
+      const handler = {
+        name: 'CountSlice',
+        events: ['CountSliceDone'],
+        handle: async () => ({ type: 'CountSliceDone', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('CountSlice', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      server.registerItemKeyExtractor('CountSlice', (d) => (d as { id?: string }).id);
+      await server.start();
+
+      const correlationId = `corr-counts-event-test`;
+
+      await fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'CountSlice', data: { id: 'item-1' }, correlationId }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const msgs = await fetchAs<StoredMessage[]>(`http://localhost:${server.port}/messages`);
+      type NodeStatusChangedMessage = {
+        type: string;
+        correlationId?: string;
+        data?: {
+          nodeId?: string;
+          status?: string;
+          previousStatus?: string;
+          pendingCount?: number;
+          endedCount?: number;
+        };
+      };
+      const nodeStatusChanged = msgs.filter((m) => m.message.type === 'NodeStatusChanged');
+      const successEvent = nodeStatusChanged.find(
+        (m) => (m.message as NodeStatusChangedMessage).data?.status === 'success',
+      );
+      expect(successEvent).toBeDefined();
+      expect((successEvent?.message as NodeStatusChangedMessage).data?.pendingCount).toBe(0);
+      expect((successEvent?.message as NodeStatusChangedMessage).data?.endedCount).toBe(1);
+
+      await server.stop();
+    });
+
+    it('should use requestId as fallback when no itemKey extractor is registered', async () => {
+      const handler = {
+        name: 'NoExtractorCmd',
+        events: ['NoExtractorDone'],
+        handle: async () => ({ type: 'NoExtractorDone', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('NoExtractorCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const correlationId = `corr-no-extractor-test`;
+
+      await fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'NoExtractorCmd', data: {}, correlationId }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const data = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${correlationId}`,
+      );
+      const cmdNode = data.nodes.find((n) => n.id === 'cmd:NoExtractorCmd');
+      expect(cmdNode?.pendingCount).toBe(0);
+      expect(cmdNode?.endedCount).toBe(1);
+      expect(cmdNode?.status).toBe('success');
+
+      await server.stop();
+    });
+
+    it('should show idle status with zero counts when no correlationId provided', async () => {
+      const handler = {
+        name: 'IdleCountCmd',
+        events: ['IdleCountDone'],
+        handle: async () => ({ type: 'IdleCountDone', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('IdleCountCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      const cmdNode = data.nodes.find((n) => n.id === 'cmd:IdleCountCmd');
+      expect(cmdNode?.status).toBe('idle');
+      expect(cmdNode?.pendingCount).toBe(0);
+      expect(cmdNode?.endedCount).toBe(0);
+
+      await server.stop();
+    });
   });
 
   describe('integration', () => {

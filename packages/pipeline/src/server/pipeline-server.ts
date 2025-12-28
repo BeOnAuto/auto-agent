@@ -386,9 +386,16 @@ export class PipelineServer {
     status: NodeStatus,
     previousStatus: NodeStatus,
   ): void {
+    const stats = this.computeCommandStats(correlationId, commandName);
     const event: Event & { correlationId: string } = {
       type: 'NodeStatusChanged',
-      data: { nodeId: `cmd:${commandName}`, status, previousStatus },
+      data: {
+        nodeId: `cmd:${commandName}`,
+        status,
+        previousStatus,
+        pendingCount: stats.pendingCount,
+        endedCount: stats.endedCount,
+      },
       correlationId,
     };
     this.sseManager.broadcast(event);
