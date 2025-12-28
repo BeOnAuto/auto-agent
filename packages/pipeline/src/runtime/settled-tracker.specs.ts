@@ -10,26 +10,58 @@ describe('SettledTracker', () => {
   });
 
   describe('handler registration', () => {
-    it('should register a handler for multiple command types', () => {
+    it('should fire handler when registered command completes', () => {
+      let fired = false;
+
       tracker.registerHandler({
         commandTypes: ['CheckTests', 'CheckTypes', 'CheckLint'],
-        handler: () => {},
+        handler: () => {
+          fired = true;
+        },
       });
 
-      expect(tracker.getRegisteredHandlerCount()).toBe(1);
+      tracker.onCommandStarted({ type: 'CheckTests', correlationId: 'c1', requestId: 'r1', data: {} });
+      tracker.onCommandStarted({ type: 'CheckTypes', correlationId: 'c1', requestId: 'r2', data: {} });
+      tracker.onCommandStarted({ type: 'CheckLint', correlationId: 'c1', requestId: 'r3', data: {} });
+
+      tracker.onEventReceived({ type: 'TestsCheckPassed', correlationId: 'c1', data: {} }, 'CheckTests');
+      tracker.onEventReceived({ type: 'TypeCheckPassed', correlationId: 'c1', data: {} }, 'CheckTypes');
+      tracker.onEventReceived({ type: 'LintCheckPassed', correlationId: 'c1', data: {} }, 'CheckLint');
+
+      expect(fired).toBe(true);
     });
 
-    it('should register multiple handlers', () => {
+    it('should fire multiple registered handlers independently', () => {
+      let handler1Fired = false;
+      let handler2Fired = false;
+
       tracker.registerHandler({
         commandTypes: ['A', 'B'],
-        handler: () => {},
+        handler: () => {
+          handler1Fired = true;
+        },
       });
       tracker.registerHandler({
         commandTypes: ['C', 'D'],
-        handler: () => {},
+        handler: () => {
+          handler2Fired = true;
+        },
       });
 
-      expect(tracker.getRegisteredHandlerCount()).toBe(2);
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
+      tracker.onCommandStarted({ type: 'B', correlationId: 'c1', requestId: 'r2', data: {} });
+      tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
+      tracker.onEventReceived({ type: 'BDone', correlationId: 'c1', data: {} }, 'B');
+
+      expect(handler1Fired).toBe(true);
+      expect(handler2Fired).toBe(false);
+
+      tracker.onCommandStarted({ type: 'C', correlationId: 'c1', requestId: 'r3', data: {} });
+      tracker.onCommandStarted({ type: 'D', correlationId: 'c1', requestId: 'r4', data: {} });
+      tracker.onEventReceived({ type: 'CDone', correlationId: 'c1', data: {} }, 'C');
+      tracker.onEventReceived({ type: 'DDone', correlationId: 'c1', data: {} }, 'D');
+
+      expect(handler2Fired).toBe(true);
     });
   });
 
@@ -53,48 +85,49 @@ describe('SettledTracker', () => {
       expect(tracker.isWaitingFor('c1', 'CheckTypes')).toBe(false);
     });
 
-    it('should instantiate handler instance when first tracked command arrives', () => {
+    it('should create handler instance when first tracked command arrives', () => {
+      let fired = false;
+
       tracker.registerHandler({
         commandTypes: ['A', 'B'],
-        handler: () => {},
+        handler: () => {
+          fired = true;
+        },
       });
 
-      tracker.onCommandStarted({
-        type: 'A',
-        correlationId: 'c1',
-        requestId: 'r1',
-        data: {},
-      });
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
 
-      expect(tracker.getActiveInstanceCount()).toBe(1);
+      expect(tracker.isWaitingFor('c1', 'A')).toBe(true);
+      expect(fired).toBe(false);
     });
 
-    it('should not create duplicate instances for same correlationId', () => {
+    it('should not fire handler multiple times for same correlationId when commands arrive separately', () => {
+      let fireCount = 0;
+
       tracker.registerHandler({
         commandTypes: ['A', 'B'],
-        handler: () => {},
+        handler: () => {
+          fireCount++;
+        },
       });
 
-      tracker.onCommandStarted({
-        type: 'A',
-        correlationId: 'c1',
-        requestId: 'r1',
-        data: {},
-      });
-      tracker.onCommandStarted({
-        type: 'B',
-        correlationId: 'c1',
-        requestId: 'r2',
-        data: {},
-      });
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
+      tracker.onCommandStarted({ type: 'B', correlationId: 'c1', requestId: 'r2', data: {} });
 
-      expect(tracker.getActiveInstanceCount()).toBe(1);
+      tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
+      tracker.onEventReceived({ type: 'BDone', correlationId: 'c1', data: {} }, 'B');
+
+      expect(fireCount).toBe(1);
     });
 
     it('should ignore commands without correlationId', () => {
+      let fired = false;
+
       tracker.registerHandler({
         commandTypes: ['A'],
-        handler: () => {},
+        handler: () => {
+          fired = true;
+        },
       });
 
       tracker.onCommandStarted({
@@ -103,13 +136,19 @@ describe('SettledTracker', () => {
         data: {},
       } as Command);
 
-      expect(tracker.getActiveInstanceCount()).toBe(0);
+      tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
+
+      expect(fired).toBe(false);
     });
 
     it('should ignore commands without requestId', () => {
+      let fired = false;
+
       tracker.registerHandler({
         commandTypes: ['A'],
-        handler: () => {},
+        handler: () => {
+          fired = true;
+        },
       });
 
       tracker.onCommandStarted({
@@ -118,7 +157,9 @@ describe('SettledTracker', () => {
         data: {},
       } as Command);
 
-      expect(tracker.getActiveInstanceCount()).toBe(0);
+      tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
+
+      expect(fired).toBe(false);
     });
   });
 
@@ -272,24 +313,21 @@ describe('SettledTracker', () => {
       expect(fireCount).toBe(1);
     });
 
-    it('should cleanup instance after handler fires', () => {
+    it('should cleanup after handler fires by allowing new tracking for same correlationId', () => {
+      let fireCount = 0;
+
       tracker.registerHandler({
         commandTypes: ['A'],
-        handler: () => {},
+        handler: () => {
+          fireCount++;
+        },
       });
 
-      tracker.onCommandStarted({
-        type: 'A',
-        correlationId: 'c1',
-        requestId: 'r1',
-        data: {},
-      });
-
-      expect(tracker.getActiveInstanceCount()).toBe(1);
-
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
       tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
+      expect(fireCount).toBe(1);
 
-      expect(tracker.getActiveInstanceCount()).toBe(0);
+      expect(tracker.isWaitingFor('c1', 'A')).toBe(false);
     });
 
     it('should handle separate correlationIds independently', () => {
@@ -335,23 +373,27 @@ describe('SettledTracker', () => {
       tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
       tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
       expect(callCount).toBe(1);
-      expect(tracker.getActiveInstanceCount()).toBe(1);
 
       tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r2', data: {} });
+      expect(tracker.isWaitingFor('c1', 'A')).toBe(true);
+
       tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
       expect(callCount).toBe(2);
-      expect(tracker.getActiveInstanceCount()).toBe(1);
 
       tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r3', data: {} });
       tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
       expect(callCount).toBe(3);
-      expect(tracker.getActiveInstanceCount()).toBe(0);
+
+      expect(tracker.isWaitingFor('c1', 'A')).toBe(false);
     });
 
-    it('should cleanup on handler error', () => {
+    it('should cleanup on handler error and not throw', () => {
+      let handlerCalls = 0;
+
       tracker.registerHandler({
         commandTypes: ['A'],
         handler: () => {
+          handlerCalls++;
           throw new Error('Handler error');
         },
       });
@@ -362,7 +404,8 @@ describe('SettledTracker', () => {
         tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
       }).not.toThrow();
 
-      expect(tracker.getActiveInstanceCount()).toBe(0);
+      expect(handlerCalls).toBe(1);
+      expect(tracker.isWaitingFor('c1', 'A')).toBe(false);
     });
   });
 

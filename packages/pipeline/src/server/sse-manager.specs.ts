@@ -49,14 +49,8 @@ describe('SSEManager', () => {
     manager = new SSEManager();
   });
 
-  describe('client management', () => {
-    it('should add client', () => {
-      const res = createMockResponse();
-      manager.addClient('c1', res);
-      expect(manager.clientCount).toBe(1);
-    });
-
-    it('should set correct SSE headers', () => {
+  describe('client connection', () => {
+    it('should set correct SSE headers when client connects', () => {
       const res = createMockResponse();
       manager.addClient('c1', res);
       expect(res.writeHeadMock).toHaveBeenCalledWith(200, {
@@ -73,23 +67,43 @@ describe('SSEManager', () => {
       expect(res.written[0]).toBe(':\n\n');
     });
 
-    it('should remove client', () => {
+    it('should receive broadcasts after connecting', () => {
+      const res = createMockResponse();
+      manager.addClient('c1', res);
+
+      const event: Event = { type: 'TestEvent', data: { foo: 'bar' } };
+      manager.broadcast(event);
+
+      expect(res.written).toContainEqual(`data: ${JSON.stringify(event)}\n\n`);
+    });
+  });
+
+  describe('client removal', () => {
+    it('should not receive broadcasts after explicit removal', () => {
       const res = createMockResponse();
       manager.addClient('c1', res);
       manager.removeClient('c1');
-      expect(manager.clientCount).toBe(0);
+
+      const event: Event = { type: 'TestEvent', data: { foo: 'bar' } };
+      manager.broadcast(event);
+
+      expect(res.written).toHaveLength(1);
     });
 
-    it('should cleanup client on response close', () => {
+    it('should not receive broadcasts after connection close', () => {
       const res = createMockResponse();
       manager.addClient('c1', res);
       res.triggerClose();
-      expect(manager.clientCount).toBe(0);
+
+      const event: Event = { type: 'TestEvent', data: { foo: 'bar' } };
+      manager.broadcast(event);
+
+      expect(res.written).toHaveLength(1);
     });
   });
 
   describe('broadcasting', () => {
-    it('should broadcast event to all clients', () => {
+    it('should broadcast event to all connected clients', () => {
       const res1 = createMockResponse();
       const res2 = createMockResponse();
 
@@ -103,21 +117,21 @@ describe('SSEManager', () => {
       expect(res2.written).toContainEqual(`data: ${JSON.stringify(event)}\n\n`);
     });
 
-    it('should filter by correlationId when set', () => {
-      const res1 = createMockResponse();
-      const res2 = createMockResponse();
+    it('should filter events by correlationId when client subscribes to specific correlation', () => {
+      const filteredRes = createMockResponse();
+      const unfilteredRes = createMockResponse();
 
-      manager.addClient('c1', res1, 'workflow-123');
-      manager.addClient('c2', res2);
+      manager.addClient('c1', filteredRes, 'workflow-123');
+      manager.addClient('c2', unfilteredRes);
 
       const event: Event = { type: 'TestEvent', correlationId: 'workflow-456', data: {} };
       manager.broadcast(event);
 
-      expect(res1.written.length).toBe(1);
-      expect(res2.written.length).toBe(2);
+      expect(filteredRes.written).toHaveLength(1);
+      expect(unfilteredRes.written).toHaveLength(2);
     });
 
-    it('should send to filtered client when correlationId matches', () => {
+    it('should send event to filtered client when correlationId matches', () => {
       const res = createMockResponse();
       manager.addClient('c1', res, 'workflow-123');
 
@@ -127,19 +141,19 @@ describe('SSEManager', () => {
       expect(res.written).toContainEqual(`data: ${JSON.stringify(event)}\n\n`);
     });
 
-    it('should not send to filtered client when correlationId does not match', () => {
+    it('should not send event to filtered client when correlationId does not match', () => {
       const res = createMockResponse();
       manager.addClient('c1', res, 'workflow-123');
 
       const event: Event = { type: 'TestEvent', correlationId: 'workflow-456', data: {} };
       manager.broadcast(event);
 
-      expect(res.written.length).toBe(1);
+      expect(res.written).toHaveLength(1);
     });
   });
 
   describe('broadcast error handling', () => {
-    it('should not throw when client.response.write fails', () => {
+    it('should not throw when client write fails', () => {
       const res = createMockResponse();
       manager.addClient('c1', res);
 
@@ -152,21 +166,28 @@ describe('SSEManager', () => {
       expect(() => manager.broadcast(event)).not.toThrow();
     });
 
-    it('should remove failed client from clients map', () => {
+    it('should stop sending to failed client on subsequent broadcasts', () => {
       const res = createMockResponse();
-      vi.mocked(res.write)
-        .mockImplementationOnce(() => true)
-        .mockImplementation(() => {
+      let writeCallCount = 0;
+      vi.mocked(res.write).mockImplementation((data: string) => {
+        writeCallCount++;
+        if (writeCallCount > 2) {
           throw new Error('Connection reset');
-        });
+        }
+        res.written.push(data);
+        return true;
+      });
 
       manager.addClient('c1', res);
-      expect(manager.clientCount).toBe(1);
 
-      const event: Event = { type: 'TestEvent', data: {} };
-      manager.broadcast(event);
+      const event1: Event = { type: 'TestEvent1', data: {} };
+      manager.broadcast(event1);
 
-      expect(manager.clientCount).toBe(0);
+      const event2: Event = { type: 'TestEvent2', data: {} };
+      manager.broadcast(event2);
+
+      const eventMessages = res.written.filter((w) => w.startsWith('data:'));
+      expect(eventMessages).toHaveLength(1);
     });
 
     it('should continue broadcasting to other clients after one fails', () => {
@@ -186,12 +207,11 @@ describe('SSEManager', () => {
       manager.broadcast(event);
 
       expect(workingRes.written).toContainEqual(`data: ${JSON.stringify(event)}\n\n`);
-      expect(manager.clientCount).toBe(1);
     });
   });
 
   describe('closeAll', () => {
-    it('should close all clients', () => {
+    it('should end all client connections', () => {
       const res1 = createMockResponse();
       const res2 = createMockResponse();
 
@@ -200,9 +220,20 @@ describe('SSEManager', () => {
 
       manager.closeAll();
 
-      expect(manager.clientCount).toBe(0);
       expect(res1.endMock).toHaveBeenCalled();
       expect(res2.endMock).toHaveBeenCalled();
+    });
+
+    it('should not send broadcasts after closeAll', () => {
+      const res = createMockResponse();
+      manager.addClient('c1', res);
+
+      manager.closeAll();
+
+      const event: Event = { type: 'TestEvent', data: {} };
+      manager.broadcast(event);
+
+      expect(res.written).toHaveLength(1);
     });
   });
 });

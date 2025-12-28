@@ -125,17 +125,22 @@ describe('PhasedExecutor', () => {
       expect(completed[0].correlationId).toBe('c1');
     });
 
-    it('should cleanup session after completion', () => {
+    it('should cleanup session after completion allowing new session with same correlationId', () => {
       const items: TestItem[] = [{ id: 'm1', type: 'molecule' }];
       const handler = createHandler(items);
       const event: Event = { type: 'ClientGenerated', correlationId: 'c1', data: { components: items } };
 
       executor.startPhased(handler, event, 'c1');
-      expect(executor.getActiveSessionCount()).toBe(1);
-
       executor.onEventReceived({ type: 'ComponentImplemented', correlationId: 'c1', data: { filePath: 'm1' } }, 'm1');
 
-      expect(executor.getActiveSessionCount()).toBe(0);
+      expect(completed).toHaveLength(1);
+
+      dispatched.length = 0;
+      completed.length = 0;
+
+      executor.startPhased(handler, event, 'c1');
+      expect(dispatched).toHaveLength(1);
+      expect((dispatched[0].data as { filePath: string }).filePath).toBe('m1');
     });
   });
 
@@ -217,7 +222,7 @@ describe('PhasedExecutor', () => {
   });
 
   describe('failure handling', () => {
-    it('should stop on failure when stopOnFailure is true', () => {
+    it('should stop on failure when stopOnFailure is true and emit failure event', () => {
       const items: TestItem[] = [
         { id: 'm1', type: 'molecule' },
         { id: 'm2', type: 'molecule' },
@@ -235,7 +240,6 @@ describe('PhasedExecutor', () => {
 
       expect(completed).toHaveLength(1);
       expect(completed[0].type).toBe('ComponentsFailed');
-      expect(executor.getActiveSessionCount()).toBe(0);
     });
 
     it('should continue on failure when stopOnFailure is false', () => {
@@ -252,11 +256,34 @@ describe('PhasedExecutor', () => {
       executor.onEventReceived({ type: 'ComponentsFailed', correlationId: 'c1', data: { filePath: 'm1' } }, 'm1');
 
       expect(completed).toHaveLength(0);
-      expect(executor.getActiveSessionCount()).toBe(1);
 
       executor.onEventReceived({ type: 'ComponentImplemented', correlationId: 'c1', data: { filePath: 'm2' } }, 'm2');
 
       expect(dispatched).toHaveLength(3);
+    });
+
+    it('should cleanup session after stopOnFailure allowing new session with same correlationId', () => {
+      const items: TestItem[] = [
+        { id: 'm1', type: 'molecule' },
+        { id: 'o1', type: 'organism' },
+      ];
+      const handler: ForEachPhasedDescriptor = {
+        ...createHandler(items),
+        stopOnFailure: true,
+      };
+      const event: Event = { type: 'ClientGenerated', correlationId: 'c1', data: { components: items } };
+
+      executor.startPhased(handler, event, 'c1');
+      executor.onEventReceived({ type: 'ComponentsFailed', correlationId: 'c1', data: { filePath: 'm1' } }, 'm1');
+
+      expect(completed).toHaveLength(1);
+      expect(completed[0].type).toBe('ComponentsFailed');
+
+      dispatched.length = 0;
+      completed.length = 0;
+
+      executor.startPhased(handler, event, 'c1');
+      expect(dispatched).toHaveLength(1);
     });
   });
 
@@ -276,13 +303,57 @@ describe('PhasedExecutor', () => {
         'c2',
       );
 
-      expect(executor.getActiveSessionCount()).toBe(2);
+      expect(dispatched).toHaveLength(2);
+      expect(dispatched[0].correlationId).toBe('c1');
+      expect(dispatched[1].correlationId).toBe('c2');
 
       executor.onEventReceived({ type: 'ComponentImplemented', correlationId: 'c1', data: { filePath: 'm1' } }, 'm1');
 
-      expect(executor.getActiveSessionCount()).toBe(1);
       expect(completed).toHaveLength(1);
       expect(completed[0].correlationId).toBe('c1');
+
+      executor.onEventReceived({ type: 'ComponentImplemented', correlationId: 'c2', data: { filePath: 'm1' } }, 'm1');
+
+      expect(completed).toHaveLength(2);
+      expect(completed[1].correlationId).toBe('c2');
+    });
+
+    it('should not interfere between concurrent sessions with different items', () => {
+      const items1: TestItem[] = [
+        { id: 'a1', type: 'molecule' },
+        { id: 'a2', type: 'organism' },
+      ];
+      const items2: TestItem[] = [
+        { id: 'b1', type: 'molecule' },
+        { id: 'b2', type: 'page' },
+      ];
+      const handler1 = createHandler(items1);
+      const handler2 = createHandler(items2);
+
+      executor.startPhased(
+        handler1,
+        { type: 'ClientGenerated', correlationId: 'c1', data: { components: items1 } },
+        'c1',
+      );
+      executor.startPhased(
+        handler2,
+        { type: 'ClientGenerated', correlationId: 'c2', data: { components: items2 } },
+        'c2',
+      );
+
+      expect(dispatched).toHaveLength(2);
+
+      executor.onEventReceived({ type: 'ComponentImplemented', correlationId: 'c1', data: { filePath: 'a1' } }, 'a1');
+
+      expect(dispatched).toHaveLength(3);
+      expect((dispatched[2].data as { filePath: string }).filePath).toBe('a2');
+      expect(dispatched[2].correlationId).toBe('c1');
+
+      executor.onEventReceived({ type: 'ComponentImplemented', correlationId: 'c2', data: { filePath: 'b1' } }, 'b1');
+
+      expect(dispatched).toHaveLength(4);
+      expect((dispatched[3].data as { filePath: string }).filePath).toBe('b2');
+      expect(dispatched[3].correlationId).toBe('c2');
     });
   });
 
@@ -321,7 +392,7 @@ describe('PhasedExecutor', () => {
       executor.onEventReceived({ type: 'ComponentImplemented', data: { filePath: 'm1' } }, 'm1');
 
       expect(dispatched).toHaveLength(1);
-      expect(executor.getActiveSessionCount()).toBe(1);
+      expect(completed).toHaveLength(0);
     });
 
     it('should ignore events with empty correlationId', () => {
@@ -336,7 +407,7 @@ describe('PhasedExecutor', () => {
       executor.onEventReceived({ type: 'ComponentImplemented', correlationId: '', data: { filePath: 'm1' } }, 'm1');
 
       expect(dispatched).toHaveLength(1);
-      expect(executor.getActiveSessionCount()).toBe(1);
+      expect(completed).toHaveLength(0);
     });
 
     it('should ignore events with unknown itemKey', () => {
@@ -352,7 +423,7 @@ describe('PhasedExecutor', () => {
       );
 
       expect(dispatched).toHaveLength(1);
-      expect(executor.getActiveSessionCount()).toBe(1);
+      expect(completed).toHaveLength(0);
     });
   });
 });

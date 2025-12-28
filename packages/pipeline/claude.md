@@ -228,3 +228,117 @@ it("does too many things", () => {
   expect(updated.modified).toBe(true); // second verify
 });
 ```
+
+### Behavioral Testing (No State Peeking)
+
+```
+╔════════════════════════════════════════════════════════════════════════╗
+║  Tests verify OBSERVABLE BEHAVIOR, not INTERNAL STATE.                  ║
+║  If a test calls `.getCount()`, `.size`, or peeks into a Map/Set,      ║
+║  it's testing implementation — not behavior.                            ║
+╚════════════════════════════════════════════════════════════════════════╝
+```
+
+Tests coupled to internal state break when you refactor. Tests verifying behavior remain stable as implementation evolves.
+
+**The Litmus Test:**
+
+> "If I changed how this is stored internally, would this test still pass?"
+
+If no, the test is coupled to implementation.
+
+**Forbidden Patterns:**
+
+```ts
+// ❌ Peeking at internal counts
+expect(tracker.getActiveInstanceCount()).toBe(0);
+expect(manager.clientCount).toBe(3);
+expect(executor.getActiveSessionCount()).toBe(1);
+
+// ❌ Accessing internal collections
+expect(service['internalMap'].size).toBe(2);
+expect(handler.pendingItems.length).toBe(0);
+
+// ❌ Testing cleanup via size checks
+tracker.cleanup();
+expect(tracker.getCount()).toBe(0);
+```
+
+**Allowed Patterns:**
+
+```ts
+// ✅ Test via callbacks/events
+const events: Event[] = [];
+tracker.onEvent((e) => events.push(e));
+tracker.process(input);
+expect(events).toEqual([{ type: 'Completed', data: { id: 'x' } }]);
+
+// ✅ Test via dispatched commands
+const dispatched: Command[] = [];
+executor.onDispatch((cmd) => dispatched.push(cmd));
+executor.start({ items: ['a', 'b'] });
+expect(dispatched).toEqual([
+  { type: 'ProcessItem', data: { id: 'a' } },
+  { type: 'ProcessItem', data: { id: 'b' } },
+]);
+
+// ✅ Test via boolean query APIs
+expect(tracker.isWaitingFor('correlationId', 'HandlerA')).toBe(true);
+expect(tracker.isPending('key')).toBe(false);
+
+// ✅ Test cleanup via re-triggering behavior
+tracker.complete('c1');
+tracker.start('c1'); // Same id reused
+expect(tracker.isActive('c1')).toBe(true); // Proves cleanup worked
+```
+
+**What to Test vs. What NOT to Test:**
+
+| Test This (Observable)  | Not This (Internal)      |
+| ----------------------- | ------------------------ |
+| Events/callbacks fired  | Internal array lengths   |
+| Commands dispatched     | Map/Set sizes            |
+| Return values           | Private field values     |
+| Query API responses     | Collection contents      |
+| Side effects (HTTP, logs) | Internal state mutations |
+
+**Testing Cleanup Without State Peeking:**
+
+```ts
+// ❌ WRONG: Testing cleanup via internal count
+it('cleans up after completion', () => {
+  tracker.start('c1');
+  tracker.complete('c1');
+  expect(tracker.getActiveCount()).toBe(0);
+});
+
+// ✅ RIGHT: Testing cleanup via re-triggering
+it('allows new session after completion', () => {
+  const completed: string[] = [];
+  tracker.onComplete((id) => completed.push(id));
+
+  tracker.start('c1');
+  tracker.complete('c1');
+
+  tracker.start('c1'); // Re-use same id
+  tracker.complete('c1');
+
+  expect(completed).toEqual(['c1', 'c1']); // Fired twice = cleanup worked
+});
+```
+
+**Do NOT expose methods solely for testing:**
+
+```ts
+// ❌ WRONG: Adding getters just for tests
+class SessionManager {
+  private sessions = new Map();
+  getSessionCount(): number { return this.sessions.size; } // Test-only method
+}
+
+// ✅ RIGHT: Test via behavior, not state inspection
+class SessionManager {
+  private sessions = new Map();
+  // No count getter — test by observing callbacks/events
+}
+```
