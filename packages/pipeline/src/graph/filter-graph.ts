@@ -55,9 +55,8 @@ function processEdge(
 
   const targets = findFinalTargets(edge.to, removedNodeIds, outgoingEdges);
   for (const target of targets) {
-    if (target !== edge.from) {
-      addReconnectedEdge(edge, target, reconnectedEdges, seenEdges);
-    }
+    const isSelfLoop = target === edge.from;
+    addReconnectedEdge(edge, target, reconnectedEdges, seenEdges, isSelfLoop);
   }
 }
 
@@ -74,6 +73,7 @@ function addReconnectedEdge(
   target: string,
   reconnectedEdges: GraphEdge[],
   seenEdges: Set<string>,
+  isSelfLoop: boolean,
 ): void {
   const key = `${sourceEdge.from}->${target}`;
   if (seenEdges.has(key)) {
@@ -85,8 +85,8 @@ function addReconnectedEdge(
   if (sourceEdge.label !== undefined) {
     newEdge.label = sourceEdge.label;
   }
-  if (sourceEdge.backLink !== undefined) {
-    newEdge.backLink = sourceEdge.backLink;
+  if (isSelfLoop || sourceEdge.backLink === true) {
+    newEdge.backLink = true;
   }
   reconnectedEdges.push(newEdge);
 }

@@ -100,24 +100,24 @@ describe('filterGraph', () => {
     });
   });
 
-  describe('P5: self-loop removal', () => {
-    it('should remove self-loops created by edge reconnection', () => {
+  describe('P5: self-loop preservation', () => {
+    it('should preserve self-loops created by edge reconnection and mark as backLink', () => {
       const graph: GraphIR = {
         nodes: [
-          { id: 'evt:A', type: 'event', label: 'A' },
-          { id: 'cmd:B', type: 'command', label: 'B' },
+          { id: 'cmd:A', type: 'command', label: 'A' },
+          { id: 'evt:B', type: 'event', label: 'B' },
         ],
         edges: [
-          { from: 'evt:A', to: 'cmd:B' },
-          { from: 'cmd:B', to: 'evt:A' },
+          { from: 'cmd:A', to: 'evt:B' },
+          { from: 'evt:B', to: 'cmd:A' },
         ],
       };
 
-      const result = filterGraph(graph, { excludeTypes: ['command'], maintainEdges: true });
+      const result = filterGraph(graph, { excludeTypes: ['event'], maintainEdges: true });
 
       expect(result).toEqual({
-        nodes: [{ id: 'evt:A', type: 'event', label: 'A' }],
-        edges: [],
+        nodes: [{ id: 'cmd:A', type: 'command', label: 'A' }],
+        edges: [{ from: 'cmd:A', to: 'cmd:A', backLink: true }],
       });
     });
   });
