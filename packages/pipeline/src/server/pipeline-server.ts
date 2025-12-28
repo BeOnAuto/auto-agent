@@ -253,7 +253,7 @@ export class PipelineServer {
           correlationId,
         };
 
-        await this.messageStore.saveMessage('$all', commandWithIds, undefined, 'command');
+        await this.emitCommandDispatched(correlationId, requestId, commandWithIds.type, commandWithIds.data);
 
         void this.processCommand(commandWithIds);
 
@@ -268,11 +268,17 @@ export class PipelineServer {
 
     this.app.get('/messages', (_req, res) => {
       void (async () => {
-        const messages = await this.messageStore.getMessages('$all');
-        const serialized = messages.map((m) => ({
-          ...m,
-          revision: m.revision.toString(),
-          position: m.position.toString(),
+        const messages = await this.eventStoreContext.readModel.getMessages();
+        const serialized = messages.map((m, index) => ({
+          message: {
+            type: m.messageName,
+            data: m.messageData,
+            correlationId: m.correlationId,
+            requestId: m.requestId,
+          },
+          messageType: m.messageType,
+          revision: String(index),
+          position: String(index),
         }));
         res.json(serialized);
       })();
@@ -421,6 +427,58 @@ export class PipelineServer {
     ]);
   }
 
+  private async emitCommandDispatched(
+    correlationId: string,
+    requestId: string,
+    commandType: string,
+    commandData: Record<string, unknown>,
+  ): Promise<void> {
+    await this.eventStoreContext.eventStore.appendToStream(`pipeline-${correlationId}`, [
+      {
+        type: 'CommandDispatched',
+        data: {
+          correlationId,
+          requestId,
+          commandType,
+          commandData,
+          timestamp: new Date(),
+        },
+      },
+    ]);
+  }
+
+  private async emitDomainEventEmitted(
+    correlationId: string,
+    requestId: string,
+    eventType: string,
+    eventData: Record<string, unknown>,
+  ): Promise<void> {
+    await this.eventStoreContext.eventStore.appendToStream(`pipeline-${correlationId}`, [
+      {
+        type: 'DomainEventEmitted',
+        data: {
+          correlationId,
+          requestId,
+          eventType,
+          eventData,
+          timestamp: new Date(),
+        },
+      },
+    ]);
+  }
+
+  private async emitPipelineRunStarted(correlationId: string, triggerCommand: string): Promise<void> {
+    await this.eventStoreContext.eventStore.appendToStream(`pipeline-${correlationId}`, [
+      {
+        type: 'PipelineRunStarted',
+        data: {
+          correlationId,
+          triggerCommand,
+        },
+      },
+    ]);
+  }
+
   private nodeStatusCache = new Map<string, Map<string, NodeStatus>>();
   private itemStatusCache = new Map<string, Map<string, Map<string, ItemStatus>>>();
 
@@ -455,17 +513,16 @@ export class PipelineServer {
       correlationId,
     };
     this.sseManager.broadcast(event);
-    void this.messageStore.saveMessage('$all', event, undefined, 'event');
   }
 
-  private broadcastPipelineRunStarted(correlationId: string, triggerCommand: string): void {
+  private async broadcastPipelineRunStarted(correlationId: string, triggerCommand: string): Promise<void> {
     const event: Event & { correlationId: string } = {
       type: 'PipelineRunStarted',
       data: { correlationId, triggerCommand },
       correlationId,
     };
     this.sseManager.broadcast(event);
-    void this.messageStore.saveMessage('$all', event, undefined, 'event');
+    await this.emitPipelineRunStarted(correlationId, triggerCommand);
   }
 
   private extractItemKey(commandType: string, data: unknown, requestId: string): string {
@@ -833,7 +890,7 @@ export class PipelineServer {
 
     const isNewCorrelationId = !this.nodeStatusCache.has(command.correlationId);
     if (isNewCorrelationId) {
-      this.broadcastPipelineRunStarted(command.correlationId, command.type);
+      await this.broadcastPipelineRunStarted(command.correlationId, command.type);
       this.latestCorrelationId = command.correlationId;
     }
 
@@ -857,7 +914,11 @@ export class PipelineServer {
       requestId: command.requestId,
     }));
 
-    await Promise.all(eventsWithIds.map((e) => this.messageStore.saveMessage('$all', e, undefined, 'event')));
+    await Promise.all(
+      eventsWithIds.map((e) =>
+        this.emitDomainEventEmitted(e.correlationId, command.requestId, e.type, e.data as Record<string, unknown>),
+      ),
+    );
 
     for (const eventWithIds of eventsWithIds) {
       this.sseManager.broadcast(eventWithIds);
@@ -883,22 +944,24 @@ export class PipelineServer {
   }
 
   private async dispatchFromSettled(commandType: string, data: unknown, correlationId: string): Promise<void> {
+    const requestId = `req-${nanoid()}`;
     const command: Command & { correlationId: string; requestId: string } = {
       type: commandType,
       data: data as Record<string, unknown>,
       correlationId,
-      requestId: `req-${nanoid()}`,
+      requestId,
     };
-    await this.messageStore.saveMessage('$all', command, undefined, 'command');
+    await this.emitCommandDispatched(correlationId, requestId, commandType, data as Record<string, unknown>);
     await this.processCommand(command);
   }
 
   private async handlePhasedComplete(event: Event, correlationId: string): Promise<void> {
+    const requestId = `req-${nanoid()}`;
     const eventWithIds: EventWithCorrelation = {
       ...event,
       correlationId,
     };
-    await this.messageStore.saveMessage('$all', eventWithIds, undefined, 'event');
+    await this.emitDomainEventEmitted(correlationId, requestId, event.type, event.data as Record<string, unknown>);
     this.sseManager.broadcast(eventWithIds);
     await this.routeEventToPipelines(eventWithIds);
   }
@@ -913,23 +976,25 @@ export class PipelineServer {
     return {
       correlationId,
       emit: async (type: string, data: unknown) => {
+        const requestId = `req-${nanoid()}`;
         const event: EventWithCorrelation = {
           type,
           data: data as Record<string, unknown>,
           correlationId,
         };
-        await this.messageStore.saveMessage('$all', event, undefined, 'event');
+        await this.emitDomainEventEmitted(correlationId, requestId, type, data as Record<string, unknown>);
         this.sseManager.broadcast(event);
         await this.routeEventToPipelines(event);
       },
       sendCommand: async (type: string, data: unknown) => {
+        const requestId = `req-${nanoid()}`;
         const command: Command & { correlationId: string; requestId: string } = {
           type,
           data: data as Record<string, unknown>,
           correlationId,
-          requestId: `req-${nanoid()}`,
+          requestId,
         };
-        await this.messageStore.saveMessage('$all', command, undefined, 'command');
+        await this.emitCommandDispatched(correlationId, requestId, type, data as Record<string, unknown>);
         await this.processCommand(command);
       },
       startPhased: (handler, event) => {

@@ -51,8 +51,19 @@ function createProjections() {
 
   const messageLogProjection = inMemorySingleStreamProjection<MessageLogDocument, MessageLogEvent>({
     collectionName: 'MessageLog',
-    canHandle: ['CommandDispatched', 'DomainEventEmitted'],
-    getDocumentId: (event) => event.data.requestId,
+    canHandle: ['CommandDispatched', 'DomainEventEmitted', 'PipelineRunStarted', 'NodeStatusChanged'],
+    getDocumentId: (event) => {
+      if (event.type === 'PipelineRunStarted') {
+        return `prs-${event.data.correlationId}`;
+      }
+      if (event.type === 'NodeStatusChanged') {
+        return `nsc-${event.data.correlationId}-${event.data.commandName}-${event.data.status}`;
+      }
+      if (event.type === 'DomainEventEmitted') {
+        return `dee-${event.data.requestId}-${event.data.eventType}`;
+      }
+      return `cmd-${event.data.requestId}`;
+    },
     evolve: (document: MessageLogDocument | null, event: MessageLogEvent) => evolveMessageLog(document, event),
   });
 
