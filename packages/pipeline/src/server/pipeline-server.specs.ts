@@ -1305,6 +1305,228 @@ describe('PipelineServer', () => {
 
       await server.stop();
     });
+
+    it('should count multiple parallel items correctly', async () => {
+      const handler = {
+        name: 'ImplementSlice',
+        events: ['SliceImplemented'],
+        handle: async () => ({ type: 'SliceImplemented', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('ImplementSlice', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      server.registerItemKeyExtractor('ImplementSlice', (d) => (d as { slicePath?: string }).slicePath);
+      await server.start();
+
+      const correlationId = `corr-parallel-test`;
+
+      await Promise.all([
+        fetch(`http://localhost:${server.port}/command`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'ImplementSlice',
+            data: { slicePath: '/server/slice-1' },
+            correlationId,
+          }),
+        }),
+        fetch(`http://localhost:${server.port}/command`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'ImplementSlice',
+            data: { slicePath: '/server/slice-2' },
+            correlationId,
+          }),
+        }),
+        fetch(`http://localhost:${server.port}/command`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'ImplementSlice',
+            data: { slicePath: '/server/slice-3' },
+            correlationId,
+          }),
+        }),
+      ]);
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const data = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${correlationId}`,
+      );
+      const cmdNode = data.nodes.find((n) => n.id === 'cmd:ImplementSlice');
+      expect(cmdNode?.pendingCount).toBe(0);
+      expect(cmdNode?.endedCount).toBe(3);
+
+      await server.stop();
+    });
+
+    it('should show pending count while commands are running', async () => {
+      const resolveHandlers: Array<() => void> = [];
+      const handler = {
+        name: 'SlowSlice',
+        events: ['SlowSliceDone'],
+        handle: async () => {
+          await new Promise<void>((resolve) => {
+            resolveHandlers.push(resolve);
+          });
+          return { type: 'SlowSliceDone', data: {} };
+        },
+      };
+      const pipeline = define('test').on('Trigger').emit('SlowSlice', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      server.registerItemKeyExtractor('SlowSlice', (d) => (d as { id?: string }).id);
+      await server.start();
+
+      const correlationId = `corr-slow-test`;
+
+      void fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'SlowSlice', data: { id: 'item-1' }, correlationId }),
+      });
+      void fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'SlowSlice', data: { id: 'item-2' }, correlationId }),
+      });
+      void fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'SlowSlice', data: { id: 'item-3' }, correlationId }),
+      });
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      const midwayData = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${correlationId}`,
+      );
+      const midwayNode = midwayData.nodes.find((n) => n.id === 'cmd:SlowSlice');
+      expect(midwayNode?.pendingCount).toBe(3);
+      expect(midwayNode?.endedCount).toBe(0);
+      expect(midwayNode?.status).toBe('running');
+
+      resolveHandlers.forEach((r) => r());
+      await new Promise((r) => setTimeout(r, 50));
+
+      const finalData = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${correlationId}`,
+      );
+      const finalNode = finalData.nodes.find((n) => n.id === 'cmd:SlowSlice');
+      expect(finalNode?.pendingCount).toBe(0);
+      expect(finalNode?.endedCount).toBe(3);
+      expect(finalNode?.status).toBe('success');
+
+      await server.stop();
+    });
+
+    it('should show error status when any item fails', async () => {
+      const handler = {
+        name: 'MixedSlice',
+        events: ['MixedSliceDone', 'MixedSliceFailed'],
+        handle: async (cmd: { data: { shouldFail?: boolean } }) => {
+          if (cmd.data.shouldFail === true) {
+            return { type: 'MixedSliceFailed', data: {} };
+          }
+          return { type: 'MixedSliceDone', data: {} };
+        },
+      };
+      const pipeline = define('test').on('Trigger').emit('MixedSlice', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      server.registerItemKeyExtractor('MixedSlice', (d) => (d as { id?: string }).id);
+      await server.start();
+
+      const correlationId = `corr-mixed-test`;
+
+      await Promise.all([
+        fetch(`http://localhost:${server.port}/command`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'MixedSlice', data: { id: 'pass-1' }, correlationId }),
+        }),
+        fetch(`http://localhost:${server.port}/command`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'MixedSlice', data: { id: 'fail-1', shouldFail: true }, correlationId }),
+        }),
+        fetch(`http://localhost:${server.port}/command`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'MixedSlice', data: { id: 'pass-2' }, correlationId }),
+        }),
+      ]);
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const data = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${correlationId}`,
+      );
+      const cmdNode = data.nodes.find((n) => n.id === 'cmd:MixedSlice');
+      expect(cmdNode?.pendingCount).toBe(0);
+      expect(cmdNode?.endedCount).toBe(3);
+      expect(cmdNode?.status).toBe('error');
+
+      await server.stop();
+    });
+
+    it('should reset item to running when retry command arrives for same itemKey', async () => {
+      let attemptCount = 0;
+      const handler = {
+        name: 'RetrySlice',
+        events: ['RetrySliceDone', 'RetrySliceFailed'],
+        handle: async () => {
+          attemptCount++;
+          if (attemptCount === 1) {
+            return { type: 'RetrySliceFailed', data: {} };
+          }
+          return { type: 'RetrySliceDone', data: {} };
+        },
+      };
+      const pipeline = define('test').on('Trigger').emit('RetrySlice', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      server.registerItemKeyExtractor('RetrySlice', (d) => (d as { slicePath?: string }).slicePath);
+      await server.start();
+
+      const correlationId = `corr-retry-test`;
+      const slicePath = '/server/retry-slice';
+
+      await fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'RetrySlice', data: { slicePath }, correlationId }),
+      });
+      await new Promise((r) => setTimeout(r, 50));
+
+      const afterFailure = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${correlationId}`,
+      );
+      expect(afterFailure.nodes.find((n) => n.id === 'cmd:RetrySlice')?.status).toBe('error');
+
+      await fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'RetrySlice', data: { slicePath }, correlationId }),
+      });
+      await new Promise((r) => setTimeout(r, 50));
+
+      const afterRetry = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${correlationId}`,
+      );
+      const node = afterRetry.nodes.find((n) => n.id === 'cmd:RetrySlice');
+      expect(node?.status).toBe('success');
+      expect(node?.pendingCount).toBe(0);
+      expect(node?.endedCount).toBe(1);
+
+      await server.stop();
+    });
   });
 
   describe('integration', () => {
