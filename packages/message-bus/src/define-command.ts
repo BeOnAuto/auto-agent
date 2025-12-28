@@ -1,4 +1,4 @@
-import type { Command, CommandHandler, Event } from './types';
+import type { Command, CommandHandler, Event, EventDefinition } from './types';
 
 // Helper types to extract command details
 type CommandData<C> = C extends Command<string, infer D> ? D : never;
@@ -18,18 +18,10 @@ export interface PackageMetadata {
   description?: string;
 }
 
-type ExtractEventTypes<T> =
-  T extends Promise<infer U>
-    ? U extends Event<infer EventType, Record<string, unknown>>
-      ? EventType
-      : U extends Event<infer EventType1, Record<string, unknown>> | Event<infer EventType2, Record<string, unknown>>
-        ? EventType1 | EventType2
-        : never
-    : never;
-
 export interface UnifiedCommandHandler<C extends Command<string, Record<string, unknown>>> extends CommandHandler {
   alias: string;
   description: string;
+  displayName?: string;
   category?: string;
   icon?: string;
   package?: PackageMetadata; // Made optional since plugin loader will extract from package.json
@@ -37,7 +29,7 @@ export interface UnifiedCommandHandler<C extends Command<string, Record<string, 
     [K in keyof CommandData<C>]: FieldDefinition<CommandData<C>[K]>;
   };
   examples: string[];
-  events?: string[];
+  events?: EventDefinition[];
   // Override the handle type to match CommandHandler but with the specific command type
   handle: (command: Command) => Promise<Event | Event[]>;
 }
@@ -54,6 +46,7 @@ export function defineCommandHandler<
   name: CommandType<C>;
   alias: string;
   description: string;
+  displayName?: string;
   category?: string;
   icon?: string;
   package?: PackageMetadata; // Made optional since plugin loader will extract from package.json
@@ -62,7 +55,7 @@ export function defineCommandHandler<
   };
   examples: string[];
   handle: H;
-  events: Array<ExtractEventTypes<ReturnType<H>>>;
+  events: EventDefinition[];
 }): UnifiedCommandHandler<C>;
 
 /**
@@ -74,26 +67,28 @@ export function defineCommandHandler(config: {
   name: string;
   alias: string;
   description: string;
+  displayName?: string;
   category?: string;
   icon?: string;
   package?: PackageMetadata;
   fields: Record<string, FieldDefinition<unknown>>;
   examples: string[];
   handle: (command: Command) => Promise<Event | Event[]>;
-  events: string[];
+  events: EventDefinition[];
 }): CommandHandler;
 
 export function defineCommandHandler(config: {
   name: string;
   alias: string;
   description: string;
+  displayName?: string;
   category?: string;
   icon?: string;
   package?: PackageMetadata;
   fields: Record<string, FieldDefinition<unknown>>;
   examples: string[];
   handle: (command: Command) => Promise<Event | Event[]>;
-  events: string[];
+  events: EventDefinition[];
 }): CommandHandler {
   // Cast the handle function to the base Command type for interface compatibility
   return {

@@ -15,11 +15,14 @@ import type { Pipeline } from '../builder/define';
 import { filterGraph } from '../graph/filter-graph';
 import type { FilterOptions, GraphIR, NodeType } from '../graph/types';
 import type { PipelineContext } from '../runtime/context';
+import type { EventDefinition } from '../runtime/event-command-map';
 import { EventCommandMapper } from '../runtime/event-command-map';
 import { PhasedExecutor } from '../runtime/phased-executor';
 import { PipelineRuntime } from '../runtime/pipeline-runtime';
 import { SettledTracker } from '../runtime/settled-tracker';
 import { SSEManager } from './sse-manager';
+
+export type { EventDefinition };
 
 export interface CommandHandlerWithMetadata extends CommandHandler {
   alias?: string;
@@ -27,7 +30,7 @@ export interface CommandHandlerWithMetadata extends CommandHandler {
   displayName?: string;
   fields?: Record<string, unknown>;
   examples?: unknown[];
-  events?: string[];
+  events?: EventDefinition[];
 }
 
 export interface PipelineServerConfig {
@@ -183,7 +186,8 @@ export class PipelineServer {
       const rawGraph = this.buildCombinedGraph();
       const pipelineEvents = this.extractPipelineEvents(rawGraph, commandToEvents);
       const graphWithEvents = this.addCommandEventEdgesToGraph(rawGraph, commandToEvents, pipelineEvents);
-      const completeGraph = this.markBackLinks(graphWithEvents);
+      const graphWithEnrichedEvents = this.enrichEventLabels(graphWithEvents);
+      const completeGraph = this.markBackLinks(graphWithEnrichedEvents);
       const filterOptions = this.parseFilterOptions(req.query);
       const filteredGraph = filterGraph(completeGraph, filterOptions);
       const allPipelineNodes = this.buildPipelineNodes();
@@ -290,17 +294,69 @@ export class PipelineServer {
       combinedGraph.edges.push(...graph.edges);
     }
 
-    return combinedGraph;
+    return this.enrichCommandLabels(combinedGraph);
+  }
+
+  private enrichCommandLabels(graph: GraphIR): GraphIR {
+    return {
+      nodes: graph.nodes.map((node) => {
+        if (node.type !== 'command') {
+          return node;
+        }
+        const handler = this.commandHandlers.get(node.label);
+        if (handler?.displayName === undefined) {
+          return node;
+        }
+        return { ...node, label: handler.displayName };
+      }),
+      edges: graph.edges,
+    };
+  }
+
+  private enrichEventLabels(graph: GraphIR): GraphIR {
+    const eventDisplayNames = this.buildEventDisplayNames();
+    return {
+      nodes: graph.nodes.map((node) => {
+        if (node.type !== 'event') {
+          return node;
+        }
+        const displayName = eventDisplayNames.get(node.label);
+        if (displayName === undefined) {
+          return node;
+        }
+        return { ...node, label: displayName };
+      }),
+      edges: graph.edges,
+    };
+  }
+
+  private getEventName(event: EventDefinition): string {
+    return typeof event === 'string' ? event : event.name;
   }
 
   private buildCommandToEvents(): Record<string, string[]> {
     const commandToEvents: Record<string, string[]> = {};
     for (const [name, handler] of this.commandHandlers.entries()) {
       if (handler.events !== undefined && Array.isArray(handler.events)) {
-        commandToEvents[name] = handler.events;
+        commandToEvents[name] = handler.events.map((e) => this.getEventName(e));
       }
     }
     return commandToEvents;
+  }
+
+  private buildEventDisplayNames(): Map<string, string> {
+    const eventDisplayNames = new Map<string, string>();
+    for (const handler of this.commandHandlers.values()) {
+      if (handler.events === undefined) {
+        continue;
+      }
+      for (const event of handler.events) {
+        if (typeof event !== 'string' && event.displayName !== undefined) {
+          eventDisplayNames.set(event.name, event.displayName);
+        }
+      }
+    }
+    return eventDisplayNames;
   }
 
   private buildPipelineNodes(): Array<{
@@ -325,7 +381,8 @@ export class PipelineServer {
     const commandIds = new Set<string>();
     for (const node of graph.nodes) {
       if (node.type === 'command') {
-        commandIds.add(node.label);
+        const commandName = node.id.replace(/^cmd:/, '');
+        commandIds.add(commandName);
       }
     }
     return commandIds;
@@ -355,7 +412,8 @@ export class PipelineServer {
     const rawGraph = this.buildCombinedGraph();
     const pipelineEvents = this.extractPipelineEvents(rawGraph, commandToEvents);
     const graphWithEvents = this.addCommandEventEdgesToGraph(rawGraph, commandToEvents, pipelineEvents);
-    const completeGraph = this.markBackLinks(graphWithEvents);
+    const graphWithEnrichedEvents = this.enrichEventLabels(graphWithEvents);
+    const completeGraph = this.markBackLinks(graphWithEnrichedEvents);
     const graph = filterOptions ? filterGraph(completeGraph, filterOptions) : completeGraph;
     const lines: string[] = ['flowchart LR'];
 
@@ -402,11 +460,11 @@ export class PipelineServer {
   }
 
   private markBackLinks(graph: GraphIR): GraphIR {
-    const outgoingEdges = new Map<string, string[]>();
+    const outgoingEdgesWithBackLink = new Map<string, Array<{ to: string; isBackLink: boolean }>>();
     for (const edge of graph.edges) {
-      const existing = outgoingEdges.get(edge.from) ?? [];
-      existing.push(edge.to);
-      outgoingEdges.set(edge.from, existing);
+      const existing = outgoingEdgesWithBackLink.get(edge.from) ?? [];
+      existing.push({ to: edge.to, isBackLink: edge.backLink === true });
+      outgoingEdgesWithBackLink.set(edge.from, existing);
     }
 
     const markedEdges = graph.edges.map((edge) => {
@@ -414,7 +472,7 @@ export class PipelineServer {
         return edge;
       }
       if (edge.from.startsWith('evt:') && edge.to.startsWith('cmd:')) {
-        const createsBackLink = this.hasPathTo(edge.to, edge.from, outgoingEdges);
+        const createsBackLink = this.hasPathToExcludingBackLinks(edge.to, edge.from, outgoingEdgesWithBackLink);
         if (createsBackLink) {
           return { ...edge, backLink: true };
         }
@@ -425,7 +483,11 @@ export class PipelineServer {
     return { nodes: graph.nodes, edges: markedEdges };
   }
 
-  private hasPathTo(from: string, target: string, outgoingEdges: Map<string, string[]>): boolean {
+  private hasPathToExcludingBackLinks(
+    from: string,
+    target: string,
+    outgoingEdges: Map<string, Array<{ to: string; isBackLink: boolean }>>,
+  ): boolean {
     const visited = new Set<string>();
     const queue = [from];
 
@@ -444,8 +506,11 @@ export class PipelineServer {
 
       const neighbors = outgoingEdges.get(current) ?? [];
       for (const neighbor of neighbors) {
-        if (!visited.has(neighbor)) {
-          queue.push(neighbor);
+        if (neighbor.isBackLink) {
+          continue;
+        }
+        if (!visited.has(neighbor.to)) {
+          queue.push(neighbor.to);
         }
       }
     }
@@ -488,11 +553,11 @@ export class PipelineServer {
         const eventName = node.id.replace('evt:', '');
         const safeId = `evt_${eventName}`;
         eventNodes.add(safeId);
-        lines.push(`  ${safeId}([${eventName}])`);
+        lines.push(`  ${safeId}([${node.label}])`);
       } else if (node.id.startsWith('cmd:')) {
         const commandName = node.id.replace('cmd:', '');
         commandNodes.add(commandName);
-        lines.push(`  ${commandName}[${commandName}]`);
+        lines.push(`  ${commandName}[${node.label}]`);
       } else if (node.id.startsWith('settled:')) {
         const commandTypes = node.id.replace('settled:', '').split(',');
         const safeId = `settled_${commandTypes.join('_')}`;

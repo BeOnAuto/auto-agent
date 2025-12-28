@@ -44,6 +44,7 @@ export type CheckClientEvents = ClientCheckedEvent | ClientCheckFailedEvent;
 
 export const checkClientCommandHandler = defineCommandHandler({
   name: 'CheckClient',
+  displayName: 'Check Client',
   alias: 'check:client',
   description: 'Full frontend validation suite',
   category: 'validation',
@@ -61,7 +62,10 @@ export const checkClientCommandHandler = defineCommandHandler({
 
   examples: ['$ auto check:client --client-directory=./client'],
 
-  events: ['ClientChecked', 'ClientCheckFailed'],
+  events: [
+    { name: 'ClientChecked', displayName: 'Client Checked' },
+    { name: 'ClientCheckFailed', displayName: 'Client Check Failed' },
+  ],
 
   handle: async (command: Command): Promise<ClientCheckedEvent | ClientCheckFailedEvent> => {
     const typedCommand = command as CheckClientCommand;

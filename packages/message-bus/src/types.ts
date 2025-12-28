@@ -31,3 +31,5 @@ export type EventHandler<TEvent extends Event = Event> = {
 export type EventSubscription = {
   unsubscribe: () => void;
 };
+
+export type EventDefinition = string | { name: string; displayName: string };

@@ -62,11 +62,16 @@ export type GenerateServerEvents = ServerGeneratedEvent | ServerGenerationFailed
 
 export const commandHandler = defineCommandHandler({
   name: 'GenerateServer',
+  displayName: 'Generate Server',
   alias: 'generate:server',
   description: 'Generate server from model',
   category: 'generate',
   icon: 'server',
-  events: ['ServerGenerated', 'ServerGenerationFailed', 'SliceGenerated'],
+  events: [
+    { name: 'ServerGenerated', displayName: 'Server Generated' },
+    { name: 'ServerGenerationFailed', displayName: 'Server Generation Failed' },
+    { name: 'SliceGenerated', displayName: 'Slice Generated' },
+  ],
   fields: {
     modelPath: {
       description: 'Path to the json model file',

@@ -42,6 +42,7 @@ export const commandHandler = defineCommandHandler<
   (command: CheckTypesCommand) => Promise<TypeCheckPassedEvent | TypeCheckFailedEvent>
 >({
   name: 'CheckTypes',
+  displayName: 'Check Types',
   alias: 'check:types',
   description: 'TypeScript type checking',
   category: 'check',
@@ -60,7 +61,10 @@ export const commandHandler = defineCommandHandler<
     '$ auto check:types --target-directory=./server',
     '$ auto check:types --target-directory=./server --scope=project',
   ],
-  events: ['TypeCheckPassed', 'TypeCheckFailed'],
+  events: [
+    { name: 'TypeCheckPassed', displayName: 'Type Check Passed' },
+    { name: 'TypeCheckFailed', displayName: 'Type Check Failed' },
+  ],
   // eslint-disable-next-line complexity
   handle: async (command: Command): Promise<TypeCheckPassedEvent | TypeCheckFailedEvent> => {
     const typedCommand = command as CheckTypesCommand;

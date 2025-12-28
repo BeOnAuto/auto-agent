@@ -58,11 +58,16 @@ export const commandHandler = defineCommandHandler<
   (command: GenerateIACommand) => Promise<IAGeneratedEvent | IAGenerationFailedEvent | IAValidationFailedEvent>
 >({
   name: 'GenerateIA',
+  displayName: 'Generate IA',
   alias: 'generate:ia',
   description: 'Generate Information Architecture',
   category: 'generate',
   icon: 'building',
-  events: ['IAGenerated', 'IAGenerationFailed', 'IAValidationFailed'],
+  events: [
+    { name: 'IAGenerated', displayName: 'IA Generated' },
+    { name: 'IAGenerationFailed', displayName: 'IA Generation Failed' },
+    { name: 'IAValidationFailed', displayName: 'IA Validation Failed' },
+  ],
   fields: {
     outputDir: {
       description: 'Context directory',

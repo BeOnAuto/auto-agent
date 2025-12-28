@@ -38,6 +38,7 @@ export const commandHandler = defineCommandHandler<
   (command: StartServerCommand) => Promise<ServerStartedEvent | ServerStartFailedEvent>
 >({
   name: 'StartServer',
+  displayName: 'Start Server',
   alias: 'start:server',
   description: 'Start the development server',
   category: 'dev',
@@ -56,7 +57,10 @@ export const commandHandler = defineCommandHandler<
     '$ auto start:server --server-directory=./server',
     '$ auto start:server --server-directory=./server --command="pnpm dev"',
   ],
-  events: ['ServerStarted', 'ServerStartFailed'],
+  events: [
+    { name: 'ServerStarted', displayName: 'Server Started' },
+    { name: 'ServerStartFailed', displayName: 'Server Start Failed' },
+  ],
   handle: async (command: Command): Promise<ServerStartedEvent | ServerStartFailedEvent> => {
     const typedCommand = command as StartServerCommand;
     debug('CommandHandler executing for StartServer');

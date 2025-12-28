@@ -46,6 +46,7 @@ export const commandHandler = defineCommandHandler<
   (command: CheckLintCommand) => Promise<LintCheckPassedEvent | LintCheckFailedEvent>
 >({
   name: 'CheckLint',
+  displayName: 'Check Lint',
   alias: 'check:lint',
   description: 'ESLint with optional auto-fix',
   category: 'check',
@@ -66,7 +67,10 @@ export const commandHandler = defineCommandHandler<
     },
   },
   examples: ['$ auto check:lint --target-directory=./server', '$ auto check:lint --target-directory=./server --fix'],
-  events: ['LintCheckPassed', 'LintCheckFailed'],
+  events: [
+    { name: 'LintCheckPassed', displayName: 'Lint Check Passed' },
+    { name: 'LintCheckFailed', displayName: 'Lint Check Failed' },
+  ],
   // eslint-disable-next-line complexity
   handle: async (command: Command) => {
     const typedCommand = command as CheckLintCommand;

@@ -1,7 +1,13 @@
-import type { CommandHandler } from '@auto-engineer/message-bus';
+import type { CommandHandler, EventDefinition } from '@auto-engineer/message-bus';
+
+export type { EventDefinition };
 
 interface CommandHandlerWithEvents extends CommandHandler {
-  events?: readonly string[];
+  events?: readonly EventDefinition[];
+}
+
+function getEventName(event: EventDefinition): string {
+  return typeof event === 'string' ? event : event.name;
 }
 
 export class EventCommandMapper {
@@ -17,11 +23,12 @@ export class EventCommandMapper {
   addHandler(handler: CommandHandlerWithEvents): void {
     const events = handler.events ?? [];
 
-    for (const eventType of events) {
+    for (const event of events) {
+      const eventType = getEventName(event);
       this.eventToCommand.set(eventType, handler.name);
     }
 
-    this.commandToEvents.set(handler.name, [...events]);
+    this.commandToEvents.set(handler.name, events.map(getEventName));
   }
 
   getSourceCommand(eventType: string): string | undefined {

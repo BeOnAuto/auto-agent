@@ -39,6 +39,7 @@ export const commandHandler = defineCommandHandler<
   (command: ImplementServerCommand) => Promise<ServerImplementedEvent | ServerImplementationFailedEvent>
 >({
   name: 'ImplementServer',
+  displayName: 'Implement Server',
   alias: 'implement:server',
   description: 'AI implements server TODOs and tests',
   category: 'implement',
@@ -50,7 +51,10 @@ export const commandHandler = defineCommandHandler<
     },
   },
   examples: ['$ auto implement:server --server-directory=./server'],
-  events: ['ServerImplemented', 'ServerImplementationFailed'],
+  events: [
+    { name: 'ServerImplemented', displayName: 'Server Implemented' },
+    { name: 'ServerImplementationFailed', displayName: 'Server Implementation Failed' },
+  ],
   handle: async (
     command: ImplementServerCommand,
   ): Promise<ServerImplementedEvent | ServerImplementationFailedEvent> => {

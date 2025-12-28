@@ -48,6 +48,7 @@ export const commandHandler = defineCommandHandler<
   (command: ImplementSliceCommand) => Promise<SliceImplementedEvent | SliceImplementationFailedEvent>
 >({
   name: 'ImplementSlice',
+  displayName: 'Implement Slice',
   alias: 'implement:slice',
   description: 'AI implements a specific server slice',
   category: 'implement',
@@ -69,7 +70,10 @@ export const commandHandler = defineCommandHandler<
   examples: [
     '$ auto implement:slice --slice-path=./server/src/domain/flows/seasonal-assistant/enters-shopping-criteria-into-assistant',
   ],
-  events: ['SliceImplemented', 'SliceImplementationFailed'],
+  events: [
+    { name: 'SliceImplemented', displayName: 'Slice Implemented' },
+    { name: 'SliceImplementationFailed', displayName: 'Slice Implementation Failed' },
+  ],
   handle: async (command: ImplementSliceCommand): Promise<SliceImplementedEvent | SliceImplementationFailedEvent> => {
     debug('CommandHandler executing for ImplementSlice');
     const result = await handleImplementSliceCommand(command);

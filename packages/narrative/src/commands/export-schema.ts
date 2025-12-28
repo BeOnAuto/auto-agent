@@ -33,11 +33,15 @@ export type ExportSchemaEvents = SchemaExportedEvent | SchemaExportFailedEvent;
 
 export const commandHandler = defineCommandHandler({
   name: 'ExportSchema',
+  displayName: 'Export Schema',
   alias: 'export:schema',
   description: 'Export flow schemas to context directory',
   category: 'export',
   icon: 'download',
-  events: ['SchemaExported', 'SchemaExportFailed'],
+  events: [
+    { name: 'SchemaExported', displayName: 'Schema Exported' },
+    { name: 'SchemaExportFailed', displayName: 'Schema Export Failed' },
+  ],
   fields: {
     directory: {
       description: 'Context directory path (defaults to current working directory)',

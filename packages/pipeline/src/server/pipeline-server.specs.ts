@@ -216,6 +216,39 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
+    it('should use displayName as label for command graph nodes', async () => {
+      const handler = {
+        name: 'Cmd',
+        displayName: 'My Command',
+        handle: async () => ({ type: 'Done', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('Cmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<GraphResponse>(`http://localhost:${server.port}/pipeline`);
+      const cmdNode = data.nodes.find((n) => n.id === 'cmd:Cmd');
+      expect(cmdNode?.label).toBe('My Command');
+      await server.stop();
+    });
+
+    it('should use command name as graph node label when displayName not provided', async () => {
+      const handler = {
+        name: 'SimpleCmd',
+        handle: async () => ({ type: 'Done', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('SimpleCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<GraphResponse>(`http://localhost:${server.port}/pipeline`);
+      const cmdNode = data.nodes.find((n) => n.id === 'cmd:SimpleCmd');
+      expect(cmdNode?.label).toBe('SimpleCmd');
+      await server.stop();
+    });
+
     it('should filter out event nodes when excludeTypes=event', async () => {
       const pipeline = define('test').on('Start').emit('Cmd', {}).build();
       const server = new PipelineServer({ port: 0 });
@@ -498,6 +531,23 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
+    it('should use displayName as label for command nodes in mermaid diagram', async () => {
+      const handler = {
+        name: 'Cmd',
+        displayName: 'My Command',
+        handle: async () => ({ type: 'Done', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('Cmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('Cmd[My Command]');
+      await server.stop();
+    });
+
     it('should include event nodes in mermaid diagram', async () => {
       const pipeline = define('test').on('Start').emit('Process', {}).build();
       const server = new PipelineServer({ port: 0 });
@@ -506,6 +556,27 @@ describe('PipelineServer', () => {
       const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
       const mermaid = await res.text();
       expect(mermaid).toContain('evt_Start');
+      await server.stop();
+    });
+
+    it('should use displayName as label for event nodes in mermaid diagram', async () => {
+      const handler = {
+        name: 'Cmd',
+        events: [{ name: 'CmdCompleted', displayName: 'Command Completed' }],
+        handle: async () => ({ type: 'CmdCompleted', data: {} }),
+      };
+      const nextHandler = {
+        name: 'NextCmd',
+        handle: async () => ({ type: 'Done', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('Cmd', {}).on('CmdCompleted').emit('NextCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler, nextHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const res = await fetch(`http://localhost:${server.port}/pipeline/mermaid`);
+      const mermaid = await res.text();
+      expect(mermaid).toContain('evt_CmdCompleted([Command Completed])');
       await server.stop();
     });
 
@@ -795,6 +866,36 @@ describe('PipelineServer', () => {
       const backLinkEdge = data.edges.find((e) => e.from === 'evt:IAValidationFailed' && e.to === 'cmd:GenerateIA');
       expect(backLinkEdge).toBeDefined();
       expect(backLinkEdge?.backLink).toBe(true);
+      await server.stop();
+    });
+
+    it('should NOT mark forward edges as backLink when cycle is broken by settled dispatch', async () => {
+      const implHandler = {
+        name: 'ImplementSlice',
+        events: ['SliceImplemented'],
+        handle: async () => ({ type: 'SliceImplemented', data: {} }),
+      };
+      const checkHandler = {
+        name: 'CheckTests',
+        events: ['TestsCheckPassed', 'TestsCheckFailed'],
+        handle: async () => ({ type: 'TestsCheckPassed', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('Start')
+        .emit('ImplementSlice', {})
+        .on('SliceImplemented')
+        .emit('CheckTests', {})
+        .settled(['CheckTests'])
+        .dispatch({ dispatches: ['ImplementSlice'] }, () => {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([implHandler, checkHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      const forwardEdge = data.edges.find((e) => e.from === 'evt:SliceImplemented' && e.to === 'cmd:CheckTests');
+      expect(forwardEdge).toBeDefined();
+      expect(forwardEdge?.backLink).toBeUndefined();
       await server.stop();
     });
 

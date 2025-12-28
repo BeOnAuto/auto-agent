@@ -64,6 +64,7 @@ export const commandHandler = defineCommandHandler<
   (command: ImplementComponentCommand) => Promise<ComponentImplementedEvent | ComponentImplementationFailedEvent>
 >({
   name: 'ImplementComponent',
+  displayName: 'Implement Component',
   alias: 'implement:component',
   description: 'AI implements a single component (atom, molecule, organism, or page)',
   category: 'implement',
@@ -87,7 +88,10 @@ export const commandHandler = defineCommandHandler<
   examples: [
     '$ auto implement:component --project-dir=./client --ia-scheme-dir=./.context --design-system-path=./design-system.md --component-type=molecule --component-name=SurveyCard',
   ],
-  events: ['ComponentImplemented', 'ComponentImplementationFailed'],
+  events: [
+    { name: 'ComponentImplemented', displayName: 'Component Implemented' },
+    { name: 'ComponentImplementationFailed', displayName: 'Component Failed' },
+  ],
   handle: async (
     command: ImplementComponentCommand,
   ): Promise<ComponentImplementedEvent | ComponentImplementationFailedEvent> => {

@@ -45,6 +45,7 @@ export const commandHandler = defineCommandHandler<
   (command: CheckTestsCommand) => Promise<TestsCheckPassedEvent | TestsCheckFailedEvent>
 >({
   name: 'CheckTests',
+  displayName: 'Check Tests',
   alias: 'check:tests',
   description: 'Run Vitest test suites',
   category: 'check',
@@ -63,7 +64,10 @@ export const commandHandler = defineCommandHandler<
     '$ auto check:tests --target-directory=./server',
     '$ auto check:tests --target-directory=./server --scope=project',
   ],
-  events: ['TestsCheckPassed', 'TestsCheckFailed'],
+  events: [
+    { name: 'TestsCheckPassed', displayName: 'Tests Check Passed' },
+    { name: 'TestsCheckFailed', displayName: 'Tests Check Failed' },
+  ],
   // eslint-disable-next-line complexity
   handle: async (command: Command): Promise<TestsCheckPassedEvent | TestsCheckFailedEvent> => {
     const typedCommand = command as CheckTestsCommand;

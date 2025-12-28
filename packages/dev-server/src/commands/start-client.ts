@@ -38,6 +38,7 @@ export const commandHandler = defineCommandHandler<
   (command: StartClientCommand) => Promise<ClientStartedEvent | ClientStartFailedEvent>
 >({
   name: 'StartClient',
+  displayName: 'Start Client',
   alias: 'start:client',
   description: 'Start the development client',
   category: 'dev',
@@ -56,7 +57,10 @@ export const commandHandler = defineCommandHandler<
     '$ auto start:client --client-directory=./client',
     '$ auto start:client --client-directory=./client --command="pnpm dev"',
   ],
-  events: ['ClientStarted', 'ClientStartFailed'],
+  events: [
+    { name: 'ClientStarted', displayName: 'Client Started' },
+    { name: 'ClientStartFailed', displayName: 'Client Start Failed' },
+  ],
   handle: async (command: Command): Promise<ClientStartedEvent | ClientStartFailedEvent> => {
     const typedCommand = command as StartClientCommand;
     debug('CommandHandler executing for StartClient');

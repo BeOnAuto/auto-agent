@@ -37,6 +37,7 @@ export const commandHandler = defineCommandHandler<
   (command: ImportDesignSystemCommand) => Promise<DesignSystemImportedEvent | DesignSystemImportFailedEvent>
 >({
   name: 'ImportDesignSystem',
+  displayName: 'Import Design System',
   alias: 'import:design-system',
   description: 'Import Figma design system',
   category: 'import',
@@ -56,7 +57,10 @@ export const commandHandler = defineCommandHandler<
   examples: [
     '$ auto import:design-system --output-dir=./.context --strategy=WITH_COMPONENT_SETS --filter-path=./shadcn-filter.ts',
   ],
-  events: ['ImportDesignSystemCompleted', 'ImportDesignSystemFailed'],
+  events: [
+    { name: 'ImportDesignSystemCompleted', displayName: 'Design System Imported' },
+    { name: 'ImportDesignSystemFailed', displayName: 'Design System Import Failed' },
+  ],
   handle: async (command: Command): Promise<DesignSystemImportedEvent | DesignSystemImportFailedEvent> => {
     const typedCommand = command as ImportDesignSystemCommand;
     debug('CommandHandler executing for ImportDesignSystem');

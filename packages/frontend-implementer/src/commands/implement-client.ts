@@ -36,6 +36,7 @@ export const commandHandler = defineCommandHandler<
   (command: ImplementClientCommand) => Promise<ClientImplementedEvent | ClientImplementationFailedEvent>
 >({
   name: 'ImplementClient',
+  displayName: 'Implement Client',
   alias: 'implement:client',
   description: 'AI implements client',
   category: 'implement',
@@ -61,7 +62,10 @@ export const commandHandler = defineCommandHandler<
   examples: [
     '$ auto implement:client --project-dir=./client --ia-scheme-dir=./.context --design-system-path=./design-system.md',
   ],
-  events: ['ClientImplemented', 'ClientImplementationFailed'],
+  events: [
+    { name: 'ClientImplemented', displayName: 'Client Implemented' },
+    { name: 'ClientImplementationFailed', displayName: 'Client Implementation Failed' },
+  ],
   handle: async (
     command: ImplementClientCommand,
   ): Promise<ClientImplementedEvent | ClientImplementationFailedEvent> => {

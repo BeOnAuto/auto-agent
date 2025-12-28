@@ -36,6 +36,7 @@ export const commandHandler = defineCommandHandler<
   (command: CopyExampleCommand) => Promise<ExampleCopiedEvent | ExampleCopyFailedEvent>
 >({
   name: 'CopyExample',
+  displayName: 'Copy Example',
   alias: 'copy:example',
   description: 'Copy example React GraphQL template',
   category: 'copy',
@@ -51,7 +52,10 @@ export const commandHandler = defineCommandHandler<
     },
   },
   examples: ['$ auto copy:example --starter-name=shadcn-starter --target-dir=./my-starter'],
-  events: ['ExampleCopied', 'ExampleCopyFailed'],
+  events: [
+    { name: 'ExampleCopied', displayName: 'Example Copied' },
+    { name: 'ExampleCopyFailed', displayName: 'Example Copy Failed' },
+  ],
   handle: async (command: Command): Promise<ExampleCopiedEvent | ExampleCopyFailedEvent> => {
     const typedCommand = command as CopyExampleCommand;
     const result = await handleCopyExampleCommand(typedCommand);
