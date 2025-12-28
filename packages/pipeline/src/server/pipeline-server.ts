@@ -286,7 +286,7 @@ export class PipelineServer {
 
     this.app.get('/stats', (_req, res) => {
       void (async () => {
-        const stats = await this.messageStore.getStats();
+        const stats = await this.eventStoreContext.readModel.getStats();
         res.json(stats);
       })();
     });
