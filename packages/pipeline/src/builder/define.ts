@@ -243,7 +243,7 @@ function processCustomHandler(ctx: GraphBuilderContext, handler: CustomHandlerDe
 
 function processSettledHandler(ctx: GraphBuilderContext, handler: SettledHandlerDescriptor): void {
   const settledNodeId = `settled:${handler.commandTypes.join(',')}`;
-  addNode(ctx, settledNodeId, 'settled', `settled(${handler.commandTypes.join(', ')})`);
+  addNode(ctx, settledNodeId, 'settled', 'Settled');
 
   for (const commandType of handler.commandTypes) {
     addNode(ctx, `cmd:${commandType}`, 'command', commandType);

@@ -25,20 +25,13 @@ interface GraphNode {
   id: string;
   type: string;
   label: string;
-}
-
-interface PipelineNode {
-  id: string;
-  name: string;
-  title: string;
-  displayName: string;
-  status: string;
+  status?: string;
 }
 
 interface PipelineResponse {
   nodes: GraphNode[];
   edges: Array<{ from: string; to: string; backLink?: boolean }>;
-  pipelineNodes?: PipelineNode[];
+  pipelineNodes?: unknown;
   commandToEvents?: Record<string, string[]>;
   eventToCommand?: Record<string, string>;
 }
@@ -177,45 +170,6 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
-    it('should return pipeline nodes with name, title, displayName, and status', async () => {
-      const handler = {
-        name: 'Cmd',
-        alias: 'cmd',
-        description: 'Test command',
-        displayName: 'My Command',
-        handle: async () => ({ type: 'Done', data: {} }),
-      };
-      const pipeline = define('test').on('Start').emit('Cmd', {}).build();
-      const server = new PipelineServer({ port: 0 });
-      server.registerCommandHandlers([handler]);
-      server.registerPipeline(pipeline);
-      await server.start();
-      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
-      const cmdNode = data.pipelineNodes?.find((n) => n.id === 'Cmd');
-      expect(cmdNode).toBeDefined();
-      expect(cmdNode?.name).toBe('Cmd');
-      expect(cmdNode?.title).toBe('Test command');
-      expect(cmdNode?.displayName).toBe('My Command');
-      expect(cmdNode?.status).toBe('None');
-      await server.stop();
-    });
-
-    it('should use command name as displayName when not provided', async () => {
-      const handler = {
-        name: 'SimpleCmd',
-        handle: async () => ({ type: 'Done', data: {} }),
-      };
-      const pipeline = define('test').on('Start').emit('SimpleCmd', {}).build();
-      const server = new PipelineServer({ port: 0 });
-      server.registerCommandHandlers([handler]);
-      server.registerPipeline(pipeline);
-      await server.start();
-      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
-      const cmdNode = data.pipelineNodes?.find((n) => n.id === 'SimpleCmd');
-      expect(cmdNode?.displayName).toBe('SimpleCmd');
-      await server.stop();
-    });
-
     it('should use displayName as label for command graph nodes', async () => {
       const handler = {
         name: 'Cmd',
@@ -307,29 +261,6 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
-    it('should filter pipelineNodes to only include commands present in filtered graph', async () => {
-      const connectedHandler = {
-        name: 'Connected',
-        events: ['Done'],
-        handle: async () => ({ type: 'Done', data: {} }),
-      };
-      const orphanHandler = {
-        name: 'Orphan',
-        events: ['OrphanDone'],
-        handle: async () => ({ type: 'OrphanDone', data: {} }),
-      };
-      const pipeline = define('test').on('Start').emit('Connected', {}).build();
-      const server = new PipelineServer({ port: 0 });
-      server.registerCommandHandlers([connectedHandler, orphanHandler]);
-      server.registerPipeline(pipeline);
-      await server.start();
-      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
-      const pipelineNodeNames = data.pipelineNodes?.map((n) => n.name) ?? [];
-      expect(pipelineNodeNames).toContain('Connected');
-      expect(pipelineNodeNames).not.toContain('Orphan');
-      await server.stop();
-    });
-
     it('should not include deprecated commandToEvents and eventToCommand fields', async () => {
       const handler = {
         name: 'Cmd',
@@ -344,6 +275,358 @@ describe('PipelineServer', () => {
       const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
       expect(data.commandToEvents).toBeUndefined();
       expect(data.eventToCommand).toBeUndefined();
+      await server.stop();
+    });
+
+    it('should not include pipelineNodes in response', async () => {
+      const handler = {
+        name: 'Cmd',
+        events: ['Done'],
+        handle: async () => ({ type: 'Done', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('Cmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      expect(data.pipelineNodes).toBeUndefined();
+      expect(data.nodes).toBeDefined();
+      expect(data.edges).toBeDefined();
+      await server.stop();
+    });
+
+    it('should have status idle on command nodes by default', async () => {
+      const handler = {
+        name: 'Cmd',
+        events: ['Done'],
+        handle: async () => ({ type: 'Done', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('Cmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      const cmdNode = data.nodes.find((n) => n.id === 'cmd:Cmd');
+      expect(cmdNode?.status).toBe('idle');
+      await server.stop();
+    });
+
+    it('should not have status on event nodes', async () => {
+      const handler = {
+        name: 'Cmd',
+        events: ['Done'],
+        handle: async () => ({ type: 'Done', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('Cmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      const eventNode = data.nodes.find((n) => n.id === 'evt:Start');
+      expect(eventNode?.status).toBeUndefined();
+      await server.stop();
+    });
+
+    it('should show running status for command being executed', async () => {
+      let resolveHandler: () => void = () => {};
+      const handlerPromise = new Promise<void>((resolve) => {
+        resolveHandler = resolve;
+      });
+      const handler = {
+        name: 'SlowCmd',
+        events: ['Done'],
+        handle: async () => {
+          await handlerPromise;
+          return { type: 'Done', data: {} };
+        },
+      };
+      const pipeline = define('test').on('Start').emit('SlowCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const commandResponse = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'SlowCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      const data = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${commandResponse.correlationId}`,
+      );
+      const cmdNode = data.nodes.find((n) => n.id === 'cmd:SlowCmd');
+      expect(cmdNode?.status).toBe('running');
+
+      resolveHandler();
+      await server.stop();
+    });
+
+    it('should show success status after command completes with success event', async () => {
+      const handler = {
+        name: 'SuccessCmd',
+        events: ['CmdCompleted'],
+        handle: async () => ({ type: 'CmdCompleted', data: {} }),
+      };
+      const pipeline = define('test').on('Start').emit('SuccessCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const commandResponse = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'SuccessCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const data = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${commandResponse.correlationId}`,
+      );
+      const cmdNode = data.nodes.find((n) => n.id === 'cmd:SuccessCmd');
+      expect(cmdNode?.status).toBe('success');
+      await server.stop();
+    });
+
+    it('should show error status after command completes with failed event', async () => {
+      const handler = {
+        name: 'FailCmd',
+        events: ['CmdFailed'],
+        handle: async () => ({ type: 'CmdFailed', data: { error: 'Something went wrong' } }),
+      };
+      const pipeline = define('test').on('Start').emit('FailCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const commandResponse = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'FailCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const data = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${commandResponse.correlationId}`,
+      );
+      const cmdNode = data.nodes.find((n) => n.id === 'cmd:FailCmd');
+      expect(cmdNode?.status).toBe('error');
+      await server.stop();
+    });
+
+    it('should broadcast PipelineRunStarted event when new correlationId is first seen', async () => {
+      const handler = {
+        name: 'StartCmd',
+        events: ['Started'],
+        handle: async () => ({ type: 'Started', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('StartCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const commandResponse = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'StartCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const msgs = await fetchAs<StoredMessage[]>(`http://localhost:${server.port}/messages`);
+      const pipelineRunStarted = msgs.find((m) => m.message.type === 'PipelineRunStarted');
+      expect(pipelineRunStarted).toBeDefined();
+      expect((pipelineRunStarted?.message as { correlationId?: string }).correlationId).toBe(
+        commandResponse.correlationId,
+      );
+      expect((pipelineRunStarted?.message as { data?: { triggerCommand?: string } }).data?.triggerCommand).toBe(
+        'StartCmd',
+      );
+      await server.stop();
+    });
+
+    it('should broadcast NodeStatusChanged event when command starts running', async () => {
+      const handler = {
+        name: 'RunCmd',
+        events: ['RunDone'],
+        handle: async () => ({ type: 'RunDone', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('RunCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const commandResponse = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'RunCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const msgs = await fetchAs<StoredMessage[]>(`http://localhost:${server.port}/messages`);
+      type NodeStatusChangedMessage = {
+        type: string;
+        correlationId?: string;
+        data?: { nodeId?: string; status?: string; previousStatus?: string };
+      };
+      const nodeStatusChanged = msgs.filter((m) => m.message.type === 'NodeStatusChanged');
+      const runningEvent = nodeStatusChanged.find(
+        (m) => (m.message as NodeStatusChangedMessage).data?.status === 'running',
+      );
+      expect(runningEvent).toBeDefined();
+      expect((runningEvent?.message as NodeStatusChangedMessage).data?.nodeId).toBe('cmd:RunCmd');
+      expect((runningEvent?.message as NodeStatusChangedMessage).data?.previousStatus).toBe('idle');
+      expect((runningEvent?.message as NodeStatusChangedMessage).correlationId).toBe(commandResponse.correlationId);
+      await server.stop();
+    });
+
+    it('should broadcast NodeStatusChanged event when command completes', async () => {
+      const handler = {
+        name: 'CompleteCmd',
+        events: ['CompleteDone'],
+        handle: async () => ({ type: 'CompleteDone', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('CompleteCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const commandResponse = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'CompleteCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const msgs = await fetchAs<StoredMessage[]>(`http://localhost:${server.port}/messages`);
+      type NodeStatusChangedMessage = {
+        type: string;
+        correlationId?: string;
+        data?: { nodeId?: string; status?: string; previousStatus?: string };
+      };
+      const nodeStatusChanged = msgs.filter((m) => m.message.type === 'NodeStatusChanged');
+      const successEvent = nodeStatusChanged.find(
+        (m) => (m.message as NodeStatusChangedMessage).data?.status === 'success',
+      );
+      expect(successEvent).toBeDefined();
+      expect((successEvent?.message as NodeStatusChangedMessage).data?.nodeId).toBe('cmd:CompleteCmd');
+      expect((successEvent?.message as NodeStatusChangedMessage).data?.previousStatus).toBe('running');
+      expect((successEvent?.message as NodeStatusChangedMessage).correlationId).toBe(commandResponse.correlationId);
+      await server.stop();
+    });
+
+    it('should persist status across multiple /pipeline calls', async () => {
+      const handler = {
+        name: 'PersistCmd',
+        events: ['PersistDone'],
+        handle: async () => ({ type: 'PersistDone', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('PersistCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const commandResponse = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'PersistCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const firstCall = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${commandResponse.correlationId}`,
+      );
+      expect(firstCall.nodes.find((n) => n.id === 'cmd:PersistCmd')?.status).toBe('success');
+
+      const secondCall = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${commandResponse.correlationId}`,
+      );
+      expect(secondCall.nodes.find((n) => n.id === 'cmd:PersistCmd')?.status).toBe('success');
+
+      await server.stop();
+    });
+
+    it('should track status independently for different correlationIds', async () => {
+      const handler = {
+        name: 'IndependentCmd',
+        events: ['IndependentDone'],
+        handle: async () => ({ type: 'IndependentDone', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('IndependentCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const run1 = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'IndependentCmd', data: {} }),
+      });
+
+      const run2 = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'IndependentCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      expect(run1.correlationId).not.toBe(run2.correlationId);
+
+      const pipeline1 = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${run1.correlationId}`,
+      );
+      const pipeline2 = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${run2.correlationId}`,
+      );
+
+      expect(pipeline1.nodes.find((n) => n.id === 'cmd:IndependentCmd')?.status).toBe('success');
+      expect(pipeline2.nodes.find((n) => n.id === 'cmd:IndependentCmd')?.status).toBe('success');
+
+      await server.stop();
+    });
+
+    it('should show idle status for all command nodes when no correlationId provided', async () => {
+      const handler = {
+        name: 'IdleCmd',
+        events: ['IdleDone'],
+        handle: async () => ({ type: 'IdleDone', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('IdleCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'IdleCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const pipelineWithoutCorrelation = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      const cmdNode = pipelineWithoutCorrelation.nodes.find((n) => n.id === 'cmd:IdleCmd');
+      expect(cmdNode?.status).toBe('idle');
+
       await server.stop();
     });
   });

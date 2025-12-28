@@ -1,9 +1,12 @@
 export type NodeType = 'event' | 'command' | 'settled';
 
+export type NodeStatus = 'idle' | 'running' | 'success' | 'error';
+
 export interface GraphNode {
   id: string;
   type: NodeType;
   label: string;
+  status?: NodeStatus;
 }
 
 export interface GraphEdge {

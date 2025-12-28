@@ -148,7 +148,7 @@ describe('settled()', () => {
     const graph = pipeline.toGraph();
     const settledNode = graph.nodes.find((n) => n.id.startsWith('settled:'));
     expect(settledNode).toBeDefined();
-    expect(settledNode?.label).toBe('settled(CheckTests, CheckTypes)');
+    expect(settledNode?.label).toBe('Settled');
   });
 
   it('should accept options-first dispatch with dispatches array', () => {
