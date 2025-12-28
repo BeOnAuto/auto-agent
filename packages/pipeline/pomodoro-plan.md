@@ -2,6 +2,305 @@
 
 ## TODO
 
+### Phase 9: Remove Dual Caches - Pure Event Sourcing (Pomodoros 71-87)
+
+**Goal**: Remove `nodeStatusCache` and `itemStatusCache` from PipelineServer. All runtime state derived from Emmett projections via `PipelineReadModel`.
+
+**Current State** (dual source of truth):
+```
+Commands → Cache (mutable) + Emmett Events → Projections
+                  ↓                              ↓
+          Used for lookups              Also stores same data
+```
+
+**Target State** (single source of truth):
+```
+Commands → Emmett Events → Projections → ReadModel queries
+```
+
+---
+
+#### Pomodoro 71: Add getNodeStatus query (test)
+
+| Value | Query node status from projection |
+| Approach | `getNodeStatus(correlationId, commandName)` returns status or null |
+| Size | S |
+
+```typescript
+it('should return null when no node status exists', async () => {
+  const result = await readModel.getNodeStatus('c1', 'CreateUser');
+  expect(result).toBeNull();
+});
+
+it('should return node status from NodeStatus collection', async () => {
+  const collection = database.collection<WithId<NodeStatusDocument>>('NodeStatus');
+  await collection.insertOne({
+    _id: 'ns-c1-CreateUser',
+    correlationId: 'c1',
+    commandName: 'CreateUser',
+    status: 'running',
+    pendingCount: 1,
+    endedCount: 0,
+  });
+
+  const result = await readModel.getNodeStatus('c1', 'CreateUser');
+  expect(result).toEqual({
+    correlationId: 'c1',
+    commandName: 'CreateUser',
+    status: 'running',
+    pendingCount: 1,
+    endedCount: 0,
+  });
+});
+```
+
+---
+
+#### Pomodoro 72: Add getNodeStatus query (implement)
+
+| Value | Can query node status from projection |
+| Approach | Query NodeStatus collection with filter |
+| Size | S |
+| Files | `src/store/pipeline-read-model.ts` |
+
+---
+
+#### Pomodoro 73: Add getItemStatus query (test)
+
+| Value | Query item status from projection |
+| Approach | `getItemStatus(correlationId, commandType, itemKey)` returns ItemStatusDocument or null |
+| Size | S |
+
+```typescript
+it('should return null when no item status exists', async () => {
+  const result = await readModel.getItemStatus('c1', 'CreateUser', 'item1');
+  expect(result).toBeNull();
+});
+
+it('should return item status from ItemStatus collection', async () => {
+  const collection = database.collection<WithId<ItemStatusDocument>>('ItemStatus');
+  await collection.insertOne({
+    _id: 'is-c1-CreateUser-item1',
+    correlationId: 'c1',
+    commandType: 'CreateUser',
+    itemKey: 'item1',
+    currentRequestId: 'r1',
+    status: 'running',
+    attemptCount: 1,
+  });
+
+  const result = await readModel.getItemStatus('c1', 'CreateUser', 'item1');
+  expect(result).toMatchObject({
+    correlationId: 'c1',
+    commandType: 'CreateUser',
+    itemKey: 'item1',
+    attemptCount: 1,
+  });
+});
+```
+
+---
+
+#### Pomodoro 74: Add getItemStatus query (implement)
+
+| Value | Can query item status from projection |
+| Approach | Query ItemStatus collection with filter |
+| Size | S |
+| Files | `src/store/pipeline-read-model.ts` |
+
+---
+
+#### Pomodoro 75: Replace previousStatus lookup (test)
+
+| Value | Get previousStatus from projection instead of cache |
+| Approach | Verify `updateNodeStatus` emits correct previousStatus |
+| Size | M |
+
+Existing tests should pass with projection-based previousStatus lookup.
+
+---
+
+#### Pomodoro 76: Replace previousStatus lookup (implement)
+
+| Value | Remove nodeStatusCache usage in updateNodeStatus |
+| Approach | Query `readModel.getNodeStatus()` for previousStatus |
+| Size | M |
+| Files | `src/server/pipeline-server.ts` lines 468-478 |
+
+```typescript
+private async updateNodeStatus(correlationId: string, commandName: string, status: NodeStatus): Promise<void> {
+  const existing = await this.eventStoreContext.readModel.getNodeStatus(correlationId, commandName);
+  const previousStatus: NodeStatus = existing?.status ?? 'idle';
+  await this.emitNodeStatusChanged(correlationId, commandName, status, previousStatus);
+  await this.broadcastNodeStatusChanged(correlationId, commandName, status, previousStatus);
+}
+```
+
+---
+
+#### Pomodoro 77: Replace hasCorrelation check (test)
+
+| Value | Detect new correlationId via projection |
+| Approach | Test that PipelineRunStarted is emitted only for new correlationIds |
+| Size | M |
+
+Existing broadcast tests should pass with projection-based detection.
+
+---
+
+#### Pomodoro 78: Replace hasCorrelation check (implement)
+
+| Value | Remove nodeStatusCache.has() check |
+| Approach | Use `readModel.hasCorrelation()` instead |
+| Size | M |
+| Files | `src/server/pipeline-server.ts` line 874 |
+
+```typescript
+const isNewCorrelationId = !(await this.eventStoreContext.readModel.hasCorrelation(command.correlationId));
+```
+
+---
+
+#### Pomodoro 79: Replace item creation/update logic (test)
+
+| Value | Get/create item status from projection |
+| Approach | Test item creation with correct attemptCount from projection |
+| Size | M |
+
+```typescript
+it('should increment attemptCount on retry', async () => {
+  // First command creates item with attemptCount=1
+  // Second command (same itemKey) should have attemptCount=2
+});
+```
+
+---
+
+#### Pomodoro 80: Replace item creation/update logic (implement)
+
+| Value | Remove itemStatusCache from getOrCreateItemStatus |
+| Approach | Query projection for existing item, derive attemptCount |
+| Size | M |
+| Files | `src/server/pipeline-server.ts` lines 520-565 |
+
+```typescript
+private async getOrCreateItemStatus(
+  correlationId: string,
+  commandType: string,
+  itemKey: string,
+  requestId: string,
+): Promise<{ attemptCount: number }> {
+  const existing = await this.eventStoreContext.readModel.getItemStatus(correlationId, commandType, itemKey);
+  const attemptCount = (existing?.attemptCount ?? 0) + 1;
+
+  await this.emitItemStatusChanged(
+    correlationId,
+    commandType,
+    itemKey,
+    requestId,
+    'running',
+    attemptCount,
+  );
+
+  return { attemptCount };
+}
+```
+
+---
+
+#### Pomodoro 81: Replace item update logic (test)
+
+| Value | Update item status via events only |
+| Approach | Test item status update emits event with correct data |
+| Size | S |
+
+Existing tests should pass with event-only updates.
+
+---
+
+#### Pomodoro 82: Replace item update logic (implement)
+
+| Value | Remove itemStatusCache from updateItemStatus |
+| Approach | Query projection for currentRequestId and attemptCount, emit event |
+| Size | S |
+| Files | `src/server/pipeline-server.ts` lines 567-591 |
+
+```typescript
+private async updateItemStatus(
+  correlationId: string,
+  commandType: string,
+  itemKey: string,
+  status: 'running' | 'success' | 'error',
+): Promise<void> {
+  const existing = await this.eventStoreContext.readModel.getItemStatus(correlationId, commandType, itemKey);
+  if (existing !== null) {
+    await this.emitItemStatusChanged(
+      correlationId,
+      commandType,
+      itemKey,
+      existing.currentRequestId,
+      status,
+      existing.attemptCount,
+    );
+  }
+}
+```
+
+---
+
+#### Pomodoro 83: Remove nodeStatusCache field
+
+| Value | Single source of truth |
+| Approach | Delete the field declaration |
+| Size | S |
+| Files | `src/server/pipeline-server.ts` line 465 |
+
+---
+
+#### Pomodoro 84: Remove itemStatusCache field
+
+| Value | Single source of truth |
+| Approach | Delete the field declaration |
+| Size | S |
+| Files | `src/server/pipeline-server.ts` line 466 |
+
+---
+
+#### Pomodoro 85: Remove ItemStatus interface (if unused)
+
+| Value | Clean up dead code |
+| Approach | Delete if no longer referenced |
+| Size | S |
+| Files | `src/server/pipeline-server.ts` lines 44-51 |
+
+---
+
+#### Pomodoro 86: Remove latestCorrelationId field
+
+| Value | Derive from LatestRunProjection |
+| Approach | Query LatestRun projection instead |
+| Size | S |
+| Files | `src/server/pipeline-server.ts` lines 67, 877 |
+
+---
+
+#### Pomodoro 87: Final verification and cleanup
+
+| Value | All tests pass, no dual state |
+| Approach | Run full test suite, verify 100% coverage |
+| Size | M |
+
+**Success Criteria:**
+1. ✅ `nodeStatusCache` field removed
+2. ✅ `itemStatusCache` field removed
+3. ✅ `ItemStatus` interface removed (if unused)
+4. ✅ `latestCorrelationId` derived from projection
+5. ✅ All state queries go through `PipelineReadModel`
+6. ✅ All tests pass with 100% coverage
+7. ✅ No mutable Maps tracking runtime state in PipelineServer
+
+---
+
 ### Phase 3: Phased Execution Pattern (Pomodoros 27-34)
 
 #### Pomodoro 27: ForEachBuilder Interface & TriggerBuilder.forEach()
