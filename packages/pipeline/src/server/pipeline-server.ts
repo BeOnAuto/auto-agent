@@ -181,7 +181,8 @@ export class PipelineServer {
       const commandToEvents = this.buildCommandToEvents();
       const rawGraph = this.buildCombinedGraph();
       const pipelineEvents = this.extractPipelineEvents(rawGraph, commandToEvents);
-      const completeGraph = this.addCommandEventEdgesToGraph(rawGraph, commandToEvents, pipelineEvents);
+      const graphWithEvents = this.addCommandEventEdgesToGraph(rawGraph, commandToEvents, pipelineEvents);
+      const completeGraph = this.markBackLinks(graphWithEvents);
       const filterOptions = this.parseFilterOptions(req.query);
       const filteredGraph = filterGraph(completeGraph, filterOptions);
       const allPipelineNodes = this.buildPipelineNodes();
@@ -344,7 +345,8 @@ export class PipelineServer {
     const commandToEvents = this.buildCommandToEvents();
     const rawGraph = this.buildCombinedGraph();
     const pipelineEvents = this.extractPipelineEvents(rawGraph, commandToEvents);
-    const completeGraph = this.addCommandEventEdgesToGraph(rawGraph, commandToEvents, pipelineEvents);
+    const graphWithEvents = this.addCommandEventEdgesToGraph(rawGraph, commandToEvents, pipelineEvents);
+    const completeGraph = this.markBackLinks(graphWithEvents);
     const graph = filterOptions ? filterGraph(completeGraph, filterOptions) : completeGraph;
     const lines: string[] = ['flowchart LR'];
 
@@ -388,6 +390,58 @@ export class PipelineServer {
     }
 
     return { nodes: newNodes, edges: newEdges };
+  }
+
+  private markBackLinks(graph: GraphIR): GraphIR {
+    const outgoingEdges = new Map<string, string[]>();
+    for (const edge of graph.edges) {
+      const existing = outgoingEdges.get(edge.from) ?? [];
+      existing.push(edge.to);
+      outgoingEdges.set(edge.from, existing);
+    }
+
+    const markedEdges = graph.edges.map((edge) => {
+      if (edge.backLink === true) {
+        return edge;
+      }
+      if (edge.from.startsWith('evt:') && edge.to.startsWith('cmd:')) {
+        const createsBackLink = this.hasPathTo(edge.to, edge.from, outgoingEdges);
+        if (createsBackLink) {
+          return { ...edge, backLink: true };
+        }
+      }
+      return edge;
+    });
+
+    return { nodes: graph.nodes, edges: markedEdges };
+  }
+
+  private hasPathTo(from: string, target: string, outgoingEdges: Map<string, string[]>): boolean {
+    const visited = new Set<string>();
+    const queue = [from];
+
+    while (queue.length > 0) {
+      const current = queue.shift();
+      if (current === undefined) {
+        break;
+      }
+      if (current === target) {
+        return true;
+      }
+      if (visited.has(current)) {
+        continue;
+      }
+      visited.add(current);
+
+      const neighbors = outgoingEdges.get(current) ?? [];
+      for (const neighbor of neighbors) {
+        if (!visited.has(neighbor)) {
+          queue.push(neighbor);
+        }
+      }
+    }
+
+    return false;
   }
 
   private extractPipelineEvents(graph: GraphIR, commandToEvents: Record<string, string[]>): Set<string> {

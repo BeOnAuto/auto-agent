@@ -36,7 +36,7 @@ interface PipelineNode {
 
 interface PipelineResponse {
   nodes: GraphNode[];
-  edges: Array<{ from: string; to: string }>;
+  edges: Array<{ from: string; to: string; backLink?: boolean }>;
   pipelineNodes?: PipelineNode[];
   commandToEvents?: Record<string, string[]>;
   eventToCommand?: Record<string, string>;
@@ -753,6 +753,29 @@ describe('PipelineServer', () => {
       const mermaid = await res.text();
       expect(mermaid).toContain('linkStyle');
       expect(mermaid).toMatch(/stroke:#[a-fA-F0-9]{6}|stroke:red/);
+      await server.stop();
+    });
+
+    it('should mark event-to-command edges as backLink when they create cycles', async () => {
+      const generateHandler = {
+        name: 'GenerateIA',
+        events: ['IAGenerated', 'IAValidationFailed'],
+        handle: async () => ({ type: 'IAGenerated', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('Start')
+        .emit('GenerateIA', {})
+        .on('IAValidationFailed')
+        .emit('GenerateIA', {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([generateHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      const backLinkEdge = data.edges.find((e) => e.from === 'evt:IAValidationFailed' && e.to === 'cmd:GenerateIA');
+      expect(backLinkEdge).toBeDefined();
+      expect(backLinkEdge?.backLink).toBe(true);
       await server.stop();
     });
 
