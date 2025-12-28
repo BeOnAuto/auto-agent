@@ -44,6 +44,11 @@ export interface RunAwaitHandlerDescriptor {
   onFailure?: GatherEventConfig<FailureContext>;
 }
 
+export type CompletionEventDescriptor = {
+  name: string;
+  displayName?: string;
+};
+
 export interface ForEachPhasedDescriptor {
   type: 'foreach-phased';
   eventType: string;
@@ -54,8 +59,8 @@ export interface ForEachPhasedDescriptor {
   stopOnFailure: boolean;
   emitFactory: (item: unknown, phase: string, event: Event) => CommandDispatch;
   completion: {
-    successEvent: string;
-    failureEvent: string;
+    successEvent: CompletionEventDescriptor;
+    failureEvent: CompletionEventDescriptor;
     itemKey: KeyExtractor;
   };
 }

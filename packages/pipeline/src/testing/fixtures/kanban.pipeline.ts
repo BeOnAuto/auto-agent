@@ -103,8 +103,8 @@ export function createKanbanPipeline() {
     .groupInto(['molecule', 'organism', 'page'], (c) => c.type)
     .process('ImplementComponent', (c) => ({ filePath: c.filePath }))
     .onComplete({
-      success: 'AllComponentsImplemented',
-      failure: 'ComponentsFailed',
+      success: { name: 'AllComponentsImplemented', displayName: 'All Components Implemented' },
+      failure: { name: 'ComponentsFailed', displayName: 'Components Failed' },
       itemKey: (e) => (e.data as { filePath?: string }).filePath ?? '',
     })
 

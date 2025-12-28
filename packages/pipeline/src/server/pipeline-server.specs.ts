@@ -34,6 +34,7 @@ interface PipelineResponse {
   pipelineNodes?: unknown;
   commandToEvents?: Record<string, string[]>;
   eventToCommand?: Record<string, string>;
+  latestRun?: string;
 }
 
 interface GraphResponse {
@@ -626,6 +627,41 @@ describe('PipelineServer', () => {
       const pipelineWithoutCorrelation = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
       const cmdNode = pipelineWithoutCorrelation.nodes.find((n) => n.id === 'cmd:IdleCmd');
       expect(cmdNode?.status).toBe('idle');
+
+      await server.stop();
+    });
+
+    it('should return latestRun with the most recent correlationId', async () => {
+      const handler = {
+        name: 'LatestCmd',
+        events: ['LatestDone'],
+        handle: async () => ({ type: 'LatestDone', data: {} }),
+      };
+      const pipeline = define('test').on('Trigger').emit('LatestCmd', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const run1 = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'LatestCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      const run2 = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'LatestCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      expect(data.latestRun).toBe(run2.correlationId);
+      expect(data.latestRun).not.toBe(run1.correlationId);
 
       await server.stop();
     });

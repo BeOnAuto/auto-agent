@@ -165,7 +165,8 @@ export class PhasedExecutor {
   }
 
   private completeSession(sessionId: string, session: PhasedSession, success: boolean): void {
-    const eventType = success ? session.handler.completion.successEvent : session.handler.completion.failureEvent;
+    const eventDescriptor = success ? session.handler.completion.successEvent : session.handler.completion.failureEvent;
+    const eventType = eventDescriptor.name;
 
     const results = this.collectResults(session);
     const eventData = success
@@ -211,7 +212,7 @@ export class PhasedExecutor {
   }
 
   private isFailureEvent(event: Event, handler: ForEachPhasedDescriptor): boolean {
-    return event.type === handler.completion.failureEvent;
+    return event.type === handler.completion.failureEvent.name;
   }
 
   private generateSessionId(correlationId: string, handler: ForEachPhasedDescriptor): string {

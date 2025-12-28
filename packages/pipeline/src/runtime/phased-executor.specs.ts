@@ -21,8 +21,8 @@ function createHandler(_items: TestItem[]): ForEachPhasedDescriptor {
       data: { filePath: (item as TestItem).id },
     }),
     completion: {
-      successEvent: 'AllComponentsImplemented',
-      failureEvent: 'ComponentsFailed',
+      successEvent: { name: 'AllComponentsImplemented' },
+      failureEvent: { name: 'ComponentsFailed' },
       itemKey: (e: Event) => (e.data as { filePath?: string; id?: string }).filePath ?? (e.data as TestItem).id,
     },
   };

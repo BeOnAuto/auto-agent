@@ -426,8 +426,8 @@ describe('forEach() and groupInto() - Phased Execution', () => {
       .build();
 
     const handler = pipeline.descriptor.handlers[0] as ForEachPhasedDescriptor;
-    expect(handler.completion.successEvent).toBe('AllItemsProcessed');
-    expect(handler.completion.failureEvent).toBe('ProcessingFailed');
+    expect(handler.completion.successEvent.name).toBe('AllItemsProcessed');
+    expect(handler.completion.failureEvent.name).toBe('ProcessingFailed');
   });
 
   it('should chain on() from PhasedTerminal', () => {

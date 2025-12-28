@@ -254,8 +254,8 @@ export const pipeline = define('kanban-todo')
     aiOptions: { maxTokens: 3000 },
   }))
   .onComplete({
-    success: 'AllComponentsImplemented',
-    failure: 'ComponentsFailed',
+    success: { name: 'AllComponentsImplemented', displayName: 'All Components Implemented' },
+    failure: { name: 'ComponentsFailed', displayName: 'Components Failed' },
     itemKey: (e) => (e.data as { filePath?: string }).filePath ?? '',
   })
 

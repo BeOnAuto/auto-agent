@@ -73,9 +73,11 @@ export interface PhasedBuilder<T> {
   process(commandType: string, dataFactory: (item: T) => Record<string, unknown>): PhasedChain<T>;
 }
 
+export type CompletionEventConfig = string | { name: string; displayName: string };
+
 export interface CompletionConfig {
-  success: string;
-  failure: string;
+  success: CompletionEventConfig;
+  failure: CompletionEventConfig;
   itemKey: (event: Event) => string;
 }
 
@@ -130,6 +132,13 @@ export interface EmitChain {
 export interface HandleChain {
   on(eventType: string): TriggerBuilder;
   build(): Pipeline;
+}
+
+function normalizeCompletionEvent(config: CompletionEventConfig): { name: string; displayName?: string } {
+  if (typeof config === 'string') {
+    return { name: config };
+  }
+  return config;
 }
 
 class PipelineBuilderImpl implements PipelineBuilder {
@@ -225,10 +234,14 @@ function processForEachPhasedHandler(ctx: GraphBuilderContext, handler: ForEachP
   const sampleCmd = handler.emitFactory({}, '', { type: '', data: {} });
   addNode(ctx, `cmd:${sampleCmd.commandType}`, 'command', sampleCmd.commandType);
   ctx.edges.push({ from: `evt:${handler.eventType}`, to: `cmd:${sampleCmd.commandType}` });
-  addNode(ctx, `evt:${handler.completion.successEvent}`, 'event', handler.completion.successEvent);
-  addNode(ctx, `evt:${handler.completion.failureEvent}`, 'event', handler.completion.failureEvent);
-  ctx.edges.push({ from: `cmd:${sampleCmd.commandType}`, to: `evt:${handler.completion.successEvent}` });
-  ctx.edges.push({ from: `cmd:${sampleCmd.commandType}`, to: `evt:${handler.completion.failureEvent}` });
+  const successEvent = handler.completion.successEvent;
+  const failureEvent = handler.completion.failureEvent;
+  const successLabel = successEvent.displayName ?? successEvent.name;
+  const failureLabel = failureEvent.displayName ?? failureEvent.name;
+  addNode(ctx, `evt:${successEvent.name}`, 'event', successLabel);
+  addNode(ctx, `evt:${failureEvent.name}`, 'event', failureLabel);
+  ctx.edges.push({ from: `cmd:${sampleCmd.commandType}`, to: `evt:${successEvent.name}` });
+  ctx.edges.push({ from: `cmd:${sampleCmd.commandType}`, to: `evt:${failureEvent.name}` });
 }
 
 function processCustomHandler(ctx: GraphBuilderContext, handler: CustomHandlerDescriptor): void {
@@ -571,8 +584,8 @@ class PhasedBuilderImpl<T> implements PhasedBuilder<T> {
 class PhasedChainImpl<T> implements PhasedChain<T> {
   private stopOnFailureFlag = false;
   private completionConfig?: {
-    successEvent: string;
-    failureEvent: string;
+    successEvent: { name: string; displayName?: string };
+    failureEvent: { name: string; displayName?: string };
     itemKey: KeyExtractor;
   };
 
@@ -594,8 +607,8 @@ class PhasedChainImpl<T> implements PhasedChain<T> {
 
   onComplete(config: CompletionConfig): PhasedTerminal {
     this.completionConfig = {
-      successEvent: config.success,
-      failureEvent: config.failure,
+      successEvent: normalizeCompletionEvent(config.success),
+      failureEvent: normalizeCompletionEvent(config.failure),
       itemKey: config.itemKey as KeyExtractor,
     };
     return new PhasedTerminalImpl(this, this.parent);

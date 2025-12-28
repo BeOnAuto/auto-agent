@@ -58,6 +58,7 @@ export class PipelineServer {
   private readonly phasedExecutor: PhasedExecutor;
   private readonly sseManager: SSEManager;
   private readonly nodeStatusByCorrelation = new Map<string, Map<string, NodeStatus>>();
+  private latestCorrelationId?: string;
 
   constructor(config: PipelineServerConfig) {
     this.requestedPort = config.port;
@@ -197,6 +198,7 @@ export class PipelineServer {
       res.json({
         nodes: graphWithStatus.nodes,
         edges: graphWithStatus.edges,
+        latestRun: this.latestCorrelationId,
       });
     });
 
@@ -658,6 +660,7 @@ export class PipelineServer {
     const isNewCorrelationId = !this.nodeStatusByCorrelation.has(command.correlationId);
     if (isNewCorrelationId) {
       this.broadcastPipelineRunStarted(command.correlationId, command.type);
+      this.latestCorrelationId = command.correlationId;
     }
 
     this.updateNodeStatus(command.correlationId, command.type, 'running');
