@@ -321,6 +321,89 @@ describe('PipelineReadModel', () => {
     });
   });
 
+  describe('getItemStatus', () => {
+    it('should return null when no item status exists', async () => {
+      const result = await readModel.getItemStatus('c1', 'CreateUser', 'item1');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return item status from ItemStatus collection', async () => {
+      const collection = database.collection<WithId<ItemStatusDocument>>('ItemStatus');
+      await collection.insertOne({
+        _id: 'c1-CreateUser-item1',
+        correlationId: 'c1',
+        commandType: 'CreateUser',
+        itemKey: 'item1',
+        currentRequestId: 'r1',
+        status: 'running',
+        attemptCount: 1,
+      });
+
+      const result = await readModel.getItemStatus('c1', 'CreateUser', 'item1');
+
+      expect(result).toMatchObject({
+        correlationId: 'c1',
+        commandType: 'CreateUser',
+        itemKey: 'item1',
+        currentRequestId: 'r1',
+        status: 'running',
+        attemptCount: 1,
+      });
+    });
+
+    it('should return null for different correlationId', async () => {
+      const collection = database.collection<WithId<ItemStatusDocument>>('ItemStatus');
+      await collection.insertOne({
+        _id: 'c1-CreateUser-item1',
+        correlationId: 'c1',
+        commandType: 'CreateUser',
+        itemKey: 'item1',
+        currentRequestId: 'r1',
+        status: 'running',
+        attemptCount: 1,
+      });
+
+      const result = await readModel.getItemStatus('c2', 'CreateUser', 'item1');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null for different commandType', async () => {
+      const collection = database.collection<WithId<ItemStatusDocument>>('ItemStatus');
+      await collection.insertOne({
+        _id: 'c1-CreateUser-item1',
+        correlationId: 'c1',
+        commandType: 'CreateUser',
+        itemKey: 'item1',
+        currentRequestId: 'r1',
+        status: 'running',
+        attemptCount: 1,
+      });
+
+      const result = await readModel.getItemStatus('c1', 'DeleteUser', 'item1');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null for different itemKey', async () => {
+      const collection = database.collection<WithId<ItemStatusDocument>>('ItemStatus');
+      await collection.insertOne({
+        _id: 'c1-CreateUser-item1',
+        correlationId: 'c1',
+        commandType: 'CreateUser',
+        itemKey: 'item1',
+        currentRequestId: 'r1',
+        status: 'running',
+        attemptCount: 1,
+      });
+
+      const result = await readModel.getItemStatus('c1', 'CreateUser', 'item2');
+
+      expect(result).toBeNull();
+    });
+  });
+
   describe('getNodeStatus', () => {
     it('should return null when no node status exists', async () => {
       const result = await readModel.getNodeStatus('c1', 'CreateUser');
