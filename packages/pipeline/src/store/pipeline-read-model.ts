@@ -73,6 +73,23 @@ export class PipelineReadModel {
     return nodes.length > 0;
   }
 
+  async getNodeStatus(correlationId: string, commandName: string): Promise<NodeStatusDocument | null> {
+    const nodes = await this.nodeStatusCollection.find(
+      (doc) => doc.correlationId === correlationId && doc.commandName === commandName,
+    );
+    if (nodes.length === 0) {
+      return null;
+    }
+    const node = nodes[0];
+    return {
+      correlationId: node.correlationId,
+      commandName: node.commandName,
+      status: node.status,
+      pendingCount: node.pendingCount,
+      endedCount: node.endedCount,
+    };
+  }
+
   async getMessages(correlationId?: string): Promise<MessageLogDocument[]> {
     if (correlationId) {
       return this.messageLogCollection.find((doc) => doc.correlationId === correlationId);

@@ -321,6 +321,68 @@ describe('PipelineReadModel', () => {
     });
   });
 
+  describe('getNodeStatus', () => {
+    it('should return null when no node status exists', async () => {
+      const result = await readModel.getNodeStatus('c1', 'CreateUser');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return node status from NodeStatus collection', async () => {
+      const collection = database.collection<WithId<NodeStatusDocument>>('NodeStatus');
+      await collection.insertOne({
+        _id: 'c1-CreateUser',
+        correlationId: 'c1',
+        commandName: 'CreateUser',
+        status: 'running',
+        pendingCount: 1,
+        endedCount: 0,
+      });
+
+      const result = await readModel.getNodeStatus('c1', 'CreateUser');
+
+      expect(result).toEqual({
+        correlationId: 'c1',
+        commandName: 'CreateUser',
+        status: 'running',
+        pendingCount: 1,
+        endedCount: 0,
+      });
+    });
+
+    it('should return null for different correlationId', async () => {
+      const collection = database.collection<WithId<NodeStatusDocument>>('NodeStatus');
+      await collection.insertOne({
+        _id: 'c1-CreateUser',
+        correlationId: 'c1',
+        commandName: 'CreateUser',
+        status: 'running',
+        pendingCount: 1,
+        endedCount: 0,
+      });
+
+      const result = await readModel.getNodeStatus('c2', 'CreateUser');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null for different commandName', async () => {
+      const collection = database.collection<WithId<NodeStatusDocument>>('NodeStatus');
+      await collection.insertOne({
+        _id: 'c1-CreateUser',
+        correlationId: 'c1',
+        commandName: 'CreateUser',
+        status: 'running',
+        pendingCount: 1,
+        endedCount: 0,
+      });
+
+      const result = await readModel.getNodeStatus('c1', 'DeleteUser');
+
+      expect(result).toBeNull();
+    });
+  });
+
   describe('getStats', () => {
     it('should return zero stats when no messages exist', async () => {
       const result = await readModel.getStats();
