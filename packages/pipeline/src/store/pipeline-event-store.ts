@@ -15,6 +15,8 @@ import type { MessageLogDocument, MessageLogEvent } from '../projections/message
 import { evolve as evolveMessageLog } from '../projections/message-log-projection';
 import type { NodeStatusChangedEvent, NodeStatusDocument } from '../projections/node-status-projection';
 import { evolve as evolveNodeStatus } from '../projections/node-status-projection';
+import type { SettledEvent, SettledInstanceDocument } from '../projections/settled-instance-projection';
+import { evolve as evolveSettledInstance } from '../projections/settled-instance-projection';
 import type { StatsDocument } from '../projections/stats-projection';
 import { evolve as evolveStats } from '../projections/stats-projection';
 import { PipelineReadModel } from './pipeline-read-model';
@@ -74,12 +76,27 @@ function createProjections() {
     evolve: (document: StatsDocument | null, event: MessageLogEvent) => evolveStats(document, event),
   });
 
+  const settledInstanceProjection = inMemorySingleStreamProjection<SettledInstanceDocument, SettledEvent>({
+    collectionName: 'SettledInstance',
+    canHandle: [
+      'SettledInstanceCreated',
+      'SettledCommandStarted',
+      'SettledEventReceived',
+      'SettledHandlerFired',
+      'SettledInstanceReset',
+      'SettledInstanceCleaned',
+    ],
+    getDocumentId: (event) => `${event.data.templateId}-${event.data.correlationId}`,
+    evolve: (document: SettledInstanceDocument | null, event: SettledEvent) => evolveSettledInstance(document, event),
+  });
+
   return inlineProjections<InMemoryReadEventMetadata>([
     itemStatusProjection,
     nodeStatusProjection,
     latestRunProjection,
     messageLogProjection,
     statsProjection,
+    settledInstanceProjection,
   ] as Parameters<typeof inlineProjections<InMemoryReadEventMetadata>>[0]);
 }
 

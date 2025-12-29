@@ -69,7 +69,7 @@ export interface SettledInstanceCleanedEvent {
   };
 }
 
-type SettledEvent =
+export type SettledEvent =
   | SettledInstanceCreatedEvent
   | SettledCommandStartedEvent
   | SettledEventReceivedEvent

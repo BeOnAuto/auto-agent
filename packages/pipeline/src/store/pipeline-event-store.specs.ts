@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ItemStatusDocument } from '../projections/item-status-projection';
 import type { NodeStatusDocument } from '../projections/node-status-projection';
+import type { SettledInstanceDocument } from '../projections/settled-instance-projection';
 import { createPipelineEventStore } from './pipeline-event-store';
 
 describe('PipelineEventStore', () => {
@@ -164,6 +165,66 @@ describe('PipelineEventStore', () => {
         ]);
 
         expect(await readModel.hasCorrelation('c1')).toBe(true);
+      } finally {
+        await close();
+      }
+    });
+  });
+
+  describe('settled instance projection', () => {
+    it('should project SettledInstanceCreated events', async () => {
+      const { eventStore, database, close } = createPipelineEventStore();
+      try {
+        await eventStore.appendToStream('settled-c1', [
+          {
+            type: 'SettledInstanceCreated',
+            data: {
+              templateId: 'template-CmdA,CmdB',
+              correlationId: 'c1',
+              commandTypes: ['CmdA', 'CmdB'],
+            },
+          },
+        ]);
+
+        const collection = database.collection<SettledInstanceDocument & { _id: string }>('SettledInstance');
+        const instances = await collection.find();
+
+        expect(instances.length).toBe(1);
+        expect(instances[0]?.status).toBe('active');
+        expect(instances[0]?.commandTrackers).toHaveLength(2);
+      } finally {
+        await close();
+      }
+    });
+
+    it('should update settled instance through lifecycle events', async () => {
+      const { eventStore, database, close } = createPipelineEventStore();
+      try {
+        await eventStore.appendToStream('settled-c1', [
+          {
+            type: 'SettledInstanceCreated',
+            data: {
+              templateId: 'template-CmdA',
+              correlationId: 'c1',
+              commandTypes: ['CmdA'],
+            },
+          },
+          {
+            type: 'SettledCommandStarted',
+            data: {
+              templateId: 'template-CmdA',
+              correlationId: 'c1',
+              commandType: 'CmdA',
+            },
+          },
+        ]);
+
+        const collection = database.collection<SettledInstanceDocument & { _id: string }>('SettledInstance');
+        const instances = await collection.find();
+
+        expect(instances.length).toBe(1);
+        expect(instances[0]?.commandTrackers[0]?.hasStarted).toBe(true);
+        expect(instances[0]?.commandTrackers[0]?.hasCompleted).toBe(false);
       } finally {
         await close();
       }
