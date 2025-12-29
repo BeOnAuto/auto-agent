@@ -810,5 +810,39 @@ describe('PipelineReadModel', () => {
         endedCount: 0,
       });
     });
+
+    it('should return status=error when any collected event contains Failed', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CheckTests,CheckTypes,CheckLint-c1',
+        instanceId: 'template-CheckTests,CheckTypes,CheckLint-c1',
+        templateId: 'template-CheckTests,CheckTypes,CheckLint',
+        correlationId: 'c1',
+        commandTrackers: [
+          {
+            commandType: 'CheckTests',
+            hasStarted: true,
+            hasCompleted: true,
+            events: [{ type: 'TestsPassed', correlationId: 'c1', data: {} }],
+          },
+          {
+            commandType: 'CheckTypes',
+            hasStarted: true,
+            hasCompleted: true,
+            events: [{ type: 'TypeCheckFailed', correlationId: 'c1', data: { errors: 'TS2322' } }],
+          },
+          { commandType: 'CheckLint', hasStarted: true, hasCompleted: false, events: [] },
+        ],
+        status: 'active',
+      });
+
+      const result = await readModel.computeSettledStats('c1', 'template-CheckTests,CheckTypes,CheckLint');
+
+      expect(result).toEqual({
+        status: 'error',
+        pendingCount: 1,
+        endedCount: 0,
+      });
+    });
   });
 });

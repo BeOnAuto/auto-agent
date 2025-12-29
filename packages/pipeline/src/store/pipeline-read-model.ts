@@ -198,9 +198,21 @@ export class PipelineReadModel {
     }
 
     if (instance.status === 'active') {
-      return { status: 'running', pendingCount: 1, endedCount: 0 };
+      const hasFailure = this.hasFailedEvent(instance);
+      return { status: hasFailure ? 'error' : 'running', pendingCount: 1, endedCount: 0 };
     }
 
     return { status: 'idle', pendingCount: 0, endedCount: 0 };
+  }
+
+  private hasFailedEvent(instance: SettledInstanceDocument): boolean {
+    for (const tracker of instance.commandTrackers) {
+      for (const event of tracker.events) {
+        if (event.type.includes('Failed')) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
