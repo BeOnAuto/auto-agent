@@ -1,5 +1,6 @@
 import type { Command, Event } from '@auto-engineer/message-bus';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SettledEvent, SettledInstanceDocument } from '../projections/settled-instance-projection';
 import { SettledTracker } from './settled-tracker';
 
 describe('SettledTracker', () => {
@@ -486,6 +487,330 @@ describe('SettledTracker', () => {
       tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
 
       expect(receivedCorrelationId).toBe('c1');
+    });
+  });
+
+  describe('event emission', () => {
+    it('should emit SettledInstanceCreated when first command starts for a template', () => {
+      const emittedEvents: SettledEvent[] = [];
+
+      tracker = new SettledTracker({
+        onEventEmit: (event) => {
+          emittedEvents.push(event);
+        },
+      });
+
+      tracker.registerHandler({
+        commandTypes: ['A', 'B'],
+        handler: () => {},
+      });
+
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
+
+      expect(emittedEvents).toHaveLength(2);
+      expect(emittedEvents[0].type).toBe('SettledInstanceCreated');
+      expect(emittedEvents[0].data).toEqual({
+        templateId: 'template-A,B',
+        correlationId: 'c1',
+        commandTypes: ['A', 'B'],
+      });
+    });
+
+    it('should emit SettledCommandStarted when command starts', () => {
+      const emittedEvents: SettledEvent[] = [];
+
+      tracker = new SettledTracker({
+        onEventEmit: (event) => {
+          emittedEvents.push(event);
+        },
+      });
+
+      tracker.registerHandler({
+        commandTypes: ['A', 'B'],
+        handler: () => {},
+      });
+
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
+
+      expect(emittedEvents[1].type).toBe('SettledCommandStarted');
+      expect(emittedEvents[1].data).toEqual({
+        templateId: 'template-A,B',
+        correlationId: 'c1',
+        commandType: 'A',
+      });
+    });
+
+    it('should not emit SettledInstanceCreated for subsequent commands in same instance', () => {
+      const emittedEvents: SettledEvent[] = [];
+
+      tracker = new SettledTracker({
+        onEventEmit: (event) => {
+          emittedEvents.push(event);
+        },
+      });
+
+      tracker.registerHandler({
+        commandTypes: ['A', 'B'],
+        handler: () => {},
+      });
+
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
+      tracker.onCommandStarted({ type: 'B', correlationId: 'c1', requestId: 'r2', data: {} });
+
+      const createdEvents = emittedEvents.filter((e) => e.type === 'SettledInstanceCreated');
+      expect(createdEvents).toHaveLength(1);
+    });
+
+    it('should emit SettledEventReceived when event is received', () => {
+      const emittedEvents: SettledEvent[] = [];
+
+      tracker = new SettledTracker({
+        onEventEmit: (event) => {
+          emittedEvents.push(event);
+        },
+      });
+
+      tracker.registerHandler({
+        commandTypes: ['A'],
+        handler: () => {},
+      });
+
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
+      emittedEvents.length = 0;
+
+      const domainEvent: Event = { type: 'ADone', correlationId: 'c1', data: { result: 'ok' } };
+      tracker.onEventReceived(domainEvent, 'A');
+
+      expect(emittedEvents[0].type).toBe('SettledEventReceived');
+      expect(emittedEvents[0].data).toEqual({
+        templateId: 'template-A',
+        correlationId: 'c1',
+        commandType: 'A',
+        event: domainEvent,
+      });
+    });
+
+    it('should emit SettledHandlerFired when handler fires', () => {
+      const emittedEvents: SettledEvent[] = [];
+
+      tracker = new SettledTracker({
+        onEventEmit: (event) => {
+          emittedEvents.push(event);
+        },
+      });
+
+      tracker.registerHandler({
+        commandTypes: ['A'],
+        handler: () => {},
+      });
+
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
+      emittedEvents.length = 0;
+
+      tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
+
+      const firedEvent = emittedEvents.find((e) => e.type === 'SettledHandlerFired');
+      expect(firedEvent).toBeDefined();
+      expect(firedEvent?.data).toEqual({
+        templateId: 'template-A',
+        correlationId: 'c1',
+        persist: false,
+      });
+    });
+
+    it('should emit SettledInstanceCleaned when handler fires without persist', () => {
+      const emittedEvents: SettledEvent[] = [];
+
+      tracker = new SettledTracker({
+        onEventEmit: (event) => {
+          emittedEvents.push(event);
+        },
+      });
+
+      tracker.registerHandler({
+        commandTypes: ['A'],
+        handler: () => {},
+      });
+
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
+      emittedEvents.length = 0;
+
+      tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
+
+      const cleanedEvent = emittedEvents.find((e) => e.type === 'SettledInstanceCleaned');
+      expect(cleanedEvent).toBeDefined();
+      expect(cleanedEvent?.data).toEqual({
+        templateId: 'template-A',
+        correlationId: 'c1',
+      });
+    });
+
+    it('should emit SettledInstanceReset when handler returns persist: true', () => {
+      const emittedEvents: SettledEvent[] = [];
+
+      tracker = new SettledTracker({
+        onEventEmit: (event) => {
+          emittedEvents.push(event);
+        },
+      });
+
+      tracker.registerHandler({
+        commandTypes: ['A'],
+        handler: () => ({ persist: true }),
+      });
+
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
+      emittedEvents.length = 0;
+
+      tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
+
+      const firedEvent = emittedEvents.find((e) => e.type === 'SettledHandlerFired');
+      expect(firedEvent?.data).toEqual({
+        templateId: 'template-A',
+        correlationId: 'c1',
+        persist: true,
+      });
+
+      const resetEvent = emittedEvents.find((e) => e.type === 'SettledInstanceReset');
+      expect(resetEvent).toBeDefined();
+      expect(resetEvent?.data).toEqual({
+        templateId: 'template-A',
+        correlationId: 'c1',
+      });
+    });
+
+    it('should emit SettledInstanceCleaned on handler error', () => {
+      const emittedEvents: SettledEvent[] = [];
+
+      tracker = new SettledTracker({
+        onEventEmit: (event) => {
+          emittedEvents.push(event);
+        },
+        onError: () => {},
+      });
+
+      tracker.registerHandler({
+        commandTypes: ['A'],
+        handler: () => {
+          throw new Error('Handler error');
+        },
+      });
+
+      tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
+      emittedEvents.length = 0;
+
+      tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
+
+      const cleanedEvent = emittedEvents.find((e) => e.type === 'SettledInstanceCleaned');
+      expect(cleanedEvent).toBeDefined();
+    });
+  });
+
+  describe('rebuild from projection', () => {
+    it('should restore active instances from projection documents', () => {
+      tracker.registerHandler({
+        commandTypes: ['A', 'B'],
+        handler: () => {},
+      });
+
+      const documents: SettledInstanceDocument[] = [
+        {
+          instanceId: 'template-A,B-c1',
+          templateId: 'template-A,B',
+          correlationId: 'c1',
+          commandTrackers: [
+            { commandType: 'A', hasStarted: true, hasCompleted: false, events: [] },
+            { commandType: 'B', hasStarted: false, hasCompleted: false, events: [] },
+          ],
+          status: 'active',
+        },
+      ];
+
+      tracker.rebuildFromProjection(documents);
+
+      expect(tracker.isWaitingFor('c1', 'A')).toBe(true);
+      expect(tracker.isWaitingFor('c1', 'B')).toBe(false);
+      expect(tracker.getActiveInstanceCount()).toBe(1);
+    });
+
+    it('should skip cleaned instances', () => {
+      tracker.registerHandler({
+        commandTypes: ['A'],
+        handler: () => {},
+      });
+
+      const documents: SettledInstanceDocument[] = [
+        {
+          instanceId: 'template-A-c1',
+          templateId: 'template-A',
+          correlationId: 'c1',
+          commandTrackers: [{ commandType: 'A', hasStarted: true, hasCompleted: false, events: [] }],
+          status: 'cleaned',
+        },
+      ];
+
+      tracker.rebuildFromProjection(documents);
+
+      expect(tracker.getActiveInstanceCount()).toBe(0);
+    });
+
+    it('should skip fired instances', () => {
+      tracker.registerHandler({
+        commandTypes: ['A'],
+        handler: () => {},
+      });
+
+      const documents: SettledInstanceDocument[] = [
+        {
+          instanceId: 'template-A-c1',
+          templateId: 'template-A',
+          correlationId: 'c1',
+          commandTrackers: [{ commandType: 'A', hasStarted: true, hasCompleted: true, events: [] }],
+          status: 'fired',
+        },
+      ];
+
+      tracker.rebuildFromProjection(documents);
+
+      expect(tracker.getActiveInstanceCount()).toBe(0);
+    });
+
+    it('should restore events in command trackers', () => {
+      tracker.registerHandler({
+        commandTypes: ['A'],
+        handler: () => {},
+      });
+
+      const storedEvent: Event = { type: 'ADone', correlationId: 'c1', data: { result: 'ok' } };
+      const documents: SettledInstanceDocument[] = [
+        {
+          instanceId: 'template-A-c1',
+          templateId: 'template-A',
+          correlationId: 'c1',
+          commandTrackers: [{ commandType: 'A', hasStarted: true, hasCompleted: true, events: [storedEvent] }],
+          status: 'active',
+        },
+      ];
+
+      tracker.rebuildFromProjection(documents);
+
+      expect(tracker.getActiveInstanceCount()).toBe(1);
+    });
+
+    it('should skip instances for unregistered templates', () => {
+      const documents: SettledInstanceDocument[] = [
+        {
+          instanceId: 'template-Unknown-c1',
+          templateId: 'template-Unknown',
+          correlationId: 'c1',
+          commandTrackers: [{ commandType: 'Unknown', hasStarted: true, hasCompleted: false, events: [] }],
+          status: 'active',
+        },
+      ];
+
+      tracker.rebuildFromProjection(documents);
+
+      expect(tracker.getActiveInstanceCount()).toBe(0);
     });
   });
 });

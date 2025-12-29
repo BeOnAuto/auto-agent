@@ -1,4 +1,5 @@
 import type { Command, Event } from '@auto-engineer/message-bus';
+import type { SettledEvent, SettledInstanceDocument } from '../projections/settled-instance-projection';
 
 type SendFunction = (commandType: string, data: unknown) => void;
 
@@ -36,6 +37,7 @@ interface SettledErrorContext {
 interface SettledTrackerOptions {
   onDispatch?: (commandType: string, data: unknown, correlationId: string) => void;
   onError?: (error: unknown, context: SettledErrorContext) => void;
+  onEventEmit?: (event: SettledEvent) => void;
 }
 
 export class SettledTracker {
@@ -44,10 +46,12 @@ export class SettledTracker {
   private commandToTemplateIds = new Map<string, Set<string>>();
   private readonly onDispatch?: (commandType: string, data: unknown, correlationId: string) => void;
   private readonly onError?: (error: unknown, context: SettledErrorContext) => void;
+  private readonly onEventEmit?: (event: SettledEvent) => void;
 
   constructor(options?: SettledTrackerOptions) {
     this.onDispatch = options?.onDispatch;
     this.onError = options?.onError;
+    this.onEventEmit = options?.onEventEmit;
   }
 
   registerHandler(registration: SettledHandlerRegistration): void {
@@ -71,6 +75,38 @@ export class SettledTracker {
 
   getActiveInstanceCount(): number {
     return this.handlerInstances.size;
+  }
+
+  rebuildFromProjection(documents: SettledInstanceDocument[]): void {
+    for (const doc of documents) {
+      if (doc.status !== 'active') {
+        continue;
+      }
+
+      const template = this.handlerTemplates.get(doc.templateId);
+      if (!template) {
+        continue;
+      }
+
+      const instanceId = this.generateInstanceId(doc.templateId, doc.correlationId);
+      const commandTrackers = new Map<string, CommandTracker>();
+
+      for (const tracker of doc.commandTrackers) {
+        commandTrackers.set(tracker.commandType, {
+          commandType: tracker.commandType,
+          hasStarted: tracker.hasStarted,
+          hasCompleted: tracker.hasCompleted,
+          events: [...tracker.events],
+        });
+      }
+
+      this.handlerInstances.set(instanceId, {
+        templateId: doc.templateId,
+        correlationId: doc.correlationId,
+        registration: template.registration,
+        commandTrackers,
+      });
+    }
   }
 
   onCommandStarted(command: Command): void {
@@ -122,6 +158,17 @@ export class SettledTracker {
       if (tracker && !tracker.hasCompleted) {
         tracker.events.push(event);
         tracker.hasCompleted = true;
+
+        this.emitEvent({
+          type: 'SettledEventReceived',
+          data: {
+            templateId: instance.templateId,
+            correlationId,
+            commandType: sourceCommandType,
+            event,
+          },
+        });
+
         this.checkAndFireHandler(instanceId, instance);
       }
     }
@@ -139,11 +186,11 @@ export class SettledTracker {
     return `${templateId}-${correlationId}`;
   }
 
-  private ensureInstanceExists(template: HandlerTemplate, correlationId: string): void {
+  private ensureInstanceExists(template: HandlerTemplate, correlationId: string): boolean {
     const instanceId = this.generateInstanceId(template.id, correlationId);
 
     if (this.handlerInstances.has(instanceId)) {
-      return;
+      return false;
     }
 
     const commandTrackers = new Map<string, CommandTracker>();
@@ -162,6 +209,17 @@ export class SettledTracker {
       registration: template.registration,
       commandTrackers,
     });
+
+    this.emitEvent({
+      type: 'SettledInstanceCreated',
+      data: {
+        templateId: template.id,
+        correlationId,
+        commandTypes: template.registration.commandTypes,
+      },
+    });
+
+    return true;
   }
 
   private markCommandStarted(templateId: string, correlationId: string, commandType: string): void {
@@ -172,7 +230,20 @@ export class SettledTracker {
     if (tracker) {
       tracker.hasStarted = true;
       tracker.hasCompleted = false;
+
+      this.emitEvent({
+        type: 'SettledCommandStarted',
+        data: {
+          templateId,
+          correlationId,
+          commandType,
+        },
+      });
     }
+  }
+
+  private emitEvent(event: SettledEvent): void {
+    this.onEventEmit?.(event);
   }
 
   private checkAndFireHandler(instanceId: string, instance: HandlerInstance): void {
@@ -194,11 +265,35 @@ export class SettledTracker {
       };
 
       const result = instance.registration.handler(eventsByCommandType, send);
+      const persist = this.shouldPersist(result);
 
-      if (this.shouldPersist(result)) {
+      this.emitEvent({
+        type: 'SettledHandlerFired',
+        data: {
+          templateId: instance.templateId,
+          correlationId: instance.correlationId,
+          persist,
+        },
+      });
+
+      if (persist) {
         this.resetTrackers(instance);
+        this.emitEvent({
+          type: 'SettledInstanceReset',
+          data: {
+            templateId: instance.templateId,
+            correlationId: instance.correlationId,
+          },
+        });
       } else {
         this.handlerInstances.delete(instanceId);
+        this.emitEvent({
+          type: 'SettledInstanceCleaned',
+          data: {
+            templateId: instance.templateId,
+            correlationId: instance.correlationId,
+          },
+        });
       }
     } catch (error) {
       this.onError?.(error, {
@@ -206,6 +301,13 @@ export class SettledTracker {
         correlationId: instance.correlationId,
       });
       this.handlerInstances.delete(instanceId);
+      this.emitEvent({
+        type: 'SettledInstanceCleaned',
+        data: {
+          templateId: instance.templateId,
+          correlationId: instance.correlationId,
+        },
+      });
     }
   }
 
