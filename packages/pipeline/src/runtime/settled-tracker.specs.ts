@@ -1,14 +1,32 @@
 import type { Command, Event } from '@auto-engineer/message-bus';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { SettledEvent, SettledInstanceDocument } from '../projections/settled-instance-projection';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SettledEvent } from '../projections/settled-instance-projection';
+import type { PipelineEventStoreContext } from '../store/pipeline-event-store';
 import { createPipelineEventStore } from '../store/pipeline-event-store';
 import { SettledTracker } from './settled-tracker';
 
+function createESTracker(ctx: PipelineEventStoreContext): SettledTracker {
+  return new SettledTracker({
+    readModel: ctx.readModel,
+    onEventEmit: async (event) => {
+      await ctx.eventStore.appendToStream(`settled-${event.data.correlationId}`, [
+        { type: event.type, data: event.data },
+      ]);
+    },
+  });
+}
+
 describe('SettledTracker', () => {
   let tracker: SettledTracker;
+  let ctx: PipelineEventStoreContext;
 
   beforeEach(() => {
-    tracker = new SettledTracker();
+    ctx = createPipelineEventStore();
+    tracker = createESTracker(ctx);
+  });
+
+  afterEach(async () => {
+    await ctx.close();
   });
 
   describe('handler registration', () => {
@@ -83,8 +101,8 @@ describe('SettledTracker', () => {
 
       await tracker.onCommandStarted(command);
 
-      expect(tracker.isWaitingFor('c1', 'CheckTests')).toBe(true);
-      expect(tracker.isWaitingFor('c1', 'CheckTypes')).toBe(false);
+      expect(await tracker.isWaitingForAsync('c1', 'CheckTests')).toBe(true);
+      expect(await tracker.isWaitingForAsync('c1', 'CheckTypes')).toBe(false);
     });
 
     it('should create handler instance when first tracked command arrives', async () => {
@@ -99,7 +117,7 @@ describe('SettledTracker', () => {
 
       await tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r1', data: {} });
 
-      expect(tracker.isWaitingFor('c1', 'A')).toBe(true);
+      expect(await tracker.isWaitingForAsync('c1', 'A')).toBe(true);
       expect(fired).toBe(false);
     });
 
@@ -187,7 +205,7 @@ describe('SettledTracker', () => {
 
       await tracker.onEventReceived(event, 'A');
 
-      expect(tracker.isWaitingFor('c1', 'A')).toBe(false);
+      expect(await tracker.isWaitingForAsync('c1', 'A')).toBe(false);
     });
 
     it('should collect events for each command type', async () => {
@@ -329,7 +347,7 @@ describe('SettledTracker', () => {
       await tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
       expect(fireCount).toBe(1);
 
-      expect(tracker.isWaitingFor('c1', 'A')).toBe(false);
+      expect(await tracker.isWaitingForAsync('c1', 'A')).toBe(false);
     });
 
     it('should handle separate correlationIds independently', async () => {
@@ -377,7 +395,7 @@ describe('SettledTracker', () => {
       expect(callCount).toBe(1);
 
       await tracker.onCommandStarted({ type: 'A', correlationId: 'c1', requestId: 'r2', data: {} });
-      expect(tracker.isWaitingFor('c1', 'A')).toBe(true);
+      expect(await tracker.isWaitingForAsync('c1', 'A')).toBe(true);
 
       await tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
       expect(callCount).toBe(2);
@@ -386,7 +404,7 @@ describe('SettledTracker', () => {
       await tracker.onEventReceived({ type: 'ADone', correlationId: 'c1', data: {} }, 'A');
       expect(callCount).toBe(3);
 
-      expect(tracker.isWaitingFor('c1', 'A')).toBe(false);
+      expect(await tracker.isWaitingForAsync('c1', 'A')).toBe(false);
     });
 
     it('should cleanup on handler error and not throw', async () => {
@@ -407,7 +425,7 @@ describe('SettledTracker', () => {
       ).resolves.not.toThrow();
 
       expect(handlerCalls).toBe(1);
-      expect(tracker.isWaitingFor('c1', 'A')).toBe(false);
+      expect(await tracker.isWaitingForAsync('c1', 'A')).toBe(false);
     });
   });
 
@@ -704,114 +722,6 @@ describe('SettledTracker', () => {
 
       const cleanedEvent = emittedEvents.find((e) => e.type === 'SettledInstanceCleaned');
       expect(cleanedEvent).toBeDefined();
-    });
-  });
-
-  describe('rebuild from projection', () => {
-    it('should restore active instances from projection documents', () => {
-      tracker.registerHandler({
-        commandTypes: ['A', 'B'],
-        handler: () => {},
-      });
-
-      const documents: SettledInstanceDocument[] = [
-        {
-          instanceId: 'template-A,B-c1',
-          templateId: 'template-A,B',
-          correlationId: 'c1',
-          commandTrackers: [
-            { commandType: 'A', hasStarted: true, hasCompleted: false, events: [] },
-            { commandType: 'B', hasStarted: false, hasCompleted: false, events: [] },
-          ],
-          status: 'active',
-        },
-      ];
-
-      tracker.rebuildFromProjection(documents);
-
-      expect(tracker.isWaitingFor('c1', 'A')).toBe(true);
-      expect(tracker.isWaitingFor('c1', 'B')).toBe(false);
-      expect(tracker.getActiveInstanceCount()).toBe(1);
-    });
-
-    it('should skip cleaned instances', () => {
-      tracker.registerHandler({
-        commandTypes: ['A'],
-        handler: () => {},
-      });
-
-      const documents: SettledInstanceDocument[] = [
-        {
-          instanceId: 'template-A-c1',
-          templateId: 'template-A',
-          correlationId: 'c1',
-          commandTrackers: [{ commandType: 'A', hasStarted: true, hasCompleted: false, events: [] }],
-          status: 'cleaned',
-        },
-      ];
-
-      tracker.rebuildFromProjection(documents);
-
-      expect(tracker.getActiveInstanceCount()).toBe(0);
-    });
-
-    it('should skip fired instances', () => {
-      tracker.registerHandler({
-        commandTypes: ['A'],
-        handler: () => {},
-      });
-
-      const documents: SettledInstanceDocument[] = [
-        {
-          instanceId: 'template-A-c1',
-          templateId: 'template-A',
-          correlationId: 'c1',
-          commandTrackers: [{ commandType: 'A', hasStarted: true, hasCompleted: true, events: [] }],
-          status: 'fired',
-        },
-      ];
-
-      tracker.rebuildFromProjection(documents);
-
-      expect(tracker.getActiveInstanceCount()).toBe(0);
-    });
-
-    it('should restore events in command trackers', () => {
-      tracker.registerHandler({
-        commandTypes: ['A'],
-        handler: () => {},
-      });
-
-      const storedEvent: Event = { type: 'ADone', correlationId: 'c1', data: { result: 'ok' } };
-      const documents: SettledInstanceDocument[] = [
-        {
-          instanceId: 'template-A-c1',
-          templateId: 'template-A',
-          correlationId: 'c1',
-          commandTrackers: [{ commandType: 'A', hasStarted: true, hasCompleted: true, events: [storedEvent] }],
-          status: 'active',
-        },
-      ];
-
-      tracker.rebuildFromProjection(documents);
-
-      expect(tracker.getActiveInstanceCount()).toBe(1);
-    });
-
-    it('should skip instances for unregistered templates', () => {
-      const documents: SettledInstanceDocument[] = [
-        {
-          instanceId: 'template-Unknown-c1',
-          templateId: 'template-Unknown',
-          correlationId: 'c1',
-          commandTrackers: [{ commandType: 'Unknown', hasStarted: true, hasCompleted: false, events: [] }],
-          status: 'active',
-        },
-      ];
-
-      tracker.rebuildFromProjection(documents);
-
-      expect(tracker.getActiveInstanceCount()).toBe(0);
     });
   });
 
