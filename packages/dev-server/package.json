@@ -23,6 +23,7 @@
   "dependencies": {
     "@auto-engineer/cli": "workspace:*",
     "@auto-engineer/message-bus": "workspace:*",
+    "chokidar": "^3.6.0",
     "debug": "^4.4.1",
     "execa": "^9.5.2"
   },

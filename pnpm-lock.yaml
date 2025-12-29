@@ -332,6 +332,9 @@ importers:
       '@auto-engineer/message-bus':
         specifier: workspace:*
         version: link:../message-bus
+      chokidar:
+        specifier: ^3.6.0
+        version: 3.6.0
       debug:
         specifier: ^4.4.1
         version: 4.4.1

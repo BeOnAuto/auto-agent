@@ -1,16 +1,24 @@
 import { access } from 'node:fs/promises';
 import path from 'node:path';
+
 import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
+import { type FSWatcher, watch } from 'chokidar';
 import createDebug from 'debug';
-import { execa } from 'execa';
+import { execa, type ResultPromise } from 'execa';
 
 const debug = createDebug('auto:dev-server:start-server');
+
+const DEFAULT_DEBOUNCE_MS = 300;
+const IGNORED_PATTERNS = ['**/node_modules/**', '**/.git/**', '**/.DS_Store'];
 
 export type StartServerCommand = Command<
   'StartServer',
   {
     serverDirectory: string;
     command?: string;
+    watch?: boolean;
+    watchDirectories?: string[];
+    debounceMs?: number;
   }
 >;
 
@@ -20,6 +28,7 @@ export type ServerStartedEvent = Event<
     serverDirectory: string;
     pid: number;
     port?: number;
+    watching: boolean;
   }
 >;
 
@@ -31,7 +40,120 @@ export type ServerStartFailedEvent = Event<
   }
 >;
 
-export type StartServerEvents = ServerStartedEvent | ServerStartFailedEvent;
+export type ServerRestartingEvent = Event<
+  'ServerRestarting',
+  {
+    serverDirectory: string;
+    changedPath: string;
+  }
+>;
+
+export type ServerRestartedEvent = Event<
+  'ServerRestarted',
+  {
+    serverDirectory: string;
+    pid: number;
+  }
+>;
+
+export type StartServerEvents =
+  | ServerStartedEvent
+  | ServerStartFailedEvent
+  | ServerRestartingEvent
+  | ServerRestartedEvent;
+
+interface ServerProcess {
+  subprocess: ResultPromise;
+  pid: number;
+}
+
+function parseCommand(cmd: string): { executable: string; args: string[] } {
+  const [executable, ...args] = cmd.split(' ');
+  return { executable, args };
+}
+
+async function startProcess(executable: string, args: string[], cwd: string): Promise<ServerProcess> {
+  debug('Starting server process...');
+  debug('  Executable: %s', executable);
+  debug('  Args: %o', args);
+  debug('  CWD: %s', cwd);
+
+  const subprocess = execa(executable, args, {
+    cwd,
+    stdio: 'inherit',
+    reject: false,
+    detached: false,
+  });
+
+  const pid = subprocess.pid;
+
+  if (pid === undefined) {
+    throw new Error('Failed to start server process');
+  }
+
+  debug('Server process started with PID: %d', pid);
+
+  subprocess.catch((error) => {
+    debug('Server process error: %O', error);
+  });
+
+  return { subprocess, pid };
+}
+
+function killProcess(process: ServerProcess): Promise<void> {
+  return new Promise((resolve) => {
+    debug('Killing server process PID: %d', process.pid);
+
+    process.subprocess.kill('SIGTERM');
+
+    const timeout = setTimeout(() => {
+      debug('Process did not exit gracefully, sending SIGKILL');
+      process.subprocess.kill('SIGKILL');
+      resolve();
+    }, 5000);
+
+    process.subprocess.finally(() => {
+      clearTimeout(timeout);
+      debug('Server process terminated');
+      resolve();
+    });
+  });
+}
+
+function createFileWatcher(directories: string[], onFileChange: (changedPath: string) => void): FSWatcher {
+  debug('Creating file watcher for directories: %o', directories);
+
+  const watcher = watch(directories, {
+    ignoreInitial: true,
+    persistent: true,
+    ignored: IGNORED_PATTERNS,
+    awaitWriteFinish: {
+      stabilityThreshold: 200,
+      pollInterval: 50,
+    },
+  });
+
+  watcher.on('add', (filePath) => {
+    debug('File added: %s', filePath);
+    onFileChange(filePath);
+  });
+
+  watcher.on('change', (filePath) => {
+    debug('File changed: %s', filePath);
+    onFileChange(filePath);
+  });
+
+  watcher.on('unlink', (filePath) => {
+    debug('File removed: %s', filePath);
+    onFileChange(filePath);
+  });
+
+  watcher.on('error', (error) => {
+    debug('Watcher error: %O', error);
+  });
+
+  return watcher;
+}
 
 export const commandHandler = defineCommandHandler<
   StartServerCommand,
@@ -40,7 +162,7 @@ export const commandHandler = defineCommandHandler<
   name: 'StartServer',
   displayName: 'Start Server',
   alias: 'start:server',
-  description: 'Start the development server',
+  description: 'Start the development server with optional watch mode for auto-restart',
   category: 'dev',
   icon: 'server',
   fields: {
@@ -52,23 +174,49 @@ export const commandHandler = defineCommandHandler<
       description: 'Command to run (default: pnpm start)',
       required: false,
     },
+    watch: {
+      description: 'Enable watch mode to auto-restart on file changes',
+      required: false,
+    },
+    watchDirectories: {
+      description: 'Directories to watch for changes (default: serverDirectory)',
+      required: false,
+    },
+    debounceMs: {
+      description: 'Debounce delay in milliseconds before restart (default: 300)',
+      required: false,
+    },
   },
   examples: [
     '$ auto start:server --server-directory=./server',
     '$ auto start:server --server-directory=./server --command="pnpm dev"',
+    '$ auto start:server --server-directory=./server --watch',
+    '$ auto start:server --server-directory=./server --watch --watch-directories=./server,./shared',
   ],
   events: [
     { name: 'ServerStarted', displayName: 'Server Started' },
     { name: 'ServerStartFailed', displayName: 'Server Start Failed' },
+    { name: 'ServerRestarting', displayName: 'Server Restarting' },
+    { name: 'ServerRestarted', displayName: 'Server Restarted' },
   ],
   handle: async (command: Command): Promise<ServerStartedEvent | ServerStartFailedEvent> => {
     const typedCommand = command as StartServerCommand;
     debug('CommandHandler executing for StartServer');
-    const { serverDirectory, command: customCommand } = typedCommand.data;
+
+    const {
+      serverDirectory,
+      command: customCommand,
+      watch: watchEnabled = false,
+      watchDirectories,
+      debounceMs = DEFAULT_DEBOUNCE_MS,
+    } = typedCommand.data;
 
     debug('Handling StartServerCommand');
     debug('  Server directory: %s', serverDirectory);
     debug('  Command: %s', customCommand ?? 'pnpm start');
+    debug('  Watch enabled: %s', watchEnabled);
+    debug('  Watch directories: %o', watchDirectories);
+    debug('  Debounce: %dms', debounceMs);
     debug('  Request ID: %s', typedCommand.requestId);
     debug('  Correlation ID: %s', typedCommand.correlationId ?? 'none');
 
@@ -82,36 +230,55 @@ export const commandHandler = defineCommandHandler<
       debug('package.json found in server directory');
 
       const cmd = customCommand ?? 'pnpm start';
-      const [executable, ...args] = cmd.split(' ');
+      const { executable, args } = parseCommand(cmd);
 
-      debug('Starting server...');
-      debug('Executable: %s', executable);
-      debug('Args: %o', args);
+      let currentProcess = await startProcess(executable, args, serverDir);
 
-      const subprocess = execa(executable, args, {
-        cwd: serverDir,
-        stdio: 'inherit',
-        reject: false,
-        detached: false,
-      });
+      if (watchEnabled) {
+        const dirsToWatch = watchDirectories?.map((d) => path.resolve(d)) ?? [serverDir];
+        let debounceTimeout: NodeJS.Timeout | null = null;
+        let isRestarting = false;
 
-      const pid = subprocess.pid;
+        const handleFileChange = (changedPath: string): void => {
+          if (debounceTimeout) {
+            clearTimeout(debounceTimeout);
+          }
 
-      if (pid === undefined) {
-        throw new Error('Failed to start server process');
+          debounceTimeout = setTimeout(() => {
+            debounceTimeout = null;
+
+            if (isRestarting) {
+              debug('Already restarting, skipping');
+              return;
+            }
+
+            isRestarting = true;
+            debug('Restarting server due to file change: %s', changedPath);
+
+            killProcess(currentProcess)
+              .then(() => startProcess(executable, args, serverDir))
+              .then((newProcess) => {
+                currentProcess = newProcess;
+                debug('Server restarted with new PID: %d', newProcess.pid);
+                isRestarting = false;
+              })
+              .catch((error) => {
+                debug('Failed to restart server: %O', error);
+                isRestarting = false;
+              });
+          }, debounceMs);
+        };
+
+        createFileWatcher(dirsToWatch, handleFileChange);
+        debug('File watcher started for directories: %o', dirsToWatch);
       }
-
-      debug('Server process started with PID: %d', pid);
-
-      subprocess.catch((error) => {
-        debug('Server process error: %O', error);
-      });
 
       return {
         type: 'ServerStarted',
         data: {
           serverDirectory,
-          pid,
+          pid: currentProcess.pid,
+          watching: watchEnabled,
         },
         timestamp: new Date(),
         requestId: typedCommand.requestId,
