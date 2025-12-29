@@ -206,7 +206,8 @@ export class PipelineReadModel {
       return { status, pendingCount: 1, endedCount };
     }
 
-    return { status: 'idle', pendingCount: 0, endedCount };
+    const status = this.hasFailedEvent(instance) ? 'error' : endedCount > 0 ? 'success' : 'idle';
+    return { status, pendingCount: 0, endedCount };
   }
 
   private hasFailedEvent(instance: SettledInstanceDocument): boolean {

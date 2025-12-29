@@ -879,5 +879,89 @@ describe('PipelineReadModel', () => {
         endedCount: 1,
       });
     });
+
+    it('should return pendingCount=0 and endedCount when instance status is fired', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CheckTests-c1',
+        instanceId: 'template-CheckTests-c1',
+        templateId: 'template-CheckTests',
+        correlationId: 'c1',
+        commandTrackers: [
+          {
+            commandType: 'CheckTests',
+            hasStarted: true,
+            hasCompleted: true,
+            events: [{ type: 'TestsPassed', correlationId: 'c1', data: {} }],
+          },
+        ],
+        status: 'fired',
+        firedCount: 2,
+      });
+
+      const result = await readModel.computeSettledStats('c1', 'template-CheckTests');
+
+      expect(result).toEqual({
+        status: 'success',
+        pendingCount: 0,
+        endedCount: 2,
+      });
+    });
+
+    it('should return status=error when fired instance has failed events', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CheckTests-c1',
+        instanceId: 'template-CheckTests-c1',
+        templateId: 'template-CheckTests',
+        correlationId: 'c1',
+        commandTrackers: [
+          {
+            commandType: 'CheckTests',
+            hasStarted: true,
+            hasCompleted: true,
+            events: [{ type: 'TestsFailed', correlationId: 'c1', data: {} }],
+          },
+        ],
+        status: 'fired',
+        firedCount: 1,
+      });
+
+      const result = await readModel.computeSettledStats('c1', 'template-CheckTests');
+
+      expect(result).toEqual({
+        status: 'error',
+        pendingCount: 0,
+        endedCount: 1,
+      });
+    });
+
+    it('should return pendingCount=0 and endedCount when instance status is cleaned', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CheckTests-c1',
+        instanceId: 'template-CheckTests-c1',
+        templateId: 'template-CheckTests',
+        correlationId: 'c1',
+        commandTrackers: [
+          {
+            commandType: 'CheckTests',
+            hasStarted: true,
+            hasCompleted: true,
+            events: [{ type: 'TestsPassed', correlationId: 'c1', data: {} }],
+          },
+        ],
+        status: 'cleaned',
+        firedCount: 3,
+      });
+
+      const result = await readModel.computeSettledStats('c1', 'template-CheckTests');
+
+      expect(result).toEqual({
+        status: 'success',
+        pendingCount: 0,
+        endedCount: 3,
+      });
+    });
   });
 });
