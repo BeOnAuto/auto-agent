@@ -68,8 +68,13 @@ export class PipelineServer {
     this.eventStoreContext = createPipelineEventStore();
     this.eventCommandMapper = new EventCommandMapper([]);
     this.settledTracker = new SettledTracker({
+      readModel: this.eventStoreContext.readModel,
       onDispatch: (commandType, data, correlationId) => {
         void this.dispatchFromSettled(commandType, data, correlationId);
+      },
+      onEventEmit: async (event) => {
+        const correlationId = event.data.correlationId;
+        await this.eventStoreContext.eventStore.appendToStream(`pipeline-${correlationId}`, [event]);
       },
     });
     this.phasedExecutor = new PhasedExecutor({
