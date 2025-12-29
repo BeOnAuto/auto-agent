@@ -850,7 +850,7 @@ export class PipelineServer {
 
       const sourceCommand = this.eventCommandMapper.getSourceCommand(eventWithIds.type);
       if (sourceCommand !== undefined) {
-        this.settledTracker.onEventReceived(eventWithIds, sourceCommand);
+        await this.settledTracker.onEventReceived(eventWithIds, sourceCommand);
       }
 
       this.routeEventToPhasedExecutor(eventWithIds);

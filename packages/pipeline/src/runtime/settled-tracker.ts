@@ -161,13 +161,21 @@ export class SettledTracker {
     return false;
   }
 
-  onEventReceived(event: Event, sourceCommandType: string): void {
+  async onEventReceived(event: Event, sourceCommandType: string): Promise<void> {
     const correlationId = event.correlationId;
 
     if (!this.isValidId(correlationId)) {
       return;
     }
 
+    if (this.readModel) {
+      await this.onEventReceivedES(event, sourceCommandType, correlationId);
+    } else {
+      await this.onEventReceivedLegacy(event, sourceCommandType, correlationId);
+    }
+  }
+
+  private async onEventReceivedLegacy(event: Event, sourceCommandType: string, correlationId: string): Promise<void> {
     for (const [instanceId, instance] of this.handlerInstances) {
       if (instance.correlationId !== correlationId) {
         continue;
@@ -178,7 +186,7 @@ export class SettledTracker {
         tracker.events.push(event);
         tracker.hasCompleted = true;
 
-        this.emitEvent({
+        await this.emitEvent({
           type: 'SettledEventReceived',
           data: {
             templateId: instance.templateId,
@@ -188,7 +196,31 @@ export class SettledTracker {
           },
         });
 
-        this.checkAndFireHandler(instanceId, instance);
+        await this.checkAndFireHandler(instanceId, instance);
+      }
+    }
+  }
+
+  private async onEventReceivedES(event: Event, sourceCommandType: string, correlationId: string): Promise<void> {
+    const instances = await this.readModel!.getActiveSettledInstances(correlationId);
+
+    for (const instanceDoc of instances) {
+      const tracker = instanceDoc.commandTrackers.find((t) => t.commandType === sourceCommandType);
+      if (tracker && !tracker.hasCompleted) {
+        await this.emitEvent({
+          type: 'SettledEventReceived',
+          data: {
+            templateId: instanceDoc.templateId,
+            correlationId,
+            commandType: sourceCommandType,
+            event,
+          },
+        });
+
+        const updatedInstance = await this.readModel!.getSettledInstance(instanceDoc.templateId, correlationId);
+        if (updatedInstance) {
+          await this.checkAndFireHandlerES(updatedInstance);
+        }
       }
     }
   }
@@ -208,26 +240,32 @@ export class SettledTracker {
   private async ensureInstanceExists(template: HandlerTemplate, correlationId: string): Promise<boolean> {
     const instanceId = this.generateInstanceId(template.id, correlationId);
 
-    if (this.handlerInstances.has(instanceId)) {
+    const existsInProjection = this.readModel
+      ? (await this.readModel.getSettledInstance(template.id, correlationId)) !== null
+      : this.handlerInstances.has(instanceId);
+
+    if (existsInProjection) {
       return false;
     }
 
-    const commandTrackers = new Map<string, CommandTracker>();
-    for (const commandType of template.registration.commandTypes) {
-      commandTrackers.set(commandType, {
-        commandType,
-        hasStarted: false,
-        hasCompleted: false,
-        events: [],
+    if (!this.readModel) {
+      const commandTrackers = new Map<string, CommandTracker>();
+      for (const commandType of template.registration.commandTypes) {
+        commandTrackers.set(commandType, {
+          commandType,
+          hasStarted: false,
+          hasCompleted: false,
+          events: [],
+        });
+      }
+
+      this.handlerInstances.set(instanceId, {
+        templateId: template.id,
+        correlationId,
+        registration: template.registration,
+        commandTrackers,
       });
     }
-
-    this.handlerInstances.set(instanceId, {
-      templateId: template.id,
-      correlationId,
-      registration: template.registration,
-      commandTrackers,
-    });
 
     await this.emitEvent({
       type: 'SettledInstanceCreated',
@@ -242,30 +280,31 @@ export class SettledTracker {
   }
 
   private async markCommandStarted(templateId: string, correlationId: string, commandType: string): Promise<void> {
-    const instanceId = this.generateInstanceId(templateId, correlationId);
-    const instance = this.handlerInstances.get(instanceId);
-
-    const tracker = instance?.commandTrackers.get(commandType);
-    if (tracker) {
-      tracker.hasStarted = true;
-      tracker.hasCompleted = false;
-
-      await this.emitEvent({
-        type: 'SettledCommandStarted',
-        data: {
-          templateId,
-          correlationId,
-          commandType,
-        },
-      });
+    if (!this.readModel) {
+      const instanceId = this.generateInstanceId(templateId, correlationId);
+      const instance = this.handlerInstances.get(instanceId);
+      const tracker = instance?.commandTrackers.get(commandType);
+      if (tracker) {
+        tracker.hasStarted = true;
+        tracker.hasCompleted = false;
+      }
     }
+
+    await this.emitEvent({
+      type: 'SettledCommandStarted',
+      data: {
+        templateId,
+        correlationId,
+        commandType,
+      },
+    });
   }
 
   private async emitEvent(event: SettledEvent): Promise<void> {
     await this.onEventEmit?.(event);
   }
 
-  private checkAndFireHandler(instanceId: string, instance: HandlerInstance): void {
+  private async checkAndFireHandler(instanceId: string, instance: HandlerInstance): Promise<void> {
     const allComplete = Array.from(instance.commandTrackers.values()).every(
       (tracker) => tracker.hasStarted && tracker.hasCompleted,
     );
@@ -286,7 +325,7 @@ export class SettledTracker {
       const result = instance.registration.handler(eventsByCommandType, send);
       const persist = this.shouldPersist(result);
 
-      this.emitEvent({
+      await this.emitEvent({
         type: 'SettledHandlerFired',
         data: {
           templateId: instance.templateId,
@@ -297,7 +336,7 @@ export class SettledTracker {
 
       if (persist) {
         this.resetTrackers(instance);
-        this.emitEvent({
+        await this.emitEvent({
           type: 'SettledInstanceReset',
           data: {
             templateId: instance.templateId,
@@ -306,7 +345,7 @@ export class SettledTracker {
         });
       } else {
         this.handlerInstances.delete(instanceId);
-        this.emitEvent({
+        await this.emitEvent({
           type: 'SettledInstanceCleaned',
           data: {
             templateId: instance.templateId,
@@ -320,7 +359,7 @@ export class SettledTracker {
         correlationId: instance.correlationId,
       });
       this.handlerInstances.delete(instanceId);
-      this.emitEvent({
+      await this.emitEvent({
         type: 'SettledInstanceCleaned',
         data: {
           templateId: instance.templateId,
@@ -330,10 +369,84 @@ export class SettledTracker {
     }
   }
 
+  private async checkAndFireHandlerES(instanceDoc: SettledInstanceDocument): Promise<void> {
+    const allComplete = instanceDoc.commandTrackers.every((tracker) => tracker.hasStarted && tracker.hasCompleted);
+
+    if (!allComplete) {
+      return;
+    }
+
+    const template = this.handlerTemplates.get(instanceDoc.templateId);
+    if (!template) {
+      return;
+    }
+
+    const eventsByCommandType = this.collectEventsFromDoc(instanceDoc);
+
+    try {
+      const send: SendFunction = (commandType, data) => {
+        if (this.onDispatch) {
+          this.onDispatch(commandType, data, instanceDoc.correlationId);
+        }
+      };
+
+      const result = template.registration.handler(eventsByCommandType, send);
+      const persist = this.shouldPersist(result);
+
+      await this.emitEvent({
+        type: 'SettledHandlerFired',
+        data: {
+          templateId: instanceDoc.templateId,
+          correlationId: instanceDoc.correlationId,
+          persist,
+        },
+      });
+
+      if (persist) {
+        await this.emitEvent({
+          type: 'SettledInstanceReset',
+          data: {
+            templateId: instanceDoc.templateId,
+            correlationId: instanceDoc.correlationId,
+          },
+        });
+      } else {
+        await this.emitEvent({
+          type: 'SettledInstanceCleaned',
+          data: {
+            templateId: instanceDoc.templateId,
+            correlationId: instanceDoc.correlationId,
+          },
+        });
+      }
+    } catch (error) {
+      const commandTypes = instanceDoc.commandTrackers.map((t) => t.commandType);
+      this.onError?.(error, {
+        commandTypes,
+        correlationId: instanceDoc.correlationId,
+      });
+      await this.emitEvent({
+        type: 'SettledInstanceCleaned',
+        data: {
+          templateId: instanceDoc.templateId,
+          correlationId: instanceDoc.correlationId,
+        },
+      });
+    }
+  }
+
   private collectEvents(instance: HandlerInstance): Record<string, Event[]> {
     const events: Record<string, Event[]> = {};
     for (const [commandType, tracker] of instance.commandTrackers) {
       events[commandType] = [...tracker.events];
+    }
+    return events;
+  }
+
+  private collectEventsFromDoc(instanceDoc: SettledInstanceDocument): Record<string, Event[]> {
+    const events: Record<string, Event[]> = {};
+    for (const tracker of instanceDoc.commandTrackers) {
+      events[tracker.commandType] = [...tracker.events];
     }
     return events;
   }
