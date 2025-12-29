@@ -5,7 +5,8 @@
   "scripts": {
     "auto": "node ../../packages/cli/dist/bin/auto.js",
     "auto:debug": "DEBUG=auto:* node ../../packages/cli/dist/bin/auto.js",
-    "start": "dotenv -e .env -- pnpm --parallel start"
+    "start": "dotenv -e .env -- pnpm --parallel start",
+    "clean": "rm -rf server client .context && mkdir .context && cp ../support-files/.context/* ./.context "
   },
   "dependencies": {
     "@auto-engineer/cli": "workspace:*",
