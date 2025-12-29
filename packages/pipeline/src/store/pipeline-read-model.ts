@@ -202,8 +202,10 @@ export class PipelineReadModel {
     if (instance.status === 'active') {
       const hasFailure = this.hasFailedEvent(instance);
       const hasFiredBefore = endedCount > 0;
+      const allCompleted = instance.commandTrackers.every((t) => t.hasCompleted);
+      const isPending = !allCompleted;
       const status = hasFailure ? 'error' : hasFiredBefore ? 'success' : 'running';
-      return { status, pendingCount: 1, endedCount };
+      return { status, pendingCount: isPending ? 1 : 0, endedCount };
     }
 
     const status = this.hasFailedEvent(instance) ? 'error' : endedCount > 0 ? 'success' : 'idle';

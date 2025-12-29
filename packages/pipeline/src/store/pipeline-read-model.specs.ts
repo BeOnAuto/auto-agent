@@ -221,6 +221,111 @@ describe('PipelineReadModel', () => {
         aggregateStatus: 'running',
       });
     });
+
+    it('should return success status when item that initially failed is now success after retry (BUG: CheckTypes showing error)', async () => {
+      const collection = database.collection<WithId<ItemStatusDocument>>('ItemStatus');
+      await collection.insertOne({
+        _id: 'c1-CheckTypes-slice1',
+        correlationId: 'c1',
+        commandType: 'CheckTypes',
+        itemKey: 'slice1',
+        currentRequestId: 'r1',
+        status: 'success',
+        attemptCount: 1,
+      });
+      await collection.insertOne({
+        _id: 'c1-CheckTypes-slice2',
+        correlationId: 'c1',
+        commandType: 'CheckTypes',
+        itemKey: 'slice2',
+        currentRequestId: 'r2',
+        status: 'success',
+        attemptCount: 1,
+      });
+      await collection.insertOne({
+        _id: 'c1-CheckTypes-slice3',
+        correlationId: 'c1',
+        commandType: 'CheckTypes',
+        itemKey: 'slice3',
+        currentRequestId: 'r3',
+        status: 'success',
+        attemptCount: 1,
+      });
+      await collection.insertOne({
+        _id: 'c1-CheckTypes-slice4',
+        correlationId: 'c1',
+        commandType: 'CheckTypes',
+        itemKey: 'slice4',
+        currentRequestId: 'r4',
+        status: 'success',
+        attemptCount: 1,
+      });
+      await collection.insertOne({
+        _id: 'c1-CheckTypes-slice5',
+        correlationId: 'c1',
+        commandType: 'CheckTypes',
+        itemKey: 'slice5',
+        currentRequestId: 'r6',
+        status: 'success',
+        attemptCount: 2,
+      });
+
+      const result = await readModel.computeCommandStats('c1', 'CheckTypes');
+
+      expect(result).toEqual({
+        pendingCount: 0,
+        endedCount: 5,
+        aggregateStatus: 'success',
+      });
+    });
+
+    it('documents behavior: returns error when stale error items exist (BUG: requestId-based itemKey needs proper extractor)', async () => {
+      const collection = database.collection<WithId<ItemStatusDocument>>('ItemStatus');
+      await collection.insertOne({
+        _id: 'c1-CheckTypes-r1',
+        correlationId: 'c1',
+        commandType: 'CheckTypes',
+        itemKey: 'r1',
+        currentRequestId: 'r1',
+        status: 'success',
+        attemptCount: 1,
+      });
+      await collection.insertOne({
+        _id: 'c1-CheckTypes-r2',
+        correlationId: 'c1',
+        commandType: 'CheckTypes',
+        itemKey: 'r2',
+        currentRequestId: 'r2',
+        status: 'success',
+        attemptCount: 1,
+      });
+      await collection.insertOne({
+        _id: 'c1-CheckTypes-r5',
+        correlationId: 'c1',
+        commandType: 'CheckTypes',
+        itemKey: 'r5',
+        currentRequestId: 'r5',
+        status: 'error',
+        attemptCount: 1,
+      });
+      await collection.insertOne({
+        _id: 'c1-CheckTypes-r6',
+        correlationId: 'c1',
+        commandType: 'CheckTypes',
+        itemKey: 'r6',
+        currentRequestId: 'r6',
+        status: 'success',
+        attemptCount: 1,
+      });
+
+      const result = await readModel.computeCommandStats('c1', 'CheckTypes');
+
+      expect(result).toEqual({
+        pendingCount: 0,
+        endedCount: 4,
+        aggregateStatus: 'error',
+      });
+    });
   });
 
   describe('hasCorrelation', () => {
@@ -795,6 +900,16 @@ describe('PipelineReadModel', () => {
   });
 
   describe('computeSettledStats', () => {
+    it('should return idle when no instance exists', async () => {
+      const result = await readModel.computeSettledStats('c1', 'template-A');
+
+      expect(result).toEqual({
+        status: 'idle',
+        pendingCount: 0,
+        endedCount: 0,
+      });
+    });
+
     it('should return pendingCount=1 and status=running when instance is active', async () => {
       const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
       await collection.insertOne({
@@ -961,6 +1076,46 @@ describe('PipelineReadModel', () => {
         status: 'success',
         pendingCount: 0,
         endedCount: 3,
+      });
+    });
+
+    it('should return pendingCount=0 when active instance has firedCount but all commands completed (BUG: settled showing running)', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CheckTests,CheckTypes,CheckLint-c1',
+        instanceId: 'template-CheckTests,CheckTypes,CheckLint-c1',
+        templateId: 'template-CheckTests,CheckTypes,CheckLint',
+        correlationId: 'c1',
+        commandTrackers: [
+          {
+            commandType: 'CheckTests',
+            hasStarted: true,
+            hasCompleted: true,
+            events: [{ type: 'TestsPassed', correlationId: 'c1', data: {} }],
+          },
+          {
+            commandType: 'CheckTypes',
+            hasStarted: true,
+            hasCompleted: true,
+            events: [{ type: 'TypeCheckPassed', correlationId: 'c1', data: {} }],
+          },
+          {
+            commandType: 'CheckLint',
+            hasStarted: true,
+            hasCompleted: true,
+            events: [{ type: 'LintCheckPassed', correlationId: 'c1', data: {} }],
+          },
+        ],
+        status: 'active',
+        firedCount: 7,
+      });
+
+      const result = await readModel.computeSettledStats('c1', 'template-CheckTests,CheckTypes,CheckLint');
+
+      expect(result).toEqual({
+        status: 'success',
+        pendingCount: 0,
+        endedCount: 7,
       });
     });
   });

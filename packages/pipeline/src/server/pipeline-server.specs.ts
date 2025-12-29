@@ -1641,6 +1641,56 @@ describe('PipelineServer', () => {
 
       await server.stop();
     });
+
+    it('documents behavior: status remains error after retry without itemKey extractor (fix: register extractor)', async () => {
+      let callCount = 0;
+      const handler = {
+        name: 'RetryNoExtractor',
+        events: ['RetryNoExtractorDone', 'RetryNoExtractorFailed'],
+        handle: async () => {
+          callCount++;
+          if (callCount === 1) {
+            return { type: 'RetryNoExtractorFailed', data: {} };
+          }
+          return { type: 'RetryNoExtractorDone', data: {} };
+        },
+      };
+      const pipeline = define('test').on('Trigger').emit('RetryNoExtractor', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const correlationId = `corr-retry-no-extractor-bug`;
+
+      await fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'RetryNoExtractor', data: { targetDir: '/slice1' }, correlationId }),
+      });
+      await new Promise((r) => setTimeout(r, 50));
+
+      const afterFailure = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${correlationId}`,
+      );
+      expect(afterFailure.nodes.find((n) => n.id === 'cmd:RetryNoExtractor')?.status).toBe('error');
+
+      await fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'RetryNoExtractor', data: { targetDir: '/slice1' }, correlationId }),
+      });
+      await new Promise((r) => setTimeout(r, 50));
+
+      const afterRetry = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${correlationId}`,
+      );
+      const node = afterRetry.nodes.find((n) => n.id === 'cmd:RetryNoExtractor');
+      expect(node?.status).toBe('error');
+      expect(node?.endedCount).toBe(2);
+
+      await server.stop();
+    });
   });
 
   describe('integration', () => {
