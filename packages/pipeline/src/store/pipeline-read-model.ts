@@ -4,6 +4,7 @@ import type { ItemStatusDocument } from '../projections/item-status-projection';
 import type { LatestRunDocument } from '../projections/latest-run-projection';
 import type { MessageLogDocument } from '../projections/message-log-projection';
 import type { NodeStatusDocument } from '../projections/node-status-projection';
+import type { SettledInstanceDocument } from '../projections/settled-instance-projection';
 import type { StatsDocument } from '../projections/stats-projection';
 
 export interface CommandStats {
@@ -24,6 +25,7 @@ export class PipelineReadModel {
   private readonly messageLogCollection;
   private readonly statsCollection;
   private readonly latestRunCollection;
+  private readonly settledInstanceCollection;
 
   constructor(database: InMemoryDatabase) {
     this.itemStatusCollection = database.collection<ItemStatusDocument>('ItemStatus');
@@ -31,6 +33,7 @@ export class PipelineReadModel {
     this.messageLogCollection = database.collection<MessageLogDocument>('MessageLog');
     this.statsCollection = database.collection<StatsDocument>('Stats');
     this.latestRunCollection = database.collection<LatestRunDocument>('LatestRun');
+    this.settledInstanceCollection = database.collection<SettledInstanceDocument>('SettledInstance');
   }
 
   async computeCommandStats(correlationId: string, commandType: string): Promise<CommandStats> {
@@ -137,5 +140,19 @@ export class PipelineReadModel {
       return undefined;
     }
     return docs[0].latestCorrelationId;
+  }
+
+  async getSettledInstance(templateId: string, correlationId: string): Promise<SettledInstanceDocument | null> {
+    const instances = await this.settledInstanceCollection.find(
+      (doc) => doc.templateId === templateId && doc.correlationId === correlationId,
+    );
+    if (instances.length === 0) {
+      return null;
+    }
+    return instances[0];
+  }
+
+  async getActiveSettledInstances(correlationId: string): Promise<SettledInstanceDocument[]> {
+    return this.settledInstanceCollection.find((doc) => doc.correlationId === correlationId && doc.status === 'active');
   }
 }

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import type { ItemStatusDocument } from '../projections/item-status-projection';
 import type { MessageLogDocument } from '../projections/message-log-projection';
 import type { NodeStatusDocument } from '../projections/node-status-projection';
+import type { SettledInstanceDocument } from '../projections/settled-instance-projection';
 import type { StatsDocument } from '../projections/stats-projection';
 import { PipelineReadModel } from './pipeline-read-model';
 
@@ -493,6 +494,141 @@ describe('PipelineReadModel', () => {
         totalCommands: 6,
         totalEvents: 4,
       });
+    });
+  });
+
+  describe('getSettledInstance', () => {
+    it('should return null when no settled instance exists', async () => {
+      const result = await readModel.getSettledInstance('template-CmdA', 'c1');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return settled instance from collection', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CmdA-c1',
+        instanceId: 'template-CmdA-c1',
+        templateId: 'template-CmdA',
+        correlationId: 'c1',
+        commandTrackers: [{ commandType: 'CmdA', hasStarted: true, hasCompleted: false, events: [] }],
+        status: 'active',
+      });
+
+      const result = await readModel.getSettledInstance('template-CmdA', 'c1');
+
+      expect(result).toMatchObject({
+        instanceId: 'template-CmdA-c1',
+        templateId: 'template-CmdA',
+        correlationId: 'c1',
+        status: 'active',
+      });
+    });
+
+    it('should return null for different templateId', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CmdA-c1',
+        instanceId: 'template-CmdA-c1',
+        templateId: 'template-CmdA',
+        correlationId: 'c1',
+        commandTrackers: [],
+        status: 'active',
+      });
+
+      const result = await readModel.getSettledInstance('template-CmdB', 'c1');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null for different correlationId', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CmdA-c1',
+        instanceId: 'template-CmdA-c1',
+        templateId: 'template-CmdA',
+        correlationId: 'c1',
+        commandTrackers: [],
+        status: 'active',
+      });
+
+      const result = await readModel.getSettledInstance('template-CmdA', 'c2');
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('getActiveSettledInstances', () => {
+    it('should return empty array when no instances exist', async () => {
+      const result = await readModel.getActiveSettledInstances('c1');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should return only active instances for correlationId', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CmdA-c1',
+        instanceId: 'template-CmdA-c1',
+        templateId: 'template-CmdA',
+        correlationId: 'c1',
+        commandTrackers: [],
+        status: 'active',
+      });
+      await collection.insertOne({
+        _id: 'template-CmdB-c1',
+        instanceId: 'template-CmdB-c1',
+        templateId: 'template-CmdB',
+        correlationId: 'c1',
+        commandTrackers: [],
+        status: 'fired',
+      });
+
+      const result = await readModel.getActiveSettledInstances('c1');
+
+      expect(result).toHaveLength(1);
+      expect(result[0].templateId).toBe('template-CmdA');
+    });
+
+    it('should filter by correlationId', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CmdA-c1',
+        instanceId: 'template-CmdA-c1',
+        templateId: 'template-CmdA',
+        correlationId: 'c1',
+        commandTrackers: [],
+        status: 'active',
+      });
+      await collection.insertOne({
+        _id: 'template-CmdA-c2',
+        instanceId: 'template-CmdA-c2',
+        templateId: 'template-CmdA',
+        correlationId: 'c2',
+        commandTrackers: [],
+        status: 'active',
+      });
+
+      const result = await readModel.getActiveSettledInstances('c1');
+
+      expect(result).toHaveLength(1);
+      expect(result[0].correlationId).toBe('c1');
+    });
+
+    it('should exclude cleaned instances', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CmdA-c1',
+        instanceId: 'template-CmdA-c1',
+        templateId: 'template-CmdA',
+        correlationId: 'c1',
+        commandTrackers: [],
+        status: 'cleaned',
+      });
+
+      const result = await readModel.getActiveSettledInstances('c1');
+
+      expect(result).toEqual([]);
     });
   });
 });
