@@ -14,6 +14,7 @@ export interface SettledInstanceDocument {
   correlationId: string;
   commandTrackers: CommandTracker[];
   status: 'active' | 'fired' | 'cleaned';
+  firedCount: number;
 }
 
 export interface SettledInstanceCreatedEvent {
@@ -137,6 +138,7 @@ export function evolve(document: SettledInstanceDocument | null, event: SettledE
           events: [],
         })),
         status: 'active',
+        firedCount: 0,
       };
     }
     case 'SettledCommandStarted':
@@ -147,7 +149,7 @@ export function evolve(document: SettledInstanceDocument | null, event: SettledE
       return evolveEventReceived(document, event.data.commandType, event.data.event);
     case 'SettledHandlerFired':
       assertDocument(document, event.type);
-      return { ...document, status: 'fired' };
+      return { ...document, status: 'fired', firedCount: document.firedCount + 1 };
     case 'SettledInstanceReset':
       assertDocument(document, event.type);
       return evolveReset(document);

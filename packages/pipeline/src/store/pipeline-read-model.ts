@@ -197,12 +197,16 @@ export class PipelineReadModel {
       return { status: 'idle', pendingCount: 0, endedCount: 0 };
     }
 
+    const endedCount = instance.firedCount ?? 0;
+
     if (instance.status === 'active') {
       const hasFailure = this.hasFailedEvent(instance);
-      return { status: hasFailure ? 'error' : 'running', pendingCount: 1, endedCount: 0 };
+      const hasFiredBefore = endedCount > 0;
+      const status = hasFailure ? 'error' : hasFiredBefore ? 'success' : 'running';
+      return { status, pendingCount: 1, endedCount };
     }
 
-    return { status: 'idle', pendingCount: 0, endedCount: 0 };
+    return { status: 'idle', pendingCount: 0, endedCount };
   }
 
   private hasFailedEvent(instance: SettledInstanceDocument): boolean {

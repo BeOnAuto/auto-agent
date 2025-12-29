@@ -34,6 +34,7 @@ describe('SettledInstanceProjection', () => {
             { commandType: 'CmdB', hasStarted: false, hasCompleted: false, events: [] },
           ],
           status: 'active',
+          firedCount: 0,
         });
       });
     });
@@ -49,6 +50,7 @@ describe('SettledInstanceProjection', () => {
             { commandType: 'CmdB', hasStarted: false, hasCompleted: false, events: [] },
           ],
           status: 'active',
+          firedCount: 0,
         };
         const event: SettledCommandStartedEvent = {
           type: 'SettledCommandStarted',
@@ -82,6 +84,7 @@ describe('SettledInstanceProjection', () => {
           correlationId: 'c1',
           commandTrackers: [{ commandType: 'CmdA', hasStarted: true, hasCompleted: true, events: [] }],
           status: 'active',
+          firedCount: 0,
         };
         const event: SettledCommandStartedEvent = {
           type: 'SettledCommandStarted',
@@ -111,6 +114,7 @@ describe('SettledInstanceProjection', () => {
           correlationId: 'c1',
           commandTrackers: [{ commandType: 'CmdA', hasStarted: true, hasCompleted: false, events: [] }],
           status: 'active',
+          firedCount: 0,
         };
         const domainEvent = { type: 'UserCreated', correlationId: 'c1', data: { userId: 'u1' } };
         const event: SettledEventReceivedEvent = {
@@ -141,6 +145,7 @@ describe('SettledInstanceProjection', () => {
           correlationId: 'c1',
           commandTrackers: [{ commandType: 'CmdA', hasStarted: true, hasCompleted: true, events: [event1] }],
           status: 'active',
+          firedCount: 0,
         };
         const event2 = { type: 'Event2', correlationId: 'c1', data: {} };
         const event: SettledEventReceivedEvent = {
@@ -160,13 +165,14 @@ describe('SettledInstanceProjection', () => {
     });
 
     describe('SettledHandlerFired', () => {
-      it('sets status to fired', () => {
+      it('sets status to fired and increments firedCount', () => {
         const existing: SettledInstanceDocument = {
           instanceId: 'template-CmdA-c1',
           templateId: 'template-CmdA',
           correlationId: 'c1',
           commandTrackers: [{ commandType: 'CmdA', hasStarted: true, hasCompleted: true, events: [] }],
           status: 'active',
+          firedCount: 0,
         };
         const event: SettledHandlerFiredEvent = {
           type: 'SettledHandlerFired',
@@ -180,6 +186,7 @@ describe('SettledInstanceProjection', () => {
         const result = evolve(existing, event);
 
         expect(result.status).toBe('fired');
+        expect(result.firedCount).toBe(1);
       });
     });
 
@@ -195,6 +202,7 @@ describe('SettledInstanceProjection', () => {
             { commandType: 'CmdB', hasStarted: true, hasCompleted: true, events: [domainEvent] },
           ],
           status: 'fired',
+          firedCount: 1,
         };
         const event: SettledInstanceResetEvent = {
           type: 'SettledInstanceReset',
@@ -222,6 +230,7 @@ describe('SettledInstanceProjection', () => {
           correlationId: 'c1',
           commandTrackers: [{ commandType: 'CmdA', hasStarted: true, hasCompleted: true, events: [] }],
           status: 'fired',
+          firedCount: 1,
         };
         const event: SettledInstanceCleanedEvent = {
           type: 'SettledInstanceCleaned',

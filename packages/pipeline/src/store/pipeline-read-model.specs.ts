@@ -514,6 +514,7 @@ describe('PipelineReadModel', () => {
         correlationId: 'c1',
         commandTrackers: [{ commandType: 'CmdA', hasStarted: true, hasCompleted: false, events: [] }],
         status: 'active',
+        firedCount: 0,
       });
 
       const result = await readModel.getSettledInstance('template-CmdA', 'c1');
@@ -535,6 +536,7 @@ describe('PipelineReadModel', () => {
         correlationId: 'c1',
         commandTrackers: [],
         status: 'active',
+        firedCount: 0,
       });
 
       const result = await readModel.getSettledInstance('template-CmdB', 'c1');
@@ -551,6 +553,7 @@ describe('PipelineReadModel', () => {
         correlationId: 'c1',
         commandTrackers: [],
         status: 'active',
+        firedCount: 0,
       });
 
       const result = await readModel.getSettledInstance('template-CmdA', 'c2');
@@ -575,6 +578,7 @@ describe('PipelineReadModel', () => {
         correlationId: 'c1',
         commandTrackers: [],
         status: 'active',
+        firedCount: 0,
       });
       await collection.insertOne({
         _id: 'template-CmdB-c1',
@@ -583,6 +587,7 @@ describe('PipelineReadModel', () => {
         correlationId: 'c1',
         commandTrackers: [],
         status: 'fired',
+        firedCount: 1,
       });
 
       const result = await readModel.getActiveSettledInstances('c1');
@@ -600,6 +605,7 @@ describe('PipelineReadModel', () => {
         correlationId: 'c1',
         commandTrackers: [],
         status: 'active',
+        firedCount: 0,
       });
       await collection.insertOne({
         _id: 'template-CmdA-c2',
@@ -608,6 +614,7 @@ describe('PipelineReadModel', () => {
         correlationId: 'c2',
         commandTrackers: [],
         status: 'active',
+        firedCount: 0,
       });
 
       const result = await readModel.getActiveSettledInstances('c1');
@@ -625,6 +632,7 @@ describe('PipelineReadModel', () => {
         correlationId: 'c1',
         commandTrackers: [],
         status: 'cleaned',
+        firedCount: 0,
       });
 
       const result = await readModel.getActiveSettledInstances('c1');
@@ -800,6 +808,7 @@ describe('PipelineReadModel', () => {
           { commandType: 'CheckLint', hasStarted: true, hasCompleted: false, events: [] },
         ],
         status: 'active',
+        firedCount: 0,
       });
 
       const result = await readModel.computeSettledStats('c1', 'template-CheckTests,CheckTypes,CheckLint');
@@ -834,6 +843,7 @@ describe('PipelineReadModel', () => {
           { commandType: 'CheckLint', hasStarted: true, hasCompleted: false, events: [] },
         ],
         status: 'active',
+        firedCount: 0,
       });
 
       const result = await readModel.computeSettledStats('c1', 'template-CheckTests,CheckTypes,CheckLint');
@@ -842,6 +852,31 @@ describe('PipelineReadModel', () => {
         status: 'error',
         pendingCount: 1,
         endedCount: 0,
+      });
+    });
+
+    it('should return endedCount=1 and status=success after handler fires without failures', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CheckTests,CheckTypes,CheckLint-c1',
+        instanceId: 'template-CheckTests,CheckTypes,CheckLint-c1',
+        templateId: 'template-CheckTests,CheckTypes,CheckLint',
+        correlationId: 'c1',
+        commandTrackers: [
+          { commandType: 'CheckTests', hasStarted: true, hasCompleted: false, events: [] },
+          { commandType: 'CheckTypes', hasStarted: true, hasCompleted: false, events: [] },
+          { commandType: 'CheckLint', hasStarted: true, hasCompleted: false, events: [] },
+        ],
+        status: 'active',
+        firedCount: 1,
+      });
+
+      const result = await readModel.computeSettledStats('c1', 'template-CheckTests,CheckTypes,CheckLint');
+
+      expect(result).toEqual({
+        status: 'success',
+        pendingCount: 1,
+        endedCount: 1,
       });
     });
   });
