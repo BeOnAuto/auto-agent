@@ -8,7 +8,7 @@ import { execa, type ResultPromise } from 'execa';
 
 const debug = createDebug('auto:dev-server:start-server');
 
-const DEFAULT_DEBOUNCE_MS = 300;
+const DEFAULT_DEBOUNCE_MS = 2000;
 const IGNORED_PATTERNS = ['**/node_modules/**', '**/.git/**', '**/.DS_Store'];
 
 export type StartServerCommand = Command<
@@ -175,7 +175,7 @@ export const commandHandler = defineCommandHandler<
       required: false,
     },
     watch: {
-      description: 'Enable watch mode to auto-restart on file changes',
+      description: 'Enable watch mode to auto-restart on file changes (default: true)',
       required: false,
     },
     watchDirectories: {
@@ -183,7 +183,7 @@ export const commandHandler = defineCommandHandler<
       required: false,
     },
     debounceMs: {
-      description: 'Debounce delay in milliseconds before restart (default: 300)',
+      description: 'Debounce delay in milliseconds before restart (default: 2000)',
       required: false,
     },
   },
@@ -206,7 +206,7 @@ export const commandHandler = defineCommandHandler<
     const {
       serverDirectory,
       command: customCommand,
-      watch: watchEnabled = false,
+      watch: watchEnabled = true,
       watchDirectories,
       debounceMs = DEFAULT_DEBOUNCE_MS,
     } = typedCommand.data;
@@ -238,20 +238,33 @@ export const commandHandler = defineCommandHandler<
         const dirsToWatch = watchDirectories?.map((d) => path.resolve(d)) ?? [serverDir];
         let debounceTimeout: NodeJS.Timeout | null = null;
         let isRestarting = false;
+        let lastRestartTime = 0;
+        const restartCooldownMs = debounceMs;
 
         const handleFileChange = (changedPath: string): void => {
+          if (isRestarting) {
+            debug('Already restarting, ignoring change: %s', changedPath);
+            return;
+          }
+
+          const timeSinceLastRestart = Date.now() - lastRestartTime;
+          if (timeSinceLastRestart < restartCooldownMs) {
+            debug(
+              'In cooldown period (%dms remaining), ignoring: %s',
+              restartCooldownMs - timeSinceLastRestart,
+              changedPath,
+            );
+            return;
+          }
+
           if (debounceTimeout) {
             clearTimeout(debounceTimeout);
           }
 
+          debug('File change detected, will restart in %dms: %s', debounceMs, changedPath);
+
           debounceTimeout = setTimeout(() => {
             debounceTimeout = null;
-
-            if (isRestarting) {
-              debug('Already restarting, skipping');
-              return;
-            }
-
             isRestarting = true;
             debug('Restarting server due to file change: %s', changedPath);
 
@@ -259,6 +272,7 @@ export const commandHandler = defineCommandHandler<
               .then(() => startProcess(executable, args, serverDir))
               .then((newProcess) => {
                 currentProcess = newProcess;
+                lastRestartTime = Date.now();
                 debug('Server restarted with new PID: %d', newProcess.pid);
                 isRestarting = false;
               })
