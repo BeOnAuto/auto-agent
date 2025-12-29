@@ -5,13 +5,22 @@ import type { PipelineEventStoreContext } from '../store/pipeline-event-store';
 import { createPipelineEventStore } from '../store/pipeline-event-store';
 import { SettledTracker } from './settled-tracker';
 
-function createESTracker(ctx: PipelineEventStoreContext): SettledTracker {
+interface ESTrackerOptions {
+  onError?: (error: unknown, context: { commandTypes: readonly string[]; correlationId: string }) => void;
+  onDispatch?: (commandType: string, data: unknown, correlationId: string) => void;
+  onEventEmit?: (event: SettledEvent) => void | Promise<void>;
+}
+
+function createESTracker(ctx: PipelineEventStoreContext, options: ESTrackerOptions = {}): SettledTracker {
   return new SettledTracker({
     readModel: ctx.readModel,
+    onError: options.onError,
+    onDispatch: options.onDispatch,
     onEventEmit: async (event) => {
       await ctx.eventStore.appendToStream(`settled-${event.data.correlationId}`, [
         { type: event.type, data: event.data },
       ]);
+      await options.onEventEmit?.(event);
     },
   });
 }
@@ -433,7 +442,7 @@ describe('SettledTracker', () => {
     it('should accept onError callback in options', () => {
       const onError = vi.fn();
 
-      tracker = new SettledTracker({ onError });
+      tracker = createESTracker(ctx, { onError });
 
       expect(tracker).toBeInstanceOf(SettledTracker);
     });
@@ -442,7 +451,7 @@ describe('SettledTracker', () => {
       const onError = vi.fn();
       const thrownError = new Error('Handler failed');
 
-      tracker = new SettledTracker({ onError });
+      tracker = createESTracker(ctx, { onError });
 
       tracker.registerHandler({
         commandTypes: ['A'],
@@ -466,7 +475,7 @@ describe('SettledTracker', () => {
     it('should call onDispatch when provided', async () => {
       const dispatched: Array<{ type: string; data: unknown }> = [];
 
-      tracker = new SettledTracker({
+      tracker = createESTracker(ctx, {
         onDispatch: (commandType, data, _correlationId) => {
           dispatched.push({ type: commandType, data });
         },
@@ -489,7 +498,7 @@ describe('SettledTracker', () => {
     it('should pass correlationId to onDispatch', async () => {
       let receivedCorrelationId: string | undefined;
 
-      tracker = new SettledTracker({
+      tracker = createESTracker(ctx, {
         onDispatch: (_commandType, _data, correlationId) => {
           receivedCorrelationId = correlationId;
         },
@@ -513,7 +522,7 @@ describe('SettledTracker', () => {
     it('should emit SettledInstanceCreated when first command starts for a template', async () => {
       const emittedEvents: SettledEvent[] = [];
 
-      tracker = new SettledTracker({
+      tracker = createESTracker(ctx, {
         onEventEmit: (event) => {
           emittedEvents.push(event);
         },
@@ -538,7 +547,7 @@ describe('SettledTracker', () => {
     it('should emit SettledCommandStarted when command starts', async () => {
       const emittedEvents: SettledEvent[] = [];
 
-      tracker = new SettledTracker({
+      tracker = createESTracker(ctx, {
         onEventEmit: (event) => {
           emittedEvents.push(event);
         },
@@ -562,7 +571,7 @@ describe('SettledTracker', () => {
     it('should not emit SettledInstanceCreated for subsequent commands in same instance', async () => {
       const emittedEvents: SettledEvent[] = [];
 
-      tracker = new SettledTracker({
+      tracker = createESTracker(ctx, {
         onEventEmit: (event) => {
           emittedEvents.push(event);
         },
@@ -583,7 +592,7 @@ describe('SettledTracker', () => {
     it('should emit SettledEventReceived when event is received', async () => {
       const emittedEvents: SettledEvent[] = [];
 
-      tracker = new SettledTracker({
+      tracker = createESTracker(ctx, {
         onEventEmit: (event) => {
           emittedEvents.push(event);
         },
@@ -612,7 +621,7 @@ describe('SettledTracker', () => {
     it('should emit SettledHandlerFired when handler fires', async () => {
       const emittedEvents: SettledEvent[] = [];
 
-      tracker = new SettledTracker({
+      tracker = createESTracker(ctx, {
         onEventEmit: (event) => {
           emittedEvents.push(event);
         },
@@ -640,7 +649,7 @@ describe('SettledTracker', () => {
     it('should emit SettledInstanceCleaned when handler fires without persist', async () => {
       const emittedEvents: SettledEvent[] = [];
 
-      tracker = new SettledTracker({
+      tracker = createESTracker(ctx, {
         onEventEmit: (event) => {
           emittedEvents.push(event);
         },
@@ -667,7 +676,7 @@ describe('SettledTracker', () => {
     it('should emit SettledInstanceReset when handler returns persist: true', async () => {
       const emittedEvents: SettledEvent[] = [];
 
-      tracker = new SettledTracker({
+      tracker = createESTracker(ctx, {
         onEventEmit: (event) => {
           emittedEvents.push(event);
         },
@@ -701,7 +710,7 @@ describe('SettledTracker', () => {
     it('should emit SettledInstanceCleaned on handler error', async () => {
       const emittedEvents: SettledEvent[] = [];
 
-      tracker = new SettledTracker({
+      tracker = createESTracker(ctx, {
         onEventEmit: (event) => {
           emittedEvents.push(event);
         },
