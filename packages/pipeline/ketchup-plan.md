@@ -2,6 +2,120 @@
 
 ## TODO
 
+### Phase 10: SQLite Event Store Persistence (Bursts 88-92)
+
+**Goal**: Replace in-memory event store with SQLite for persistence. Events survive restarts; projections rebuilt from event stream on startup.
+
+**Current State**:
+```
+In-Memory EventStore → In-Memory Projections → Lost on restart
+```
+
+**Target State**:
+```
+SQLite EventStore → Consumer → In-Memory Projections (rebuilt on startup)
+```
+
+---
+
+#### Burst 88: Async createPipelineEventStore with config
+
+| Value | Enable async initialization and configurable file path |
+| Approach | Make createPipelineEventStore async, accept optional config |
+| Size | S |
+
+```typescript
+it('should create event store with default config', async () => {
+  const context = await createPipelineEventStore();
+  expect(context.eventStore).toBeDefined();
+  expect(context.readModel).toBeDefined();
+  await context.close();
+});
+
+it('should accept custom fileName config', async () => {
+  const context = await createPipelineEventStore({ fileName: ':memory:' });
+  expect(context.eventStore).toBeDefined();
+  await context.close();
+});
+```
+
+---
+
+#### Burst 89: SQLite event store with schema auto-migration
+
+| Value | Events persist to SQLite file |
+| Approach | Replace getInMemoryEventStore with getSQLiteEventStore |
+| Size | M |
+
+```typescript
+it('should persist events to SQLite', async () => {
+  const context = await createPipelineEventStore({ fileName: ':memory:' });
+  await context.eventStore.appendToStream('test-stream', [
+    { type: 'TestEvent', data: { value: 42 } }
+  ]);
+  const stream = await context.eventStore.readStream('test-stream');
+  expect(stream.events).toHaveLength(1);
+  await context.close();
+});
+```
+
+---
+
+#### Burst 90: Consumer replays events to projections
+
+| Value | Projections rebuilt from event stream on startup |
+| Approach | Consumer with projection-updater processor from BEGINNING |
+| Size | M |
+
+```typescript
+it('should replay events to projections on startup', async () => {
+  const context = await createPipelineEventStore({ fileName: ':memory:' });
+  await context.eventStore.appendToStream('pipeline-c1', [
+    { type: 'ItemStatusChanged', data: { correlationId: 'c1', commandType: 'Cmd', itemKey: 'k1', requestId: 'r1', status: 'running', attemptCount: 1 } }
+  ]);
+  // Allow consumer to process
+  await new Promise(resolve => setTimeout(resolve, 50));
+  const item = await context.readModel.getItemStatus('c1', 'Cmd', 'k1');
+  expect(item?.status).toBe('running');
+  await context.close();
+});
+```
+
+---
+
+#### Burst 91: close() stops and closes consumer
+
+| Value | Clean shutdown without resource leaks |
+| Approach | Call consumer.stop() and consumer.close() in close() |
+| Size | S |
+
+```typescript
+it('should stop consumer on close', async () => {
+  const context = await createPipelineEventStore({ fileName: ':memory:' });
+  await context.close();
+  // No error means success - consumer stopped cleanly
+});
+```
+
+---
+
+#### Burst 92: PipelineServer uses async factory
+
+| Value | Server initializes SQLite event store |
+| Approach | Static PipelineServer.create() factory, configurable fileName |
+| Size | M |
+| Files | `src/server/pipeline-server.ts` |
+
+```typescript
+it('should create server with async event store initialization', async () => {
+  const server = await PipelineServer.create({ port: 0 });
+  expect(server.port).toBeGreaterThan(0);
+  await server.stop();
+});
+```
+
+---
+
 ### Phase 9: Remove Dual Caches - Pure Event Sourcing (Bursts 71-87)
 
 **Goal**: Remove `nodeStatusCache` and `itemStatusCache` from PipelineServer. All runtime state derived from Emmett projections via `PipelineReadModel`.
