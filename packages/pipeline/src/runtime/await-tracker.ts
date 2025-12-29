@@ -1,50 +1,62 @@
-interface AwaitState {
-  pendingKeys: Set<string>;
-  results: Map<string, unknown>;
+import type { AwaitEvent } from '../projections/await-tracker-projection';
+import type { PipelineReadModel } from '../store/pipeline-read-model';
+
+interface AwaitTrackerOptions {
+  readModel: PipelineReadModel;
+  onEventEmit: (event: AwaitEvent) => void | Promise<void>;
 }
 
 export class AwaitTracker {
-  private readonly state = new Map<string, AwaitState>();
+  private readonly readModel: PipelineReadModel;
+  private readonly onEventEmit: (event: AwaitEvent) => void | Promise<void>;
 
-  startAwaiting(correlationId: string, keys: string[]): void {
-    this.state.set(correlationId, {
-      pendingKeys: new Set(keys),
-      results: new Map(),
+  constructor(options: AwaitTrackerOptions) {
+    this.readModel = options.readModel;
+    this.onEventEmit = options.onEventEmit;
+  }
+
+  async startAwaiting(correlationId: string, keys: string[]): Promise<void> {
+    await this.emitEvent({
+      type: 'AwaitStarted',
+      data: { correlationId, keys },
     });
   }
 
-  isPending(correlationId: string): boolean {
-    return this.state.has(correlationId);
+  async isPending(correlationId: string): Promise<boolean> {
+    const state = await this.readModel.getAwaitState(correlationId);
+    return state !== null;
   }
 
-  getPendingKeys(correlationId: string): string[] {
-    const awaitState = this.state.get(correlationId);
-    return awaitState ? Array.from(awaitState.pendingKeys) : [];
+  async getPendingKeys(correlationId: string): Promise<string[]> {
+    const state = await this.readModel.getAwaitState(correlationId);
+    return state ? state.pendingKeys : [];
   }
 
-  markComplete(correlationId: string, key: string, result: unknown): void {
-    const awaitState = this.state.get(correlationId);
-    if (awaitState) {
-      awaitState.pendingKeys.delete(key);
-      awaitState.results.set(key, result);
-    }
+  async markComplete(correlationId: string, key: string, result: unknown): Promise<void> {
+    await this.emitEvent({
+      type: 'AwaitItemCompleted',
+      data: { correlationId, key, result },
+    });
   }
 
-  isComplete(correlationId: string): boolean {
-    const awaitState = this.state.get(correlationId);
-    return awaitState ? awaitState.pendingKeys.size === 0 : false;
+  async isComplete(correlationId: string): Promise<boolean> {
+    const state = await this.readModel.getAwaitState(correlationId);
+    return state !== null && state.pendingKeys.length === 0;
   }
 
-  getResults(correlationId: string): Record<string, unknown> {
-    const awaitState = this.state.get(correlationId);
-    if (!awaitState) {
+  async getResults(correlationId: string): Promise<Record<string, unknown>> {
+    const state = await this.readModel.getAwaitState(correlationId);
+    if (state === null) {
       return {};
     }
-    const results: Record<string, unknown> = {};
-    for (const [key, value] of awaitState.results) {
-      results[key] = value;
-    }
-    this.state.delete(correlationId);
-    return results;
+    await this.emitEvent({
+      type: 'AwaitCompleted',
+      data: { correlationId },
+    });
+    return state.results;
+  }
+
+  private async emitEvent(event: AwaitEvent): Promise<void> {
+    await this.onEventEmit(event);
   }
 }

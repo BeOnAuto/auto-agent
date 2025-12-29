@@ -33,6 +33,7 @@ export { dispatch } from './core/types';
 export type { GraphEdge, GraphIR, GraphNode, NodeType } from './graph/types';
 export type { EventLoggerOptions, LogEntry } from './logging/event-logger';
 export { EventLogger } from './logging/event-logger';
+export type { AwaitEvent, AwaitTrackerDocument } from './projections/await-tracker-projection';
 export { AwaitTracker } from './runtime/await-tracker';
 export type { PipelineContext, RuntimeConfig } from './runtime/context';
 export { EventCommandMapper } from './runtime/event-command-map';

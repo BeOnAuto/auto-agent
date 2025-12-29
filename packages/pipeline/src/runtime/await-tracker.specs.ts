@@ -1,52 +1,75 @@
+import type { AwaitEvent } from '../projections/await-tracker-projection';
+import { createPipelineEventStore, type PipelineEventStoreContext } from '../store/pipeline-event-store';
 import { AwaitTracker } from './await-tracker';
 
+function createESTracker(ctx: PipelineEventStoreContext): AwaitTracker {
+  return new AwaitTracker({
+    readModel: ctx.readModel,
+    onEventEmit: async (event: AwaitEvent) => {
+      await ctx.eventStore.appendToStream(`await-${event.data.correlationId}`, [
+        { type: event.type, data: event.data },
+      ]);
+    },
+  });
+}
+
 describe('AwaitTracker', () => {
-  it('should track pending keys', () => {
-    const tracker = new AwaitTracker();
-    tracker.startAwaiting('corr-1', ['a', 'b']);
-    expect(tracker.isPending('corr-1')).toBe(true);
-    expect(tracker.getPendingKeys('corr-1')).toEqual(['a', 'b']);
+  let ctx: PipelineEventStoreContext;
+
+  beforeEach(() => {
+    ctx = createPipelineEventStore();
   });
 
-  it('should detect completion', () => {
-    const tracker = new AwaitTracker();
-    tracker.startAwaiting('c', ['a', 'b']);
-    tracker.markComplete('c', 'a', { result: 1 });
-    expect(tracker.isComplete('c')).toBe(false);
-    tracker.markComplete('c', 'b', { result: 2 });
-    expect(tracker.isComplete('c')).toBe(true);
+  afterEach(async () => {
+    await ctx.close();
   });
 
-  it('should return false for unknown correlationId', () => {
-    const tracker = new AwaitTracker();
-    expect(tracker.isPending('unknown')).toBe(false);
-    expect(tracker.isComplete('unknown')).toBe(false);
+  it('should track pending keys', async () => {
+    const tracker = createESTracker(ctx);
+    await tracker.startAwaiting('corr-1', ['a', 'b']);
+    expect(await tracker.isPending('corr-1')).toBe(true);
+    expect(await tracker.getPendingKeys('corr-1')).toEqual(['a', 'b']);
   });
 
-  it('should return empty array for unknown correlationId keys', () => {
-    const tracker = new AwaitTracker();
-    expect(tracker.getPendingKeys('unknown')).toEqual([]);
+  it('should detect completion', async () => {
+    const tracker = createESTracker(ctx);
+    await tracker.startAwaiting('c', ['a', 'b']);
+    await tracker.markComplete('c', 'a', { result: 1 });
+    expect(await tracker.isComplete('c')).toBe(false);
+    await tracker.markComplete('c', 'b', { result: 2 });
+    expect(await tracker.isComplete('c')).toBe(true);
   });
 
-  it('should collect results when all keys complete', () => {
-    const tracker = new AwaitTracker();
-    tracker.startAwaiting('c', ['x', 'y']);
-    tracker.markComplete('c', 'x', { val: 1 });
-    tracker.markComplete('c', 'y', { val: 2 });
-    const results = tracker.getResults('c');
+  it('should return false for unknown correlationId', async () => {
+    const tracker = createESTracker(ctx);
+    expect(await tracker.isPending('unknown')).toBe(false);
+    expect(await tracker.isComplete('unknown')).toBe(false);
+  });
+
+  it('should return empty array for unknown correlationId keys', async () => {
+    const tracker = createESTracker(ctx);
+    expect(await tracker.getPendingKeys('unknown')).toEqual([]);
+  });
+
+  it('should collect results when all keys complete', async () => {
+    const tracker = createESTracker(ctx);
+    await tracker.startAwaiting('c', ['x', 'y']);
+    await tracker.markComplete('c', 'x', { val: 1 });
+    await tracker.markComplete('c', 'y', { val: 2 });
+    const results = await tracker.getResults('c');
     expect(results).toEqual({ x: { val: 1 }, y: { val: 2 } });
   });
 
-  it('should clear tracking after getting results', () => {
-    const tracker = new AwaitTracker();
-    tracker.startAwaiting('c', ['a']);
-    tracker.markComplete('c', 'a', {});
-    tracker.getResults('c');
-    expect(tracker.isPending('c')).toBe(false);
+  it('should clear tracking after getting results', async () => {
+    const tracker = createESTracker(ctx);
+    await tracker.startAwaiting('c', ['a']);
+    await tracker.markComplete('c', 'a', {});
+    await tracker.getResults('c');
+    expect(await tracker.isPending('c')).toBe(false);
   });
 
-  it('should return empty object for unknown correlationId results', () => {
-    const tracker = new AwaitTracker();
-    expect(tracker.getResults('unknown')).toEqual({});
+  it('should return empty object for unknown correlationId results', async () => {
+    const tracker = createESTracker(ctx);
+    expect(await tracker.getResults('unknown')).toEqual({});
   });
 });

@@ -7,6 +7,8 @@ import {
   inlineProjections,
   inMemorySingleStreamProjection,
 } from '@event-driven-io/emmett';
+import type { AwaitEvent, AwaitTrackerDocument } from '../projections/await-tracker-projection';
+import { evolve as evolveAwaitTracker } from '../projections/await-tracker-projection';
 import type { ItemStatusChangedEvent, ItemStatusDocument } from '../projections/item-status-projection';
 import { evolve as evolveItemStatus } from '../projections/item-status-projection';
 import type { LatestRunDocument } from '../projections/latest-run-projection';
@@ -107,6 +109,13 @@ function createProjections() {
       evolvePhasedExecution(document, event),
   });
 
+  const awaitTrackerProjection = inMemorySingleStreamProjection<AwaitTrackerDocument, AwaitEvent>({
+    collectionName: 'AwaitTracker',
+    canHandle: ['AwaitStarted', 'AwaitItemCompleted', 'AwaitCompleted'],
+    getDocumentId: (event) => event.data.correlationId,
+    evolve: (document: AwaitTrackerDocument | null, event: AwaitEvent) => evolveAwaitTracker(document, event),
+  });
+
   return inlineProjections<InMemoryReadEventMetadata>([
     itemStatusProjection,
     nodeStatusProjection,
@@ -115,6 +124,7 @@ function createProjections() {
     statsProjection,
     settledInstanceProjection,
     phasedExecutionProjection,
+    awaitTrackerProjection,
   ] as Parameters<typeof inlineProjections<InMemoryReadEventMetadata>>[0]);
 }
 

@@ -1,5 +1,6 @@
 import type { InMemoryDatabase } from '@event-driven-io/emmett';
 import type { NodeStatus } from '../graph/types';
+import type { AwaitTrackerDocument } from '../projections/await-tracker-projection';
 import type { ItemStatusDocument } from '../projections/item-status-projection';
 import type { LatestRunDocument } from '../projections/latest-run-projection';
 import type { MessageLogDocument } from '../projections/message-log-projection';
@@ -28,6 +29,7 @@ export class PipelineReadModel {
   private readonly latestRunCollection;
   private readonly settledInstanceCollection;
   private readonly phasedExecutionCollection;
+  private readonly awaitTrackerCollection;
 
   constructor(database: InMemoryDatabase) {
     this.itemStatusCollection = database.collection<ItemStatusDocument>('ItemStatus');
@@ -37,6 +39,7 @@ export class PipelineReadModel {
     this.latestRunCollection = database.collection<LatestRunDocument>('LatestRun');
     this.settledInstanceCollection = database.collection<SettledInstanceDocument>('SettledInstance');
     this.phasedExecutionCollection = database.collection<PhasedExecutionDocument>('PhasedExecution');
+    this.awaitTrackerCollection = database.collection<AwaitTrackerDocument>('AwaitTracker');
   }
 
   async computeCommandStats(correlationId: string, commandType: string): Promise<CommandStats> {
@@ -169,5 +172,15 @@ export class PipelineReadModel {
 
   async getActivePhasedExecutions(correlationId: string): Promise<PhasedExecutionDocument[]> {
     return this.phasedExecutionCollection.find((doc) => doc.correlationId === correlationId && doc.status === 'active');
+  }
+
+  async getAwaitState(correlationId: string): Promise<AwaitTrackerDocument | null> {
+    const docs = await this.awaitTrackerCollection.find(
+      (doc) => doc.correlationId === correlationId && doc.status === 'pending',
+    );
+    if (docs.length === 0) {
+      return null;
+    }
+    return docs[0];
   }
 }
