@@ -1,5 +1,6 @@
 import type { Event } from '@auto-engineer/message-bus';
 import type { ForEachPhasedDescriptor } from '../core/descriptors';
+import type { PhasedExecutionDocument, PhasedExecutionEvent } from '../projections/phased-execution-projection';
 
 interface ItemTracker {
   key: string;
@@ -9,6 +10,7 @@ interface ItemTracker {
 }
 
 interface PhasedSession {
+  executionId: string;
   correlationId: string;
   handler: ForEachPhasedDescriptor;
   triggerEvent: Event;
@@ -22,17 +24,26 @@ interface PhasedSession {
 interface PhasedExecutorOptions {
   onDispatch: (commandType: string, data: unknown, correlationId: string) => void;
   onComplete: (event: Event, correlationId: string) => void;
+  onEventEmit?: (event: PhasedExecutionEvent) => void;
 }
 
 export class PhasedExecutor {
   private sessions = new Map<string, PhasedSession>();
   private keyToSession = new Map<string, string>();
+  private handlerRegistry = new Map<string, ForEachPhasedDescriptor>();
   private readonly onDispatch: (commandType: string, data: unknown, correlationId: string) => void;
   private readonly onComplete: (event: Event, correlationId: string) => void;
+  private readonly onEventEmit?: (event: PhasedExecutionEvent) => void;
 
   constructor(options: PhasedExecutorOptions) {
     this.onDispatch = options.onDispatch;
     this.onComplete = options.onComplete;
+    this.onEventEmit = options.onEventEmit;
+  }
+
+  registerHandler(handler: ForEachPhasedDescriptor): void {
+    const handlerId = this.generateHandlerId(handler);
+    this.handlerRegistry.set(handlerId, handler);
   }
 
   startPhased(handler: ForEachPhasedDescriptor, event: Event, correlationId: string): void {
@@ -50,7 +61,11 @@ export class PhasedExecutor {
       });
     }
 
+    const executionId = this.generateSessionId(correlationId, handler);
+    const handlerId = this.generateHandlerId(handler);
+
     const session: PhasedSession = {
+      executionId,
       correlationId,
       handler,
       triggerEvent: event,
@@ -61,14 +76,25 @@ export class PhasedExecutor {
       failedItems: new Map(),
     };
 
-    const sessionId = this.generateSessionId(correlationId, handler);
-    this.sessions.set(sessionId, session);
+    this.sessions.set(executionId, session);
 
     for (const key of itemTrackers.keys()) {
-      this.keyToSession.set(this.keyWithCorrelation(key, correlationId), sessionId);
+      this.keyToSession.set(this.keyWithCorrelation(key, correlationId), executionId);
     }
 
-    this.dispatchCurrentPhase(sessionId);
+    this.emitEvent({
+      type: 'PhasedExecutionStarted',
+      data: {
+        executionId,
+        correlationId,
+        handlerId,
+        triggerEvent: event,
+        items: Array.from(itemTrackers.values()).map((t) => ({ ...t })),
+        phases: handler.phases,
+      },
+    });
+
+    this.dispatchCurrentPhase(executionId);
   }
 
   onEventReceived(event: Event, itemKey: string): void {
@@ -88,9 +114,18 @@ export class PhasedExecutor {
 
     if (session.handler.stopOnFailure && this.isFailureEvent(event, session.handler)) {
       session.failedItems.set(itemKey, event);
+      this.emitEvent({
+        type: 'PhasedItemFailed',
+        data: { executionId: session.executionId, itemKey, error: event },
+      });
       this.handleFailure(sessionId, session);
       return;
     }
+
+    this.emitEvent({
+      type: 'PhasedItemCompleted',
+      data: { executionId: session.executionId, itemKey, resultEvent: event },
+    });
 
     if (session.pendingInPhase.size === 0) {
       this.advanceToNextPhase(sessionId, session);
@@ -147,6 +182,11 @@ export class PhasedExecutor {
       tracker.dispatched = true;
       session.pendingInPhase.add(tracker.key);
 
+      this.emitEvent({
+        type: 'PhasedItemDispatched',
+        data: { executionId: session.executionId, itemKey: tracker.key, phase: tracker.phase },
+      });
+
       const item = this.findItemByKey(session, tracker.key);
       if (item !== undefined) {
         const command = session.handler.emitFactory(item, tracker.phase, session.triggerEvent);
@@ -156,7 +196,14 @@ export class PhasedExecutor {
   }
 
   private advanceToNextPhase(sessionId: string, session: PhasedSession): void {
+    const fromPhase = session.currentPhaseIndex;
     session.currentPhaseIndex++;
+
+    this.emitEvent({
+      type: 'PhasedPhaseAdvanced',
+      data: { executionId: session.executionId, fromPhase, toPhase: session.currentPhaseIndex },
+    });
+
     this.dispatchCurrentPhase(sessionId);
   }
 
@@ -178,6 +225,11 @@ export class PhasedExecutor {
       correlationId: session.correlationId,
       data: eventData,
     };
+
+    this.emitEvent({
+      type: 'PhasedExecutionCompleted',
+      data: { executionId: session.executionId, success, results },
+    });
 
     this.onComplete(completionEvent, session.correlationId);
     this.cleanupSession(sessionId, session);
@@ -221,5 +273,83 @@ export class PhasedExecutor {
 
   private keyWithCorrelation(key: string, correlationId: string): string {
     return `${correlationId}::${key}`;
+  }
+
+  private generateHandlerId(handler: ForEachPhasedDescriptor): string {
+    return `phased-handler-${handler.eventType}`;
+  }
+
+  private emitEvent(event: PhasedExecutionEvent): void {
+    this.onEventEmit?.(event);
+  }
+
+  rebuildFromProjection(documents: PhasedExecutionDocument[]): void {
+    for (const doc of documents) {
+      if (doc.status !== 'active') {
+        continue;
+      }
+
+      const handler = this.handlerRegistry.get(doc.handlerId);
+      if (handler === undefined) {
+        continue;
+      }
+
+      this.rebuildSession(doc, handler);
+    }
+  }
+
+  private rebuildSession(doc: PhasedExecutionDocument, handler: ForEachPhasedDescriptor): void {
+    const itemTrackers = this.rebuildItemTrackers(doc.items);
+    const pendingInPhase = this.rebuildPendingInPhase(doc.items);
+    const failedItems = this.rebuildFailedItems(doc.failedItems);
+
+    const session: PhasedSession = {
+      executionId: doc.executionId,
+      correlationId: doc.correlationId,
+      handler,
+      triggerEvent: doc.triggerEvent,
+      items: itemTrackers,
+      phases: doc.phases,
+      currentPhaseIndex: doc.currentPhaseIndex,
+      pendingInPhase,
+      failedItems,
+    };
+
+    this.sessions.set(doc.executionId, session);
+
+    for (const key of itemTrackers.keys()) {
+      this.keyToSession.set(this.keyWithCorrelation(key, doc.correlationId), doc.executionId);
+    }
+  }
+
+  private rebuildItemTrackers(items: PhasedExecutionDocument['items']): Map<string, ItemTracker> {
+    const trackers = new Map<string, ItemTracker>();
+    for (const item of items) {
+      trackers.set(item.key, {
+        key: item.key,
+        phase: item.phase,
+        dispatched: item.dispatched,
+        completed: item.completed,
+      });
+    }
+    return trackers;
+  }
+
+  private rebuildPendingInPhase(items: PhasedExecutionDocument['items']): Set<string> {
+    const pending = new Set<string>();
+    for (const item of items) {
+      if (item.dispatched && !item.completed) {
+        pending.add(item.key);
+      }
+    }
+    return pending;
+  }
+
+  private rebuildFailedItems(failedItems: PhasedExecutionDocument['failedItems']): Map<string, unknown> {
+    const failed = new Map<string, unknown>();
+    for (const item of failedItems) {
+      failed.set(item.key, item.error);
+    }
+    return failed;
   }
 }
