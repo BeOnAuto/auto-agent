@@ -179,7 +179,7 @@ export const commandHandler = defineCommandHandler<
       required: false,
     },
     watchDirectories: {
-      description: 'Directories to watch for changes (default: serverDirectory)',
+      description: 'Directories to watch for changes (default: serverDirectory/src)',
       required: false,
     },
     debounceMs: {
@@ -235,7 +235,8 @@ export const commandHandler = defineCommandHandler<
       let currentProcess = await startProcess(executable, args, serverDir);
 
       if (watchEnabled) {
-        const dirsToWatch = watchDirectories?.map((d) => path.resolve(d)) ?? [serverDir];
+        const defaultWatchDir = path.join(serverDir, 'src');
+        const dirsToWatch = watchDirectories?.map((d) => path.resolve(d)) ?? [defaultWatchDir];
         let debounceTimeout: NodeJS.Timeout | null = null;
         let isRestarting = false;
         let lastRestartTime = 0;
