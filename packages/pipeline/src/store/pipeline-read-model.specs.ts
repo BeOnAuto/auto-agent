@@ -785,4 +785,30 @@ describe('PipelineReadModel', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('computeSettledStats', () => {
+    it('should return pendingCount=1 and status=running when instance is active', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CheckTests,CheckTypes,CheckLint-c1',
+        instanceId: 'template-CheckTests,CheckTypes,CheckLint-c1',
+        templateId: 'template-CheckTests,CheckTypes,CheckLint',
+        correlationId: 'c1',
+        commandTrackers: [
+          { commandType: 'CheckTests', hasStarted: true, hasCompleted: false, events: [] },
+          { commandType: 'CheckTypes', hasStarted: true, hasCompleted: false, events: [] },
+          { commandType: 'CheckLint', hasStarted: true, hasCompleted: false, events: [] },
+        ],
+        status: 'active',
+      });
+
+      const result = await readModel.computeSettledStats('c1', 'template-CheckTests,CheckTypes,CheckLint');
+
+      expect(result).toEqual({
+        status: 'running',
+        pendingCount: 1,
+        endedCount: 0,
+      });
+    });
+  });
 });

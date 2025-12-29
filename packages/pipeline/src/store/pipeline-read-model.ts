@@ -15,6 +15,12 @@ export interface CommandStats {
   aggregateStatus: NodeStatus;
 }
 
+export interface SettledStats {
+  status: NodeStatus;
+  pendingCount: number;
+  endedCount: number;
+}
+
 export interface MessageStats {
   totalMessages: number;
   totalCommands: number;
@@ -182,5 +188,19 @@ export class PipelineReadModel {
       return null;
     }
     return docs[0];
+  }
+
+  async computeSettledStats(correlationId: string, templateId: string): Promise<SettledStats> {
+    const instance = await this.getSettledInstance(templateId, correlationId);
+
+    if (instance === null) {
+      return { status: 'idle', pendingCount: 0, endedCount: 0 };
+    }
+
+    if (instance.status === 'active') {
+      return { status: 'running', pendingCount: 1, endedCount: 0 };
+    }
+
+    return { status: 'idle', pendingCount: 0, endedCount: 0 };
   }
 }
