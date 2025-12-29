@@ -15,6 +15,8 @@ import type { MessageLogDocument, MessageLogEvent } from '../projections/message
 import { evolve as evolveMessageLog } from '../projections/message-log-projection';
 import type { NodeStatusChangedEvent, NodeStatusDocument } from '../projections/node-status-projection';
 import { evolve as evolveNodeStatus } from '../projections/node-status-projection';
+import type { PhasedExecutionDocument, PhasedExecutionEvent } from '../projections/phased-execution-projection';
+import { evolve as evolvePhasedExecution } from '../projections/phased-execution-projection';
 import type { SettledEvent, SettledInstanceDocument } from '../projections/settled-instance-projection';
 import { evolve as evolveSettledInstance } from '../projections/settled-instance-projection';
 import type { StatsDocument } from '../projections/stats-projection';
@@ -90,6 +92,21 @@ function createProjections() {
     evolve: (document: SettledInstanceDocument | null, event: SettledEvent) => evolveSettledInstance(document, event),
   });
 
+  const phasedExecutionProjection = inMemorySingleStreamProjection<PhasedExecutionDocument, PhasedExecutionEvent>({
+    collectionName: 'PhasedExecution',
+    canHandle: [
+      'PhasedExecutionStarted',
+      'PhasedItemDispatched',
+      'PhasedItemCompleted',
+      'PhasedItemFailed',
+      'PhasedPhaseAdvanced',
+      'PhasedExecutionCompleted',
+    ],
+    getDocumentId: (event) => event.data.executionId,
+    evolve: (document: PhasedExecutionDocument | null, event: PhasedExecutionEvent) =>
+      evolvePhasedExecution(document, event),
+  });
+
   return inlineProjections<InMemoryReadEventMetadata>([
     itemStatusProjection,
     nodeStatusProjection,
@@ -97,6 +114,7 @@ function createProjections() {
     messageLogProjection,
     statsProjection,
     settledInstanceProjection,
+    phasedExecutionProjection,
   ] as Parameters<typeof inlineProjections<InMemoryReadEventMetadata>>[0]);
 }
 

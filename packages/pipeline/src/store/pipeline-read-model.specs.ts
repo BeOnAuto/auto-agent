@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import type { ItemStatusDocument } from '../projections/item-status-projection';
 import type { MessageLogDocument } from '../projections/message-log-projection';
 import type { NodeStatusDocument } from '../projections/node-status-projection';
+import type { PhasedExecutionDocument } from '../projections/phased-execution-projection';
 import type { SettledInstanceDocument } from '../projections/settled-instance-projection';
 import type { StatsDocument } from '../projections/stats-projection';
 import { PipelineReadModel } from './pipeline-read-model';
@@ -627,6 +628,159 @@ describe('PipelineReadModel', () => {
       });
 
       const result = await readModel.getActiveSettledInstances('c1');
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('getPhasedExecution', () => {
+    it('should return null when no execution exists', async () => {
+      const result = await readModel.getPhasedExecution('exec-1');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return execution from collection', async () => {
+      const collection = database.collection<WithId<PhasedExecutionDocument>>('PhasedExecution');
+      const triggerEvent = { type: 'TestEvent', correlationId: 'c1', data: {} };
+      await collection.insertOne({
+        _id: 'exec-1',
+        executionId: 'exec-1',
+        correlationId: 'c1',
+        handlerId: 'handler-1',
+        triggerEvent,
+        items: [{ key: 'a', phase: 'prepare', dispatched: false, completed: false }],
+        phases: ['prepare'],
+        currentPhaseIndex: 0,
+        status: 'active',
+        failedItems: [],
+      });
+
+      const result = await readModel.getPhasedExecution('exec-1');
+
+      expect(result).toMatchObject({
+        executionId: 'exec-1',
+        correlationId: 'c1',
+        handlerId: 'handler-1',
+        status: 'active',
+      });
+    });
+
+    it('should return null for different executionId', async () => {
+      const collection = database.collection<WithId<PhasedExecutionDocument>>('PhasedExecution');
+      const triggerEvent = { type: 'TestEvent', correlationId: 'c1', data: {} };
+      await collection.insertOne({
+        _id: 'exec-1',
+        executionId: 'exec-1',
+        correlationId: 'c1',
+        handlerId: 'handler-1',
+        triggerEvent,
+        items: [],
+        phases: ['prepare'],
+        currentPhaseIndex: 0,
+        status: 'active',
+        failedItems: [],
+      });
+
+      const result = await readModel.getPhasedExecution('exec-2');
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('getActivePhasedExecutions', () => {
+    it('should return empty array when no executions exist', async () => {
+      const result = await readModel.getActivePhasedExecutions('c1');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should return only active executions for correlationId', async () => {
+      const collection = database.collection<WithId<PhasedExecutionDocument>>('PhasedExecution');
+      const triggerEvent = { type: 'TestEvent', correlationId: 'c1', data: {} };
+      await collection.insertOne({
+        _id: 'exec-1',
+        executionId: 'exec-1',
+        correlationId: 'c1',
+        handlerId: 'handler-1',
+        triggerEvent,
+        items: [],
+        phases: ['prepare'],
+        currentPhaseIndex: 0,
+        status: 'active',
+        failedItems: [],
+      });
+      await collection.insertOne({
+        _id: 'exec-2',
+        executionId: 'exec-2',
+        correlationId: 'c1',
+        handlerId: 'handler-2',
+        triggerEvent,
+        items: [],
+        phases: ['prepare'],
+        currentPhaseIndex: 0,
+        status: 'completed',
+        failedItems: [],
+      });
+
+      const result = await readModel.getActivePhasedExecutions('c1');
+
+      expect(result).toHaveLength(1);
+      expect(result[0].executionId).toBe('exec-1');
+    });
+
+    it('should filter by correlationId', async () => {
+      const collection = database.collection<WithId<PhasedExecutionDocument>>('PhasedExecution');
+      const triggerEvent1 = { type: 'TestEvent', correlationId: 'c1', data: {} };
+      const triggerEvent2 = { type: 'TestEvent', correlationId: 'c2', data: {} };
+      await collection.insertOne({
+        _id: 'exec-1',
+        executionId: 'exec-1',
+        correlationId: 'c1',
+        handlerId: 'handler-1',
+        triggerEvent: triggerEvent1,
+        items: [],
+        phases: ['prepare'],
+        currentPhaseIndex: 0,
+        status: 'active',
+        failedItems: [],
+      });
+      await collection.insertOne({
+        _id: 'exec-2',
+        executionId: 'exec-2',
+        correlationId: 'c2',
+        handlerId: 'handler-1',
+        triggerEvent: triggerEvent2,
+        items: [],
+        phases: ['prepare'],
+        currentPhaseIndex: 0,
+        status: 'active',
+        failedItems: [],
+      });
+
+      const result = await readModel.getActivePhasedExecutions('c1');
+
+      expect(result).toHaveLength(1);
+      expect(result[0].correlationId).toBe('c1');
+    });
+
+    it('should exclude failed executions', async () => {
+      const collection = database.collection<WithId<PhasedExecutionDocument>>('PhasedExecution');
+      const triggerEvent = { type: 'TestEvent', correlationId: 'c1', data: {} };
+      await collection.insertOne({
+        _id: 'exec-1',
+        executionId: 'exec-1',
+        correlationId: 'c1',
+        handlerId: 'handler-1',
+        triggerEvent,
+        items: [],
+        phases: ['prepare'],
+        currentPhaseIndex: 0,
+        status: 'failed',
+        failedItems: [{ key: 'a', error: { message: 'Failed' } }],
+      });
+
+      const result = await readModel.getActivePhasedExecutions('c1');
 
       expect(result).toEqual([]);
     });

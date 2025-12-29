@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ItemStatusDocument } from '../projections/item-status-projection';
 import type { NodeStatusDocument } from '../projections/node-status-projection';
+import type { PhasedExecutionDocument } from '../projections/phased-execution-projection';
 import type { SettledInstanceDocument } from '../projections/settled-instance-projection';
 import { createPipelineEventStore } from './pipeline-event-store';
 
@@ -225,6 +226,81 @@ describe('PipelineEventStore', () => {
         expect(instances.length).toBe(1);
         expect(instances[0]?.commandTrackers[0]?.hasStarted).toBe(true);
         expect(instances[0]?.commandTrackers[0]?.hasCompleted).toBe(false);
+      } finally {
+        await close();
+      }
+    });
+  });
+
+  describe('phased execution projection', () => {
+    it('should project PhasedExecutionStarted events', async () => {
+      const { eventStore, database, close } = createPipelineEventStore();
+      try {
+        await eventStore.appendToStream('phased-c1', [
+          {
+            type: 'PhasedExecutionStarted',
+            data: {
+              executionId: 'exec-1',
+              correlationId: 'c1',
+              handlerId: 'handler-1',
+              triggerEvent: { type: 'TestEvent', correlationId: 'c1', data: {} },
+              items: [{ key: 'a', phase: 'prepare', dispatched: false, completed: false }],
+              phases: ['prepare', 'execute'],
+            },
+          },
+        ]);
+
+        const collection = database.collection<PhasedExecutionDocument & { _id: string }>('PhasedExecution');
+        const executions = await collection.find();
+
+        expect(executions.length).toBe(1);
+        expect(executions[0]?.status).toBe('active');
+        expect(executions[0]?.items).toHaveLength(1);
+      } finally {
+        await close();
+      }
+    });
+
+    it('should update phased execution through lifecycle events', async () => {
+      const { eventStore, database, close } = createPipelineEventStore();
+      try {
+        await eventStore.appendToStream('phased-c1', [
+          {
+            type: 'PhasedExecutionStarted',
+            data: {
+              executionId: 'exec-1',
+              correlationId: 'c1',
+              handlerId: 'handler-1',
+              triggerEvent: { type: 'TestEvent', correlationId: 'c1', data: {} },
+              items: [{ key: 'a', phase: 'prepare', dispatched: false, completed: false }],
+              phases: ['prepare'],
+            },
+          },
+          {
+            type: 'PhasedItemDispatched',
+            data: { executionId: 'exec-1', itemKey: 'a', phase: 'prepare' },
+          },
+          {
+            type: 'PhasedItemCompleted',
+            data: {
+              executionId: 'exec-1',
+              itemKey: 'a',
+              resultEvent: { type: 'ItemDone', correlationId: 'c1', data: {} },
+            },
+          },
+          {
+            type: 'PhasedExecutionCompleted',
+            data: { executionId: 'exec-1', success: true, results: ['a'] },
+          },
+        ]);
+
+        const collection = database.collection<PhasedExecutionDocument & { _id: string }>('PhasedExecution');
+        const executions = await collection.find();
+
+        expect(executions.length).toBe(1);
+        expect(executions[0]?.status).toBe('completed');
+        expect(executions[0]?.items[0]?.dispatched).toBe(true);
+        expect(executions[0]?.items[0]?.completed).toBe(true);
       } finally {
         await close();
       }

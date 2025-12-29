@@ -4,6 +4,7 @@ import type { ItemStatusDocument } from '../projections/item-status-projection';
 import type { LatestRunDocument } from '../projections/latest-run-projection';
 import type { MessageLogDocument } from '../projections/message-log-projection';
 import type { NodeStatusDocument } from '../projections/node-status-projection';
+import type { PhasedExecutionDocument } from '../projections/phased-execution-projection';
 import type { SettledInstanceDocument } from '../projections/settled-instance-projection';
 import type { StatsDocument } from '../projections/stats-projection';
 
@@ -26,6 +27,7 @@ export class PipelineReadModel {
   private readonly statsCollection;
   private readonly latestRunCollection;
   private readonly settledInstanceCollection;
+  private readonly phasedExecutionCollection;
 
   constructor(database: InMemoryDatabase) {
     this.itemStatusCollection = database.collection<ItemStatusDocument>('ItemStatus');
@@ -34,6 +36,7 @@ export class PipelineReadModel {
     this.statsCollection = database.collection<StatsDocument>('Stats');
     this.latestRunCollection = database.collection<LatestRunDocument>('LatestRun');
     this.settledInstanceCollection = database.collection<SettledInstanceDocument>('SettledInstance');
+    this.phasedExecutionCollection = database.collection<PhasedExecutionDocument>('PhasedExecution');
   }
 
   async computeCommandStats(correlationId: string, commandType: string): Promise<CommandStats> {
@@ -154,5 +157,17 @@ export class PipelineReadModel {
 
   async getActiveSettledInstances(correlationId: string): Promise<SettledInstanceDocument[]> {
     return this.settledInstanceCollection.find((doc) => doc.correlationId === correlationId && doc.status === 'active');
+  }
+
+  async getPhasedExecution(executionId: string): Promise<PhasedExecutionDocument | null> {
+    const executions = await this.phasedExecutionCollection.find((doc) => doc.executionId === executionId);
+    if (executions.length === 0) {
+      return null;
+    }
+    return executions[0];
+  }
+
+  async getActivePhasedExecutions(correlationId: string): Promise<PhasedExecutionDocument[]> {
+    return this.phasedExecutionCollection.find((doc) => doc.correlationId === correlationId && doc.status === 'active');
   }
 }
