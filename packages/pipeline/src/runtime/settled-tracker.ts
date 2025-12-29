@@ -200,23 +200,13 @@ export class SettledTracker {
         },
       });
 
-      if (persist) {
-        await this.emitEvent({
-          type: 'SettledInstanceReset',
-          data: {
-            templateId: instanceDoc.templateId,
-            correlationId: instanceDoc.correlationId,
-          },
-        });
-      } else {
-        await this.emitEvent({
-          type: 'SettledInstanceCleaned',
-          data: {
-            templateId: instanceDoc.templateId,
-            correlationId: instanceDoc.correlationId,
-          },
-        });
-      }
+      await this.emitEvent({
+        type: 'SettledInstanceReset',
+        data: {
+          templateId: instanceDoc.templateId,
+          correlationId: instanceDoc.correlationId,
+        },
+      });
     } catch (error) {
       const commandTypes = instanceDoc.commandTrackers.map((t) => t.commandType);
       this.onError?.(error, {

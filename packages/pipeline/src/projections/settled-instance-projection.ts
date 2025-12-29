@@ -90,7 +90,7 @@ function evolveCommandStarted(document: SettledInstanceDocument, commandType: st
   return {
     ...document,
     commandTrackers: document.commandTrackers.map((tracker) =>
-      tracker.commandType === commandType ? { ...tracker, hasStarted: true, hasCompleted: false } : tracker,
+      tracker.commandType === commandType ? { ...tracker, hasStarted: true } : tracker,
     ),
   };
 }
@@ -116,7 +116,6 @@ function evolveReset(document: SettledInstanceDocument): SettledInstanceDocument
     status: 'active',
     commandTrackers: document.commandTrackers.map((tracker) => ({
       ...tracker,
-      hasStarted: false,
       hasCompleted: false,
       events: [],
     })),

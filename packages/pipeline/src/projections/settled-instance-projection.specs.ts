@@ -75,7 +75,7 @@ describe('SettledInstanceProjection', () => {
         });
       });
 
-      it('resets hasCompleted when command restarts', () => {
+      it('preserves hasCompleted when command restarts (supports concurrent commands)', () => {
         const existing: SettledInstanceDocument = {
           instanceId: 'template-CmdA-c1',
           templateId: 'template-CmdA',
@@ -97,7 +97,7 @@ describe('SettledInstanceProjection', () => {
         expect(result.commandTrackers[0]).toEqual({
           commandType: 'CmdA',
           hasStarted: true,
-          hasCompleted: false,
+          hasCompleted: true,
           events: [],
         });
       });
@@ -208,8 +208,8 @@ describe('SettledInstanceProjection', () => {
 
         expect(result.status).toBe('active');
         expect(result.commandTrackers).toEqual([
-          { commandType: 'CmdA', hasStarted: false, hasCompleted: false, events: [] },
-          { commandType: 'CmdB', hasStarted: false, hasCompleted: false, events: [] },
+          { commandType: 'CmdA', hasStarted: true, hasCompleted: false, events: [] },
+          { commandType: 'CmdB', hasStarted: true, hasCompleted: false, events: [] },
         ]);
       });
     });
