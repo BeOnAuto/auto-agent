@@ -1,12 +1,13 @@
-# Pipeline Package - Pomodoro Plan
+# Pipeline Package - Ketchup Plan
 
 ## TODO
 
-### Phase 9: Remove Dual Caches - Pure Event Sourcing (Pomodoros 71-87)
+### Phase 9: Remove Dual Caches - Pure Event Sourcing (Bursts 71-87)
 
 **Goal**: Remove `nodeStatusCache` and `itemStatusCache` from PipelineServer. All runtime state derived from Emmett projections via `PipelineReadModel`.
 
 **Current State** (dual source of truth):
+
 ```
 Commands → Cache (mutable) + Emmett Events → Projections
                   ↓                              ↓
@@ -14,40 +15,42 @@ Commands → Cache (mutable) + Emmett Events → Projections
 ```
 
 **Target State** (single source of truth):
+
 ```
 Commands → Emmett Events → Projections → ReadModel queries
 ```
 
 ---
 
-#### Pomodoro 71: Add getNodeStatus query (test)
+#### Burst 71: Add getNodeStatus query (test)
 
 | Value | Query node status from projection |
 | Approach | `getNodeStatus(correlationId, commandName)` returns status or null |
 | Size | S |
 
 ```typescript
-it('should return null when no node status exists', async () => {
-  const result = await readModel.getNodeStatus('c1', 'CreateUser');
+it("should return null when no node status exists", async () => {
+  const result = await readModel.getNodeStatus("c1", "CreateUser");
   expect(result).toBeNull();
 });
 
-it('should return node status from NodeStatus collection', async () => {
-  const collection = database.collection<WithId<NodeStatusDocument>>('NodeStatus');
+it("should return node status from NodeStatus collection", async () => {
+  const collection =
+    database.collection<WithId<NodeStatusDocument>>("NodeStatus");
   await collection.insertOne({
-    _id: 'ns-c1-CreateUser',
-    correlationId: 'c1',
-    commandName: 'CreateUser',
-    status: 'running',
+    _id: "ns-c1-CreateUser",
+    correlationId: "c1",
+    commandName: "CreateUser",
+    status: "running",
     pendingCount: 1,
     endedCount: 0,
   });
 
-  const result = await readModel.getNodeStatus('c1', 'CreateUser');
+  const result = await readModel.getNodeStatus("c1", "CreateUser");
   expect(result).toEqual({
-    correlationId: 'c1',
-    commandName: 'CreateUser',
-    status: 'running',
+    correlationId: "c1",
+    commandName: "CreateUser",
+    status: "running",
     pendingCount: 1,
     endedCount: 0,
   });
@@ -56,7 +59,7 @@ it('should return node status from NodeStatus collection', async () => {
 
 ---
 
-#### Pomodoro 72: Add getNodeStatus query (implement)
+#### Burst 72: Add getNodeStatus query (implement)
 
 | Value | Can query node status from projection |
 | Approach | Query NodeStatus collection with filter |
@@ -65,35 +68,36 @@ it('should return node status from NodeStatus collection', async () => {
 
 ---
 
-#### Pomodoro 73: Add getItemStatus query (test)
+#### Burst 73: Add getItemStatus query (test)
 
 | Value | Query item status from projection |
 | Approach | `getItemStatus(correlationId, commandType, itemKey)` returns ItemStatusDocument or null |
 | Size | S |
 
 ```typescript
-it('should return null when no item status exists', async () => {
-  const result = await readModel.getItemStatus('c1', 'CreateUser', 'item1');
+it("should return null when no item status exists", async () => {
+  const result = await readModel.getItemStatus("c1", "CreateUser", "item1");
   expect(result).toBeNull();
 });
 
-it('should return item status from ItemStatus collection', async () => {
-  const collection = database.collection<WithId<ItemStatusDocument>>('ItemStatus');
+it("should return item status from ItemStatus collection", async () => {
+  const collection =
+    database.collection<WithId<ItemStatusDocument>>("ItemStatus");
   await collection.insertOne({
-    _id: 'is-c1-CreateUser-item1',
-    correlationId: 'c1',
-    commandType: 'CreateUser',
-    itemKey: 'item1',
-    currentRequestId: 'r1',
-    status: 'running',
+    _id: "is-c1-CreateUser-item1",
+    correlationId: "c1",
+    commandType: "CreateUser",
+    itemKey: "item1",
+    currentRequestId: "r1",
+    status: "running",
     attemptCount: 1,
   });
 
-  const result = await readModel.getItemStatus('c1', 'CreateUser', 'item1');
+  const result = await readModel.getItemStatus("c1", "CreateUser", "item1");
   expect(result).toMatchObject({
-    correlationId: 'c1',
-    commandType: 'CreateUser',
-    itemKey: 'item1',
+    correlationId: "c1",
+    commandType: "CreateUser",
+    itemKey: "item1",
     attemptCount: 1,
   });
 });
@@ -101,7 +105,7 @@ it('should return item status from ItemStatus collection', async () => {
 
 ---
 
-#### Pomodoro 74: Add getItemStatus query (implement)
+#### Burst 74: Add getItemStatus query (implement)
 
 | Value | Can query item status from projection |
 | Approach | Query ItemStatus collection with filter |
@@ -110,7 +114,7 @@ it('should return item status from ItemStatus collection', async () => {
 
 ---
 
-#### Pomodoro 75: Replace previousStatus lookup (test)
+#### Burst 75: Replace previousStatus lookup (test)
 
 | Value | Get previousStatus from projection instead of cache |
 | Approach | Verify `updateNodeStatus` emits correct previousStatus |
@@ -120,7 +124,7 @@ Existing tests should pass with projection-based previousStatus lookup.
 
 ---
 
-#### Pomodoro 76: Replace previousStatus lookup (implement)
+#### Burst 76: Replace previousStatus lookup (implement)
 
 | Value | Remove nodeStatusCache usage in updateNodeStatus |
 | Approach | Query `readModel.getNodeStatus()` for previousStatus |
@@ -138,7 +142,7 @@ private async updateNodeStatus(correlationId: string, commandName: string, statu
 
 ---
 
-#### Pomodoro 77: Replace hasCorrelation check (test)
+#### Burst 77: Replace hasCorrelation check (test)
 
 | Value | Detect new correlationId via projection |
 | Approach | Test that PipelineRunStarted is emitted only for new correlationIds |
@@ -148,7 +152,7 @@ Existing broadcast tests should pass with projection-based detection.
 
 ---
 
-#### Pomodoro 78: Replace hasCorrelation check (implement)
+#### Burst 78: Replace hasCorrelation check (implement)
 
 | Value | Remove nodeStatusCache.has() check |
 | Approach | Use `readModel.hasCorrelation()` instead |
@@ -156,19 +160,22 @@ Existing broadcast tests should pass with projection-based detection.
 | Files | `src/server/pipeline-server.ts` line 874 |
 
 ```typescript
-const isNewCorrelationId = !(await this.eventStoreContext.readModel.hasCorrelation(command.correlationId));
+const isNewCorrelationId =
+  !(await this.eventStoreContext.readModel.hasCorrelation(
+    command.correlationId
+  ));
 ```
 
 ---
 
-#### Pomodoro 79: Replace item creation/update logic (test)
+#### Burst 79: Replace item creation/update logic (test)
 
 | Value | Get/create item status from projection |
 | Approach | Test item creation with correct attemptCount from projection |
 | Size | M |
 
 ```typescript
-it('should increment attemptCount on retry', async () => {
+it("should increment attemptCount on retry", async () => {
   // First command creates item with attemptCount=1
   // Second command (same itemKey) should have attemptCount=2
 });
@@ -176,7 +183,7 @@ it('should increment attemptCount on retry', async () => {
 
 ---
 
-#### Pomodoro 80: Replace item creation/update logic (implement)
+#### Burst 80: Replace item creation/update logic (implement)
 
 | Value | Remove itemStatusCache from getOrCreateItemStatus |
 | Approach | Query projection for existing item, derive attemptCount |
@@ -208,7 +215,7 @@ private async getOrCreateItemStatus(
 
 ---
 
-#### Pomodoro 81: Replace item update logic (test)
+#### Burst 81: Replace item update logic (test)
 
 | Value | Update item status via events only |
 | Approach | Test item status update emits event with correct data |
@@ -218,7 +225,7 @@ Existing tests should pass with event-only updates.
 
 ---
 
-#### Pomodoro 82: Replace item update logic (implement)
+#### Burst 82: Replace item update logic (implement)
 
 | Value | Remove itemStatusCache from updateItemStatus |
 | Approach | Query projection for currentRequestId and attemptCount, emit event |
@@ -248,7 +255,7 @@ private async updateItemStatus(
 
 ---
 
-#### Pomodoro 83: Remove nodeStatusCache field
+#### Burst 83: Remove nodeStatusCache field
 
 | Value | Single source of truth |
 | Approach | Delete the field declaration |
@@ -257,7 +264,7 @@ private async updateItemStatus(
 
 ---
 
-#### Pomodoro 84: Remove itemStatusCache field
+#### Burst 84: Remove itemStatusCache field
 
 | Value | Single source of truth |
 | Approach | Delete the field declaration |
@@ -266,7 +273,7 @@ private async updateItemStatus(
 
 ---
 
-#### Pomodoro 85: Remove ItemStatus interface (if unused)
+#### Burst 85: Remove ItemStatus interface (if unused)
 
 | Value | Clean up dead code |
 | Approach | Delete if no longer referenced |
@@ -275,7 +282,7 @@ private async updateItemStatus(
 
 ---
 
-#### Pomodoro 86: Remove latestCorrelationId field
+#### Burst 86: Remove latestCorrelationId field
 
 | Value | Derive from LatestRunProjection |
 | Approach | Query LatestRun projection instead |
@@ -284,13 +291,14 @@ private async updateItemStatus(
 
 ---
 
-#### Pomodoro 87: Final verification and cleanup
+#### Burst 87: Final verification and cleanup
 
 | Value | All tests pass, no dual state |
 | Approach | Run full test suite, verify 100% coverage |
 | Size | M |
 
 **Success Criteria:**
+
 1. ✅ `nodeStatusCache` field removed
 2. ✅ `itemStatusCache` field removed
 3. ✅ `ItemStatus` interface removed (if unused)
@@ -301,87 +309,87 @@ private async updateItemStatus(
 
 ---
 
-### Phase 3: Phased Execution Pattern (Pomodoros 27-34)
+### Phase 3: Phased Execution Pattern (Bursts 27-34)
 
-#### Pomodoro 27: ForEachBuilder Interface & TriggerBuilder.forEach()
+#### Burst 27: ForEachBuilder Interface & TriggerBuilder.forEach()
 
 | Value | Entry point to phased execution pattern |
 | Approach | TriggerBuilder.forEach() returns ForEachBuilder |
 | Size | S |
 
 ```typescript
-it('should return ForEachBuilder from TriggerBuilder.forEach()', () => {
+it("should return ForEachBuilder from TriggerBuilder.forEach()", () => {
   type ItemsEvent = { data: { items: Array<{ id: string }> } };
-  const builder = define('test')
-    .on('ItemsReady')
+  const builder = define("test")
+    .on("ItemsReady")
     .forEach((e: ItemsEvent) => e.data.items);
 
   expect(builder).toBeDefined();
-  expect(typeof builder.groupInto).toBe('function');
+  expect(typeof builder.groupInto).toBe("function");
 });
 ```
 
 ---
 
-#### Pomodoro 28: ForEachBuilder.groupInto() with phases
+#### Burst 28: ForEachBuilder.groupInto() with phases
 
 | Value | Define execution phases for items |
 | Approach | groupInto() accepts phase names and classifier |
 | Size | M |
 
 ```typescript
-it('should configure phases with groupInto()', () => {
-  type Item = { id: string; type: 'critical' | 'normal' };
-  const pipeline = define('test')
-    .on('ItemsReady')
+it("should configure phases with groupInto()", () => {
+  type Item = { id: string; type: "critical" | "normal" };
+  const pipeline = define("test")
+    .on("ItemsReady")
     .forEach((e: { data: { items: Item[] } }) => e.data.items)
-    .groupInto(['critical', 'normal'], (item: Item) => item.type)
-    .process('ProcessItem', (item: Item) => ({ itemId: item.id }))
+    .groupInto(["critical", "normal"], (item: Item) => item.type)
+    .process("ProcessItem", (item: Item) => ({ itemId: item.id }))
     .build();
 
   const handler = pipeline.descriptor.handlers[0] as ForEachPhasedDescriptor;
-  expect(handler.phases).toEqual(['critical', 'normal']);
+  expect(handler.phases).toEqual(["critical", "normal"]);
 });
 ```
 
 ---
 
-#### Pomodoro 29: PhasedBuilder.process() with emit factory
+#### Burst 29: PhasedBuilder.process() with emit factory
 
 | Value | Define command emission for each item |
 | Approach | process() accepts commandType and data factory |
 | Size | S |
 
 ```typescript
-it('should configure emitFactory with process()', () => {
+it("should configure emitFactory with process()", () => {
   type Item = { id: string };
-  const pipeline = define('test')
-    .on('ItemsReady')
+  const pipeline = define("test")
+    .on("ItemsReady")
     .forEach((e: { data: { items: Item[] } }) => e.data.items)
-    .groupInto(['phase1'], () => 'phase1')
-    .process('ProcessItem', (item: Item) => ({ itemId: item.id }))
+    .groupInto(["phase1"], () => "phase1")
+    .process("ProcessItem", (item: Item) => ({ itemId: item.id }))
     .build();
 
   const handler = pipeline.descriptor.handlers[0] as ForEachPhasedDescriptor;
-  expect(typeof handler.emitFactory).toBe('function');
+  expect(typeof handler.emitFactory).toBe("function");
 });
 ```
 
 ---
 
-#### Pomodoro 30: PhasedBuilder.stopOnFailure()
+#### Burst 30: PhasedBuilder.stopOnFailure()
 
 | Value | Configure failure behavior |
 | Approach | stopOnFailure() sets flag in descriptor |
 | Size | S |
 
 ```typescript
-it('should set stopOnFailure flag', () => {
-  const pipeline = define('test')
-    .on('ItemsReady')
+it("should set stopOnFailure flag", () => {
+  const pipeline = define("test")
+    .on("ItemsReady")
     .forEach((e: { data: { items: unknown[] } }) => e.data.items)
-    .groupInto(['phase1'], () => 'phase1')
-    .process('ProcessItem', () => ({}))
+    .groupInto(["phase1"], () => "phase1")
+    .process("ProcessItem", () => ({}))
     .stopOnFailure()
     .build();
 
@@ -392,51 +400,51 @@ it('should set stopOnFailure flag', () => {
 
 ---
 
-#### Pomodoro 31: PhasedBuilder.onComplete()
+#### Burst 31: PhasedBuilder.onComplete()
 
 | Value | Configure completion events |
 | Approach | onComplete() sets success/failure event types |
 | Size | M |
 
 ```typescript
-it('should configure completion events', () => {
+it("should configure completion events", () => {
   type Item = { id: string };
-  const pipeline = define('test')
-    .on('ItemsReady')
+  const pipeline = define("test")
+    .on("ItemsReady")
     .forEach((e: { data: { items: Item[] } }) => e.data.items)
-    .groupInto(['phase1'], () => 'phase1')
-    .process('ProcessItem', (item: Item) => ({ itemId: item.id }))
+    .groupInto(["phase1"], () => "phase1")
+    .process("ProcessItem", (item: Item) => ({ itemId: item.id }))
     .onComplete({
-      success: 'AllItemsProcessed',
-      failure: 'ProcessingFailed',
+      success: "AllItemsProcessed",
+      failure: "ProcessingFailed",
       itemKey: (e: { data: { itemId: string } }) => e.data.itemId,
     })
     .build();
 
   const handler = pipeline.descriptor.handlers[0] as ForEachPhasedDescriptor;
-  expect(handler.completion.successEvent).toBe('AllItemsProcessed');
-  expect(handler.completion.failureEvent).toBe('ProcessingFailed');
+  expect(handler.completion.successEvent).toBe("AllItemsProcessed");
+  expect(handler.completion.failureEvent).toBe("ProcessingFailed");
 });
 ```
 
 ---
 
-#### Pomodoro 32: Chaining from PhasedBuilder
+#### Burst 32: Chaining from PhasedBuilder
 
 | Value | Continue pipeline definition after phased |
 | Approach | PhasedBuilder returns to chain |
 | Size | S |
 
 ```typescript
-it('should chain on() from PhasedBuilder', () => {
-  const pipeline = define('test')
-    .on('ItemsReady')
+it("should chain on() from PhasedBuilder", () => {
+  const pipeline = define("test")
+    .on("ItemsReady")
     .forEach((e: { data: { items: unknown[] } }) => e.data.items)
-    .groupInto(['phase1'], () => 'phase1')
-    .process('ProcessItem', () => ({}))
-    .onComplete({ success: 'Done', failure: 'Failed', itemKey: () => '' })
-    .on('Done')
-    .emit('Notify', {})
+    .groupInto(["phase1"], () => "phase1")
+    .process("ProcessItem", () => ({}))
+    .onComplete({ success: "Done", failure: "Failed", itemKey: () => "" })
+    .on("Done")
+    .emit("Notify", {})
     .build();
 
   expect(pipeline.descriptor.handlers).toHaveLength(2);
@@ -445,20 +453,20 @@ it('should chain on() from PhasedBuilder', () => {
 
 ---
 
-#### Pomodoro 33: Default stopOnFailure behavior
+#### Burst 33: Default stopOnFailure behavior
 
 | Value | Sensible defaults |
 | Approach | stopOnFailure defaults to false |
 | Size | S |
 
 ```typescript
-it('should default stopOnFailure to false', () => {
-  const pipeline = define('test')
-    .on('ItemsReady')
+it("should default stopOnFailure to false", () => {
+  const pipeline = define("test")
+    .on("ItemsReady")
     .forEach((e: { data: { items: unknown[] } }) => e.data.items)
-    .groupInto(['phase1'], () => 'phase1')
-    .process('ProcessItem', () => ({}))
-    .onComplete({ success: 'Done', failure: 'Failed', itemKey: () => '' })
+    .groupInto(["phase1"], () => "phase1")
+    .process("ProcessItem", () => ({}))
+    .onComplete({ success: "Done", failure: "Failed", itemKey: () => "" })
     .build();
 
   const handler = pipeline.descriptor.handlers[0] as ForEachPhasedDescriptor;
@@ -468,99 +476,101 @@ it('should default stopOnFailure to false', () => {
 
 ---
 
-#### Pomodoro 34: Phase 3 Integration Test
+#### Burst 34: Phase 3 Integration Test
 
 | Value | Validate complete phased pipeline |
 | Approach | Integration test with realistic scenario |
 | Size | M |
 
 ```typescript
-it('should create complete phased execution pipeline', () => {
-  type Component = { path: string; priority: 'high' | 'medium' | 'low' };
+it("should create complete phased execution pipeline", () => {
+  type Component = { path: string; priority: "high" | "medium" | "low" };
   type ComponentEvent = { data: { components: Component[] } };
 
-  const pipeline = define('component-processor')
-    .version('1.0.0')
-    .description('Process components in priority phases')
-    .on('ComponentsGenerated')
+  const pipeline = define("component-processor")
+    .version("1.0.0")
+    .description("Process components in priority phases")
+    .on("ComponentsGenerated")
     .when((e: ComponentEvent) => e.data.components.length > 0)
     .forEach((e: ComponentEvent) => e.data.components)
-    .groupInto(['high', 'medium', 'low'], (c: Component) => c.priority)
-    .process('ImplementComponent', (c: Component) => ({ componentPath: c.path }))
+    .groupInto(["high", "medium", "low"], (c: Component) => c.priority)
+    .process("ImplementComponent", (c: Component) => ({
+      componentPath: c.path,
+    }))
     .stopOnFailure()
     .onComplete({
-      success: 'AllComponentsImplemented',
-      failure: 'ComponentImplementationFailed',
+      success: "AllComponentsImplemented",
+      failure: "ComponentImplementationFailed",
       itemKey: (e: { data: { componentPath: string } }) => e.data.componentPath,
     })
     .build();
 
-  expect(pipeline.descriptor.name).toBe('component-processor');
+  expect(pipeline.descriptor.name).toBe("component-processor");
   const handler = pipeline.descriptor.handlers[0] as ForEachPhasedDescriptor;
-  expect(handler.type).toBe('foreach-phased');
-  expect(handler.phases).toEqual(['high', 'medium', 'low']);
+  expect(handler.type).toBe("foreach-phased");
+  expect(handler.phases).toEqual(["high", "medium", "low"]);
   expect(handler.stopOnFailure).toBe(true);
 });
 ```
 
 ---
 
-### Phase 4: Custom Handlers (Pomodoros 35-37)
+### Phase 4: Custom Handlers (Bursts 35-37)
 
-#### Pomodoro 35: TriggerBuilder.handle() basic
+#### Burst 35: TriggerBuilder.handle() basic
 
 | Value | Escape hatch for imperative logic |
 | Approach | handle() accepts async handler function |
 | Size | S |
 
 ```typescript
-it('should capture custom handler', () => {
+it("should capture custom handler", () => {
   const handler = async (e: { data: unknown }) => {
     console.log(e);
   };
-  const pipeline = define('test').on('CustomEvent').handle(handler).build();
+  const pipeline = define("test").on("CustomEvent").handle(handler).build();
 
   const desc = pipeline.descriptor.handlers[0] as CustomHandlerDescriptor;
-  expect(desc.type).toBe('custom');
+  expect(desc.type).toBe("custom");
   expect(desc.handler).toBe(handler);
 });
 ```
 
 ---
 
-#### Pomodoro 36: handle() with declaredEmits
+#### Burst 36: handle() with declaredEmits
 
 | Value | Graph introspection support |
 | Approach | Optional second param for declared emits |
 | Size | S |
 
 ```typescript
-it('should capture declaredEmits for graph introspection', () => {
-  const pipeline = define('test')
-    .on('CustomEvent')
-    .handle(async () => {}, { emits: ['EventA', 'EventB'] })
+it("should capture declaredEmits for graph introspection", () => {
+  const pipeline = define("test")
+    .on("CustomEvent")
+    .handle(async () => {}, { emits: ["EventA", "EventB"] })
     .build();
 
   const desc = pipeline.descriptor.handlers[0] as CustomHandlerDescriptor;
-  expect(desc.declaredEmits).toEqual(['EventA', 'EventB']);
+  expect(desc.declaredEmits).toEqual(["EventA", "EventB"]);
 });
 ```
 
 ---
 
-#### Pomodoro 37: Phase 4 Integration & Chaining
+#### Burst 37: Phase 4 Integration & Chaining
 
 | Value | Complete custom handler support |
 | Approach | Chaining from handle() |
 | Size | S |
 
 ```typescript
-it('should chain on() from handle()', () => {
-  const pipeline = define('test')
-    .on('EventA')
+it("should chain on() from handle()", () => {
+  const pipeline = define("test")
+    .on("EventA")
     .handle(async () => {})
-    .on('EventB')
-    .emit('CommandB', {})
+    .on("EventB")
+    .emit("CommandB", {})
     .build();
 
   expect(pipeline.descriptor.handlers).toHaveLength(2);
@@ -569,22 +579,22 @@ it('should chain on() from handle()', () => {
 
 ---
 
-### Phase 5: Graph Extraction (Pomodoros 38-42)
+### Phase 5: Graph Extraction (Bursts 38-42)
 
-#### Pomodoro 38: GraphIR type definition
+#### Burst 38: GraphIR type definition
 
 | Value | Intermediate representation for visualization |
 | Approach | Define nodes and edges types |
 | Size | S |
 
 ```typescript
-it('should define GraphIR with nodes and edges', () => {
+it("should define GraphIR with nodes and edges", () => {
   const graph: GraphIR = {
     nodes: [
-      { id: 'evt:Start', type: 'event', label: 'Start' },
-      { id: 'cmd:Process', type: 'command', label: 'Process' },
+      { id: "evt:Start", type: "event", label: "Start" },
+      { id: "cmd:Process", type: "command", label: "Process" },
     ],
-    edges: [{ from: 'evt:Start', to: 'cmd:Process', label: 'triggers' }],
+    edges: [{ from: "evt:Start", to: "cmd:Process", label: "triggers" }],
   };
   expect(graph.nodes).toHaveLength(2);
 });
@@ -592,25 +602,25 @@ it('should define GraphIR with nodes and edges', () => {
 
 ---
 
-#### Pomodoro 39: Pipeline.toGraph() basic
+#### Burst 39: Pipeline.toGraph() basic
 
 | Value | Extract graph from pipeline |
 | Approach | toGraph() method on Pipeline |
 | Size | M |
 
 ```typescript
-it('should extract graph from emit handler', () => {
-  const pipeline = define('test').on('Start').emit('Process', {}).build();
+it("should extract graph from emit handler", () => {
+  const pipeline = define("test").on("Start").emit("Process", {}).build();
 
   const graph = pipeline.toGraph();
-  expect(graph.nodes.some((n) => n.id === 'evt:Start')).toBe(true);
-  expect(graph.nodes.some((n) => n.id === 'cmd:Process')).toBe(true);
+  expect(graph.nodes.some((n) => n.id === "evt:Start")).toBe(true);
+  expect(graph.nodes.some((n) => n.id === "cmd:Process")).toBe(true);
 });
 ```
 
 ---
 
-#### Pomodoro 40: toGraph() with run-await handlers
+#### Burst 40: toGraph() with run-await handlers
 
 | Value | Graph extraction for scatter-gather |
 | Approach | Include await relationships |
@@ -618,7 +628,7 @@ it('should extract graph from emit handler', () => {
 
 ---
 
-#### Pomodoro 41: toGraph() with foreach-phased handlers
+#### Burst 41: toGraph() with foreach-phased handlers
 
 | Value | Graph extraction for phased execution |
 | Approach | Include phase groupings |
@@ -626,7 +636,7 @@ it('should extract graph from emit handler', () => {
 
 ---
 
-#### Pomodoro 42: toGraph() with custom handlers
+#### Burst 42: toGraph() with custom handlers
 
 | Value | Graph extraction using declaredEmits |
 | Approach | Use declaredEmits for edges |
@@ -634,13 +644,13 @@ it('should extract graph from emit handler', () => {
 
 ---
 
-### Phase 6: Cloud Abstractions (Pomodoros 43-48)
+### Phase 6: Cloud Abstractions (Bursts 43-48)
 
 (Deferred - interfaces only, no runtime implementation yet)
 
 ---
 
-### Phase 7: Pipeline Runtime (Pomodoros 49-54)
+### Phase 7: Pipeline Runtime (Bursts 49-54)
 
 (Deferred - requires Phase 6 abstractions)
 
@@ -648,11 +658,11 @@ it('should extract graph from emit handler', () => {
 
 ## DONE
 
-### Phase 8: CLI Integration (Pomodoros 67-70) ✅
+### Phase 8: CLI Integration (Bursts 67-70) ✅
 
-Pomodoro 67-70 complete. E2E tests validate CLI parity.
+Burst 67-70 complete. E2E tests validate CLI parity.
 
-### Pomodoro 69-70: E2E Tests for CLI Parity
+### Burst 69-70: E2E Tests for CLI Parity
 
 Implemented:
 
@@ -665,7 +675,7 @@ All 99 tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 67-68: Enhanced /pipeline Response
+### Burst 67-68: Enhanced /pipeline Response
 
 Implemented:
 
@@ -679,7 +689,7 @@ All 91 tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 53-54: AwaitTracker
+### Burst 53-54: AwaitTracker
 
 Implemented:
 
@@ -695,7 +705,7 @@ All 87 tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 55-66: PipelineServer
+### Burst 55-66: PipelineServer
 
 Implemented:
 
@@ -713,7 +723,7 @@ All 80 tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 51-52: Run-await and ForEach-phased Runtime
+### Burst 51-52: Run-await and ForEach-phased Runtime
 
 Implemented:
 
@@ -726,7 +736,7 @@ All 80 tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 45-50: PipelineRuntime Core
+### Burst 45-50: PipelineRuntime Core
 
 Implemented:
 
@@ -741,7 +751,7 @@ All 59 tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 43-44: PipelineContext & RuntimeConfig
+### Burst 43-44: PipelineContext & RuntimeConfig
 
 Implemented:
 
@@ -751,7 +761,7 @@ Implemented:
 
 ---
 
-### Pomodoro 38-42: Phase 5 Graph Extraction
+### Burst 38-42: Phase 5 Graph Extraction
 
 Implemented:
 
@@ -770,7 +780,7 @@ All 46 tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 35-37: Phase 4 Custom Handlers
+### Burst 35-37: Phase 4 Custom Handlers
 
 Implemented:
 
@@ -783,7 +793,7 @@ All 37 tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 27-34: Phase 3 Phased Execution Pattern
+### Burst 27-34: Phase 3 Phased Execution Pattern
 
 Implemented:
 
@@ -799,7 +809,7 @@ All 34 tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 19-26: Phase 2 Scatter-Gather Pattern
+### Burst 19-26: Phase 2 Scatter-Gather Pattern
 
 Implemented:
 
@@ -821,7 +831,7 @@ All 26 tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 13, 15, 18: Remaining Phase 1 features
+### Burst 13, 15, 18: Remaining Phase 1 features
 
 - emit() with data factory
 - when() predicate for conditional execution
@@ -831,7 +841,7 @@ All Phase 1 tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 6-12, 14, 16, 17: Builder API (batched)
+### Burst 6-12, 14, 16, 17: Builder API (batched)
 
 Implemented:
 
@@ -849,93 +859,93 @@ All tests pass with 100% coverage.
 
 ---
 
-### Pomodoro 5: PipelineDescriptor Type
+### Burst 5: PipelineDescriptor Type
 
 | Value | Pipeline structure definition |
 | Approach | Interface with metadata + handlers array |
 | Size | S |
 
 ```typescript
-it('should create PipelineDescriptor', () => {
+it("should create PipelineDescriptor", () => {
   const descriptor: PipelineDescriptor = {
-    name: 'test-pipeline',
-    version: '1.0.0',
+    name: "test-pipeline",
+    version: "1.0.0",
     keys: new Map(),
     handlers: [],
   };
-  expect(descriptor.name).toBe('test-pipeline');
+  expect(descriptor.name).toBe("test-pipeline");
 });
 ```
 
 ---
 
-### Pomodoro 4: dispatch() Helper
+### Burst 4: dispatch() Helper
 
 | Value | Ergonomic CommandDispatch creation |
 | Approach | Simple factory function |
 | Size | S |
 
 ```typescript
-it('should create CommandDispatch via dispatch()', () => {
-  const cmd = dispatch('CheckTests', { targetDirectory: './src' });
+it("should create CommandDispatch via dispatch()", () => {
+  const cmd = dispatch("CheckTests", { targetDirectory: "./src" });
   expect(cmd).toEqual({
-    commandType: 'CheckTests',
-    data: { targetDirectory: './src' },
+    commandType: "CheckTests",
+    data: { targetDirectory: "./src" },
   });
 });
 ```
 
 ---
 
-### Pomodoro 3: CommandDispatch Type
+### Burst 3: CommandDispatch Type
 
 | Value | Dispatch instruction type |
 | Approach | Simple interface with commandType + data |
 | Size | S |
 
 ```typescript
-it('should create CommandDispatch with static data', () => {
+it("should create CommandDispatch with static data", () => {
   const cmd: CommandDispatch = {
-    commandType: 'CheckTests',
-    data: { targetDirectory: './src', scope: 'slice' },
+    commandType: "CheckTests",
+    data: { targetDirectory: "./src", scope: "slice" },
   };
   expect(cmd).toEqual({
-    commandType: 'CheckTests',
-    data: { targetDirectory: './src', scope: 'slice' },
+    commandType: "CheckTests",
+    data: { targetDirectory: "./src", scope: "slice" },
   });
 });
 
-it('should create CommandDispatch with data factory', () => {
+it("should create CommandDispatch with data factory", () => {
   const cmd: CommandDispatch = {
-    commandType: 'ImplementSlice',
+    commandType: "ImplementSlice",
     data: (e) => ({ slicePath: e.data.path }),
   };
-  const event: Event = { type: 'SliceGenerated', data: { path: './slice' } };
-  const resolved = typeof cmd.data === 'function' ? cmd.data(event) : cmd.data;
-  expect(resolved).toEqual({ slicePath: './slice' });
+  const event: Event = { type: "SliceGenerated", data: { path: "./slice" } };
+  const resolved = typeof cmd.data === "function" ? cmd.data(event) : cmd.data;
+  expect(resolved).toEqual({ slicePath: "./slice" });
 });
 ```
 
 ---
 
-### Pomodoro 2: Core Types
+### Burst 2: Core Types
 
 | Value | Foundation types |
 | Approach | Re-export message-bus types + add pipeline types |
 | Size | S |
 
 ```typescript
-it('should re-export Command and Event from message-bus', () => {
-  const cmd: Command = { type: 'Test', data: {} };
-  const evt: Event = { type: 'TestDone', data: {} };
-  expect(cmd.type).toBe('Test');
-  expect(evt.type).toBe('TestDone');
+it("should re-export Command and Event from message-bus", () => {
+  const cmd: Command = { type: "Test", data: {} };
+  const evt: Event = { type: "TestDone", data: {} };
+  expect(cmd.type).toBe("Test");
+  expect(evt.type).toBe("TestDone");
 });
 ```
 
 ---
 
-### Pomodoro 1: Package Scaffold
+### Burst 1: Package Scaffold
 
 | Value | Foundation for all work |
 | Approach | Copy patterns from `@auto-engineer/id` |

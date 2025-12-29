@@ -1,6 +1,6 @@
-# Development Guide
+# 🥫 The Ketchup Technique
 
-## Pomodoro + TDD + TCR + 100% Coverage
+## Controlled Bursts + TDD + TCR + 100% Coverage
 
 ```
 ╔═════════════════════════════════════════════════════════════════════╗
@@ -16,17 +16,73 @@
 
 ---
 
-## 🍅 Pomodoro Workflow
+## 💥 Controlled Bursts
 
-One atomic test + implementation per cycle (5-15 min).
+**Controlled bursts. One test, one commit, no sprawl.**
 
-**Planning a Pomodoro:**
+```
+╔═════════════════════════════════════════════════════════════════════╗
+║                                                                     ║
+║   BURST ───► COMMIT ───► BURST ───► COMMIT ───► DONE                ║
+║                                                                     ║
+║   Each burst: one failing test → minimal code → commit              ║
+║                                                                     ║
+║   No burst = no code.                                               ║
+║                                                                     ║
+╚═════════════════════════════════════════════════════════════════════╝
+```
 
-- Independent, valuable, small, testable
-- Define: value added, code surface size (S/M/L), complexity (S/M/L)
-- 1-2 line approach description
-- Create `pomodoro-plan.md` with sections: TODO / DONE
-- Commit the plan with initial pomodoros
+### Why Ketchup?
+
+**You operate in controlled bursts.**
+
+Do not write large amounts of code at once. Each burst is one failing test → minimal passing code → commit. Stop. Wait. Next burst.
+
+Like ketchup from a bottle: tap, controlled amount, stop. Never upend and pour.
+
+### What's a Burst?
+
+The smallest unit of deliverable work. One test, one behavior, one commit.
+
+Each burst must be:
+
+- **Independent** — works on its own
+- **Valuable** — adds real functionality
+- **Small** — one test, one behavior
+- **Testable** — single clear assertion
+- **Reviewable** — the human operator can verify correctness at a glance
+
+The constraint is scope, not time. Keep bursts small enough that:
+
+1. You stay focused on one thing
+2. The operator can verify quickly
+3. A revert loses minimal work
+
+---
+
+## 🥫 Ketchup Workflow
+
+**Planning:**
+
+- Break the feature into bursts: independent, valuable, small, testable
+- For each burst define: value added, code surface size (S/M/L), complexity (S/M/L)
+- 1-2 line approach description per burst
+- Create `ketchup-plan.md` with sections: TODO / DONE
+- Commit the plan before any code
+
+```markdown
+# Ketchup Plan: [Feature Name]
+
+## TODO
+
+- [ ] Burst 1: [1-2 line description]
+- [ ] Burst 2: [1-2 line description]
+- [ ] Burst 3: [1-2 line description]
+
+## DONE
+
+- [x] (completed bursts move here with commit hash)
+```
 
 **Execution:**
 
@@ -35,7 +91,47 @@ One atomic test + implementation per cycle (5-15 min).
 3. TCR: `test && commit || revert` (include plan update)
 4. Refactor if needed
 5. TCR: `test && commit || revert`
-6. Move pomodoro to DONE in the `pomodoro-plan.md`, commit with TCR
+6. Move burst to DONE in `ketchup-plan.md`, commit with TCR
+7. Next burst
+
+**TCR: Test && Commit || Revert**
+
+```
+╔══════════════════════════════════════════════════════════════════════╗
+║  TCR is not optional. It's how you operate.                          ║
+║                                                                      ║
+║  Pass → commit → continue                                            ║
+║  Fail → REVERT → STOP → RETHINK                                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+```
+
+**Why Revert Instead of Fix?**
+
+When a test fails, your instinct will be to patch the code until it passes. **Do not do this.**
+
+Patching builds on broken foundations. Each fix adds complexity to compensate for a flawed approach. You end up with:
+
+- Defensive code that handles symptoms, not causes
+- Tangled logic that's hard to reason about
+- Technical debt baked into the design
+
+**Revert forces a clean slate.** The code disappears, but the _learning_ remains. You now know:
+
+- What approach didn't work
+- What edge case you missed
+- What assumption was wrong
+
+Use that knowledge to design a better approach, not to patch a bad one.
+
+**The RETHINK Step:**
+
+After a revert, do not immediately retry the same approach. Stop and ask:
+
+1. Was the burst too big? → Split it smaller
+2. Was the design flawed? → Try a different approach
+3. Was the test wrong? → Clarify the requirement first
+
+Only then write the next failing test.
 
 **TCR Command:**
 
@@ -44,6 +140,8 @@ pnpm test --run && \
   git add -A && git commit -m "<COMMITIZEN FORMAT>" || \
   git checkout -- packages/<package>/
 ```
+
+**The Rule:** No burst, no code. Every line of production code starts with a failing test in a planned burst.
 
 ---
 
@@ -256,7 +354,7 @@ expect(manager.clientCount).toBe(3);
 expect(executor.getActiveSessionCount()).toBe(1);
 
 // ❌ Accessing internal collections
-expect(service['internalMap'].size).toBe(2);
+expect(service["internalMap"].size).toBe(2);
 expect(handler.pendingItems.length).toBe(0);
 
 // ❌ Testing cleanup via size checks
@@ -271,59 +369,59 @@ expect(tracker.getCount()).toBe(0);
 const events: Event[] = [];
 tracker.onEvent((e) => events.push(e));
 tracker.process(input);
-expect(events).toEqual([{ type: 'Completed', data: { id: 'x' } }]);
+expect(events).toEqual([{ type: "Completed", data: { id: "x" } }]);
 
 // ✅ Test via dispatched commands
 const dispatched: Command[] = [];
 executor.onDispatch((cmd) => dispatched.push(cmd));
-executor.start({ items: ['a', 'b'] });
+executor.start({ items: ["a", "b"] });
 expect(dispatched).toEqual([
-  { type: 'ProcessItem', data: { id: 'a' } },
-  { type: 'ProcessItem', data: { id: 'b' } },
+  { type: "ProcessItem", data: { id: "a" } },
+  { type: "ProcessItem", data: { id: "b" } },
 ]);
 
 // ✅ Test via boolean query APIs
-expect(tracker.isWaitingFor('correlationId', 'HandlerA')).toBe(true);
-expect(tracker.isPending('key')).toBe(false);
+expect(tracker.isWaitingFor("correlationId", "HandlerA")).toBe(true);
+expect(tracker.isPending("key")).toBe(false);
 
 // ✅ Test cleanup via re-triggering behavior
-tracker.complete('c1');
-tracker.start('c1'); // Same id reused
-expect(tracker.isActive('c1')).toBe(true); // Proves cleanup worked
+tracker.complete("c1");
+tracker.start("c1"); // Same id reused
+expect(tracker.isActive("c1")).toBe(true); // Proves cleanup worked
 ```
 
 **What to Test vs. What NOT to Test:**
 
-| Test This (Observable)  | Not This (Internal)      |
-| ----------------------- | ------------------------ |
-| Events/callbacks fired  | Internal array lengths   |
-| Commands dispatched     | Map/Set sizes            |
-| Return values           | Private field values     |
-| Query API responses     | Collection contents      |
+| Test This (Observable)    | Not This (Internal)      |
+| ------------------------- | ------------------------ |
+| Events/callbacks fired    | Internal array lengths   |
+| Commands dispatched       | Map/Set sizes            |
+| Return values             | Private field values     |
+| Query API responses       | Collection contents      |
 | Side effects (HTTP, logs) | Internal state mutations |
 
 **Testing Cleanup Without State Peeking:**
 
 ```ts
 // ❌ WRONG: Testing cleanup via internal count
-it('cleans up after completion', () => {
-  tracker.start('c1');
-  tracker.complete('c1');
+it("cleans up after completion", () => {
+  tracker.start("c1");
+  tracker.complete("c1");
   expect(tracker.getActiveCount()).toBe(0);
 });
 
 // ✅ RIGHT: Testing cleanup via re-triggering
-it('allows new session after completion', () => {
+it("allows new session after completion", () => {
   const completed: string[] = [];
   tracker.onComplete((id) => completed.push(id));
 
-  tracker.start('c1');
-  tracker.complete('c1');
+  tracker.start("c1");
+  tracker.complete("c1");
 
-  tracker.start('c1'); // Re-use same id
-  tracker.complete('c1');
+  tracker.start("c1"); // Re-use same id
+  tracker.complete("c1");
 
-  expect(completed).toEqual(['c1', 'c1']); // Fired twice = cleanup worked
+  expect(completed).toEqual(["c1", "c1"]); // Fired twice = cleanup worked
 });
 ```
 
@@ -333,7 +431,9 @@ it('allows new session after completion', () => {
 // ❌ WRONG: Adding getters just for tests
 class SessionManager {
   private sessions = new Map();
-  getSessionCount(): number { return this.sessions.size; } // Test-only method
+  getSessionCount(): number {
+    return this.sessions.size;
+  } // Test-only method
 }
 
 // ✅ RIGHT: Test via behavior, not state inspection
