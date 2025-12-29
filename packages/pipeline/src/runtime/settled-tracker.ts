@@ -1,5 +1,6 @@
 import type { Command, Event } from '@auto-engineer/message-bus';
 import type { SettledEvent, SettledInstanceDocument } from '../projections/settled-instance-projection';
+import type { PipelineReadModel } from '../store/pipeline-read-model';
 
 type SendFunction = (commandType: string, data: unknown) => void;
 
@@ -35,20 +36,23 @@ interface SettledErrorContext {
 }
 
 interface SettledTrackerOptions {
+  readModel?: PipelineReadModel;
   onDispatch?: (commandType: string, data: unknown, correlationId: string) => void;
   onError?: (error: unknown, context: SettledErrorContext) => void;
-  onEventEmit?: (event: SettledEvent) => void;
+  onEventEmit?: (event: SettledEvent) => void | Promise<void>;
 }
 
 export class SettledTracker {
   private handlerTemplates = new Map<string, HandlerTemplate>();
   private handlerInstances = new Map<string, HandlerInstance>();
   private commandToTemplateIds = new Map<string, Set<string>>();
+  private readonly readModel?: PipelineReadModel;
   private readonly onDispatch?: (commandType: string, data: unknown, correlationId: string) => void;
   private readonly onError?: (error: unknown, context: SettledErrorContext) => void;
-  private readonly onEventEmit?: (event: SettledEvent) => void;
+  private readonly onEventEmit?: (event: SettledEvent) => void | Promise<void>;
 
   constructor(options?: SettledTrackerOptions) {
+    this.readModel = options?.readModel;
     this.onDispatch = options?.onDispatch;
     this.onError = options?.onError;
     this.onEventEmit = options?.onEventEmit;
@@ -109,7 +113,7 @@ export class SettledTracker {
     }
   }
 
-  onCommandStarted(command: Command): void {
+  async onCommandStarted(command: Command): Promise<void> {
     const { type: commandType, correlationId, requestId } = command;
 
     if (!this.isValidId(correlationId) || !this.isValidId(requestId)) {
@@ -124,8 +128,8 @@ export class SettledTracker {
     for (const templateId of templateIds) {
       const template = this.handlerTemplates.get(templateId);
       if (template) {
-        this.ensureInstanceExists(template, correlationId);
-        this.markCommandStarted(template.id, correlationId, commandType);
+        await this.ensureInstanceExists(template, correlationId);
+        await this.markCommandStarted(template.id, correlationId, commandType);
       }
     }
   }
@@ -137,6 +141,21 @@ export class SettledTracker {
         if (tracker?.hasStarted === true && tracker.hasCompleted === false) {
           return true;
         }
+      }
+    }
+    return false;
+  }
+
+  async isWaitingForAsync(correlationId: string, commandType: string): Promise<boolean> {
+    if (!this.readModel) {
+      return this.isWaitingFor(correlationId, commandType);
+    }
+
+    const instances = await this.readModel.getActiveSettledInstances(correlationId);
+    for (const instance of instances) {
+      const tracker = instance.commandTrackers.find((t) => t.commandType === commandType);
+      if (tracker?.hasStarted === true && tracker.hasCompleted === false) {
+        return true;
       }
     }
     return false;
@@ -186,7 +205,7 @@ export class SettledTracker {
     return `${templateId}-${correlationId}`;
   }
 
-  private ensureInstanceExists(template: HandlerTemplate, correlationId: string): boolean {
+  private async ensureInstanceExists(template: HandlerTemplate, correlationId: string): Promise<boolean> {
     const instanceId = this.generateInstanceId(template.id, correlationId);
 
     if (this.handlerInstances.has(instanceId)) {
@@ -210,7 +229,7 @@ export class SettledTracker {
       commandTrackers,
     });
 
-    this.emitEvent({
+    await this.emitEvent({
       type: 'SettledInstanceCreated',
       data: {
         templateId: template.id,
@@ -222,7 +241,7 @@ export class SettledTracker {
     return true;
   }
 
-  private markCommandStarted(templateId: string, correlationId: string, commandType: string): void {
+  private async markCommandStarted(templateId: string, correlationId: string, commandType: string): Promise<void> {
     const instanceId = this.generateInstanceId(templateId, correlationId);
     const instance = this.handlerInstances.get(instanceId);
 
@@ -231,7 +250,7 @@ export class SettledTracker {
       tracker.hasStarted = true;
       tracker.hasCompleted = false;
 
-      this.emitEvent({
+      await this.emitEvent({
         type: 'SettledCommandStarted',
         data: {
           templateId,
@@ -242,8 +261,8 @@ export class SettledTracker {
     }
   }
 
-  private emitEvent(event: SettledEvent): void {
-    this.onEventEmit?.(event);
+  private async emitEvent(event: SettledEvent): Promise<void> {
+    await this.onEventEmit?.(event);
   }
 
   private checkAndFireHandler(instanceId: string, instance: HandlerInstance): void {

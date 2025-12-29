@@ -823,7 +823,7 @@ export class PipelineServer {
     await this.getOrCreateItemStatus(command.correlationId, command.type, itemKey, command.requestId);
 
     await this.updateNodeStatus(command.correlationId, command.type, 'running');
-    this.settledTracker.onCommandStarted(command);
+    await this.settledTracker.onCommandStarted(command);
 
     const resultEvent = await handler.handle(command);
     const events = Array.isArray(resultEvent) ? resultEvent : [resultEvent];
