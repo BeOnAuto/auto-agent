@@ -133,9 +133,10 @@ export class SettledTracker {
   }
 
   private async ensureInstanceExists(template: HandlerTemplate, correlationId: string): Promise<boolean> {
-    const existsInProjection = (await this.readModel.getSettledInstance(template.id, correlationId)) !== null;
+    const existing = await this.readModel.getSettledInstance(template.id, correlationId);
+    const isActiveInstance = existing !== null && existing.status === 'active';
 
-    if (existsInProjection) {
+    if (isActiveInstance) {
       return false;
     }
 

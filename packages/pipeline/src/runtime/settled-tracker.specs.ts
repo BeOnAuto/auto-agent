@@ -801,5 +801,72 @@ describe('SettledTracker', () => {
         await close();
       }
     });
+
+    it('should create new instance after previous instance was cleaned (retry scenario)', async () => {
+      const { eventStore, readModel, close } = createPipelineEventStore();
+
+      try {
+        let handlerCallCount = 0;
+        const dispatched: Array<{ commandType: string; data: unknown }> = [];
+
+        const esTracker = new SettledTracker({
+          readModel,
+          onDispatch: (commandType, data) => {
+            dispatched.push({ commandType, data });
+          },
+          onEventEmit: async (event) => {
+            await eventStore.appendToStream(`settled-${event.data.correlationId}`, [
+              { type: event.type, data: event.data },
+            ]);
+          },
+        });
+
+        esTracker.registerHandler({
+          commandTypes: ['CheckTypes'],
+          handler: (events, send) => {
+            handlerCallCount++;
+            const checkTypesEvents = events['CheckTypes'] ?? [];
+            const failedEvent = checkTypesEvents.find((e) => e.type === 'TypeCheckFailed');
+            if (failedEvent) {
+              send('ImplementSlice', { retry: true, errors: failedEvent.data });
+            }
+          },
+        });
+
+        await esTracker.onCommandStarted({
+          type: 'CheckTypes',
+          correlationId: 'c1',
+          requestId: 'r1',
+          data: { target: './slice1' },
+        });
+
+        await esTracker.onEventReceived(
+          { type: 'TypeCheckFailed', correlationId: 'c1', data: { errors: 'TS2322' } },
+          'CheckTypes',
+        );
+
+        expect(handlerCallCount).toBe(1);
+        expect(dispatched).toHaveLength(1);
+        expect(dispatched[0].commandType).toBe('ImplementSlice');
+
+        dispatched.length = 0;
+
+        await esTracker.onCommandStarted({
+          type: 'CheckTypes',
+          correlationId: 'c1',
+          requestId: 'r2',
+          data: { target: './slice1' },
+        });
+
+        await esTracker.onEventReceived(
+          { type: 'TypeCheckPassed', correlationId: 'c1', data: { target: './slice1' } },
+          'CheckTypes',
+        );
+
+        expect(handlerCallCount).toBe(2);
+      } finally {
+        await close();
+      }
+    });
   });
 });
