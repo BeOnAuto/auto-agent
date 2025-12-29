@@ -5,7 +5,7 @@ export interface PipelineContext {
   emit: (type: string, data: unknown) => Promise<void>;
   sendCommand: (type: string, data: unknown) => Promise<void>;
   correlationId: string;
-  startPhased?: (handler: ForEachPhasedDescriptor, event: Event) => void;
+  startPhased?: (handler: ForEachPhasedDescriptor, event: Event) => Promise<void>;
 }
 
 export interface RuntimeConfig {

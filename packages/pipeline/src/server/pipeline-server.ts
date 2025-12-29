@@ -78,11 +78,18 @@ export class PipelineServer {
       },
     });
     this.phasedExecutor = new PhasedExecutor({
+      readModel: this.eventStoreContext.readModel,
       onDispatch: (commandType, data, correlationId) => {
         void this.dispatchFromSettled(commandType, data, correlationId);
       },
       onComplete: (event, correlationId) => {
         void this.handlePhasedComplete(event, correlationId);
+      },
+      onEventEmit: async (event) => {
+        const data = event.data as Record<string, unknown>;
+        const correlationId =
+          (data.correlationId as string) ?? (data.executionId as string)?.split('-')[1] ?? 'default';
+        await this.eventStoreContext.eventStore.appendToStream(`pipeline-${correlationId}`, [event]);
       },
     });
     this.sseManager = new SSEManager();
@@ -858,7 +865,7 @@ export class PipelineServer {
         await this.settledTracker.onEventReceived(eventWithIds, sourceCommand);
       }
 
-      this.routeEventToPhasedExecutor(eventWithIds);
+      await this.routeEventToPhasedExecutor(eventWithIds);
     }
 
     await Promise.all(eventsWithIds.map((e) => this.routeEventToPipelines(e)));
@@ -927,18 +934,18 @@ export class PipelineServer {
         await this.emitCommandDispatched(correlationId, requestId, type, data as Record<string, unknown>);
         await this.processCommand(command);
       },
-      startPhased: (handler, event) => {
-        this.phasedExecutor.startPhased(handler, event, correlationId);
+      startPhased: async (handler, event) => {
+        await this.phasedExecutor.startPhased(handler, event, correlationId);
       },
     };
   }
 
-  private routeEventToPhasedExecutor(event: EventWithCorrelation): void {
+  private async routeEventToPhasedExecutor(event: EventWithCorrelation): Promise<void> {
     for (const pipeline of this.pipelines.values()) {
       for (const handler of pipeline.descriptor.handlers) {
         if (handler.type === 'foreach-phased') {
           const itemKey = handler.completion.itemKey(event);
-          this.phasedExecutor.onEventReceived(event, itemKey);
+          await this.phasedExecutor.onEventReceived(event, itemKey);
         }
       }
     }
