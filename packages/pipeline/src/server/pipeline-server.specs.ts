@@ -295,6 +295,30 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
+    it('should have idle status on settled nodes when no correlationId provided', async () => {
+      const handler = {
+        name: 'CheckTests',
+        events: ['TestsPassed'],
+        handle: async () => ({ type: 'TestsPassed', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('Start')
+        .emit('CheckTests', {})
+        .settled(['CheckTests'])
+        .dispatch({ dispatches: [] }, () => {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      const settledNode = data.nodes.find((n) => n.id === 'settled:CheckTests');
+      expect(settledNode?.status).toBe('idle');
+      expect(settledNode?.pendingCount).toBe(0);
+      expect(settledNode?.endedCount).toBe(0);
+      await server.stop();
+    });
+
     it('should show running status for command being executed', async () => {
       let resolveHandler: () => void = () => {};
       const handlerPromise = new Promise<void>((resolve) => {

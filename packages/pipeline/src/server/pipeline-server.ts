@@ -12,7 +12,7 @@ import getPort from 'get-port';
 import { nanoid } from 'nanoid';
 import type { Pipeline } from '../builder/define';
 import { filterGraph } from '../graph/filter-graph';
-import type { FilterOptions, GraphIR, NodeStatus, NodeType } from '../graph/types';
+import type { FilterOptions, GraphIR, GraphNode, NodeStatus, NodeType } from '../graph/types';
 import type { PipelineContext } from '../runtime/context';
 import type { EventDefinition } from '../runtime/event-command-map';
 import { EventCommandMapper } from '../runtime/event-command-map';
@@ -345,25 +345,47 @@ export class PipelineServer {
   private async addStatusToCommandNodes(graph: GraphIR, correlationId?: string): Promise<GraphIR> {
     const nodesWithStatus = await Promise.all(
       graph.nodes.map(async (node) => {
-        if (node.type !== 'command') {
-          return node;
+        if (node.type === 'command') {
+          return this.addStatusToCommandNode(node, correlationId);
         }
-        const commandName = node.id.replace(/^cmd:/, '');
-        if (correlationId === undefined) {
-          return { ...node, status: 'idle' as NodeStatus, pendingCount: 0, endedCount: 0 };
+        if (node.type === 'settled') {
+          return this.addStatusToSettledNode(node, correlationId);
         }
-        const stats = await this.computeCommandStats(correlationId, commandName);
-        return {
-          ...node,
-          status: stats.aggregateStatus,
-          pendingCount: stats.pendingCount,
-          endedCount: stats.endedCount,
-        };
+        return node;
       }),
     );
     return {
       nodes: nodesWithStatus,
       edges: graph.edges,
+    };
+  }
+
+  private async addStatusToCommandNode(node: GraphNode, correlationId?: string): Promise<GraphNode> {
+    const commandName = node.id.replace(/^cmd:/, '');
+    if (correlationId === undefined) {
+      return { ...node, status: 'idle' as NodeStatus, pendingCount: 0, endedCount: 0 };
+    }
+    const stats = await this.computeCommandStats(correlationId, commandName);
+    return {
+      ...node,
+      status: stats.aggregateStatus,
+      pendingCount: stats.pendingCount,
+      endedCount: stats.endedCount,
+    };
+  }
+
+  private async addStatusToSettledNode(node: GraphNode, correlationId?: string): Promise<GraphNode> {
+    if (correlationId === undefined) {
+      return { ...node, status: 'idle' as NodeStatus, pendingCount: 0, endedCount: 0 };
+    }
+    const commandTypes = node.id.replace(/^settled:/, '');
+    const templateId = `template-${commandTypes}`;
+    const stats = await this.eventStoreContext.readModel.computeSettledStats(correlationId, templateId);
+    return {
+      ...node,
+      status: stats.status,
+      pendingCount: stats.pendingCount,
+      endedCount: stats.endedCount,
     };
   }
 
