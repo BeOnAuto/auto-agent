@@ -1,0 +1,10 @@
+import { commandHandler as generateServerHandler } from './commands/generate-server.js';
+
+export const COMMANDS = [generateServerHandler];
+export {
+  type GenerateServerCommand,
+  type GenerateServerEvents,
+  type ServerGeneratedEvent,
+  type ServerGenerationFailedEvent,
+  type SliceGeneratedEvent,
+} from './commands/generate-server.js';

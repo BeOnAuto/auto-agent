@@ -1,0 +1,46 @@
+<%
+const moduleName = pascalCase(flowName) + 'Module';
+const entityName = pascalCase(flowName) + 'Entity';
+%>import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
+import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { <%= entityName %> } from './entities/<%= toKebabCase(entityName) %>.entity';
+<% for (const slice of slices) { -%>
+<% if (slice.type === 'command') { -%>
+import { <%= pascalCase(slice.name) %>Handler } from './<%= toKebabCase(slice.name) %>/<%= toKebabCase(slice.name) %>.handler';
+import { <%= pascalCase(slice.name) %>Resolver } from './<%= toKebabCase(slice.name) %>/<%= toKebabCase(slice.name) %>.resolver';
+<% } else if (slice.type === 'query') { -%>
+import { <%= pascalCase(slice.name) %>Handler } from './<%= toKebabCase(slice.name) %>/<%= toKebabCase(slice.name) %>.handler';
+import { <%= pascalCase(slice.name) %>Resolver } from './<%= toKebabCase(slice.name) %>/<%= toKebabCase(slice.name) %>.resolver';
+<% } -%>
+<% } -%>
+
+const CommandHandlers = [
+<% for (const slice of slices) { -%>
+<% if (slice.type === 'command') { -%>
+  <%= pascalCase(slice.name) %>Handler,
+<% } -%>
+<% } -%>
+];
+
+const QueryHandlers = [
+<% for (const slice of slices) { -%>
+<% if (slice.type === 'query') { -%>
+  <%= pascalCase(slice.name) %>Handler,
+<% } -%>
+<% } -%>
+];
+
+const Resolvers = [
+<% for (const slice of slices) { -%>
+<% if (slice.type === 'command' || slice.type === 'query') { -%>
+  <%= pascalCase(slice.name) %>Resolver,
+<% } -%>
+<% } -%>
+];
+
+@Module({
+  imports: [CqrsModule, MikroOrmModule.forFeature([<%= entityName %>])],
+  providers: [...CommandHandlers, ...QueryHandlers, ...Resolvers],
+})
+export class <%= moduleName %> {}

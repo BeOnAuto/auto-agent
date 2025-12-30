@@ -1,0 +1,16 @@
+<%
+const command = commands[0];
+if (!command) return '';
+const enumList = collectEnumNames(command.fields);
+%><% if (enumList.length > 0) { -%>
+import { <%= enumList.join(', ') %> } from '../entities';
+<% } -%>
+
+export class <%= pascalCase(command.type) %>Command {
+  constructor(
+  <% for (let i = 0; i < command.fields.length; i++) { const field = command.fields[i]; -%>
+    public readonly <%= field.name %>: <%= toTsFieldType(field.tsType) %>,
+  <% } -%>
+    public readonly now?: Date,
+  ) {}
+}

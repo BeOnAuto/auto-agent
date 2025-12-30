@@ -1,0 +1,35 @@
+<%
+function getOrmType(field) {
+  const cleanType = field.tsType.replace(/\s*\|\s*null\b/g, '').trim();
+  if (cleanType === 'string') return 'string';
+  if (cleanType === 'number') return 'number';
+  if (cleanType === 'boolean') return 'boolean';
+  if (cleanType === 'Date') return 'Date';
+  return 'string';
+}
+%>import { Entity, PrimaryKey, Property, Enum, Index } from '@mikro-orm/core';
+<% if (entity.enumImports.length > 0) { -%>
+import { <%= entity.enumImports.join(', ') %> } from '.';
+<% } -%>
+
+@Entity({ tableName: '<%= entity.tableName %>' })
+export class <%= entity.entityName %> {
+<% for (const field of entity.fields) { -%>
+<% if (field.isPrimary) { -%>
+  @PrimaryKey({ type: '<%= getOrmType(field) %>' })
+  <%= field.name %>!: <%= toTsFieldType(field.tsType) %>;
+
+<% } else if (field.isEnum && field.enumName) { -%>
+  @Enum(() => <%= field.enumName %>)
+<% if (field.indexed) { -%>
+  @Index()
+<% } -%>
+  <%= field.name %>!: <%= field.enumName %>;
+
+<% } else { -%>
+  @Property({ type: '<%= getOrmType(field) %>'<%= field.nullable ? ', nullable: true' : '' %> })
+  <%= field.name %><%= field.nullable ? '?' : '!' %>: <%= toTsFieldType(field.tsType) %><%= field.nullable ? ' | null' : '' %>;
+
+<% } -%>
+<% } -%>
+}

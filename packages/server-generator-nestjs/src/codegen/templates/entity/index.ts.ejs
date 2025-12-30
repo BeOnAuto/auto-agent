@@ -1,0 +1,6 @@
+export * from './<%= toKebabCase(entity.entityName) %>.entity';
+<% if (entity.enumImports.length > 0) { -%>
+<% for (const enumName of entity.enumImports) { -%>
+export * from './<%= toKebabCase(enumName) %>.enum';
+<% } -%>
+<% } -%>

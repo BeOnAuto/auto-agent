@@ -1,0 +1,30 @@
+<%
+const command = commands[0];
+if (!command) return '';
+const entityName = pascalCase(flowName) + 'Entity';
+const enumList = collectEnumNames(command.fields);
+%>import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityRepository } from '@mikro-orm/core';
+import { <%= pascalCase(command.type) %>Command } from './<%= toKebabCase(sliceName) %>.command';
+import { <%= entityName %><% if (enumList.length > 0) { %>, <%= enumList.join(', ') %><% } %> } from '../entities';
+
+@CommandHandler(<%= pascalCase(command.type) %>Command)
+export class <%= pascalCase(command.type) %>Handler implements ICommandHandler<<%= pascalCase(command.type) %>Command> {
+  constructor(
+    @InjectRepository(<%= entityName %>)
+    private readonly repository: EntityRepository<<%= entityName %>>,
+  ) {}
+
+  async execute(command: <%= pascalCase(command.type) %>Command): Promise<void> {
+    // TODO: Implement command handler logic
+    // This is a generated stub - implement based on your business rules
+    // Example for create operation:
+    // const entity = this.repository.create({
+    //   ...command fields...
+    // });
+    // await this.repository.getEntityManager().persistAndFlush(entity);
+
+    throw new Error('Not yet implemented: <%= command.type %>');
+  }
+}

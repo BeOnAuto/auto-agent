@@ -1,0 +1,65 @@
+import { Module, Logger } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { SqliteDriver } from '@mikro-orm/sqlite';
+import { Migrator } from '@mikro-orm/migrations';
+import { join } from 'path';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+
+<% for (const flow of flows) { -%>
+import { <%= pascalCase(flow.name) %>Module } from './domain/<%= toKebabCase(flow.name) %>/<%= toKebabCase(flow.name) %>.module';
+import { <%= pascalCase(flow.name) %>Entity } from './domain/<%= toKebabCase(flow.name) %>/entities';
+<% } -%>
+
+const domainModules = [
+<% for (const flow of flows) { -%>
+  <%= pascalCase(flow.name) %>Module,
+<% } -%>
+];
+
+const entities = [
+<% for (const flow of flows) { -%>
+  <%= pascalCase(flow.name) %>Entity,
+<% } -%>
+];
+
+@Module({
+  imports: [
+    ...domainModules,
+    MikroOrmModule.forRoot({
+      entities,
+      dbName: process.env.NODE_ENV === 'test' ? ':memory:' : './db.sqlite',
+      driver: SqliteDriver,
+      allowGlobalContext: true,
+      debug: process.env.NODE_ENV !== 'production',
+      ensureDatabase: true,
+      extensions: [Migrator],
+      migrations: {
+        path: join(__dirname, 'migrations'),
+        glob: '!(*.d).{js,ts}',
+        transactional: true,
+        disableForeignKeys: false,
+        emit: 'ts',
+      },
+    }),
+    CqrsModule.forRoot(),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      sortSchema: true,
+      playground: false,
+      introspection: true,
+      csrfPrevention: false,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+    }),
+  ],
+})
+export class AppModule {
+  private readonly logger = new Logger(AppModule.name);
+
+  constructor() {
+    this.logger.log('✅ Application module initialized');
+  }
+}

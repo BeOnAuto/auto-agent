@@ -1,0 +1,50 @@
+<%
+const command = commands[0];
+if (!command) return '';
+const entityName = pascalCase(flowName) + 'Entity';
+const enumList = collectEnumNames(command.fields);
+%>import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@mikro-orm/nestjs';
+import { <%= pascalCase(command.type) %>Handler } from './<%= toKebabCase(sliceName) %>.handler';
+import { <%= pascalCase(command.type) %>Command } from './<%= toKebabCase(sliceName) %>.command';
+import { <%= entityName %><% if (enumList.length > 0) { %>, <%= enumList.join(', ') %><% } %> } from '../entities';
+
+describe('<%= pascalCase(command.type) %>Handler', () => {
+  let handler: <%= pascalCase(command.type) %>Handler;
+  let mockRepository: Record<string, unknown>;
+
+  beforeEach(async () => {
+    mockRepository = {
+      create: vi.fn(),
+      findOne: vi.fn(),
+      getEntityManager: vi.fn(() => ({
+        persistAndFlush: vi.fn(),
+      })),
+    };
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        <%= pascalCase(command.type) %>Handler,
+        {
+          provide: getRepositoryToken(<%= entityName %>),
+          useValue: mockRepository,
+        },
+      ],
+    }).compile();
+
+    handler = module.get<<%= pascalCase(command.type) %>Handler>(<%= pascalCase(command.type) %>Handler);
+  });
+
+  it('should be defined', () => {
+    expect(handler).toBeDefined();
+  });
+
+  // TODO: Add test cases based on GWT specs
+  // Example:
+  // it('should handle <%= command.type %>', async () => {
+  //   const command = new <%= pascalCase(command.type) %>Command(...);
+  //   await handler.execute(command);
+  //   expect(mockRepository.create).toHaveBeenCalled();
+  // });
+});

@@ -1,0 +1,25 @@
+<%
+const entityName = pascalCase(flowName) + 'Entity';
+const typeName = projectionType || pascalCase(sliceName) + 'State';
+const isSingleton = projectionSingleton === true;
+%>import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityRepository } from '@mikro-orm/core';
+import { <%= pascalCase(sliceName) %>Query } from './<%= toKebabCase(sliceName) %>.query';
+import { <%= entityName %> } from '../entities/<%= toKebabCase(entityName) %>.entity';
+
+@QueryHandler(<%= pascalCase(sliceName) %>Query)
+export class <%= pascalCase(sliceName) %>Handler implements IQueryHandler<<%= pascalCase(sliceName) %>Query> {
+  constructor(
+    @InjectRepository(<%= entityName %>)
+    private readonly repository: EntityRepository<<%= entityName %>>,
+  ) {}
+
+  async execute(): Promise<<%= entityName %><%= isSingleton ? ' | null' : '[]' %>> {
+<% if (isSingleton) { -%>
+    return this.repository.findOne({});
+<% } else { -%>
+    return this.repository.findAll();
+<% } -%>
+  }
+}

@@ -1,0 +1,20 @@
+<%
+const typeName = projectionType || pascalCase(sliceName) + 'State';
+const queryName = camelCase(projectionName || sliceName);
+const isSingleton = projectionSingleton === true;
+%>import { Query, Resolver } from '@nestjs/graphql';
+import { Injectable } from '@nestjs/common';
+import { QueryBus } from '@nestjs/cqrs';
+import { <%= pascalCase(sliceName) %>Query } from './<%= toKebabCase(sliceName) %>.query';
+import { <%= typeName %> } from './<%= toKebabCase(sliceName) %>.type';
+
+@Injectable()
+@Resolver()
+export class <%= pascalCase(sliceName) %>Resolver {
+  constructor(private readonly queryBus: QueryBus) {}
+
+  @Query(() => <%= isSingleton ? typeName : `[${typeName}]` %>)
+  async <%= queryName %>(): Promise<<%= typeName %><%= isSingleton ? ' | null' : '[]' %>> {
+    return this.queryBus.execute(new <%= pascalCase(sliceName) %>Query());
+  }
+}

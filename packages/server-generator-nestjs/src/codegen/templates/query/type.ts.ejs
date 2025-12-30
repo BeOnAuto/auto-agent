@@ -1,0 +1,24 @@
+<%
+const state = states[0] || message;
+if (!state || !state.fields) return '';
+const usesID = state.fields.some(f => graphqlType(f.tsType) === 'ID');
+const usesFloat = state.fields.some(f => fieldUsesFloat(f.tsType));
+const usesJSON = state.fields.some(f => fieldUsesJSON(f.tsType));
+const enumList = collectEnumNames(state.fields);
+const typeName = projectionType || pascalCase(sliceName) + 'State';
+%>import { ObjectType, Field<% if (usesID) { %>, ID<% } %><% if (usesFloat) { %>, Float<% } %> } from '@nestjs/graphql';
+<% if (usesJSON) { -%>
+import GraphQLJSON from 'graphql-type-json';
+<% } -%>
+<% if (enumList.length > 0) { -%>
+import { <%= enumList.join(', ') %> } from '../entities';
+<% } -%>
+
+@ObjectType()
+export class <%= typeName %> {
+<% for (const field of state.fields) { -%>
+  @Field(() => <%= graphqlType(field.tsType) %><%= isNullable(field.tsType) ? ', { nullable: true }' : '' %>)
+  <%= field.name %><%= isNullable(field.tsType) ? '?' : '!' %>: <%= toTsFieldType(field.tsType) %><%= isNullable(field.tsType) ? ' | null' : '' %>;
+
+<% } -%>
+}

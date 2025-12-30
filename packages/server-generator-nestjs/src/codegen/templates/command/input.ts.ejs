@@ -1,0 +1,23 @@
+<%
+const command = commands[0];
+if (!command) return '';
+const usesID = command.fields.some(f => graphqlType(f.tsType) === 'ID');
+const usesFloat = command.fields.some(f => fieldUsesFloat(f.tsType));
+const usesJSON = command.fields.some(f => fieldUsesJSON(f.tsType));
+const enumList = collectEnumNames(command.fields);
+%>import { InputType, Field<% if (usesID) { %>, ID<% } %><% if (usesFloat) { %>, Float<% } %> } from '@nestjs/graphql';
+<% if (usesJSON) { -%>
+import GraphQLJSON from 'graphql-type-json';
+<% } -%>
+<% if (enumList.length > 0) { -%>
+import { <%= enumList.join(', ') %> } from '../entities';
+<% } -%>
+
+@InputType()
+export class <%= pascalCase(command.type) %>Input {
+<% for (const field of command.fields) { -%>
+  @Field(() => <%= graphqlType(field.tsType) %><%= isNullable(field.tsType) ? ', { nullable: true }' : '' %>)
+  <%= field.name %><%= isNullable(field.tsType) ? '?' : '!' %>: <%= toTsFieldType(field.tsType) %>;
+
+<% } -%>
+}

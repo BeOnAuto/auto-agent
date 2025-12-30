@@ -1,0 +1,56 @@
+<%
+const command = commands[0];
+if (!command) return '';
+const mutationName = camelCase(sliceName);
+%>import { Mutation, Resolver, Args } from '@nestjs/graphql';
+import { Logger, Injectable } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
+import { <%= pascalCase(command.type) %>Command } from './<%= toKebabCase(sliceName) %>.command';
+import { <%= pascalCase(command.type) %>Input } from './<%= toKebabCase(sliceName) %>.input';
+import { MutationResponse } from '../../shared/graphql-types';
+
+@Injectable()
+@Resolver()
+export class <%= pascalCase(command.type) %>Resolver {
+  private readonly logger = new Logger(<%= pascalCase(command.type) %>Resolver.name);
+
+  constructor(private readonly commandBus: CommandBus) {}
+
+  @Mutation(() => MutationResponse)
+  async <%= mutationName %>(
+    @Args({ name: 'input', type: () => <%= pascalCase(command.type) %>Input })
+    input: <%= pascalCase(command.type) %>Input
+  ): Promise<MutationResponse> {
+    try {
+      await this.commandBus.execute(
+        new <%= pascalCase(command.type) %>Command(
+        <% for (let i = 0; i < command.fields.length; i++) { const field = command.fields[i]; -%>
+          input.<%= field.name %>,
+        <% } -%>
+        )
+      );
+      this.logger.log(`Successfully executed: <%= mutationName %>`);
+      return { success: true };
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(`Failed to execute <%= mutationName %>: ${error.message}`, error.stack);
+        return {
+          success: false,
+          error: {
+            type: error.name,
+            message: error.message,
+          },
+        };
+      }
+
+      this.logger.error('Failed to execute <%= mutationName %>: Unknown error');
+      return {
+        success: false,
+        error: {
+          type: 'UnknownError',
+          message: 'An unexpected error occurred',
+        },
+      };
+    }
+  }
+}
