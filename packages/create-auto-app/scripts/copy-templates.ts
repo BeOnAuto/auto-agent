@@ -47,6 +47,33 @@ const copyDirectory = async (src: string, dest: string): Promise<void> => {
   }
 };
 
+const fixPackageJsonForStandalone = async (templateDir: string): Promise<void> => {
+  const packageJsonPath = path.join(templateDir, 'package.json');
+
+  if (!(await fs.pathExists(packageJsonPath))) {
+    return;
+  }
+
+  const pkg = (await fs.readJson(packageJsonPath)) as Record<string, unknown>;
+  const scripts = pkg.scripts as Record<string, string> | undefined;
+
+  if (scripts !== undefined) {
+    // Fix scripts that use relative paths to monorepo packages
+    if (scripts.auto?.includes('../../packages/cli')) {
+      scripts.auto = 'auto';
+    }
+    if (scripts['auto:debug']?.includes('../../packages/cli')) {
+      scripts['auto:debug'] = 'DEBUG=auto:* auto';
+    }
+    // Remove scripts that reference monorepo-only paths
+    if (scripts.clean?.includes('../support-files')) {
+      delete scripts.clean;
+    }
+  }
+
+  await fs.writeJson(packageJsonPath, pkg, { spaces: 2 });
+};
+
 const mergeSupportFiles = async (templateDir: string): Promise<void> => {
   if (!(await fs.pathExists(supportFilesDir))) {
     console.warn('Warning: support-files directory not found');
@@ -96,6 +123,9 @@ const copyTemplates = async (): Promise<void> => {
 
     console.log(`Merging support-files into ${example.name}...`);
     await mergeSupportFiles(exampleDest);
+
+    console.log(`Fixing package.json for standalone use...`);
+    await fixPackageJsonForStandalone(exampleDest);
   }
 
   console.log('Templates copied successfully!');

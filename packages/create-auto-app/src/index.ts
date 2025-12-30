@@ -12,10 +12,11 @@ import ora from 'ora';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const DEFAULT_TEMPLATE = 'kanban-todo';
+
 interface ProjectOptions {
   name: string;
-  template?: string;
-  preset?: 'minimal' | 'full';
+  template: string;
   packageManager: 'npm' | 'pnpm' | 'yarn';
   installDeps: boolean;
 }
@@ -25,24 +26,7 @@ interface TemplateMetadata {
   displayName: string;
   description: string;
   type: 'template';
-  preset: 'minimal' | 'full';
 }
-
-const AUTO_ENGINEER_PACKAGES = [
-  '@auto-engineer/message-bus',
-  '@auto-engineer/server-checks',
-  '@auto-engineer/design-system-importer',
-  '@auto-engineer/server-generator-apollo-emmett',
-  '@auto-engineer/narrative',
-  '@auto-engineer/frontend-checks',
-  '@auto-engineer/frontend-implementer',
-  '@auto-engineer/component-implementer',
-  '@auto-engineer/information-architect',
-  '@auto-engineer/frontend-generator-react-graphql',
-  '@auto-engineer/server-implementer',
-];
-
-const MINIMAL_PACKAGES = ['@auto-engineer/narrative', '@auto-engineer/server-generator-apollo-emmett'];
 
 async function detectPackageManager(): Promise<'npm' | 'pnpm' | 'yarn'> {
   try {
@@ -67,6 +51,52 @@ async function getLatestVersion(packageName: string): Promise<string> {
   }
 }
 
+function extractAutoEngineerPackages(pkg: Record<string, unknown>): string[] {
+  const packages = new Set<string>();
+
+  const deps = pkg.dependencies as Record<string, string> | undefined;
+  const devDeps = pkg.devDependencies as Record<string, string> | undefined;
+
+  if (deps !== undefined) {
+    for (const name of Object.keys(deps)) {
+      if (name.startsWith('@auto-engineer/')) {
+        packages.add(name);
+      }
+    }
+  }
+
+  if (devDeps !== undefined) {
+    for (const name of Object.keys(devDeps)) {
+      if (name.startsWith('@auto-engineer/')) {
+        packages.add(name);
+      }
+    }
+  }
+
+  return Array.from(packages);
+}
+
+async function collectAllAutoEngineerPackages(targetDir: string): Promise<string[]> {
+  const packages = new Set<string>();
+
+  const packageJsonPaths = [
+    path.join(targetDir, 'package.json'),
+    path.join(targetDir, 'client', 'package.json'),
+    path.join(targetDir, 'server', 'package.json'),
+  ];
+
+  for (const pkgPath of packageJsonPaths) {
+    if (await fs.pathExists(pkgPath)) {
+      const pkg = (await fs.readJson(pkgPath)) as Record<string, unknown>;
+      for (const name of extractAutoEngineerPackages(pkg)) {
+        packages.add(name);
+      }
+    }
+  }
+
+  return Array.from(packages);
+}
+
 async function getLatestVersions(packages: string[]): Promise<Record<string, string>> {
   const spinner = ora('Fetching latest package versions...').start();
   const versions: Record<string, string> = {};
@@ -77,55 +107,45 @@ async function getLatestVersions(packages: string[]): Promise<Record<string, str
     }),
   );
 
-  // Always include CLI
-  versions['@auto-engineer/cli'] = await getLatestVersion('@auto-engineer/cli');
-
   spinner.succeed('Package versions fetched');
   return versions;
 }
 
+function applyVersionsToDeps(deps: Record<string, string> | undefined, versions: Record<string, string>): void {
+  if (deps === undefined) {
+    return;
+  }
+  for (const [pkg, version] of Object.entries(versions)) {
+    if (deps[pkg] !== undefined) {
+      deps[pkg] = version;
+    }
+  }
+}
+
+async function updatePackageJsonName(pkgPath: string, name: string): Promise<void> {
+  if (!(await fs.pathExists(pkgPath))) {
+    return;
+  }
+  const pkg = (await fs.readJson(pkgPath)) as Record<string, unknown>;
+  pkg.name = name;
+  await fs.writeJson(pkgPath, pkg, { spaces: 2 });
+}
+
 async function updatePackageVersions(targetDir: string, projectName: string, versions: Record<string, string>) {
   const rootPackageJsonPath = path.join(targetDir, 'package.json');
-  const clientPackageJsonPath = path.join(targetDir, 'client', 'package.json');
-  const serverPackageJsonPath = path.join(targetDir, 'server', 'package.json');
 
-  // Update root package.json
   if (await fs.pathExists(rootPackageJsonPath)) {
     const rootPkg = (await fs.readJson(rootPackageJsonPath)) as Record<string, unknown>;
-    // Update dependencies
-    if (rootPkg.dependencies !== undefined) {
-      for (const [pkg, version] of Object.entries(versions)) {
-        if ((rootPkg.dependencies as Record<string, string>)[pkg] !== undefined) {
-          (rootPkg.dependencies as Record<string, string>)[pkg] = version;
-        }
-      }
-    }
-    // Update devDependencies
-    if (rootPkg.devDependencies !== undefined) {
-      for (const [pkg, version] of Object.entries(versions)) {
-        if ((rootPkg.devDependencies as Record<string, string>)[pkg] !== undefined) {
-          (rootPkg.devDependencies as Record<string, string>)[pkg] = version;
-        }
-      }
-    }
+    applyVersionsToDeps(rootPkg.dependencies as Record<string, string> | undefined, versions);
+    applyVersionsToDeps(rootPkg.devDependencies as Record<string, string> | undefined, versions);
     rootPkg.name = projectName;
     await fs.writeJson(rootPackageJsonPath, rootPkg, { spaces: 2 });
   }
 
-  // Update client package.json if exists
-  if (await fs.pathExists(clientPackageJsonPath)) {
-    const clientPkg = (await fs.readJson(clientPackageJsonPath)) as Record<string, unknown>;
-    clientPkg.name = `${projectName}-client`;
-    await fs.writeJson(clientPackageJsonPath, clientPkg, { spaces: 2 });
-  }
-
-  // Update server package.json if exists
-  if (await fs.pathExists(serverPackageJsonPath)) {
-    const serverPkg = (await fs.readJson(serverPackageJsonPath)) as Record<string, unknown>;
-    serverPkg.name = `${projectName}-server`;
-    await fs.writeJson(serverPackageJsonPath, serverPkg, { spaces: 2 });
-  }
+  await updatePackageJsonName(path.join(targetDir, 'client', 'package.json'), `${projectName}-client`);
+  await updatePackageJsonName(path.join(targetDir, 'server', 'package.json'), `${projectName}-server`);
 }
+
 async function installDependencies(targetDir: string, packageManager: 'npm' | 'pnpm' | 'yarn') {
   const spinner = ora('Installing dependencies...').start();
   try {
@@ -198,8 +218,8 @@ async function createFromTemplate(templatePath: string, targetDir: string, proje
     await fs.writeFile(workspaceYamlPath, "packages:\n  - '*'\n");
   }
 
-  // Get latest versions for all packages
-  const packagesToCheck = [...AUTO_ENGINEER_PACKAGES];
+  // Scan template for all @auto-engineer packages and get their latest versions
+  const packagesToCheck = await collectAllAutoEngineerPackages(targetDir);
   const versions = await getLatestVersions(packagesToCheck);
 
   await replaceTemplateFileId(targetDir);
@@ -278,30 +298,8 @@ async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
   return templates;
 }
 
-async function handleTemplateCreation(
-  template: string | undefined,
-  preset: 'minimal' | 'full' | undefined,
-  targetDir: string,
-  projectName: string,
-  packageManager: string,
-) {
-  if (template !== undefined) {
-    const templatePath = path.join(__dirname, '../..', 'templates', template);
-
-    if (await fs.pathExists(templatePath)) {
-      await createFromTemplate(templatePath, targetDir, projectName, template);
-    } else {
-      console.log(chalk.yellow(`Template not found at ${templatePath}, creating minimal project...`));
-      await createMinimalProject(targetDir, projectName, preset || 'minimal', packageManager);
-    }
-  } else {
-    // Create project based on preset
-    await createMinimalProject(targetDir, projectName, preset || 'minimal', packageManager);
-  }
-}
-
 async function createProject(options: ProjectOptions) {
-  const { name, template, preset, packageManager, installDeps } = options;
+  const { name, template, packageManager, installDeps } = options;
   const targetDir = path.resolve(process.cwd(), name === '.' ? process.cwd() : name);
   const projectName = name === '.' ? path.basename(process.cwd()) : name;
 
@@ -313,8 +311,15 @@ async function createProject(options: ProjectOptions) {
 
   console.log(chalk.blue(`\nCreating Auto Engineer project in ${chalk.bold(targetDir)}\n`));
 
-  // Handle template or preset creation
-  await handleTemplateCreation(template, preset, targetDir, projectName, packageManager);
+  // Create from template
+  const templatePath = path.join(__dirname, '../..', 'templates', template);
+
+  if (await fs.pathExists(templatePath)) {
+    await createFromTemplate(templatePath, targetDir, projectName, template);
+  } else {
+    console.error(chalk.red(`Template "${template}" not found at ${templatePath}`));
+    process.exit(1);
+  }
 
   // Install dependencies if requested
   if (installDeps) {
@@ -325,98 +330,6 @@ async function createProject(options: ProjectOptions) {
   printSuccessMessage(name, packageManager, installDeps);
 }
 
-async function createMinimalProject(
-  targetDir: string,
-  projectName: string,
-  preset: 'minimal' | 'full',
-  packageManager: string,
-) {
-  // Determine which packages to include
-  const packagesToInclude = preset === 'full' ? AUTO_ENGINEER_PACKAGES : MINIMAL_PACKAGES;
-
-  // Get latest versions
-  const versions = await getLatestVersions(packagesToInclude);
-
-  // Generate package.json
-  const packageJson = {
-    name: projectName,
-    version: '0.1.0',
-    private: true,
-    scripts: {
-      dev: 'auto dev',
-      build: 'auto build',
-      test: 'auto test',
-    },
-    devDependencies: versions,
-  };
-
-  // Write package.json
-  await fs.writeJson(path.join(targetDir, 'package.json'), packageJson, { spaces: 2 });
-
-  // Create auto.config.ts
-  const plugins = Object.keys(versions)
-    .filter((pkg) => pkg !== '@auto-engineer/cli')
-    .map((pkg) => `    '${pkg}',`)
-    .join('\n');
-
-  const autoConfig = `export default {
-  plugins: [
-${plugins}
-  ],
-};
-`;
-
-  await fs.writeFile(path.join(targetDir, 'auto.config.ts'), autoConfig);
-
-  // Create basic directory structure
-  await fs.ensureDir(path.join(targetDir, 'flows'));
-  await fs.ensureDir(path.join(targetDir, '.context'));
-
-  // Create .gitignore
-  const gitignore = `node_modules
-dist
-.tmp
-.env.local
-*.log
-.next
-.turbo
-`;
-  await fs.writeFile(path.join(targetDir, '.gitignore'), gitignore);
-
-  // Create README.md
-  const readme = `# ${projectName}
-
-An Auto Engineer project.
-
-## Getting Started
-
-\`\`\`bash
-# Install dependencies
-${packageManager} install
-
-# Install Auto and start it
-${packageManager} install -g @auto-engineer/cli@latest
-auto
-
-# Start the client and server in development mode
-${packageManager} run start
-\`\`\`
-
-## Available Commands
-
-- \`auto generate:server\` - Generate server from flows
-- \`auto generate:client\` - Generate client application
-- \`auto check:frontend\` - Run frontend checks
-- \`auto check:server\` - Run server checks
-
-## Learn More
-
-Visit [Auto Engineer Documentation](https://github.com/solguru310/auto-engineer) to learn more.
-`;
-  await fs.writeFile(path.join(targetDir, 'README.md'), readme);
-}
-
-// TODO also make this install the global cli if not present
 async function main() {
   // Get available templates for help text
   const availableTemplates = await getAvailableTemplates();
@@ -427,8 +340,7 @@ async function main() {
     .description('Create a new Auto Engineer application')
     .version('0.1.0')
     .argument('[project-name]', 'Name of the project (use "." for current directory)')
-    .option('-t, --template <template>', `Project template (${templateNames})`)
-    .option('-p, --preset <preset>', 'Package preset (minimal, full)', 'full')
+    .option('-t, --template <template>', `Project template (${templateNames})`, DEFAULT_TEMPLATE)
     .option('--no-install', 'Skip dependency installation')
     .option('--use-npm', 'Use npm as package manager')
     .option('--use-yarn', 'Use yarn as package manager')
@@ -446,12 +358,6 @@ async function main() {
       value: template.name,
     }));
 
-    const setupChoices = [
-      ...templateChoices,
-      { name: 'Create minimal project (just essentials)', value: 'minimal' },
-      { name: 'Create full project (all packages)', value: 'full' },
-    ];
-
     const answers = (await inquirer.prompt([
       {
         type: 'input',
@@ -467,13 +373,18 @@ async function main() {
           return true;
         },
       },
-      {
-        type: 'list',
-        name: 'setupType',
-        message: 'How would you like to set up your project?',
-        choices: setupChoices,
-        default: availableTemplates.length > 0 ? availableTemplates[0].name : 'minimal',
-      },
+      // Only ask for template if there are multiple options
+      ...(templateChoices.length > 1
+        ? [
+            {
+              type: 'list',
+              name: 'template',
+              message: 'Which template would you like to use?',
+              choices: templateChoices,
+              default: DEFAULT_TEMPLATE,
+            },
+          ]
+        : []),
       {
         type: 'confirm',
         name: 'installDeps',
@@ -482,19 +393,12 @@ async function main() {
       },
     ])) as {
       name: string;
-      setupType: string;
+      template?: string;
       installDeps: boolean;
     };
 
     projectName = answers.name;
-    const selectedTemplate = availableTemplates.find((t) => t.name === answers.setupType);
-    if (selectedTemplate) {
-      options.template = selectedTemplate.name;
-      options.preset = undefined;
-    } else {
-      options.template = undefined;
-      options.preset = answers.setupType as 'minimal' | 'full';
-    }
+    options.template = answers.template ?? DEFAULT_TEMPLATE;
     options.install = answers.installDeps;
   }
 
@@ -512,8 +416,7 @@ async function main() {
 
   const projectOptions: ProjectOptions = {
     name: projectName,
-    template: typeof options.template === 'string' ? options.template : undefined,
-    preset: options.preset as 'minimal' | 'full' | undefined,
+    template: options.template as string,
     packageManager,
     installDeps: options.install !== false,
   };
