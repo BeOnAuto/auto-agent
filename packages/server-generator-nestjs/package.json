@@ -11,16 +11,16 @@
   },
   "scripts": {
     "generate:server": "tsx src/cli/index.ts",
-    "build": "tsc && tsx ../../scripts/fix-esm-imports.ts && rm -rf dist/src/codegen/templates && mkdir -p dist/src/codegen && cp -r src/codegen/templates dist/src/codegen/templates && cp -r src/shared dist/src",
-    "test": "vitest run --reporter=dot",
-    "type-check": "tsc --noEmit --project tsconfig.json",
-    "lint": "eslint 'src/**/*.ts' --ignore-pattern '**/*.specs.ts' --ignore-pattern '**/.tmp/**' --ignore-pattern 'src/shared/**' --max-warnings 0 --config ../../eslint.config.ts",
-    "format": "prettier --write \"**/*.{js,ts,json,md,yml,yaml}\" --ignore-path ../../.prettierignore --log-level warn",
-    "lint:fix": "eslint 'src/**/*.ts' --ignore-pattern '**/*.specs.ts' --ignore-pattern '**/.tmp/**' --fix --config ../../eslint.config.ts",
-    "format:fix": "prettier --write \"**/*.{js,ts,json,md,yml,yaml}\" --ignore-path ../../.prettierignore --log-level warn",
-    "link:dev": "pnpm build && pnpm link --global",
-    "unlink:dev": "pnpm unlink --global",
-    "prepublishOnly": "npm run build"
+    "-DISABLE-build": "tsc && tsx ../../scripts/fix-esm-imports.ts && rm -rf dist/src/codegen/templates && mkdir -p dist/src/codegen && cp -r src/codegen/templates dist/src/codegen/templates && cp -r src/shared dist/src",
+    "-DISABLE-test": "vitest run --reporter=dot",
+    "-DISABLE-type-check": "tsc --noEmit --project tsconfig.json",
+    "-DISABLE-lint": "eslint 'src/**/*.ts' --ignore-pattern '**/*.specs.ts' --ignore-pattern '**/.tmp/**' --ignore-pattern 'src/shared/**' --max-warnings 0 --config ../../eslint.config.ts",
+    "-DISABLE-format": "prettier --write \"**/*.{js,ts,json,md,yml,yaml}\" --ignore-path ../../.prettierignore --log-level warn",
+    "-DISABLE-lint:fix": "eslint 'src/**/*.ts' --ignore-pattern '**/*.specs.ts' --ignore-pattern '**/.tmp/**' --fix --config ../../eslint.config.ts",
+    "-DISABLE-format:fix": "prettier --write \"**/*.{js,ts,json,md,yml,yaml}\" --ignore-path ../../.prettierignore --log-level warn",
+    "-DISABLE-link:dev": "pnpm build && pnpm link --global",
+    "-DISABLE-unlink:dev": "pnpm unlink --global",
+    "-DISABLE-prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@auto-engineer/narrative": "workspace:*",
