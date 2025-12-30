@@ -1,6 +1,6 @@
 # Auto Engineer
 
-Tell the story. Auto writes the code
+Tell the story. Auto writes the code.
 
 [![Build](https://img.shields.io/github/actions/workflow/status/SamHatoum/auto-engineer/ci.yml?style=flat-square)](https://github.com/SamHatoum/auto-engineer/actions) [![License: EL2](https://img.shields.io/badge/License-EL2-blue?style=flat-square)](https://www.elastic.co/licensing/elastic-license) [![npm](https://img.shields.io/npm/v/create-auto-app?style=flat-square)](https://www.npmjs.com/package/create-auto-app) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?style=flat-square)](https://www.typescriptlang.org/) [![Discord](https://img.shields.io/discord/1336421551255457846?style=flat-square&logo=discord)](https://discord.gg/B8BKcKMRm8)
 
