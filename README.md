@@ -2,7 +2,7 @@
 
 Tell the story. Auto writes the code.
 
-[![Build](https://img.shields.io/github/actions/workflow/status/BeOnAuto/auto-engineer/ci.yml?style=flat-square)](https://github.com/BeOnAuto/auto-engineer/actions) [![License: EL2](https://img.shields.io/badge/License-EL2-blue?style=flat-square)](https://www.elastic.co/licensing/elastic-license) [![npm](https://img.shields.io/npm/v/create-auto-app?style=flat-square)](https://www.npmjs.com/package/create-auto-app) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?style=flat-square)](https://www.typescriptlang.org/) [![Discord](https://img.shields.io/discord/1336421551255457846?style=flat-square&logo=discord)](https://discord.gg/B8BKcKMRm8)
+[![Build](https://img.shields.io/github/actions/workflow/status/BeOnAuto/auto-engineer/build-and-test.yml?style=flat-square)](https://github.com/BeOnAuto/auto-engineer/actions) [![License: EL2](https://img.shields.io/badge/License-EL2-blue?style=flat-square)](https://www.elastic.co/licensing/elastic-license) [![npm](https://img.shields.io/npm/v/create-auto-app?style=flat-square)](https://www.npmjs.com/package/create-auto-app) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?style=flat-square)](https://www.typescriptlang.org/) [![Discord](https://img.shields.io/discord/1336421551255457846?style=flat-square&logo=discord)](https://discord.gg/B8BKcKMRm8)
 
 > **Early Preview** - We're actively battle-testing Auto with real-world clients. Expect bugs and rapid evolution. Watch and star this repo to stay updated, and join the [Discord](https://discord.gg/B8BKcKMRm8) for conversations.
 
