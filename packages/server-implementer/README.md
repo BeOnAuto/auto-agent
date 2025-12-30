@@ -1,264 +1,238 @@
 # @auto-engineer/server-implementer
 
-AI-powered implementation plugin for the Auto Engineer CLI that implements server-side code with AI assistance. This plugin takes generated code stubs and business requirements to create implementations.
+AI-powered code implementation that completes TODO-marked TypeScript files in event-driven servers.
+
+---
+
+## Purpose
+
+Without `@auto-engineer/server-implementer`, you would have to manually implement scaffolded TypeScript code, run tests, interpret errors, and iterate on fixes by hand.
+
+This package automates the implementation of scaffolded CQRS/event-sourced server code. It identifies files with TODO markers, generates implementations using AI, validates with TypeScript and Vitest, and retries with error feedback until tests pass.
+
+---
 
 ## Installation
 
-This is a plugin for the Auto Engineer CLI. Install both the CLI and this plugin:
+```bash
+pnpm add @auto-engineer/server-implementer
+```
+
+## Quick Start
+
+Register the handler and implement server code:
+
+### 1. Register the handlers
+
+```typescript
+import { COMMANDS } from '@auto-engineer/server-implementer';
+import { createMessageBus } from '@auto-engineer/message-bus';
+
+const bus = createMessageBus();
+COMMANDS.forEach(cmd => bus.registerCommand(cmd));
+```
+
+### 2. Send a command
+
+```typescript
+const result = await bus.dispatch({
+  type: 'ImplementServer',
+  data: {
+    serverDirectory: './server',
+  },
+  requestId: 'req-123',
+});
+
+console.log(result);
+// → { type: 'ServerImplemented', data: { serverDirectory: './server' } }
+```
+
+The command processes all flows in `src/domain/flows/` and implements TODO-marked files.
+
+---
+
+## How-to Guides
+
+### Run via CLI
 
 ```bash
-npm install -g @auto-engineer/cli
-npm install @auto-engineer/server-implementer
+auto implement:server --server-directory=./server
+auto implement:slice --slice-path=./server/src/domain/flows/order/place-order
 ```
 
-## Configuration
-
-Add this plugin to your `auto.config.ts`:
+### Run Programmatically
 
 ```typescript
-export default {
-  plugins: [
-    '@auto-engineer/server-implementer',
-    // ... other plugins
-  ],
-};
+import { handleImplementSliceCommand } from '@auto-engineer/server-implementer';
+
+const result = await handleImplementSliceCommand({
+  type: 'ImplementSlice',
+  data: {
+    slicePath: './server/src/domain/flows/order/place-order',
+    aiOptions: { maxTokens: 4000 },
+  },
+  requestId: 'req-123',
+});
 ```
 
-## Commands
+### Retry with Previous Errors
 
-This plugin provides the following commands:
+```typescript
+const retryResult = await handleImplementSliceCommand({
+  type: 'ImplementSlice',
+  data: {
+    slicePath: './server/src/domain/flows/order/place-order',
+    context: {
+      previousOutputs: 'TypeError: Property "status" is missing...',
+      attemptNumber: 2,
+    },
+  },
+  requestId: 'req-124',
+});
+```
 
-- `implement:server` - Implement server-side code with AI assistance
-- `implement:slice` - Implement a specific server slice with AI assistance
+### Handle Errors
 
-## What does this plugin do?
+```typescript
+if (result.type === 'ServerImplementationFailed') {
+  console.error(result.data.error);
+}
 
-The Server Implementer uses AI capabilities to implement business logic, database operations, and integration code for server services. It bridges the gap between generated code scaffolds and functional implementations.
+if (result.type === 'SliceImplementationFailed') {
+  console.error(result.data.error);
+}
+```
 
-## Key Features
-
-### AI Code Generation
-
-- Analyzes existing code structure and patterns
-- Understands business requirements from comments and specifications
-- Generates appropriate implementations
-- Maintains consistency with existing codebase patterns
-
-### Incremental Implementation
-
-- Implements one slice or component at a time
-- Preserves existing implementations
-- Allows for iterative refinement
-- Supports partial implementations and manual overrides
-
-### Test-Driven Development
-
-- Generates implementations that pass existing tests
-- Creates test cases for edge cases
-- Validates implementations against test suites
-- Supports behavior-driven development patterns
-
-### Integration Awareness
-
-- Understands dependencies between components
-- Implements integration patterns correctly
-- Handles error scenarios and edge cases
-- Maintains data consistency across operations
-
-## Workflow
-
-### 1. Full Server Implementation
-
-Use `implement:server` to implement an entire server project:
+### Enable Debug Logging
 
 ```bash
-auto implement:server
+DEBUG=auto:server-implementer:* auto implement:server --server-directory=./server
 ```
 
-This command:
+---
 
-- Scans the entire server project
-- Identifies unimplemented stubs and TODOs
-- Implements business logic based on specifications
-- Ensures all components work together coherently
+## API Reference
 
-### 2. Slice-by-Slice Implementation
-
-Use `implement:slice` for targeted implementation of specific features:
-
-```bash
-auto implement:slice --slice="order-management"
-```
-
-This approach:
-
-- Focuses on a single business domain
-- Implements related commands, events, and queries
-- Maintains isolation between different slices
-- Allows for parallel development of features
-
-## Implementation Patterns
-
-### Command Handler Implementation
-
-The plugin understands common command handler patterns:
+### Exports
 
 ```typescript
-// Before (generated stub)
-export class PlaceOrderCommandHandler {
-  async handle(command: PlaceOrderCommand): Promise<OrderPlaced[]> {
-    // TODO: Implement order placement logic
-    throw new Error('Not implemented');
-  }
-}
+import {
+  COMMANDS,
+  implementServerHandler,
+  implementSliceHandler,
+  handleImplementSliceCommand,
+} from '@auto-engineer/server-implementer';
 
-// After (AI implementation)
-export class PlaceOrderCommandHandler {
-  async handle(command: PlaceOrderCommand): Promise<OrderPlaced[]> {
-    // Validate inventory availability
-    const inventory = await this.inventoryService.checkAvailability(command.items);
-    if (!inventory.available) {
-      throw new InsufficientInventoryError(command.items);
-    }
-
-    // Calculate pricing
-    const pricing = await this.pricingService.calculateTotal(command.items);
-
-    // Create order aggregate
-    const order = new Order({
-      customerId: command.customerId,
-      items: command.items,
-      total: pricing.total,
-    });
-
-    // Emit order placed event
-    return [
-      new OrderPlaced({
-        orderId: order.id,
-        customerId: command.customerId,
-        total: pricing.total,
-        timestamp: new Date(),
-      }),
-    ];
-  }
-}
+import type {
+  ImplementServerCommand,
+  ServerImplementedEvent,
+  ServerImplementationFailedEvent,
+  ImplementSliceCommand,
+  SliceImplementedEvent,
+  SliceImplementationFailedEvent,
+} from '@auto-engineer/server-implementer';
 ```
 
-### Query Implementation
+### Commands
 
-Implements read-side query handlers:
+| Command | CLI Alias | Description |
+|---------|-----------|-------------|
+| `ImplementServer` | `implement:server` | Implement all flows in server project |
+| `ImplementSlice` | `implement:slice` | Implement single slice directory |
+
+### ImplementServerCommand
 
 ```typescript
-// Implements projection queries with proper filtering, sorting, and pagination
-export class OrderQueryHandler {
-  async getOrderHistory(customerId: string, options: QueryOptions) {
-    return await this.orderProjection
-      .query()
-      .where('customerId', customerId)
-      .orderBy('createdAt', 'desc')
-      .limit(options.limit)
-      .offset(options.offset)
-      .execute();
+type ImplementServerCommand = Command<
+  'ImplementServer',
+  {
+    serverDirectory: string;
   }
-}
+>;
 ```
 
-### Integration Implementation
-
-Handles external service integrations:
+### ImplementSliceCommand
 
 ```typescript
-// Implements integration patterns with proper error handling
-export class PaymentIntegration {
-  async processPayment(paymentRequest: PaymentRequest): Promise<PaymentResult> {
-    try {
-      const result = await this.stripeClient.charges.create({
-        amount: paymentRequest.amount * 100, // Convert to cents
-        currency: 'usd',
-        source: paymentRequest.token,
-        description: paymentRequest.description,
-      });
-
-      return {
-        success: true,
-        transactionId: result.id,
-        amount: result.amount / 100,
-      };
-    } catch (error) {
-      if (error.type === 'StripeCardError') {
-        throw new PaymentDeclinedError(error.message);
-      }
-      throw new PaymentProcessingError('Payment failed', error);
-    }
+type ImplementSliceCommand = Command<
+  'ImplementSlice',
+  {
+    slicePath: string;
+    context?: {
+      previousOutputs?: string;
+      attemptNumber?: number;
+    };
+    aiOptions?: {
+      maxTokens?: number;
+    };
   }
-}
+>;
 ```
 
-## Configuration Options
-
-Customize implementation behavior through environment variables or config:
+### SliceImplementedEvent
 
 ```typescript
-// auto.config.ts
-export default {
-  plugins: [
-    [
-      '@auto-engineer/server-implementer',
-      {
-        // AI model configuration
-        model: 'claude-3-sonnet',
-        temperature: 0.1,
-
-        // Implementation preferences
-        includeLogging: true,
-        includeMetrics: true,
-        errorHandlingPattern: 'domain-exceptions',
-
-        // Test generation
-        generateTests: true,
-        testFramework: 'vitest',
-      },
-    ],
-  ],
-};
+type SliceImplementedEvent = Event<
+  'SliceImplemented',
+  {
+    slicePath: string;
+    filesImplemented: string[];
+  }
+>;
 ```
 
-## Integration with Other Plugins
+---
 
-Works with the Auto Engineer ecosystem:
+## Architecture
 
-- **@auto-engineer/server-generator-apollo-emmett**: Implements generated command handlers and queries
-- **@auto-engineer/server-checks**: Validates implementations pass type checking and tests
-- **@auto-engineer/flow**: Uses flow specifications to understand business requirements
-- **@auto-engineer/ai-gateway**: Leverages AI models for intelligent code generation
+```
+src/
+├── index.ts
+├── commands/
+│   ├── implement-server.ts
+│   └── implement-slice.ts
+├── agent/
+│   ├── runFlows.ts
+│   ├── runAllSlices.ts
+│   ├── runSlice.ts
+│   └── runTests.ts
+├── prompts/
+│   └── systemPrompt.ts
+└── utils/
+    └── extractCodeBlock.ts
+```
 
-## Quality Assurance
+The following diagram shows the implementation flow:
 
-The plugin ensures quality implementations through:
+```mermaid
+flowchart TB
+    A[ImplementSlice] --> B[Load Slice Files]
+    B --> C[Find TODO Markers]
+    C --> D[Generate via AI]
+    D --> E[Write File]
+    E --> F[Run Tests + TypeCheck]
+    F --> G{Pass?}
+    G -->|Yes| H[SliceImplementedEvent]
+    G -->|No| I{Retries < 5?}
+    I -->|Yes| J[Build Retry Prompt]
+    J --> D
+    I -->|No| K[SliceImplementationFailedEvent]
+```
 
-- Static Analysis: Validates TypeScript compliance and best practices
-- Test Execution: Runs existing tests to ensure implementations work
-- Code Review: Uses AI to review generated code for potential issues
-- Pattern Consistency: Maintains consistency with existing codebase patterns
-- Documentation: Generates inline documentation for complex logic
+*Flow: Command loads files, identifies TODOs, generates via AI, validates, retries up to 5 times on failure.*
 
-## Advanced Features
+### Implementation Markers
 
-### Context-Aware Implementation
+Files are identified for processing by:
+- `// @auto-implement` comment
+- `TODO:` comments
+- `IMPLEMENTATION INSTRUCTIONS` text
 
-The AI understands:
+### Dependencies
 
-- Existing project patterns and conventions
-- Database schema and relationships
-- External API contracts and integration patterns
-- Error handling strategies used in the project
-- Testing approaches and mocking patterns
-
-### Iterative Refinement
-
-- Analyzes test failures and refines implementations
-- Learns from manual corrections and adjustments
-- Adapts to project-specific requirements and constraints
-- Supports incremental improvement over time
-
-The Server Implementer transforms code scaffolds into implementations, accelerating server development while maintaining code quality and consistency.
+| Package | Usage |
+|---------|-------|
+| `@auto-engineer/ai-gateway` | AI text generation |
+| `@auto-engineer/message-bus` | Command/event infrastructure |
+| `fast-glob` | File discovery |
+| `debug` | Debug logging |

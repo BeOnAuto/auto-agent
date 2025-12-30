@@ -1,244 +1,231 @@
 # @auto-engineer/message-bus
 
-A message bus plugin for the Auto Engineer CLI that implements a Command Query Responsibility Segregation (CQRS) pattern for handling commands and events in an event-driven architecture. It supports command handling, event publishing, and subscription with robust debugging capabilities.
+Type-safe message bus implementing the CQRS pattern with command handling and event publishing.
+
+---
+
+## Purpose
+
+Without `@auto-engineer/message-bus`, you would have to implement your own command/event routing, handle handler registration, manage request/correlation ID propagation, and ensure proper error isolation between handlers.
+
+This package provides the core messaging infrastructure for the Auto Engineer ecosystem. It enables decoupled communication through commands (write operations) and events (state changes) with robust debugging support.
+
+---
 
 ## Installation
 
-Install the package as a dependency in your Auto Engineer project:
-
 ```bash
-npm install @auto-engineer/message-bus
+pnpm add @auto-engineer/message-bus
 ```
 
-## Configuration
-
-Add the plugin to your `auto.config.ts`:
+## Quick Start
 
 ```typescript
-export default {
-  plugins: [
-    '@auto-engineer/message-bus',
-    // ... other plugins
-  ],
-};
-```
-
-## What does this package do?
-
-The `@auto-engineer/message-bus` plugin provides a lightweight, type-safe message bus for managing commands and events in the Auto Engineer ecosystem. It enables plugins to communicate through a CQRS pattern, where commands trigger actions and events notify subscribers of changes. It includes detailed debugging support and integrates seamlessly with other Auto Engineer plugins.
-
-## Key Features
-
-### CQRS Pattern
-
-- **Commands**: Trigger actions with type-safe data payloads
-- **Events**: Notify subscribers of state changes or actions
-- **Handlers**: Define command and event handlers with type safety
-- **Subscriptions**: Subscribe to specific events or all events
-
-### Command Handling
-
-- Register command handlers with `registerCommandHandler`
-- Execute commands with `sendCommand`
-- Supports async command handling with optional event emission
-- Ensures one handler per command type
-
-### Event Publishing and Subscription
-
-- Publish events with `publishEvent`
-- Subscribe to specific events with `subscribeToEvent`
-- Subscribe to all events with `subscribeAll`
-- Unsubscribe from events using subscription objects
-
-### Debugging Support
-
-- Uses the `debug` library for detailed logging
-- Namespaces: `message-bus`, `message-bus:command`, `message-bus:event`, `message-bus:handler`
-- Logs command execution, event publishing, and handler registration
-- Configurable via `DEBUG` environment variable
-
-## Usage
-
-### Creating a Message Bus
-
-```typescript
-import { createMessageBus } from '@auto-engineer/message-bus';
+import { createMessageBus, defineCommandHandler } from '@auto-engineer/message-bus';
 
 const bus = createMessageBus();
-```
 
-### Registering a Command Handler
-
-```typescript
-import { defineCommandHandler } from '@auto-engineer/message-bus';
-
-const createUserHandler = defineCommandHandler({
+const handler = defineCommandHandler({
   name: 'CreateUser',
   alias: 'create-user',
   description: 'Creates a new user',
-  category: 'User Management',
   fields: {
     name: { description: 'User name', required: true },
-    email: { description: 'User email', required: true },
   },
-  examples: ['create-user --name John --email john@example.com'],
-  handle: async (command) => {
-    console.log(`Creating user: ${command.data.name}`);
-    return {
-      type: 'UserCreated',
-      data: { userId: '123', name: command.data.name, email: command.data.email },
-      timestamp: new Date(),
-      requestId: command.requestId,
-      correlationId: command.correlationId,
-    };
-  },
+  examples: [],
+  events: ['UserCreated'],
+  handle: async (cmd) => ({
+    type: 'UserCreated',
+    data: { userId: 'u-001', name: cmd.data.name },
+  }),
 });
 
-bus.registerCommandHandler(createUserHandler);
+bus.registerCommandHandler(handler);
+
+const result = await bus.sendCommand({
+  type: 'CreateUser',
+  data: { name: 'John' },
+});
+
+console.log(result);
+// → { type: 'UserCreated', data: { userId: 'u-001', name: 'John' } }
 ```
 
-### Sending a Command
+---
+
+## How-to Guides
+
+### Register a Command Handler
 
 ```typescript
-await bus.sendCommand({
+import { createMessageBus, defineCommandHandler } from '@auto-engineer/message-bus';
+
+const handler = defineCommandHandler({
+  name: 'MyCommand',
+  alias: 'my-command',
+  description: 'Does something',
+  fields: {},
+  examples: [],
+  events: ['MyEvent'],
+  handle: async (cmd) => ({ type: 'MyEvent', data: {} }),
+});
+
+const bus = createMessageBus();
+bus.registerCommandHandler(handler);
+```
+
+### Send a Command
+
+```typescript
+const result = await bus.sendCommand({
   type: 'CreateUser',
   data: { name: 'John', email: 'john@example.com' },
   requestId: 'req-123',
-  correlationId: 'corr-456',
 });
 ```
 
-### Subscribing to Events
+### Subscribe to Events
 
 ```typescript
 const subscription = bus.subscribeToEvent('UserCreated', {
-  name: 'UserCreatedHandler',
+  name: 'UserCreatedNotifier',
   handle: async (event) => {
     console.log(`User created: ${event.data.userId}`);
   },
 });
 
-// Unsubscribe when needed
 subscription.unsubscribe();
 ```
 
-### Subscribing to All Events
+### Subscribe to All Events
 
 ```typescript
 const subscription = bus.subscribeAll({
-  name: 'AllEventsHandler',
-  handle: async (event) => {
-    console.log(`Event received: ${event.type}`);
+  name: 'EventLogger',
+  handle: (event) => {
+    console.log(`[${event.type}]`, event.data);
   },
 });
-
-// Unsubscribe when needed
-subscription.unsubscribe();
 ```
 
-### Debugging
+### Return Multiple Events
 
-Enable debug logging with the `DEBUG` environment variable:
-
-```bash
-DEBUG=message-bus:* npm run dev
+```typescript
+const handler = defineCommandHandler({
+  name: 'BatchCreate',
+  // ...
+  handle: async (cmd) => {
+    return cmd.data.items.map(item => ({
+      type: 'ItemCreated',
+      data: item,
+    }));
+  },
+});
 ```
 
-Example output:
+---
 
-```
-message-bus Creating new message bus instance
-message-bus Message bus state initialized
-message-bus:handler Registering command handler: CreateUser
-message-bus:handler Handler registered successfully, total handlers: 1
-message-bus:command Sending command: CreateUser
-message-bus:command   Request ID: req-123
-message-bus:command   Correlation ID: corr-456
-message-bus:command   Data keys: [ 'name', 'email' ]
-message-bus:command Handler found for command: CreateUser
-message-bus:command Executing handler for: CreateUser
-message-bus:event Publishing event: UserCreated
-message-bus:event   Request ID: req-123
-message-bus:event   Correlation ID: corr-456
-message-bus:event   Timestamp: 2025-09-04T14:19:00.000Z
-message-bus:event   Data keys: [ 'userId', 'name', 'email' ]
-```
+## API Reference
 
-See [DEBUG.md](./DEBUG.md) for detailed debugging instructions.
+### Package Exports
 
-## Project Structure
+```typescript
+import {
+  createMessageBus,
+  defineCommandHandler,
+} from '@auto-engineer/message-bus';
 
-```
-message-bus/
-├── src/
-│   ├── index.ts            # Exports and main entry point
-│   ├── message-bus.ts      # Core message bus implementation
-│   ├── define-command.ts   # Command handler definition utility
-│   ├── types.ts            # Type definitions for CQRS
-├── DEBUG.md                # Debugging instructions
-├── CHANGELOG.md            # Version history
-├── package.json
-├── tsconfig.json
+import type {
+  Command,
+  Event,
+  CommandHandler,
+  EventHandler,
+  EventSubscription,
+  MessageBus,
+  UnifiedCommandHandler,
+  FieldDefinition,
+} from '@auto-engineer/message-bus';
 ```
 
-## Quality Assurance
+### Functions
 
-- **Type Safety**: Full TypeScript support with strict type checking
-- **Testing**: Unit tests using Vitest
-- **Linting**: ESLint and Prettier for code quality
-- **Error Handling**: Robust error handling for command and event processing
-- **Debugging**: Detailed logging with `debug` library
+#### `createMessageBus(): MessageBus`
 
-## Integration with Auto Engineer Ecosystem
+Create a new message bus instance.
 
-Works with other Auto Engineer plugins:
+#### `defineCommandHandler(options): UnifiedCommandHandler`
 
-- **@auto-engineer/file-syncer**: Emits file change events
-- **@auto-engineer/flow**: Publishes flow-related events
-- **@auto-engineer/server-generator-apollo-emmett**: Triggers commands for server generation
-- **@auto-engineer/frontend-generator-react-graphql**: Triggers commands for frontend generation
-- **@auto-engineer/server-implementer**: Handles server implementation commands
-- **@auto-engineer/frontend-implementer**: Handles frontend implementation commands
+Define a command handler with CLI metadata.
 
-## Commands
+### Command Type
 
-This plugin integrates with the Auto Engineer CLI but does not expose direct CLI commands. It is used internally by other plugins for event-driven communication.
-
-## Getting Started
-
-1. Install the plugin (see Installation above)
-2. Add it to your `auto.config.ts`
-3. Use the message bus in your application or other plugins
-
-Example:
-
-```bash
-# Install the plugin
-npm install @auto-engineer/message-bus
-
-# Run your Auto Engineer project
-npm run start
+```typescript
+type Command<Type extends string, Data> = Readonly<{
+  type: Type;
+  data: Readonly<Data>;
+  timestamp?: Date;
+  requestId?: string;
+  correlationId?: string;
+}>;
 ```
 
-## Advanced Features
+### Event Type
 
-### Type-Safe Command Handlers
+```typescript
+type Event<Type extends string, Data> = Readonly<{
+  type: Type;
+  data: Data;
+  timestamp?: Date;
+  requestId?: string;
+  correlationId?: string;
+}>;
+```
 
-- Use `defineCommandHandler` to create handlers with metadata (alias, description, fields)
-- Supports command validation through field definitions
-- Generates events or void responses
+### MessageBus Interface
 
-### Event-Driven Architecture
+```typescript
+interface MessageBus {
+  registerCommandHandler(handler: CommandHandler): void;
+  registerEventHandler(eventType: string, handler: EventHandler): void;
+  sendCommand(command: Command): Promise<Event | Event[]>;
+  publishEvent(event: Event): Promise<void>;
+  subscribeToEvent(eventType: string, handler: EventHandler): EventSubscription;
+  subscribeAll(handler: EventHandler): EventSubscription;
+  getCommandHandlers(): Record<string, CommandHandler>;
+}
+```
 
-- Asynchronous event handling with `Promise.allSettled` for robust execution
-- Supports multiple handlers per event type
-- All-event subscription for global event monitoring
+---
 
-### Correlation and Request IDs
+## Architecture
 
-- Tracks `requestId` and `correlationId` for command/event traceability
-- Useful for debugging and logging workflows
+```
+src/
+├── index.ts
+├── message-bus.ts
+├── define-command.ts
+└── types.ts
+```
 
-## Changelog
+The following diagram shows the message flow:
 
-See [CHANGELOG.md](./CHANGELOG.md) for version history and updates.
+```mermaid
+flowchart LR
+    A[sendCommand] --> B[CommandHandler]
+    B --> C[Event]
+    C --> D[publishEvent]
+    D --> E[EventHandlers]
+```
+
+*Flow: Command is sent, handler processes it, returns event(s), events are published to subscribers.*
+
+### Key Concepts
+
+- **One handler per command type**: Ensures deterministic command processing
+- **Multiple handlers per event type**: Enables fan-out notification
+- **Request/Correlation ID propagation**: Maintains traceability
+- **Error isolation**: Handler failures don't affect other handlers
+
+### Dependencies
+
+This package has no dependencies on other `@auto-engineer/*` packages. It is a foundational package used throughout the monorepo.

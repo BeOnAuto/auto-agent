@@ -1,91 +1,218 @@
 # @auto-engineer/server-checks
 
-Server validation commands for Auto Engineer projects. Plugin for the Auto Engineer CLI that provides commands for checking types, tests, and linting that can be orchestrated through event-driven workflows.
+Server validation commands for TypeScript type checking, ESLint linting, and Vitest test execution.
+
+---
+
+## Purpose
+
+Without `@auto-engineer/server-checks`, you would have to manually run TypeScript, ESLint, and Vitest separately, parse their outputs, and integrate results into your pipeline.
+
+This package provides command handlers for validating server code quality. Each command follows the CQRS pattern, accepting a command and emitting passed or failed events for integration with event-driven workflows.
+
+---
 
 ## Installation
 
-This is a plugin for the Auto Engineer CLI. Install both the CLI and this plugin:
-
 ```bash
-npm install -g @auto-engineer/cli
-npm install @auto-engineer/server-checks
+pnpm add @auto-engineer/server-checks
 ```
 
-## Configuration
+## Quick Start
 
-Add this plugin to your `auto.config.ts`:
+Register the handlers and run validation checks:
+
+### 1. Register the handlers
 
 ```typescript
-export default {
-  plugins: [
-    '@auto-engineer/server-checks',
-    // ... other plugins
-  ],
-};
+import { COMMANDS } from '@auto-engineer/server-checks';
+import { createMessageBus } from '@auto-engineer/message-bus';
+
+const bus = createMessageBus();
+COMMANDS.forEach(cmd => bus.registerCommand(cmd));
 ```
 
-## Commands
-
-This plugin provides the following commands:
-
-- `check:types` - Check TypeScript types in the server code
-- `check:lint` - Run linter checks on the server code
-- `check:tests` - Run tests on the server code
-
-### CheckTypes
-
-Runs TypeScript type checking on a target directory or project.
-
-Command: `CheckTypes`
-Events:
-
-- `TypeCheckPassed` - Emitted when all types are valid
-- `TypeCheckFailed` - Emitted when type errors are found
-
-### CheckTests
-
-Runs test suite using Vitest on a target directory or project.
-
-Command: `CheckTests`
-Events:
-
-- `TestsCheckPassed` - Emitted when all tests pass
-- `TestsCheckFailed` - Emitted when tests fail
-
-### CheckLint
-
-Runs ESLint checks on TypeScript files in a target directory or project.
-
-Command: `CheckLint`  
-Events:
-
-- `LintCheckPassed` - Emitted when no lint issues found
-- `LintCheckFailed` - Emitted when lint issues are detected
-
-## Usage
-
-Each command can be imported and used in event-driven workflows:
+### 2. Send a command
 
 ```typescript
-import { handleCheckTypesCommand, handleCheckTestsCommand, handleCheckLintCommand } from '@auto-engineer/server-checks';
-
-// Run type checking
-const typeResult = await handleCheckTypesCommand({
+const result = await bus.dispatch({
   type: 'CheckTypes',
   data: {
-    targetDirectory: './src/domain/flows/order',
-    scope: 'slice', // or 'project'
+    targetDirectory: './server',
   },
-  timestamp: new Date(),
   requestId: 'req-123',
 });
 
-// Handle result events
-if (typeResult.type === 'TypeCheckFailed') {
-  // Retry implementation with error context
+console.log(result);
+// → { type: 'TypeCheckPassed', data: { targetDirectory: './server', checkedFiles: 42 } }
+```
+
+The command runs `tsc --noEmit` and returns structured results.
+
+---
+
+## How-to Guides
+
+### Run via CLI
+
+```bash
+auto check:types --target-directory=./server
+auto check:lint --target-directory=./server
+auto check:tests --target-directory=./server
+```
+
+### Run with Auto-Fix
+
+```bash
+auto check:lint --target-directory=./server --fix
+```
+
+### Run at Project Scope
+
+```bash
+auto check:types --target-directory=./server --scope=project
+```
+
+### Run Programmatically
+
+```typescript
+import { checkTypesCommandHandler } from '@auto-engineer/server-checks';
+
+const result = await checkTypesCommandHandler.handle({
+  type: 'CheckTypes',
+  data: {
+    targetDirectory: './server',
+    scope: 'slice',
+  },
+  requestId: 'req-123',
+});
+```
+
+### Handle Errors
+
+```typescript
+if (result.type === 'TypeCheckFailed') {
+  console.error('Type errors:', result.data.errors);
+  console.error('Failed files:', result.data.failedFiles);
+}
+
+if (result.type === 'LintCheckFailed') {
+  console.error('Lint errors:', result.data.errorCount);
+}
+
+if (result.type === 'TestsCheckFailed') {
+  console.error('Failed tests:', result.data.failedTests);
 }
 ```
 
-## Integration with Event-Driven Workflows
+### Enable Debug Logging
 
-These commands are designed to work with the `@auto-engineer/message-bus` for event-driven orchestration. Failed checks can trigger re-implementation with error context for self-healing workflows.
+```bash
+DEBUG=auto:server-checks:* auto check:types --target-directory=./server
+```
+
+---
+
+## API Reference
+
+### Exports
+
+```typescript
+import {
+  COMMANDS,
+  checkTypesCommandHandler,
+  checkLintCommandHandler,
+  checkTestsCommandHandler,
+} from '@auto-engineer/server-checks';
+
+import type {
+  CheckTypesCommand,
+  TypeCheckPassedEvent,
+  TypeCheckFailedEvent,
+  CheckLintCommand,
+  LintCheckPassedEvent,
+  LintCheckFailedEvent,
+  CheckTestsCommand,
+  TestsCheckPassedEvent,
+  TestsCheckFailedEvent,
+} from '@auto-engineer/server-checks';
+```
+
+### Commands
+
+| Command | CLI Alias | Description |
+|---------|-----------|-------------|
+| `CheckTypes` | `check:types` | Run TypeScript type checking |
+| `CheckLint` | `check:lint` | Run ESLint validation |
+| `CheckTests` | `check:tests` | Run Vitest tests |
+
+### CheckTypesCommand
+
+```typescript
+type CheckTypesCommand = Command<'CheckTypes', {
+  targetDirectory: string;
+  scope?: 'slice' | 'project';
+}>;
+```
+
+### CheckLintCommand
+
+```typescript
+type CheckLintCommand = Command<'CheckLint', {
+  targetDirectory: string;
+  scope?: 'slice' | 'project';
+  fix?: boolean;
+}>;
+```
+
+### CheckTestsCommand
+
+```typescript
+type CheckTestsCommand = Command<'CheckTests', {
+  targetDirectory: string;
+  scope?: 'slice' | 'project';
+}>;
+```
+
+### Scope Options
+
+| Value | Description |
+|-------|-------------|
+| `slice` | Check only files within target directory (default) |
+| `project` | Check all files in the project |
+
+---
+
+## Architecture
+
+```
+src/
+├── index.ts
+└── commands/
+    ├── check-types.ts
+    ├── check-lint.ts
+    └── check-tests.ts
+```
+
+The following diagram shows the check flow:
+
+```mermaid
+flowchart TB
+    A[Command] --> B[Find Project Root]
+    B --> C[Discover Files]
+    C --> D[Run Tool]
+    D --> E{Success?}
+    E -->|Yes| F[PassedEvent]
+    E -->|No| G[FailedEvent]
+```
+
+*Flow: Command finds project root, discovers files based on scope, runs tool, emits result event.*
+
+### Dependencies
+
+| Package | Usage |
+|---------|-------|
+| `@auto-engineer/message-bus` | Command/event infrastructure |
+| `execa` | Process execution for tsc, eslint, vitest |
+| `fast-glob` | File discovery |
+| `debug` | Debug logging |

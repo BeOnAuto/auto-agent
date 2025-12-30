@@ -1,141 +1,165 @@
-[![Discord Online](https://img.shields.io/discord/1336421551255457846?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B8BKcKMRm8)
-[![Discord Users](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FfUn2AZsBpW%3Fwith_counts%3Dtrue&query=%24.profile.member_count&label=Total&style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B8BKcKMRm8)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?style=for-the-badge)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-20.x-green?style=for-the-badge)](https://nodejs.org/)
-[![pnpm](https://img.shields.io/badge/pnpm-%3E=8.15.4-orange?style=for-the-badge)](https://pnpm.io/)
-[![Monorepo](https://img.shields.io/badge/monorepo-turborepo-orange?style=for-the-badge)](https://turbo.build/repo)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](http://makeapullrequest.com)
-[![License: EL2](https://img.shields.io/badge/License-EL2-blue.svg?style=for-the-badge)](https://www.elastic.co/licensing/elastic-license) [![Wallaby.js](https://img.shields.io/badge/wallaby.js-powered-blue.svg?style=for-the-badge&logo=github)](https://wallabyjs.com/oss/)
-
 # Auto Engineer
 
-> Put your SDLC on Auto, and build production-grade apps with humans and agents.
+Tell the story. Auto writes the code
 
-##### _EARLY PREVIEW_
+[![Build](https://img.shields.io/github/actions/workflow/status/SamHatoum/auto-engineer/ci.yml?style=flat-square)](https://github.com/SamHatoum/auto-engineer/actions) [![License: EL2](https://img.shields.io/badge/License-EL2-blue?style=flat-square)](https://www.elastic.co/licensing/elastic-license) [![npm](https://img.shields.io/npm/v/create-auto-app?style=flat-square)](https://www.npmjs.com/package/create-auto-app) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?style=flat-square)](https://www.typescriptlang.org/) [![Discord](https://img.shields.io/discord/1336421551255457846?style=flat-square&logo=discord)](https://discord.gg/B8BKcKMRm8)
 
-- It will be buggy as you use it!
-- We are working hard on making it awesome
-- We are actively using Auto with real-world clients and use-cases
-- We are making a lot of design decisions as we battle test the approach
+> **Early Preview** - We're actively battle-testing Auto with real-world clients. Expect bugs and rapid evolution. Watch and star this repo to stay updated, and join the [Discord](https://discord.gg/B8BKcKMRm8) for conversations.
 
-Stay up to date by watching 👀 and giving us a star ⭐ - join the 💬 Discord for conversations.
+---
 
-## 🚀 Quick Start
+## What is Auto Engineer?
 
-### Prerequisites
+Building apps with AI is hit-or-miss: you prompt, get code, test it, find bugs, re-prompt, and repeat until something works (or you give up). Auto Engineer fixes this by giving AI agents deterministic scaffolds, specs, and feedback loops so they self-correct reliably.
 
-Please ensure you have the following dependencies installed:
+**Think of Auto like an SLR camera.** In green-square mode, anyone can point and shoot; the system handles the complexity automatically. Switch to manual, and you control every parameter. Same tool, different depths. Beginners ship apps on day one; experts fine-tune every stage of the pipeline.
 
-- **Node.js**: Version 20.0.0 or higher
-- **\*A package manager**: pnpm (recommended) / npm / yarn / bun
-- **AI Provider API Key**: Anthropic (recommended) / OpenAI / Google / xAI Grok / Custom
-  - For custom models and/or routers, see the .env.template
+You model your apps using **Narratives**, a flow-of-time DSL where you tell the story of your application slice by slice, like a user journey.
 
-### Installation Steps
+The pipeline transforms these high-level flow models into production-ready code: narratives become a domain model, which scaffolds a backend; an AI architect generates a user experience architecture, which scaffolds a frontend. Both are then implemented and tested by AI agents with deterministic feedback loops.
 
-1. **Use the Create Auto App installer**
+Auto Engineer is for teams who want to collaborate with non-technical stakeholders on real specifications, not mock wireframes, while keeping full control over the generated architecture through customizable pipelines.
+
+---
+
+## Quick Start
 
 ```bash
-npx create-auto-app@latest # Tip: the todo example is a good start
-```
-
-2. **Configure API keys**
-   Copy the `.env.template` variables into a new `.env` and configure your API keys for your preferred model(s).
-
-3. **Run the app**
-   Go into the generated directory `cd <project-name>` and run:
-
-```bash
+npx create-auto-app@latest my-project
+cd my-project
+cp .env.template .env  # Add your API key (Anthropic recommended)
 auto
 ```
 
-You should see `server running on http://localhost:5555` in your console. You're ready to start exploring!
+You should see `server running on http://localhost:5555`. Open the URL and click through to your sandbox to see the visual counterpart of your narratives.
 
-### Explore Narratives
+**Next steps:**
 
-Open one of the narrative files in your IDE. Narrative files are located under `/narratives` in the example you installed.
+- [Explore the kanban-todo example](./examples/kanban-todo)
+- [Join the Discord community](https://discord.gg/B8BKcKMRm8)
 
-Next, navigate to http://localhost:5555 in your browser. Click the button to go to your sandbox, and you'll see the visual counterpart of the narrative that you saw in your IDE. 🤯
+---
 
-With Narratives, you model your apps using the flow of time. Think of Narratives like a user journey where you tell the story slice by slice.
+## How It Works
 
-Click on a slice, which are the purple boxes that you see inside the narratives, and you'll see a pen icon. Click that to see the specs in plain English for that slice. You can edit them to and get as specific as you require.
+```mermaid
+flowchart LR
+    A[Narratives] --> B[Domain Model]
+    B --> C[Server Scaffold]
+    B --> D[IA Schema]
+    D --> E[Frontend Scaffold]
+    C --> F[AI Implementation]
+    E --> F
+    F --> G[Quality Checks]
+    G -->|Fail| F
+    G -->|Pass| H[Production Code]
+```
 
-As you make changes, you'll see an "sync" icon with a number in the top right. This is an indication of the number of differences between the sandbox and your IDE. You can think of the sandbox you're working in as a git remote that you need to push and pull from.
+Narratives define your application as slices of behavior. The pipeline converts these to a domain model, scaffolds both server and frontend code with implementation hints, then AI agents implement the code. If tests fail, the AI receives error feedback and self-corrects. Passing code undergoes type checking, linting, and runtime validation.
 
-### Collaborate on your Narratives
+---
 
-Grab the `sandbox.on.auto/...` link that you see in your browser and share it with your colleagues. They can immediately collaborate with you on your canvas! No apps to download, just instant access to the narratives. Any changes they make will also appear for you in the top right sync icon. This allows you to collaborate with non-technical people and get their input, while still keeping it real. 🤘
+## Packages
 
-### Build your Narrative into an App
+### Core
 
-Ok, so you've authored a narrative to your liking, sliced and diced it, you've collaborated on it, and got a 👍 from your colleagues. Now let's build your app!
+| Package                                                    | Description                                                        |
+| ---------------------------------------------------------- | ------------------------------------------------------------------ |
+| [`@auto-engineer/cli`](./packages/cli)                     | Command-line interface for running Auto Engineer pipelines         |
+| [`@auto-engineer/pipeline`](./packages/pipeline)           | Command/event pipeline orchestration with projections and reactors |
+| [`@auto-engineer/message-bus`](./packages/message-bus)     | In-process message bus for command dispatch and event publishing   |
+| [`@auto-engineer/message-store`](./packages/message-store) | Event persistence and replay for message bus                       |
+| [`@auto-engineer/narrative`](./packages/narrative)         | DSL for modeling application behavior as time-based flows          |
+| [`@auto-engineer/flow`](./packages/flow)                   | Flow modeling utilities                                            |
+| [`@auto-engineer/id`](./packages/id)                       | Deterministic ID generation for pipeline correlation               |
 
-On the left toolbar, you'll see a pipelines icon. Click it and you'll see a visual of a pipeline.
+### Generators
 
-Select "Export Schema" and click run, then continue reading as you marvel at cogs turning.
+| Package                                                                                          | Description                                              |
+| ------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| [`@auto-engineer/server-generator-apollo-emmett`](./packages/server-generator-apollo-emmett)     | Apollo GraphQL + Emmett event-sourced server scaffolding |
+| [`@auto-engineer/frontend-generator-react-graphql`](./packages/frontend-generator-react-graphql) | React + GraphQL frontend scaffolding from schema         |
+| [`@auto-engineer/information-architect`](./packages/information-architect)                       | AI-driven schema generation for UI/UX architecture       |
+| [`@auto-engineer/design-system-importer`](./packages/design-system-importer)                     | Import and configure design system components            |
+| [`@auto-engineer/create-auto-app`](./packages/create-auto-app)                                   | Project scaffolding CLI with templates                   |
 
-The pipelines are where all the magic happens. First the narratives are converted into a model, which is used to scaffold a backend. AI then creates a user experience architecture, which in turn scaffolds a front end. Both the scaffolded frontend and backend are then implemented and tested by AI 🤖.
+### Implementers
 
-The pipeline gives you full control over how you want apps to be built. The example has a set of default that the Auto team put together, but everything is customizable to the nth degree, including the narrative DSL itself!
+| Package                                                                    | Description                             |
+| -------------------------------------------------------------------------- | --------------------------------------- |
+| [`@auto-engineer/server-implementer`](./packages/server-implementer)       | AI-powered server code implementation   |
+| [`@auto-engineer/frontend-implementer`](./packages/frontend-implementer)   | AI-powered frontend code implementation |
+| [`@auto-engineer/component-implementer`](./packages/component-implementer) | AI-powered UI component implementation  |
 
-### Preview your App
+### Utilities
 
-Once the run is complete, you can go to `https://localhost:3000` and preview your newly created app.
+| Package                                                        | Description                                                    |
+| -------------------------------------------------------------- | -------------------------------------------------------------- |
+| [`@auto-engineer/ai-gateway`](./packages/ai-gateway)           | Multi-provider AI abstraction (Anthropic, OpenAI, Google, xAI) |
+| [`@auto-engineer/dev-server`](./packages/dev-server)           | Development server with SSE events and pipeline visualization  |
+| [`@auto-engineer/file-store`](./packages/file-store)           | File system operations with caching                            |
+| [`@auto-engineer/server-checks`](./packages/server-checks)     | Server code validation (types, lint, tests)                    |
+| [`@auto-engineer/frontend-checks`](./packages/frontend-checks) | Frontend code validation (types, lint, tests)                  |
 
-Congratulations, you built your first app using Auto! 🚀
+---
 
-## Explore more
+## Examples
 
-Head over to the [Discord Community](https://discord.gg/B8BKcKMRm8) to chat with the team and community directly for more.
+| Example                                       | Description                                   | Complexity   |
+| --------------------------------------------- | --------------------------------------------- | ------------ |
+| [`kanban-todo`](./examples/kanban-todo)       | Task management with drag-and-drop boards     | Beginner     |
+| [`questionnaires`](./examples/questionnaires) | Survey builder with design system integration | Intermediate |
+| [`support-files`](./examples/support-files)   | Shared assets and design tokens               | Reference    |
 
-Let's go through some of the other features Auto provides you.
+---
 
-### Configuring your pipeline
+## Development
 
-The pipelines are a little bit like CI/CD pipelines, but on steroids! Just like CI/CD, you can configure the steps required to build, test, and deploy. However unlike CI/CD these pipelines have feedback loops. The output of one job can retrigger another job. Some jobs may even ask for asynchronous input from humans. This is why we call them Software Development Lifecycle pipelines. They help you automated your whole SDLC.
+### Prerequisites
 
-You can configure these pipelines in `auto.config.ts` file. In there you will find a set of reactions that read something like this: `on(SomeEvent).dispatch(SomeCommand)`. By chaining these reactions together you can build SDLC pipelines that are as simple or complex as you like.
+- Node.js 20.0.0+
+- pnpm 8.15.4+
+- AI Provider API Key (Anthropic, OpenAI, Google, or xAI)
 
-Some jobs are procedural and deterministic, some are stochastic and non-deterministic, and some are a mix of both.
-
-Job are triggered by a single command and emit one or more events – of they might emit an error if they fail or timeout unexpectedly.
-
-You can read more about pipelines in the core-concepts section.
-
-### Running commands from the CLI
-
-Just like you can run commands from the UI, you can also run from them from the CLI.
-
-If you'd like to see which commands are available, type this in your console:
+### Setup
 
 ```bash
-auto --help
+git clone https://github.com/SamHatoum/auto-engineer.git
+cd auto-engineer
+pnpm install
+pnpm watch
 ```
 
-You'll get a list of commands based on the plugins you have configured in your `auto.config.ts` file
+### Commands
 
+| Command      | Description                      |
+| ------------ | -------------------------------- |
+| `pnpm watch` | Build all packages in watch mode |
+| `pnpm build` | Build all packages               |
+| `pnpm test`  | Run all tests                    |
+| `pnpm check` | Run type checking and linting    |
+
+### Working with Local Packages
+
+To use local packages in example projects:
+
+```bash
+cd examples/kanban-todo
+pnpm add '@auto-engineer/cli@workspace:*' '@auto-engineer/flow@workspace:*'
 ```
-auto generate:server --schema-path=.context/schema.json --destination=.
-```
 
-If you're already running an Auto server, you run the cli commands against it by passing in the server url like this:
+### Testing
 
-```
-auto generate:server --schema-path=.context/schema.json --destination=. --host=localhost:5555
-```
+Write focused tests for single behaviors, cover edge cases, and aim for 80%+ coverage with `pnpm test:coverage`.
 
-## 🤝 Contributing
+---
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+## Contributing
 
-## 📄 License
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-Auto Engineer is licensed under the [Elastic License 2.0 (EL2)](LICENSE.md).
+---
 
-## 🔗 Links
+## License
 
-- [Discord Community](https://discord.gg/B8BKcKMRm8)
-- [Issue Tracker](https://github.com/SamHatoum/auto-engineer/issues)
-
-<img referrerpolicy="no-referrer-when-downgrade" src="https://static.on.auto/a.png?x-pxid=3e68b410-a966-4c96-887b-34102030fd15&page=README.md" />
+Elastic License 2.0 (EL2) - See [LICENSE.md](LICENSE.md) for details.

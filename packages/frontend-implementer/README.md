@@ -1,358 +1,190 @@
 # @auto-engineer/frontend-implementer
 
-AI-powered frontend implementation plugin for the Auto Engineer CLI that implements client-side code with AI assistance. This plugin creates React components, hooks, and application logic from specifications and design requirements.
+AI-powered frontend implementation that transforms IA schemes into complete React applications.
+
+---
+
+## Purpose
+
+Without `@auto-engineer/frontend-implementer`, you would have to manually translate Information Architecture specifications into React components, maintain consistency across atoms/molecules/organisms/pages, and integrate GraphQL operations by hand.
+
+This package provides an AI agent that reads IA scheme specifications and generates production-ready React code with TypeScript types, atomic design structure, and GraphQL integration.
+
+---
 
 ## Installation
 
-This is a plugin for the Auto Engineer CLI. Install both the CLI and this plugin:
+```bash
+pnpm add @auto-engineer/frontend-implementer
+```
+
+## Quick Start
+
+Register the handler and implement a frontend project:
+
+### 1. Register the handlers
+
+```typescript
+import { COMMANDS } from '@auto-engineer/frontend-implementer';
+import { createMessageBus } from '@auto-engineer/message-bus';
+
+const bus = createMessageBus();
+COMMANDS.forEach(cmd => bus.registerCommand(cmd));
+```
+
+### 2. Send a command
+
+```typescript
+const result = await bus.dispatch({
+  type: 'ImplementClient',
+  data: {
+    projectDir: './client',
+    iaSchemeDir: './.context',
+    designSystemPath: './design-system.md',
+  },
+  requestId: 'req-123',
+});
+
+console.log(result);
+// → { type: 'ClientImplemented', data: { projectDir: './client' } }
+```
+
+The command analyzes the IA scheme and generates the complete frontend implementation.
+
+---
+
+## How-to Guides
+
+### Run via CLI
 
 ```bash
-npm install -g @auto-engineer/cli
-npm install @auto-engineer/frontend-implementer
+auto implement:client --project-dir=./client --ia-scheme-dir=./.context --design-system-path=./design-system.md
 ```
 
-## Configuration
+### Run via Script
 
-Add this plugin to your `auto.config.ts`:
-
-```typescript
-export default {
-  plugins: [
-    '@auto-engineer/frontend-implementer',
-    // ... other plugins
-  ],
-};
+```bash
+pnpm ai-agent ./client ./.context ./design-system.md
 ```
 
-## Commands
-
-This plugin provides the following commands:
-
-- `implement:client` - Implement client-side code with AI assistance
-
-## What does this plugin do?
-
-The Frontend Implementer plugin uses AI capabilities to implement React applications, including components, pages, hooks, and business logic. It understands design systems, GraphQL schemas, and user experience requirements to create functional user interfaces.
-
-## Key Features
-
-### AI React Development
-
-- Generates functional React components from specifications
-- Implements custom hooks for state management and API interactions
-- Creates responsive layouts and interactive user interfaces
-- Integrates with design systems and component libraries
-
-### GraphQL Integration
-
-- Generates Apollo Client queries and mutations
-- Implements optimistic updates and error handling
-- Creates type-safe GraphQL operations
-- Handles loading states and data caching
-
-### Design System Awareness
-
-- Uses imported design tokens and components consistently
-- Follows established design patterns and UI conventions
-- Implements accessibility standards and best practices
-- Maintains visual consistency across the application
-
-### User Experience Focus
-
-- Implements intuitive user workflows and navigation
-- Handles edge cases and error scenarios gracefully
-- Creates responsive designs for mobile and desktop
-- Optimizes for performance and user experience
-
-## Implementation Patterns
-
-### Page Component Implementation
-
-The plugin creates complete page implementations:
+### Run Programmatically
 
 ```typescript
-// Before (generated stub)
-export function OrderHistoryPage() {
-  // TODO: Implement order history display
-  return <div>Order History - Not implemented</div>;
-}
+import { runAIAgent } from '@auto-engineer/frontend-implementer/dist/src/agent';
 
-// After (AI implementation)
-export function OrderHistoryPage() {
-  const { data, loading, error, refetch } = useOrderHistoryQuery({
-    variables: { customerId: useCurrentUser().id },
-    errorPolicy: 'partial'
-  });
+await runAIAgent(
+  './client',
+  './.context',
+  './design-system.md',
+  []
+);
+```
 
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+### Handle Errors
 
-  if (loading) return <LoadingSpinner message="Loading your orders..." />;
-  if (error) return <ErrorMessage error={error} onRetry={refetch} />;
-
-  return (
-    <PageLayout title="Order History" breadcrumbs={[{ label: 'Orders', href: '/orders' }]}>
-      <div className="space-y-6">
-        <OrderFilters onFilterChange={handleFilterChange} />
-
-        {data?.orders.length === 0 ? (
-          <EmptyState
-            title="No orders found"
-            description="You haven't placed any orders yet."
-            action={<Button href="/products">Start Shopping</Button>}
-          />
-        ) : (
-          <OrderList
-            orders={data?.orders || []}
-            onSelectOrder={setSelectedOrder}
-          />
-        )}
-
-        {selectedOrder && (
-          <OrderDetailModal
-            order={selectedOrder}
-            isOpen={!!selectedOrder}
-            onClose={() => setSelectedOrder(null)}
-          />
-        )}
-      </div>
-    </PageLayout>
-  );
+```typescript
+if (result.type === 'ClientImplementationFailed') {
+  console.error(result.data.error);
 }
 ```
 
-### Custom Hook Implementation
+### Enable Debug Logging
 
-Creates reusable hooks for complex logic:
-
-```typescript
-// Implements data fetching and state management
-export function useOrderManagement() {
-  const [placeOrderMutation] = usePlaceOrderMutation();
-  const [cancelOrderMutation] = useCancelOrderMutation();
-  const [orders, setOrders] = useState<Order[]>([]);
-
-  const placeOrder = useCallback(
-    async (orderData: PlaceOrderInput) => {
-      try {
-        const result = await placeOrderMutation({
-          variables: { input: orderData },
-          optimisticResponse: {
-            placeOrder: {
-              __typename: 'Order',
-              id: `temp-${Date.now()}`,
-              status: OrderStatus.Pending,
-              ...orderData,
-            },
-          },
-          update: (cache, { data }) => {
-            if (data?.placeOrder) {
-              cache.modify({
-                fields: {
-                  orders: (existing = []) => [...existing, data.placeOrder],
-                },
-              });
-            }
-          },
-        });
-
-        return result.data?.placeOrder;
-      } catch (error) {
-        throw new OrderPlacementError('Failed to place order', error);
-      }
-    },
-    [placeOrderMutation],
-  );
-
-  const cancelOrder = useCallback(
-    async (orderId: string) => {
-      // Implementation with optimistic updates and error handling
-    },
-    [cancelOrderMutation],
-  );
-
-  return { placeOrder, cancelOrder, orders };
-}
+```bash
+DEBUG=auto:frontend-implementer:* pnpm ai-agent ./client ./.context ./design-system.md
 ```
 
-### Component Implementation
+---
 
-Creates feature-rich, accessible components:
+## API Reference
 
-```typescript
-// Implements interactive components with full functionality
-export function ProductCard({ product, onAddToCart }: ProductCardProps) {
-  const [isAdding, setIsAdding] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const { addToast } = useToast();
-
-  const handleAddToCart = async () => {
-    setIsAdding(true);
-    try {
-      await onAddToCart(product.id);
-      addToast({
-        type: 'success',
-        message: `${product.name} added to cart`
-      });
-    } catch (error) {
-      addToast({
-        type: 'error',
-        message: 'Failed to add item to cart'
-      });
-    } finally {
-      setIsAdding(false);
-    }
-  };
-
-  return (
-    <Card className="group hover:shadow-lg transition-shadow">
-      <CardContent className="p-0">
-        {!imageError ? (
-          <img
-            src={product.imageUrl}
-            alt={product.name}
-            className="w-full h-48 object-cover rounded-t-lg"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded-t-lg">
-            <ImageIcon className="text-gray-400" size={48} />
-          </div>
-        )}
-
-        <div className="p-4">
-          <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-            {product.description}
-          </p>
-
-          <div className="flex justify-between items-center">
-            <span className="text-xl font-bold text-primary">
-              ${product.price.toFixed(2)}
-            </span>
-
-            <Button
-              onClick={handleAddToCart}
-              disabled={isAdding || !product.inStock}
-              className="min-w-24"
-            >
-              {isAdding ? (
-                <Spinner size="sm" />
-              ) : !product.inStock ? (
-                'Out of Stock'
-              ) : (
-                'Add to Cart'
-              )}
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-```
-
-## Configuration Options
-
-Customize implementation behavior:
+### Exports
 
 ```typescript
-// auto.config.ts
-export default {
-  plugins: [
-    [
-      '@auto-engineer/frontend-implementer',
-      {
-        // AI model configuration
-        model: 'claude-3-sonnet',
+import { COMMANDS } from '@auto-engineer/frontend-implementer';
 
-        // Framework preferences
-        framework: 'react',
-        stateManagement: 'apollo-client',
-
-        // UI library integration
-        designSystem: 'shadcn/ui',
-        iconLibrary: 'lucide-react',
-
-        // Implementation preferences
-        includeAccessibility: true,
-        includeAnimations: true,
-        includeErrorBoundaries: true,
-
-        // Testing
-        generateTests: true,
-        testingLibrary: 'testing-library',
-      },
-    ],
-  ],
-};
+import type {
+  ImplementClientCommand,
+  ClientImplementedEvent,
+  ClientImplementationFailedEvent,
+} from '@auto-engineer/frontend-implementer';
 ```
 
-## Features
+### Commands
 
-### Responsive Design Implementation
+| Command | CLI Alias | Description |
+|---------|-----------|-------------|
+| `ImplementClient` | `implement:client` | Generate React frontend from IA scheme |
 
-- Mobile-first approach with responsive breakpoints
-- Touch-friendly interactions for mobile devices
-- Optimized layouts for different screen sizes
-- Progressive enhancement patterns
+### ImplementClientCommand
 
-### Accessibility (a11y) Integration
+```typescript
+type ImplementClientCommand = Command<
+  'ImplementClient',
+  {
+    projectDir: string;
+    iaSchemeDir: string;
+    designSystemPath: string;
+    failures?: string[];
+  }
+>;
+```
 
-- ARIA labels and roles for screen readers
-- Keyboard navigation support
-- Color contrast compliance
-- Focus management and visual indicators
+### ClientImplementedEvent
 
-### Performance Optimization
+```typescript
+type ClientImplementedEvent = Event<
+  'ClientImplemented',
+  {
+    projectDir: string;
+  }
+>;
+```
 
-- Lazy loading for images and components
-- Code splitting for optimal bundle sizes
-- Memoization for expensive computations
-- Efficient re-rendering patterns
+### ClientImplementationFailedEvent
 
-### Error Handling
+```typescript
+type ClientImplementationFailedEvent = Event<
+  'ClientImplementationFailed',
+  {
+    error: string;
+    projectDir: string;
+  }
+>;
+```
 
-- Comprehensive error boundaries
-- User-friendly error messages
-- Retry mechanisms for failed operations
-- Graceful degradation patterns
+---
 
-## Integration with Other Plugins
+## Architecture
 
-Works with the Auto Engineer ecosystem:
+```
+src/
+├── index.ts
+├── agent.ts
+├── agent-cli.ts
+└── commands/
+    └── implement-client.ts
+```
 
-- **@auto-engineer/frontend-generator-react-graphql**: Implements generated component scaffolds
-- **@auto-engineer/design-system-importer**: Uses imported design tokens and components
-- **@auto-engineer/frontend-checks**: Validates implementations pass tests and type checking
-- **@auto-engineer/information-architect**: Uses IA specifications for navigation and content structure
+The following diagram shows the implementation flow:
 
-## Quality Assurance
+```mermaid
+flowchart TB
+    A[ImplementClient] --> B[Load Project Context]
+    B --> C[Load IA Scheme]
+    C --> D[Analyze Atoms/Components]
+    D --> E[Plan File Changes]
+    E --> F[Generate Files via AI]
+    F --> G[ClientImplementedEvent]
+```
 
-Ensures high-quality implementations through:
+*Flow: Command loads context, plans changes based on IA scheme, generates files via AI.*
 
-- **TypeScript Compliance**: Full type safety and IntelliSense support
-- **Component Testing**: Comprehensive test coverage for user interactions
-- **Accessibility Auditing**: WCAG compliance and screen reader compatibility
-- **Performance Monitoring**: Identifies and resolves performance bottlenecks
-- **Code Review**: AI-powered review for best practices and patterns
+### Dependencies
 
-## Advanced Features
-
-### Context-Aware Implementation
-
-The AI understands:
-
-- Existing design patterns and component structure
-- GraphQL schema and available operations
-- Design system tokens and component props
-- User experience requirements and workflows
-- Performance considerations and optimization opportunities
-
-### Progressive Implementation
-
-- Implements core functionality first
-- Adds advanced features incrementally
-- Supports partial implementations and manual refinements
-- Adapts to user feedback and requirements changes
-
-The Frontend Implementer plugin transforms UI specifications and design requirements into functional React applications, accelerating frontend development while maintaining quality and consistency.
+| Package | Usage |
+|---------|-------|
+| `@auto-engineer/ai-gateway` | AI text generation |
+| `@auto-engineer/message-bus` | Command/event infrastructure |
+| `zod` | Schema validation |
+| `debug` | Debug logging |

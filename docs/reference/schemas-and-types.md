@@ -1,1 +1,0 @@
-# Schemas and Types

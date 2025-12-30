@@ -1,204 +1,164 @@
 # @auto-engineer/file-store
 
-A file storage plugin for the Auto Engineer CLI, providing a unified interface for file system operations. It supports both in-memory and Node.js-based file storage, with robust handling of file paths, directories, and binary/text data.
+Platform-agnostic file storage abstraction with in-memory and Node.js implementations.
+
+---
+
+## Purpose
+
+Without `@auto-engineer/file-store`, you would have to write platform-specific file operations, handle path normalization across operating systems, and create separate test implementations for file-dependent code.
+
+This package provides unified interfaces for file system operations. The in-memory implementation enables testing without touching the disk, while the Node.js implementation handles real file operations with automatic directory creation.
+
+---
 
 ## Installation
 
-Install the package as a dependency in your Auto Engineer project:
-
 ```bash
-npm install @auto-engineer/file-store
+pnpm add @auto-engineer/file-store
 ```
 
-## Configuration
-
-Add the plugin to your `auto.config.ts`:
-
-```typescript
-export default {
-  plugins: [
-    '@auto-engineer/file-store',
-    // ... other plugins
-  ],
-};
-```
-
-## What does this package do?
-
-The `@auto-engineer/file-store` package provides a consistent interface for file system operations within the Auto Engineer ecosystem. It supports both in-memory (`InMemoryFileStore`) and disk-based (`NodeFileStore`) file storage, enabling flexible file management for development, testing, and production environments.
-
-## Key Features
-
-### Unified File Store Interface
-
-- Implements `IFileStore` and `IExtendedFileStore` interfaces for consistent file operations
-- Supports binary (`Uint8Array`) and text-based file operations
-- Handles file paths in a platform-agnostic way (POSIX-style paths)
-
-### In-Memory File Store
-
-- `InMemoryFileStore`: Stores files in memory for testing or ephemeral use cases
-- Supports file writes, reads, existence checks, and directory tree listing
-- Normalizes paths to POSIX format for consistency
-
-### Node.js File Store
-
-- `NodeFileStore`: Interacts with the local file system using Node.js APIs
-- Supports recursive directory creation, file reading/writing, and directory listing
-- Handles symlinks and error cases gracefully
-- Provides utility methods for path manipulation (`join`, `dirname`, `fromHere`)
-
-### File Operations
-
-- **Write**: Write binary (`write`) or text (`writeText`) data to files
-- **Read**: Read binary (`read`) or text (`readText`) data from files
-- **Exists**: Check if a file or directory exists (`exists`)
-- **Remove**: Delete files or directories (`remove`)
-- **List Tree**: List directory trees with file and directory metadata (`listTree`)
-- **Directory Management**: Create directories (`ensureDir`), list directory contents (`readdir`)
-
-### Path Handling
-
-- Converts Windows-style paths to POSIX-style paths (`toPosix`)
-- Resolves relative and absolute paths
-- Supports `file://` URLs for compatibility
-
-## Usage
-
-### Using InMemoryFileStore
+## Quick Start
 
 ```typescript
 import { InMemoryFileStore } from '@auto-engineer/file-store';
 
-const fileStore = new InMemoryFileStore();
+const store = new InMemoryFileStore();
 
-await fileStore.write('/example.txt', new TextEncoder().encode('Hello, world!'));
-const content = await fileStore.read('/example.txt');
-console.log(new TextDecoder().decode(content)); // Outputs: Hello, world!
+await store.write('/data/file.txt', new TextEncoder().encode('content'));
+const data = await store.read('/data/file.txt');
 
-const tree = await fileStore.listTree('/');
-console.log(tree); // [{ path: '/', type: 'dir', size: 0 }, { path: '/example.txt', type: 'file', size: 13 }]
+console.log(new TextDecoder().decode(data!));
+// → "content"
 ```
 
-### Using NodeFileStore
+---
+
+## How-to Guides
+
+### Use In-Memory Store for Testing
 
 ```typescript
-import { NodeFileStore } from '@auto-engineer/file-store';
+import { InMemoryFileStore } from '@auto-engineer/file-store';
 
-const fileStore = new NodeFileStore();
+const store = new InMemoryFileStore();
+await store.write('/input.txt', new TextEncoder().encode('data'));
 
-await fileStore.writeText('example.txt', 'Hello, world!');
-const content = await fileStore.readText('example.txt');
-console.log(content); // Outputs: Hello, world!
-
-await fileStore.ensureDir('nested/dir');
-await fileStore.write('nested/dir/file.txt', new TextEncoder().encode('Nested content'));
-
-const tree = await fileStore.listTree(process.cwd());
-console.log(tree); // Lists directories and files with paths, types, and sizes
+const exists = await store.exists('/input.txt');
+const tree = await store.listTree('/');
 ```
 
-### Path Utilities
+### Use Node Store for Production
 
 ```typescript
-import { NodeFileStore, toPosix } from '@auto-engineer/file-store';
+import { NodeFileStore } from '@auto-engineer/file-store/node';
 
-const fileStore = new NodeFileStore();
+const store = new NodeFileStore();
 
-const path = fileStore.join('path', 'to', 'file.txt');
-console.log(path); // Outputs: path/to/file.txt (POSIX format)
-
-const dir = fileStore.dirname('path/to/file.txt');
-console.log(dir); // Outputs: path/to
-
-const resolvedPath = fileStore.fromHere('relative/file.txt');
-console.log(resolvedPath); // Outputs: absolute path to relative/file.txt
+await store.writeText('config.json', JSON.stringify({ key: 'value' }));
+const text = await store.readText('config.json');
 ```
 
-## Project Structure
+### List Directory Tree
 
-```
-file-store/
-├── src/
-│   ├── index.ts              # Exports and main entry point
-│   ├── InMemoryFileStore.ts  # In-memory file store implementation
-│   ├── NodeFileStore.ts      # Node.js file store implementation
-│   ├── path.ts               # Path utility functions
-│   ├── types.ts              # Type definitions for file store interfaces
-│   ├── NodeFileStore.specs.ts # Unit tests
-├── CHANGELOG.md              # Version history
-├── package.json
-├── tsconfig.json
-├── tsconfig.test.json
+```typescript
+import { NodeFileStore } from '@auto-engineer/file-store/node';
+
+const store = new NodeFileStore();
+const tree = await store.listTree('/project', {
+  pruneDirRegex: /node_modules|\.git/,
+  includeSizes: true,
+});
 ```
 
-## Quality Assurance
+### Dependency Injection
 
-- **Type Safety**: Full TypeScript support with strict type checking
-- **Testing**: Unit tests using Vitest for `NodeFileStore`
-- **Linting**: ESLint and Prettier for code quality
-- **Error Handling**: Graceful handling of file system errors and edge cases
-- **Platform Compatibility**: POSIX-style paths for cross-platform consistency
+```typescript
+import type { IFileStore } from '@auto-engineer/file-store';
 
-## Integration with Auto Engineer Ecosystem
+class DocumentManager {
+  constructor(private store: IFileStore) {}
 
-Works with other Auto Engineer plugins:
-
-- **@auto-engineer/flow**: Stores flow specifications
-- **@auto-engineer/server-generator-apollo-emmett**: Manages server code files
-- **@auto-engineer/frontend-generator-react-graphql**: Manages frontend code files
-- **@auto-engineer/server-implementer**: Reads/writes server implementation files
-- **@auto-engineer/frontend-implementer**: Reads/writes frontend implementation files
-
-## Commands
-
-This plugin integrates with the Auto Engineer CLI but does not expose direct CLI commands. It is used internally by other plugins for file operations.
-
-## Debugging
-
-Enable debugging with the `DEBUG` environment variable:
-
-```bash
-DEBUG=file-store:* npm run dev
+  async save(id: string, content: string): Promise<void> {
+    await this.store.write(`/docs/${id}.json`, new TextEncoder().encode(content));
+  }
+}
 ```
 
-## Changelog
+---
 
-See [CHANGELOG.md](./CHANGELOG.md) for version history and updates.
+## API Reference
 
-## Getting Started
+### Package Exports
 
-1. Install the plugin (see Installation above)
-2. Add it to your `auto.config.ts`
-3. Use `InMemoryFileStore` or `NodeFileStore` in your application or tests
+```typescript
+import { InMemoryFileStore, type IFileStore, type IExtendedFileStore } from '@auto-engineer/file-store';
 
-Example:
-
-```bash
-# Install the plugin
-npm install @auto-engineer/file-store
-
-# Run your Auto Engineer project
-npm run start
+import { NodeFileStore } from '@auto-engineer/file-store/node';
 ```
 
-## Advanced Features
+### Entry Points
 
-### In-Memory Store
+| Entry Point | Import Path | Description |
+|-------------|-------------|-------------|
+| Main | `@auto-engineer/file-store` | Platform-agnostic (InMemoryFileStore, types) |
+| Node | `@auto-engineer/file-store/node` | Node.js-specific (NodeFileStore) |
 
-- Ideal for unit testing and temporary file storage
-- Fast and lightweight, with no disk I/O
-- Supports directory tree operations
+### IFileStore Interface
 
-### Node.js Store
+```typescript
+interface IFileStore {
+  write(path: string, data: Uint8Array): Promise<void>;
+  read(path: string): Promise<Uint8Array | null>;
+  exists(path: string): Promise<boolean>;
+  listTree(root?: string, opts?: ListTreeOptions): Promise<TreeEntry[]>;
+  remove(path: string): Promise<void>;
+}
+```
 
-- Handles recursive directory creation for nested paths
-- Supports symlink resolution for `listTree`
-- Provides text-based file operations for convenience
-- Robust error handling for file system operations
+### IExtendedFileStore Interface
 
-### Path Normalization
+```typescript
+interface IExtendedFileStore extends IFileStore {
+  ensureDir(path: string): Promise<void>;
+  readdir(path: string): Promise<DirEntry[]>;
+  readText(path: string): Promise<string | null>;
+  writeText(path: string, text: string): Promise<void>;
+  join(...parts: string[]): string;
+  dirname(p: string): string;
+  fromHere(relative: string, base?: string): string;
+}
+```
 
-- Ensures consistent POSIX-style paths across platforms
-- Supports `file://` URLs and relative/absolute paths
-- Utility methods for path manipulation
+### ListTree Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `followSymlinkDirs` | `boolean` | `true` | Traverse symlinked directories |
+| `includeSizes` | `boolean` | `true` | Include file sizes |
+| `pruneDirRegex` | `RegExp` | - | Skip matching directories |
+
+---
+
+## Architecture
+
+```
+src/
+├── index.ts
+├── node.ts
+├── types.ts
+├── path.ts
+├── InMemoryFileStore.ts
+└── NodeFileStore.ts
+```
+
+### Key Concepts
+
+- **Binary-first API**: Core operations use `Uint8Array` for compatibility
+- **Null over exceptions**: Read returns `null` for missing files
+- **POSIX normalization**: All paths use forward slashes
+- **Auto directory creation**: Write creates parent directories
+
+### Dependencies
+
+This package has **zero external dependencies**. It uses only Node.js built-in modules.

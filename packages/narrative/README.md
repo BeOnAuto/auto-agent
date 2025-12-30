@@ -1,141 +1,193 @@
-# @auto-engineer/flow
+# @auto-engineer/narrative
 
-Domain-specific language for building event-driven applications with type-safe schemas and GraphQL API generation. Plugin for the Auto Engineer CLI that enables defining business flows, data transformations, and integrations using TypeScript-based syntax.
+TypeScript DSL for defining business narratives using BDD patterns with Given/When/Then syntax.
+
+---
+
+## Purpose
+
+Without `@auto-engineer/narrative`, you would have to manually structure behavioral specifications, write boilerplate for command/query definitions, and handle the conversion between specification code and JSON models.
+
+This package enables developers to express system behavior through narratives containing slices (commands, queries, reactions, experiences). Each slice supports client and server specifications using Gherkin-style Given/When/Then syntax.
+
+---
 
 ## Installation
 
-This is a plugin for the Auto Engineer CLI. Install both the CLI and this plugin:
-
 ```bash
-npm install -g @auto-engineer/cli
-npm install @auto-engineer/flow
+pnpm add @auto-engineer/narrative
 ```
 
-## Configuration
-
-Add this plugin to your `auto.config.ts`:
+## Quick Start
 
 ```typescript
-export default {
-  plugins: [
-    '@auto-engineer/flow',
-    // ... other plugins
-  ],
-};
-```
+import { flow, command, specs, rule, example, type Event, type Command } from '@auto-engineer/narrative';
 
-## Commands
+type OrderPlaced = Event<'OrderPlaced', { orderId: string }>;
+type PlaceOrder = Command<'PlaceOrder', { productId: string }>;
 
-This plugin provides the following commands:
-
-- `create:example` - Create an example project with Flow
-- `export:schema` - Export flow schema to JSON
-
-## What is Flow?
-
-Flow is a declarative language for describing business processes, data flows, and system integrations. It combines:
-
-- Type Safety: Full TypeScript integration with compile-time validation
-- Event-Driven Architecture: Built on top of the Emmett event sourcing framework
-- GraphQL Integration: Schema generation and resolver creation
-- Message Bus Support: Support for inter-service communication
-- Flow Orchestration: Define workflows with branching logic and error handling
-
-## Key Features
-
-### Fluent API Design
-
-Define business flows using chainable API:
-
-```typescript
-import { flow } from '@auto-engineer/flow';
-
-const orderFlow = flow('place-order')
-  .input<PlaceOrderCommand>()
-  .validate(command => /* validation logic */)
-  .process(async (command, ctx) => {
-    // Business logic here
-    return { orderId: generateId(), status: 'confirmed' };
-  })
-  .emit<OrderPlaced>()
-  .build();
-```
-
-### Schema Generation
-
-Generate GraphQL schemas from flow definitions:
-
-```typescript
-// Flows are converted to GraphQL mutations and queries
-// Input types become GraphQL input types
-// Output events become GraphQL object types
-```
-
-### Integration Support
-
-Support for external service integrations:
-
-```typescript
-const flow = flow('payment-processing')
-  .integration('stripe', StripePaymentGateway)
-  .integration('email', EmailService)
-  .process(async (command, ctx) => {
-    const payment = await ctx.integrations.stripe.charge(command.amount);
-    await ctx.integrations.email.sendReceipt(command.email, payment);
-    return payment;
-  });
-```
-
-### Testing Support
-
-Testing utilities for flow validation:
-
-```typescript
-import { testFlow } from '@auto-engineer/flow/testing';
-
-describe('order flow', () => {
-  it('should process valid orders', async () => {
-    const result = await testFlow(orderFlow)
-      .withInput({ productId: '123', quantity: 2 })
-      .expectEvent<OrderPlaced>()
-      .run();
-
-    expect(result.orderId).toBeDefined();
-  });
+flow('Orders', () => {
+  command('Place order')
+    .server(() => {
+      specs('Order placement', () => {
+        rule('Valid orders are processed', () => {
+          example('User places order')
+            .when<PlaceOrder>({ productId: 'p-001' })
+            .then<OrderPlaced>({ orderId: 'o-001' });
+        });
+      });
+    });
 });
 ```
 
+---
+
+## How-to Guides
+
+### Define a Command Slice
+
+```typescript
+import { flow, command, specs, rule, example } from '@auto-engineer/narrative';
+
+flow('Users', () => {
+  command('Create user')
+    .stream('user-${userId}')
+    .server(() => {
+      specs('User creation', () => {
+        rule('Valid users created', () => {
+          example('New user')
+            .when({ name: 'John' })
+            .then({ userId: 'u-001' });
+        });
+      });
+    });
+});
+```
+
+### Define a Query Slice
+
+```typescript
+import { flow, query, describe, it, data, source } from '@auto-engineer/narrative';
+
+flow('Products', () => {
+  query('View products')
+    .client(() => {
+      describe('Product list', () => {
+        it('displays all products');
+      });
+    })
+    .server(() => {
+      data([source().state('Products').fromProjection('ProductsProjection', 'id')]);
+    });
+});
+```
+
+### Define Data Sinks and Sources
+
+```typescript
+import { flow, command, data, sink, source } from '@auto-engineer/narrative';
+
+flow('Payments', () => {
+  command('Process payment')
+    .server(() => {
+      data([
+        sink().event('PaymentProcessed').toStream('payment-${paymentId}'),
+        source().state('Account').fromProjection('Accounts', 'accountId'),
+      ]);
+    });
+});
+```
+
+### Load Narratives from File System
+
+```typescript
+import { getNarratives } from '@auto-engineer/narrative';
+import { NodeFileStore } from '@auto-engineer/file-store';
+
+const vfs = new NodeFileStore();
+const result = await getNarratives({ vfs, root: '/path/to/src' });
+const model = result.toModel();
+```
+
+---
+
+## API Reference
+
+### Package Exports
+
+```typescript
+import {
+  flow, narrative,
+  command, query, react, experience,
+  specs, rule, example, describe, it, should,
+  client, server, data,
+  sink, source,
+  getNarratives, modelToNarrative,
+  addAutoIds, hasAllIds,
+  gql,
+  type Event, type Command, type State,
+} from '@auto-engineer/narrative';
+
+import { COMMANDS, exportSchemaCommandHandler } from '@auto-engineer/narrative/node';
+```
+
+### Entry Points
+
+| Entry Point | Import Path | Description |
+|-------------|-------------|-------------|
+| Main | `@auto-engineer/narrative` | Core DSL and types |
+| Node | `@auto-engineer/narrative/node` | Command handlers |
+
+### Slice Types
+
+| Type | Description | Client | Server |
+|------|-------------|--------|--------|
+| `command` | User actions that modify state | Yes | Yes |
+| `query` | Read operations | Yes | Yes |
+| `react` | Event reactions | No | Yes |
+| `experience` | UI-only behaviors | Yes | No |
+
+### Message Types
+
+```typescript
+type Event<Type extends string, Data> = { type: Type; data: Data };
+type Command<Type extends string, Data> = { type: Type; data: Data };
+type State<Type extends string, Data> = { type: Type; data: Data };
+```
+
+---
+
 ## Architecture
 
-Flow builds on several core concepts:
+```
+src/
+├── index.ts
+├── node.ts
+├── narrative.ts
+├── fluent-builder.ts
+├── schema.ts
+├── types.ts
+├── data-narrative-builders.ts
+├── loader/
+├── transformers/
+├── id/
+└── commands/
+```
 
-- Flows: The main building blocks that define business processes
-- Messages: Strongly-typed data structures for communication
-- Integrations: External service connectors with retry and error handling
-- Context: Runtime environment providing access to integrations and utilities
-- Registry: Central repository for flow definitions and metadata
+### Key Concepts
 
-## Getting Started
+- **Narratives**: Business capabilities containing slices
+- **Slices**: Behavioral units (command, query, react, experience)
+- **Specifications**: BDD-style Given/When/Then assertions
+- **Data Flow**: Sinks (outbound) and Sources (inbound)
 
-1. Install the plugin (see Installation above)
-2. Create your first flow project:
-   ```bash
-   auto create:example
-   ```
-3. Explore the generated example flows in the `flows/` directory
-4. Define your own business flows using the Flow API
-5. Export your schema for GraphQL integration:
-   ```bash
-   auto export:schema
-   ```
+### Dependencies
 
-## Integration with Auto Engineer
-
-Flow works with other Auto Engineer plugins:
-
-- **@auto-engineer/server-generator-apollo-emmett**: Generates server infrastructure from Flow schemas
-- **@auto-engineer/frontend-generator-react-graphql**: Creates React components from flow-generated GraphQL schemas
-- **@auto-engineer/server-implementer**: Implements flow handlers with AI assistance
-- **@auto-engineer/information-architect**: Generates information architecture from flow definitions
-
-This plugin-based approach allows building applications from high-level flow definitions to production code.
+| Package | Usage |
+|---------|-------|
+| `@auto-engineer/file-store` | Virtual file system |
+| `@auto-engineer/id` | ID generation |
+| `@auto-engineer/message-bus` | Command/Event types |
+| `zod` | Schema validation |
+| `typescript` | AST parsing |
+| `graphql` | GraphQL query parsing |

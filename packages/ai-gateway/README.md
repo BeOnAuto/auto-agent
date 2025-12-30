@@ -1,365 +1,222 @@
 # @auto-engineer/ai-gateway
 
-AI Gateway plugin for the Auto Engineer CLI that provides a unified interface for interacting with multiple AI providers and managing AI-driven workflows. This plugin enables seamless integration with various AI models for text generation, structured data generation, and tool execution in event-driven architectures.
+Unified AI provider abstraction layer with multi-provider support and MCP tool integration.
+
+---
+
+## Purpose
+
+Without `@auto-engineer/ai-gateway`, you would have to manage multiple AI provider SDKs, handle provider-specific authentication, and implement your own streaming and structured data generation logic.
+
+This package provides a unified interface for OpenAI, Anthropic, Google, XAI, and custom OpenAI-compatible providers. Built on the Vercel AI SDK with support for text generation, structured data, streaming, and MCP tools.
+
+---
 
 ## Installation
 
-This is a plugin for the Auto Engineer CLI. Install both the CLI and this plugin:
-
 ```bash
-npm install -g @auto-engineer/cli
-npm install @auto-engineer/ai-gateway
+pnpm add @auto-engineer/ai-gateway
 ```
 
-## Configuration
-
-Add this plugin to your `auto.config.ts`:
+## Quick Start
 
 ```typescript
-export default {
-  plugins: [
-    '@auto-engineer/ai-gateway',
-    // ... other plugins
-  ],
-};
+import { generateTextWithAI, AIProvider } from '@auto-engineer/ai-gateway';
+
+const text = await generateTextWithAI('Explain quantum computing', {
+  provider: AIProvider.Anthropic,
+  temperature: 0.7,
+  maxTokens: 1000,
+});
+
+console.log(text);
+// → "Quantum computing is a type of computation..."
 ```
 
-### Environment Variables
+---
 
-Configure AI providers by setting environment variables in a `.env` file or your environment:
+## How-to Guides
 
-```bash
-# At least one of these is required
-OPENAI_API_KEY=your-openai-key
-ANTHROPIC_API_KEY=your-anthropic-key
-GEMINI_API_KEY=your-google-key
-XAI_API_KEY=your-xai-key
-
-# Custom Provider Configuration (optional)
-# Use this to connect to any OpenAI-compatible API endpoint
-CUSTOM_PROVIDER_NAME=litellm
-CUSTOM_PROVIDER_BASE_URL=https://api.litellm.ai
-CUSTOM_PROVIDER_API_KEY=your-custom-api-key
-CUSTOM_PROVIDER_DEFAULT_MODEL=claude-3-sonnet
-
-# Optional: Set default provider and model
-DEFAULT_AI_PROVIDER=openai
-DEFAULT_AI_MODEL=gpt-4o-mini
-```
-
-## Commands
-
-This plugin provides the following commands:
-
-- `ai:generate-text` - Generate text using AI models
-- `ai:stream-text` - Stream text output from AI models
-- `ai:generate-structured` - Generate structured data with schema validation
-- `ai:stream-structured` - Stream structured data with schema validation
-
-## What does this plugin do?
-
-The AI Gateway plugin provides a unified interface for interacting with multiple AI providers (OpenAI, Anthropic, Google, XAI, and Custom providers) and integrates with the Auto Engineer ecosystem for AI-driven code generation and tool execution. It supports text generation, structured data generation, and streaming capabilities with robust error handling and debugging.
-
-The plugin now includes custom provider support, enabling integration with any OpenAI-compatible API endpoint, including LiteLLM proxies, local AI models, and corporate AI services.
-
-## Key Features
-
-### Multi-Provider Support
-
-- Supports OpenAI, Anthropic, Google, XAI, and Custom providers
-- Automatic provider selection based on environment configuration
-- Fallback to available providers if default is not configured
-- Configurable default models per provider
-
-### Custom Provider Support
-
-The AI Gateway now supports custom providers, allowing you to connect to any OpenAI-compatible API endpoint. This is particularly useful for:
-
-- **LiteLLM Proxy**: Access 100+ AI models through a single interface
-- **Local AI models**: Connect to locally hosted models (Ollama, local OpenAI servers)
-- **Corporate AI endpoints**: Use company-hosted AI services
-- **Custom AI proxies**: Route through custom authentication or processing layers
-
-#### Configuration
-
-To configure a custom provider, set all four environment variables:
-
-```bash
-CUSTOM_PROVIDER_NAME=your-provider-name
-CUSTOM_PROVIDER_BASE_URL=https://your-api-endpoint.com
-CUSTOM_PROVIDER_API_KEY=your-api-key
-CUSTOM_PROVIDER_DEFAULT_MODEL=your-default-model
-```
-
-#### Common Use Cases
-
-**LiteLLM Proxy:**
-
-```bash
-CUSTOM_PROVIDER_NAME=litellm
-CUSTOM_PROVIDER_BASE_URL=https://api.litellm.ai
-CUSTOM_PROVIDER_API_KEY=sk-litellm-your-key
-CUSTOM_PROVIDER_DEFAULT_MODEL=claude-3-sonnet
-```
-
-**Local Ollama:**
-
-```bash
-CUSTOM_PROVIDER_NAME=ollama
-CUSTOM_PROVIDER_BASE_URL=http://localhost:11434/v1
-CUSTOM_PROVIDER_API_KEY=ollama
-CUSTOM_PROVIDER_DEFAULT_MODEL=llama3.1:8b
-```
-
-**Azure OpenAI:**
-
-```bash
-CUSTOM_PROVIDER_NAME=azure
-CUSTOM_PROVIDER_BASE_URL=https://your-resource.openai.azure.com/openai/deployments
-CUSTOM_PROVIDER_API_KEY=your-azure-key
-CUSTOM_PROVIDER_DEFAULT_MODEL=gpt-4
-```
-
-The custom provider leverages the same robust OpenAI-compatible interface, ensuring full compatibility with all AI Gateway features including streaming, structured generation, and tool integration.
-
-### Text Generation
-
-- Generate text with customizable parameters (temperature, max tokens)
-- Supports both synchronous and streaming text generation
-- Integrates with registered tools for enhanced functionality
-- Image-based text generation for supported providers (OpenAI, XAI)
-
-### Structured Data Generation
-
-- Generates structured data with Zod schema validation
-- Retry logic for schema validation failures
-- Enhanced error prompts for iterative refinement
-- Streaming support for partial object updates
-
-### Tool Integration
-
-- Registers and executes custom tools via the Model Context Protocol (MCP) server
-- Supports batch tool registration
-- Validates tool inputs with Zod schemas
-- Integrates tools with AI-driven workflows
-
-### Debugging Support
-
-Comprehensive debug logging with namespaces:
-
-- `ai-gateway`: General operations
-- `ai-gateway:call`: AI call operations
-- `ai-gateway:provider`: Provider selection and initialization
-- `ai-gateway:error`: Error handling
-- `ai-gateway:stream`: Streaming operations
-- `ai-gateway:result`: Result processing
-
-Enable debugging:
-
-```bash
-DEBUG=ai-gateway:* npm run dev
-```
-
-See [DEBUG.md](./DEBUG.md) for detailed debugging instructions.
-
-## Usage
-
-### Generating Text
+### Generate Text
 
 ```typescript
 import { generateTextWithAI } from '@auto-engineer/ai-gateway';
 
-const result = await generateTextWithAI('Write a poem about the stars', {
-  provider: 'openai',
-  model: 'gpt-4o-mini',
-  temperature: 0.7,
-  maxTokens: 500,
-});
-
-console.log(result);
+const text = await generateTextWithAI('Write a haiku about coding');
 ```
 
-### Streaming Text
+### Stream Text
 
 ```typescript
-import { generateTextStreamingWithAI } from '@auto-engineer/ai-gateway';
+import { streamTextWithAI } from '@auto-engineer/ai-gateway';
 
-const result = await generateTextStreamingWithAI('Explain quantum computing', {
-  provider: 'anthropic',
-  model: 'claude-sonnet-4-20250514',
-  streamCallback: (token) => process.stdout.write(token),
-});
-
-console.log(result); // Full collected result
+for await (const chunk of streamTextWithAI('Tell me a story')) {
+  process.stdout.write(chunk);
+}
 ```
 
-### Generating Structured Data
+### Generate Structured Data
 
 ```typescript
 import { generateStructuredDataWithAI, z } from '@auto-engineer/ai-gateway';
 
-const schema = z.object({
+const TodoSchema = z.object({
   title: z.string(),
-  description: z.string(),
+  priority: z.enum(['low', 'medium', 'high']),
   completed: z.boolean(),
 });
 
-const result = await generateStructuredDataWithAI('Generate a todo item', {
-  provider: 'xai',
-  schema,
-  schemaName: 'TodoItem',
-  schemaDescription: 'A todo item with title, description, and completion status',
+const todo = await generateStructuredDataWithAI('Create a todo for code review', {
+  schema: TodoSchema,
+  schemaName: 'Todo',
 });
-
-console.log(result); // { title: string, description: string, completed: boolean }
 ```
 
-### Tool Registration and Execution
+### Use with Images
 
 ```typescript
-import { registerTool, startServer } from '@auto-engineer/ai-gateway';
-import { z } from 'zod';
+import { generateTextWithImageAI, AIProvider } from '@auto-engineer/ai-gateway';
 
-registerTool(
+const description = await generateTextWithImageAI(
+  'Describe this image',
+  imageBase64String,
+  { provider: AIProvider.OpenAI }
+);
+```
+
+### Register MCP Tools
+
+```typescript
+import { registerTool, startServer, z } from '@auto-engineer/ai-gateway';
+
+registerTool<{ name: string }>(
   'greet',
   {
     title: 'Greeting Tool',
-    description: 'Greets users in different languages',
-    inputSchema: {
-      name: z.string().min(1, 'Name is required'),
-      language: z.enum(['en', 'es', 'fr', 'de']).optional().default('en'),
-    },
+    description: 'Greets users',
+    inputSchema: { name: z.string() },
   },
-  async ({ name, language = 'en' }) => {
-    const greetings = {
-      en: `Hello, ${name}!`,
-      es: `¡Hola, ${name}!`,
-      fr: `Bonjour, ${name}!`,
-      de: `Hallo, ${name}!`,
-    };
-    return { content: [{ type: 'text', text: greetings[language] }] };
-  },
+  async ({ name }) => ({
+    content: [{ type: 'text', text: `Hello, ${name}!` }],
+  })
 );
 
 await startServer();
 ```
 
-## Configuration Options
+---
 
-Customize behavior through `auto.config.ts`:
+## API Reference
+
+### Package Exports
 
 ```typescript
-export default {
-  plugins: [
-    [
-      '@auto-engineer/ai-gateway',
-      {
-        // Default AI provider
-        defaultProvider: 'openai',
+import {
+  generateTextWithAI,
+  generateTextStreamingWithAI,
+  streamTextWithAI,
+  generateTextWithImageAI,
+  generateTextWithToolsAI,
+  generateStructuredDataWithAI,
+  streamStructuredDataWithAI,
+  getAvailableProviders,
+  getDefaultAIProvider,
+  getDefaultModel,
+  AIProvider,
+  z,
+} from '@auto-engineer/ai-gateway';
 
-        // Default model per provider
-        defaultModels: {
-          openai: 'gpt-4o-mini',
-          anthropic: 'claude-sonnet-4-20250514',
-          google: 'gemini-2.5-pro',
-          xai: 'grok-4',
-        },
+import { createAIContext, generateText } from '@auto-engineer/ai-gateway/core';
 
-        // Generation parameters
-        temperature: 0.7,
-        maxTokens: 1000,
-
-        // Tool integration
-        includeToolsByDefault: true,
-      },
-    ],
-  ],
-};
+import { registerTool, startServer, mcpServer } from '@auto-engineer/ai-gateway/node';
 ```
 
-## Integration with Auto Engineer Ecosystem
+### Entry Points
 
-Works with other Auto Engineer plugins:
+| Entry Point | Import Path | Description |
+|-------------|-------------|-------------|
+| Main | `@auto-engineer/ai-gateway` | Node.js wrappers with global context |
+| Core | `@auto-engineer/ai-gateway/core` | Pure functions requiring explicit context |
+| Node | `@auto-engineer/ai-gateway/node` | Full Node.js API including MCP server |
 
-- **@auto-engineer/server-implementer**: Uses AI Gateway for AI-driven server code implementation
-- **@auto-engineer/frontend-implementer**: Powers AI-driven frontend code generation
-- **@auto-engineer/flow**: Integrates with Flow specifications for AI-driven workflows
-- **@auto-engineer/server-generator-apollo-emmett**: Enhances server generation with AI capabilities
-- **@auto-engineer/frontend-generator-react-graphql**: Supports AI-driven frontend scaffolding
+### Functions
 
-## Project Structure
+#### `generateTextWithAI(prompt: string, options?: AIOptions): Promise<string>`
 
-```
-ai-gateway/
-├── src/
-│   ├── config.ts          # AI provider configuration
-│   ├── index.ts           # Main API and provider logic
-│   ├── mcp-server.ts      # Model Context Protocol server for tool management
-│   └── example-use.ts     # Example tool implementations
-├── DEBUG.md               # Debugging instructions
-├── CHANGELOG.md           # Version history
-├── package.json
-└── tsconfig.json
-```
+Generate text from a prompt.
 
-## Quality Assurance
+#### `streamTextWithAI(prompt: string, options?: AIOptions): AsyncGenerator<string>`
 
-- **Type Safety**: Full TypeScript support with Zod schema validation
-- **Error Handling**: Comprehensive error detection and logging
-- **Testing**: Unit tests with Vitest for core functionality
-- **Linting**: ESLint and Prettier for code quality
-- **Debugging**: Detailed logging with `debug` library
+Stream text generation as an async generator.
 
-## Advanced Features
+#### `generateStructuredDataWithAI<T>(prompt: string, options: StructuredAIOptions<T>): Promise<T>`
 
-### Retry Logic
+Generate structured data validated against a Zod schema.
 
-- Automatic retries for schema validation failures
-- Enhanced error prompts for better AI responses
-- Configurable retry limits
+### AIProvider
 
-### Streaming Support
-
-- Real-time text streaming with callbacks
-- Partial object streaming for structured data
-- Efficient chunk handling for large responses
-
-### Provider Flexibility
-
-- Dynamic provider selection based on availability
-- Environment-based configuration
-- Support for provider-specific error handling
-
-## Getting Started
-
-1. Install the plugin (see Installation above)
-2. Configure environment variables for your AI providers
-3. Add the plugin to `auto.config.ts`
-4. Use the provided commands or import functions for AI operations
-
-Example workflow:
-
-```bash
-# Install dependencies
-npm install @auto-engineer/ai-gateway
-
-# Generate text
-auto ai:generate-text --prompt="Write a story" --provider=openai
-
-# Generate structured data
-auto ai:generate-structured --prompt="Create a user profile" --schema=userSchema.json
+```typescript
+enum AIProvider {
+  OpenAI = 'openai',
+  Anthropic = 'anthropic',
+  Google = 'google',
+  XAI = 'xai',
+  Custom = 'custom',
+}
 ```
 
-## Debugging
+### AIOptions
 
-Enable detailed logging for troubleshooting:
-
-```bash
-DEBUG=ai-gateway:* npm run dev
+```typescript
+interface AIOptions {
+  provider?: AIProvider;
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
+  streamCallback?: (token: string) => void;
+  includeTools?: boolean;
+}
 ```
 
-See [DEBUG.md](./DEBUG.md) for more details.
+---
 
-## Changelog
+## Architecture
 
-See [CHANGELOG.md](./CHANGELOG.md) for version history and updates.
+```
+src/
+├── index.ts
+├── core/
+│   ├── context.ts
+│   ├── generators.ts
+│   ├── types.ts
+│   └── providers/
+└── node/
+    ├── wrappers.ts
+    ├── config.ts
+    └── mcp-server.ts
+```
+
+The following diagram shows the provider abstraction:
+
+```mermaid
+flowchart LR
+    A[Application] --> B[ai-gateway]
+    B --> C[OpenAI]
+    B --> D[Anthropic]
+    B --> E[Google]
+    B --> F[XAI]
+    B --> G[Custom]
+```
+
+*Flow: Application calls ai-gateway, which routes to the configured provider.*
+
+### Dependencies
+
+| Package | Usage |
+|---------|-------|
+| `ai` | Vercel AI SDK core |
+| `@ai-sdk/anthropic` | Anthropic provider |
+| `@ai-sdk/openai` | OpenAI provider |
+| `@ai-sdk/google` | Google Gemini provider |
+| `@ai-sdk/xai` | xAI Grok provider |
+| `zod` | Schema validation |

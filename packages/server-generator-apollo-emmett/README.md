@@ -1,185 +1,235 @@
 # @auto-engineer/server-generator-apollo-emmett
 
-Code generation plugin for the Auto Engineer CLI that scaffolds event-driven servers using the Emmett event sourcing framework. This plugin takes Flow specifications and generates GraphQL servers with commands, events, projections, and queries.
+Code generation that scaffolds event-sourced GraphQL servers using the Emmett framework.
+
+---
+
+## Purpose
+
+Without `@auto-engineer/server-generator-apollo-emmett`, you would have to manually write event sourcing boilerplate, create GraphQL resolvers, define command/event types, and set up projections for every slice in your server.
+
+This package transforms narrative specifications into a complete Apollo GraphQL server with commands, events, projections, queries, and reactors following the Emmett event sourcing patterns.
+
+---
 
 ## Installation
 
-This is a plugin for the Auto Engineer CLI. Install both the CLI and this plugin:
-
 ```bash
-npm install -g @auto-engineer/cli
-npm install @auto-engineer/server-generator-apollo-emmett
+pnpm add @auto-engineer/server-generator-apollo-emmett
 ```
 
-## Configuration
+## Quick Start
 
-Add this plugin to your `auto.config.ts`:
+Register the handler and generate a server:
+
+### 1. Register the handlers
 
 ```typescript
-export default {
-  plugins: [
-    '@auto-engineer/server-generator-apollo-emmett',
-    // ... other plugins
-  ],
-};
+import { COMMANDS } from '@auto-engineer/server-generator-apollo-emmett';
+import { createMessageBus } from '@auto-engineer/message-bus';
+
+const bus = createMessageBus();
+COMMANDS.forEach(cmd => bus.registerCommand(cmd));
 ```
 
-## Commands
+### 2. Send a command
 
-This plugin provides the following commands:
+```typescript
+const result = await bus.dispatch({
+  type: 'GenerateServer',
+  data: {
+    modelPath: './.context/schema.json',
+    destination: '.',
+  },
+  requestId: 'req-123',
+});
 
-- `generate:server` - Generate a GraphQL server from flow specifications
+console.log(result);
+// → { type: 'ServerGenerated', data: { serverDir: './server', destination: '.' } }
+```
 
-## What does this plugin do?
+The command generates a complete server directory with Apollo, Emmett, and type-graphql.
 
-The Emmett Generator transforms high-level flow specifications into event-driven servers. It generates:
+---
 
-### Command Handlers
+## How-to Guides
 
-- Command validation and business logic stubs
-- Event emission patterns
-- Error handling and domain validation
-- Integration with the Emmett command bus
+### Run via CLI
 
-### Event Sourcing Infrastructure
+```bash
+auto generate:server --model-path=./.context/schema.json --destination=.
+```
 
-- Event store configuration
-- Event versioning and migration support
-- Projection builders for read models
-- Event stream processing
+### Run Programmatically
 
-### GraphQL API Layer
+```typescript
+import { COMMANDS } from '@auto-engineer/server-generator-apollo-emmett';
+import { createMessageBus } from '@auto-engineer/message-bus';
 
-- Type-safe GraphQL schema generation
-- Mutation resolvers for commands
-- Query resolvers for projections
-- Subscription support for real-time updates
+const bus = createMessageBus();
+COMMANDS.forEach(handler => bus.register(handler));
 
-### Testing Infrastructure
+await bus.send({
+  type: 'GenerateServer',
+  data: {
+    modelPath: './.context/schema.json',
+    destination: '.',
+  },
+});
+```
 
-- Comprehensive test suites for all generated components
-- Behavioral tests for command handlers
-- Integration tests for the GraphQL API
-- Test data factories and fixtures
+### Handle Errors
 
-## Generated Project Structure
+```typescript
+if (result.type === 'ServerGenerationFailed') {
+  console.error(result.data.error);
+}
+```
 
-When you run `auto generate:server`, the plugin creates a complete server project:
+### Listen for Slice Events
+
+```typescript
+bus.on('SliceGenerated', (event) => {
+  console.log(`Generated: ${event.data.flowName}/${event.data.sliceName}`);
+});
+```
+
+---
+
+## API Reference
+
+### Exports
+
+```typescript
+import { COMMANDS } from '@auto-engineer/server-generator-apollo-emmett';
+
+import type {
+  GenerateServerCommand,
+  ServerGeneratedEvent,
+  ServerGenerationFailedEvent,
+  SliceGeneratedEvent,
+} from '@auto-engineer/server-generator-apollo-emmett';
+```
+
+### Commands
+
+| Command | CLI Alias | Description |
+|---------|-----------|-------------|
+| `GenerateServer` | `generate:server` | Generate event-sourced GraphQL server |
+
+### GenerateServerCommand
+
+```typescript
+type GenerateServerCommand = Command<
+  'GenerateServer',
+  {
+    modelPath: string;
+    destination: string;
+  }
+>;
+```
+
+### ServerGeneratedEvent
+
+```typescript
+type ServerGeneratedEvent = Event<
+  'ServerGenerated',
+  {
+    modelPath: string;
+    destination: string;
+    serverDir: string;
+    contextSchemaGraphQL?: string;
+  }
+>;
+```
+
+### SliceGeneratedEvent
+
+```typescript
+type SliceGeneratedEvent = Event<
+  'SliceGenerated',
+  {
+    flowName: string;
+    sliceName: string;
+    sliceType: string;
+    schemaPath: string;
+    slicePath: string;
+  }
+>;
+```
+
+---
+
+## Architecture
+
+```
+src/
+├── index.ts
+├── server.ts
+├── commands/
+│   └── generate-server.ts
+├── codegen/
+│   ├── scaffoldFromSchema.ts
+│   ├── extract/
+│   └── templates/
+│       ├── command/
+│       ├── query/
+│       └── react/
+├── domain/shared/
+└── utils/
+```
+
+The following diagram shows the generation flow:
+
+```mermaid
+flowchart TB
+    A[GenerateServer] --> B[Load Model JSON]
+    B --> C[Extract Messages from Specs]
+    C --> D[Build GWT Mappings]
+    D --> E[Render EJS Templates]
+    E --> F[Write Files to Disk]
+    F --> G[ServerGeneratedEvent]
+```
+
+*Flow: Command loads model, extracts commands/events, renders templates, writes generated server.*
+
+### Generated Server Structure
 
 ```
 server/
 ├── src/
-│   ├── domain/
-│   │   ├── commands/           # Command handlers
-│   │   ├── events/            # Event definitions
-│   │   ├── projections/       # Read model projections
-│   │   └── queries/           # Query handlers
-│   ├── graphql/
-│   │   ├── resolvers/         # GraphQL resolvers
-│   │   └── schema.ts          # Generated schema
-│   ├── infrastructure/
-│   │   ├── eventStore.ts      # Event store setup
-│   │   └── commandBus.ts      # Command bus configuration
-│   └── server.ts              # Application entry point
-├── tests/                     # Generated test suites
-└── package.json
+│   ├── server.ts
+│   ├── utils/
+│   └── domain/
+│       ├── shared/
+│       └── flows/
+│           └── {flow-name}/
+│               └── {slice-name}/
+│                   ├── commands.ts
+│                   ├── events.ts
+│                   ├── state.ts
+│                   ├── decide.ts
+│                   ├── evolve.ts
+│                   └── mutation.resolver.ts
+├── package.json
+└── tsconfig.json
 ```
 
-## Features
+### Slice Types
 
-### Type-Safe Code Generation
+| Type | Description |
+|------|-------------|
+| Command | Mutation resolvers with decide/evolve pattern |
+| Query | Query resolvers backed by projections |
+| React | Reactors responding to events with commands |
 
-All generated code is fully typed using TypeScript, ensuring compile-time safety and developer experience.
+### Dependencies
 
-### Event-Driven Architecture
-
-Built on Emmett's event sourcing patterns:
-
-- Commands represent intent to change state
-- Events capture what actually happened
-- Projections create read models from events
-- Queries serve data to GraphQL clients
-
-### Infrastructure
-
-Generated servers include:
-
-- Error handling and logging
-- Health checks and monitoring endpoints
-- Environment-based configuration
-- Database migration scripts
-
-### Templates
-
-Uses EJS templating system for code generation:
-
-- Command handler templates
-- Event definition templates
-- GraphQL resolver templates
-- Test suite templates
-
-## Integration with Flow
-
-This plugin is designed to work with `@auto-engineer/flow` specifications:
-
-1. Define your business flows using the Flow DSL
-2. Export the flow schema using `auto export:schema`
-3. Generate the server using `auto generate:server`
-4. The generator reads the schema and creates appropriate handlers
-
-## Example Workflow
-
-```bash
-# 1. Create a flow specification project
-auto create:example
-
-# 2. Define your business flows in flows/
-# Edit flows/order-management.flow.ts
-
-# 3. Generate the server server
-auto generate:server
-
-# 4. The generated server is ready to run:
-cd server
-npm install
-npm run start
-```
-
-## Advanced Features
-
-### Custom Templates
-
-Override default templates by providing your own EJS files:
-
-- Place custom templates in `.auto-engineer/templates/`
-- Templates follow the same structure as built-in ones
-- Supports partial overrides for specific components
-
-### Plugin Integration
-
-Works with other Auto Engineer plugins:
-
-- **@auto-engineer/server-implementer**: AI-powered implementation of generated stubs
-- **@auto-engineer/server-checks**: Validation of generated code
-- **@auto-engineer/frontend-generator-react-graphql**: Frontend generation from server schema
-
-### Configuration Options
-
-Customize generation behavior through `auto.config.ts`:
-
-```typescript
-export default {
-  plugins: [
-    [
-      '@auto-engineer/server-generator-apollo-emmett',
-      {
-        outputDir: './server',
-        templateOverrides: './templates',
-        generateMigrations: true,
-      },
-    ],
-  ],
-};
-```
-
-The Emmett Generator bridges the gap between high-level business requirements and server infrastructure, enabling development of scalable, maintainable applications.
+| Package | Usage |
+|---------|-------|
+| `@auto-engineer/narrative` | Model type definitions |
+| `@auto-engineer/message-bus` | Command/event infrastructure |
+| `@event-driven-io/emmett` | Event sourcing framework |
+| `apollo-server` | GraphQL server runtime |
+| `type-graphql` | GraphQL schema decorators |
+| `ejs` | Template rendering |

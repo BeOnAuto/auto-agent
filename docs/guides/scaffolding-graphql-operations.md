@@ -1,1 +1,0 @@
-# Scaffolding GraphQL Operations
