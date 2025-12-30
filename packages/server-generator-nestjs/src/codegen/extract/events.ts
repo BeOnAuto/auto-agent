@@ -1,7 +1,7 @@
-import { EventExample } from '@auto-engineer/narrative';
-import { Message, MessageDefinition } from '../types';
+import type { Message, MessageDefinition } from '../types';
 import { extractFieldsFromMessage } from './fields';
-import { ReactGwtSpec } from './messages';
+import type { ReactGwtSpec } from './messages';
+import type { EventExample } from './step-types';
 
 function createEventMessage(
   eventRef: string | undefined,

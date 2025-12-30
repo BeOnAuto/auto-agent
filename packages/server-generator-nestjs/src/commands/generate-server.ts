@@ -1,16 +1,15 @@
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
+import type { Model } from '@auto-engineer/narrative';
+import createDebug from 'debug';
+import { execa } from 'execa';
+import { existsSync } from 'fs';
+import { readFile, writeFile } from 'fs/promises';
 import fs from 'fs-extra';
 import * as path from 'path';
-import { readFile, writeFile } from 'fs/promises';
-import { resolve, join } from 'path';
-import { existsSync } from 'fs';
+import { dirname, join, resolve } from 'path';
+import { fileURLToPath } from 'url';
 import { generateScaffoldFilePlans, writeScaffoldFilePlans } from '../codegen/scaffoldFromSchema.js';
 import { ensureDirExists, ensureDirPath, toKebabCase } from '../codegen/utils/path.js';
-import { Model } from '@auto-engineer/narrative';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { execa } from 'execa';
-import createDebug from 'debug';
-import { defineCommandHandler, Command, Event } from '@auto-engineer/message-bus';
 
 const debug = createDebug('auto:server-generator-nestjs');
 const debugModel = createDebug('auto:server-generator-nestjs:schema');

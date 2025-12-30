@@ -1,5 +1,5 @@
-import { defineConfig } from '@mikro-orm/sqlite';
 import { Migrator } from '@mikro-orm/migrations';
+import { defineConfig } from '@mikro-orm/sqlite';
 import { join } from 'path';
 
 export default defineConfig({

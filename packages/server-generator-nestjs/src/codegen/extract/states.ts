@@ -1,5 +1,5 @@
-import { Slice } from '@auto-engineer/narrative';
-import { Message, MessageDefinition } from '../types';
+import type { Slice } from '@auto-engineer/narrative';
+import type { Message, MessageDefinition } from '../types';
 import { extractFieldsFromMessage } from './fields';
 
 interface DataItem {

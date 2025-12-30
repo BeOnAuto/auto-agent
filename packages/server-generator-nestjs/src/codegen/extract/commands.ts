@@ -1,6 +1,6 @@
-import { CommandExample, EventExample } from '@auto-engineer/narrative';
-import { Message, MessageDefinition } from '../types';
+import type { Message, MessageDefinition } from '../types';
 import { extractFieldsFromMessage } from './fields';
+import type { CommandExample, EventExample } from './step-types';
 
 function createCommandMessage(
   commandRef: string,

@@ -1,8 +1,8 @@
-import { Narrative } from '@auto-engineer/narrative';
-import { MessageDefinition, Field, Message } from './types.js';
-import { extractMessagesFromSpecs } from './extract/index.js';
-import { pascalCase, camelCase } from 'change-case';
+import type { Narrative } from '@auto-engineer/narrative';
+import { camelCase, pascalCase } from 'change-case';
 import createDebug from 'debug';
+import { extractMessagesFromSpecs } from './extract/index.js';
+import type { Field, Message, MessageDefinition } from './types.js';
 
 const debug = createDebug('auto:server-generator-nestjs:entity');
 

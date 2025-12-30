@@ -1,39 +1,37 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import ejs from 'ejs';
-import { ensureDirExists, ensureDirPath, toKebabCase } from './utils/path.js';
+import type { Model, Narrative, Slice } from '@auto-engineer/narrative';
 import { camelCase, pascalCase } from 'change-case';
-import prettier from 'prettier';
-import { Narrative, Slice, Model } from '@auto-engineer/narrative';
 import createDebug from 'debug';
+import ejs from 'ejs';
+import fs from 'fs/promises';
+import path, { dirname } from 'path';
+import prettier from 'prettier';
+import { fileURLToPath } from 'url';
+import { ensureDirExists, ensureDirPath, toKebabCase } from './utils/path.js';
 
 const debug = createDebug('auto:server-generator-nestjs:scaffold');
 
+import { type ConsolidatedEntity, consolidateEntityFields } from './entity-consolidation.js';
+import { getStreamFromSink } from './extract/data-sink.js';
+import { parseGraphQlRequest } from './extract/graphql.js';
 import {
+  baseTs,
   buildCommandGwtMapping,
   buildQueryGwtMapping,
+  createCollectEnumNames,
+  createEventUnionType,
+  createFieldUsesDate,
+  createFieldUsesFloat,
+  createFieldUsesJSON,
+  createIsEnumType,
   extractMessagesFromSpecs,
   extractProjectionName,
-  groupEventImports,
   getAllEventTypes,
   getLocalEvents,
-  createEventUnionType,
-  isInlineObject as isInlineObjectHelper,
+  groupEventImports,
   isInlineObjectArray as isInlineObjectArrayHelper,
-  baseTs,
-  createIsEnumType,
-  createFieldUsesDate,
-  createFieldUsesJSON,
-  createFieldUsesFloat,
-  createCollectEnumNames,
+  isInlineObject as isInlineObjectHelper,
 } from './extract/index.js';
-
-import { Message, MessageDefinition } from './types.js';
-import { parseGraphQlRequest } from './extract/graphql.js';
-import { getStreamFromSink } from './extract/data-sink.js';
-import { consolidateEntityFields, type ConsolidatedEntity } from './entity-consolidation.js';
+import type { Message, MessageDefinition } from './types.js';
 
 const defaultFilesByType: Record<string, string[]> = {
   command: ['command.ts.ejs', 'input.ts.ejs', 'handler.ts.ejs', 'resolver.ts.ejs', 'handler.specs.ts.ejs'],
@@ -167,7 +165,6 @@ async function writeEnumsToEntitiesFolder(baseDir: string, flowName: string, enu
     try {
       await fs.access(enumFilePath);
       debug('Enum file already exists: %s, skipping', enumFilePath);
-      continue;
     } catch {
       const content = generateEnumTypeScript(enumDef);
       const prettierConfig = await prettier.resolveConfig(enumFilePath);

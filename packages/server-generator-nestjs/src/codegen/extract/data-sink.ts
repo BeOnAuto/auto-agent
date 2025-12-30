@@ -1,37 +1,36 @@
-import { CommandExample, Slice, type Example } from '@auto-engineer/narrative';
+import type { Slice } from '@auto-engineer/narrative';
+import { extractGwtSpecsFromSlice, type GwtResult } from './step-converter';
+import type { CommandExample } from './step-types';
 
 function resolveStreamId(stream: string, exampleData: Record<string, unknown>): string {
   return stream.replace(/\$\{([^}]+)\}/g, (_, key: string) => String(exampleData?.[key] ?? 'unknown'));
 }
 
-function extractExampleDataFromReact(firstSpec: { when: unknown }): Record<string, unknown> {
+function extractExampleDataFromReact(firstSpec: GwtResult): Record<string, unknown> {
   if (Array.isArray(firstSpec.when)) {
-    const firstWhen = firstSpec.when[0] as { exampleData?: Record<string, unknown> } | undefined;
+    const firstWhen = firstSpec.when[0];
     return typeof firstWhen?.exampleData === 'object' && firstWhen.exampleData !== null ? firstWhen.exampleData : {};
   }
   return {};
 }
 
-function extractExampleDataFromCommand(firstSpec: { then: unknown }): Record<string, unknown> {
-  const then = firstSpec.then as (CommandExample | { errorType: string })[];
+function extractExampleDataFromCommand(firstSpec: GwtResult): Record<string, unknown> {
+  const then = firstSpec.then;
   const firstExample = then.find((t): t is CommandExample => 'exampleData' in t);
   return typeof firstExample?.exampleData === 'object' && firstExample.exampleData !== null
     ? firstExample.exampleData
     : {};
 }
 
-function extractExampleDataFromQuery(firstSpec: { when: unknown }): Record<string, unknown> {
+function extractExampleDataFromQuery(firstSpec: GwtResult): Record<string, unknown> {
   if (Array.isArray(firstSpec.when)) {
-    const firstWhen = firstSpec.when[0] as { exampleData?: Record<string, unknown> } | undefined;
+    const firstWhen = firstSpec.when[0];
     return typeof firstWhen?.exampleData === 'object' && firstWhen.exampleData !== null ? firstWhen.exampleData : {};
   }
   return {};
 }
 
-function extractExampleDataFromSpecs(
-  slice: Slice,
-  gwtSpecs: Array<{ given?: unknown; when: unknown; then: unknown }>,
-): Record<string, unknown> {
+function extractExampleDataFromSpecs(slice: Slice, gwtSpecs: GwtResult[]): Record<string, unknown> {
   if (gwtSpecs.length === 0) {
     return {};
   }
@@ -47,21 +46,6 @@ function extractExampleDataFromSpecs(
     default:
       return {};
   }
-}
-
-function extractGwtSpecs(slice: Slice) {
-  if (!('server' in slice)) return [];
-  const specs = slice.server?.specs;
-  const rules = specs?.rules;
-  return Array.isArray(rules) && rules.length > 0
-    ? rules.flatMap((rule) =>
-        rule.examples.map((example: Example) => ({
-          given: example.given,
-          when: example.when,
-          then: example.then,
-        })),
-      )
-    : [];
 }
 
 function isValidStreamSink(item: unknown): item is { destination: { pattern: string } } {
@@ -91,7 +75,7 @@ function processStreamSink(item: unknown, exampleData: Record<string, unknown>) 
 
 export function getStreamFromSink(slice: Slice): { streamPattern?: string; streamId?: string } {
   if (!('server' in slice)) return {};
-  const gwtSpecs = extractGwtSpecs(slice);
+  const gwtSpecs = extractGwtSpecsFromSlice(slice);
   const exampleData = extractExampleDataFromSpecs(slice, gwtSpecs);
   if (!('server' in slice) || slice.server == null || !('data' in slice.server) || !Array.isArray(slice.server.data)) {
     return {};

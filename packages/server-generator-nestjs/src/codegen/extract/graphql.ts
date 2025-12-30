@@ -1,4 +1,4 @@
-import { parse, OperationDefinitionNode, TypeNode, print } from 'graphql';
+import { type OperationDefinitionNode, parse, print, type TypeNode } from 'graphql';
 
 export interface ParsedArg {
   name: string;

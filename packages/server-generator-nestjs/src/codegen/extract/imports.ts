@@ -1,5 +1,5 @@
+import type { Message } from '../types';
 import { toKebabCase } from '../utils/path';
-import { Message } from '../types';
 
 export interface ImportGroup {
   importPath: string;

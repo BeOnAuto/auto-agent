@@ -1,4 +1,6 @@
-import { CommandExample, EventExample, StateExample } from '@auto-engineer/narrative';
+import type { CommandExample, ErrorRef, EventExample, StateExample } from './extract/step-types';
+
+export type { CommandExample, ErrorRef, EventExample, StateExample };
 
 export interface Message {
   type: string;
