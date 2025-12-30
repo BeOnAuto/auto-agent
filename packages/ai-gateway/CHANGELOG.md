@@ -1,5 +1,11 @@
 # @auto-engineer/ai-gateway
 
+## 0.15.0
+
+### Minor Changes
+
+- version bump
+
 ## 0.14.0
 
 ### Minor Changes
