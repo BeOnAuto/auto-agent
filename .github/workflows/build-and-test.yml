@@ -41,18 +41,6 @@ jobs:
       - name: Pre-fetch deps
         run: pnpm fetch --network-concurrency=8
 
-      - name: Debug Turbo Remote Cache
-        run: |
-          echo "=== Turbo Remote Cache Debug ==="
-          echo "TURBO_TOKEN length: ${#TURBO_TOKEN}"
-          echo "TURBO_TOKEN starts with: ${TURBO_TOKEN:0:8}..."
-          echo "TURBO_TEAM length: ${#TURBO_TEAM}"
-          echo "TURBO_TEAM starts with: ${TURBO_TEAM:0:8}..."
-          echo "teamId from config: $(cat .turbo/config.json)"
-          echo ""
-          echo "=== Testing Vercel API connectivity ==="
-          curl -s --max-time 10 https://api.vercel.com/v8/artifacts/status -H "Authorization: Bearer $TURBO_TOKEN" || echo "curl failed"
-
       - name: Install dependencies
         run: |
           set -e
