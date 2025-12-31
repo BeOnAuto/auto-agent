@@ -1,4 +1,9 @@
 {
+    "vitest.exclude": [
+        "**/dist/**",
+        "**/node_modules/**",
+        "**/*.timestamp-*.mjs"
+    ],
     "mcp": {
         "servers": {
             "wallaby": {
