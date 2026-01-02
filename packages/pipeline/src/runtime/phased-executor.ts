@@ -95,11 +95,6 @@ export class PhasedExecutor {
     }
   }
 
-  async getActiveSessionCount(): Promise<number> {
-    const allExecutions = await this.readModel.getActivePhasedExecutions('');
-    return allExecutions.length;
-  }
-
   async isPhaseComplete(correlationId: string, phase: string): Promise<boolean> {
     const executions = await this.readModel.getActivePhasedExecutions(correlationId);
     for (const execution of executions) {
