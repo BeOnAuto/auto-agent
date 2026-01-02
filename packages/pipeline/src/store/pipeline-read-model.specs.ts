@@ -1118,5 +1118,53 @@ describe('PipelineReadModel', () => {
         endedCount: 7,
       });
     });
+
+    it('should default endedCount to 0 when firedCount is undefined', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CheckTests-c1',
+        instanceId: 'template-CheckTests-c1',
+        templateId: 'template-CheckTests',
+        correlationId: 'c1',
+        commandTrackers: [{ commandType: 'CheckTests', hasStarted: true, hasCompleted: false, events: [] }],
+        status: 'active',
+      } as SettledInstanceDocument);
+
+      const result = await readModel.computeSettledStats('c1', 'template-CheckTests');
+
+      expect(result).toEqual({
+        status: 'running',
+        pendingCount: 1,
+        endedCount: 0,
+      });
+    });
+
+    it('should return status=idle when fired instance has zero firedCount', async () => {
+      const collection = database.collection<WithId<SettledInstanceDocument>>('SettledInstance');
+      await collection.insertOne({
+        _id: 'template-CheckTests-c1',
+        instanceId: 'template-CheckTests-c1',
+        templateId: 'template-CheckTests',
+        correlationId: 'c1',
+        commandTrackers: [
+          {
+            commandType: 'CheckTests',
+            hasStarted: true,
+            hasCompleted: true,
+            events: [{ type: 'TestsPassed', correlationId: 'c1', data: {} }],
+          },
+        ],
+        status: 'fired',
+        firedCount: 0,
+      });
+
+      const result = await readModel.computeSettledStats('c1', 'template-CheckTests');
+
+      expect(result).toEqual({
+        status: 'idle',
+        pendingCount: 0,
+        endedCount: 0,
+      });
+    });
   });
 });

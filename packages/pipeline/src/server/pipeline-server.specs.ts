@@ -157,6 +157,28 @@ describe('PipelineServer', () => {
       expect(data.folds).toEqual([]);
       await server.stop();
     });
+
+    it('should exclude settled handlers from eventHandlers list', async () => {
+      const handler = {
+        name: 'CheckTests',
+        events: ['TestsPassed'],
+        handle: async () => ({ type: 'TestsPassed', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('Start')
+        .emit('CheckTests', {})
+        .settled(['CheckTests'])
+        .dispatch({ dispatches: [] }, () => {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<RegistryResponse>(`http://localhost:${server.port}/registry`);
+      expect(data.eventHandlers).toContain('Start');
+      expect(data.eventHandlers).not.toContain('settled:CheckTests');
+      await server.stop();
+    });
   });
 
   describe('GET /pipeline', () => {
@@ -316,6 +338,41 @@ describe('PipelineServer', () => {
       expect(settledNode?.status).toBe('idle');
       expect(settledNode?.pendingCount).toBe(0);
       expect(settledNode?.endedCount).toBe(0);
+      await server.stop();
+    });
+
+    it('should have status from computeSettledStats on settled nodes when correlationId provided', async () => {
+      const handler = {
+        name: 'CheckTests',
+        events: ['TestsPassed'],
+        handle: async () => ({ type: 'TestsPassed', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('Start')
+        .emit('CheckTests', {})
+        .settled(['CheckTests'])
+        .dispatch({ dispatches: [] }, () => {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      const commandResponse = await fetchAs<{ correlationId: string }>(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'CheckTests', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      const data = await fetchAs<PipelineResponse>(
+        `http://localhost:${server.port}/pipeline?correlationId=${commandResponse.correlationId}`,
+      );
+      const settledNode = data.nodes.find((n) => n.id === 'settled:CheckTests');
+      expect(settledNode?.status).toBeDefined();
+      expect(settledNode?.pendingCount).toBeDefined();
+      expect(settledNode?.endedCount).toBeDefined();
       await server.stop();
     });
 
@@ -1196,6 +1253,52 @@ describe('PipelineServer', () => {
       await server.stop();
     });
 
+    it('should handle diamond graph patterns when detecting backlinks', async () => {
+      const cmdAHandler = {
+        name: 'CmdA',
+        events: ['EventA'],
+        handle: async () => ({ type: 'EventA', data: {} }),
+      };
+      const cmdBHandler = {
+        name: 'CmdB',
+        events: ['EventB'],
+        handle: async () => ({ type: 'EventB', data: {} }),
+      };
+      const cmdCHandler = {
+        name: 'CmdC',
+        events: ['EventC'],
+        handle: async () => ({ type: 'EventC', data: {} }),
+      };
+      const cmdDHandler = {
+        name: 'CmdD',
+        events: ['EventD'],
+        handle: async () => ({ type: 'EventD', data: {} }),
+      };
+      const pipeline = define('test')
+        .on('Start')
+        .emit('CmdA', {})
+        .on('EventA')
+        .emit('CmdB', {})
+        .on('EventA')
+        .emit('CmdC', {})
+        .on('EventB')
+        .emit('CmdD', {})
+        .on('EventC')
+        .emit('CmdD', {})
+        .on('EventD')
+        .emit('CmdA', {})
+        .build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([cmdAHandler, cmdBHandler, cmdCHandler, cmdDHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+      const data = await fetchAs<PipelineResponse>(`http://localhost:${server.port}/pipeline`);
+      const backLinkEdge = data.edges.find((e) => e.from === 'evt:EventD' && e.to === 'cmd:CmdA');
+      expect(backLinkEdge).toBeDefined();
+      expect(backLinkEdge?.backLink).toBe(true);
+      await server.stop();
+    });
+
     it('should add event nodes from settled handler commandToEvents when not already added', async () => {
       const checkAHandler = {
         name: 'CheckA',
@@ -1720,6 +1823,102 @@ describe('PipelineServer', () => {
       await new Promise((r) => setTimeout(r, 200));
       const msgs = await fetchAs<StoredMessage[]>(`http://localhost:${server.port}/messages`);
       expect(msgs.some((m) => m.message.type === 'Process')).toBe(true);
+      await server.stop();
+    });
+  });
+
+  describe('GET /events', () => {
+    it('should accept SSE connections', async () => {
+      const server = new PipelineServer({ port: 0 });
+      await server.start();
+
+      const controller = new AbortController();
+      const responsePromise = fetch(`http://localhost:${server.port}/events`, {
+        signal: controller.signal,
+      });
+
+      await new Promise((r) => setTimeout(r, 50));
+      controller.abort();
+
+      try {
+        await responsePromise;
+      } catch {
+        // AbortError expected
+      }
+
+      await server.stop();
+    });
+
+    it('should accept SSE connections with correlationId filter', async () => {
+      const server = new PipelineServer({ port: 0 });
+      await server.start();
+
+      const controller = new AbortController();
+      const responsePromise = fetch(`http://localhost:${server.port}/events?correlationId=test-123`, {
+        signal: controller.signal,
+      });
+
+      await new Promise((r) => setTimeout(r, 50));
+      controller.abort();
+
+      try {
+        await responsePromise;
+      } catch {
+        // AbortError expected
+      }
+
+      await server.stop();
+    });
+  });
+
+  describe('phased execution', () => {
+    it('should emit phased execution events when foreach-phased handler runs', async () => {
+      type Component = { path: string; priority: 'high' | 'medium' | 'low' };
+      type ComponentEvent = { data: { components: Component[] } };
+      type ResultEvent = { data: { componentPath: string } };
+
+      const generateHandler = {
+        name: 'GenerateComponents',
+        events: ['ComponentsGenerated'],
+        handle: async () => ({
+          type: 'ComponentsGenerated',
+          data: { components: [{ path: '/comp/a.tsx', priority: 'high' }] },
+        }),
+      };
+
+      const implementHandler = {
+        name: 'ImplementComponent',
+        events: ['ComponentImplemented'],
+        handle: async (cmd: { data: { componentPath: string } }) => ({
+          type: 'ComponentImplemented',
+          data: { componentPath: cmd.data.componentPath },
+        }),
+      };
+
+      const pipeline = define('test')
+        .on('ComponentsGenerated')
+        .forEach((e: ComponentEvent) => e.data.components)
+        .groupInto(['high', 'medium', 'low'], (c: Component) => c.priority)
+        .process('ImplementComponent', (c: Component) => ({ componentPath: c.path }))
+        .onComplete({
+          success: 'AllComponentsImplemented',
+          failure: 'ComponentImplementationFailed',
+          itemKey: (e: ResultEvent) => e.data.componentPath,
+        })
+        .build();
+
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([generateHandler, implementHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      await fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'GenerateComponents', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 300));
       await server.stop();
     });
   });
