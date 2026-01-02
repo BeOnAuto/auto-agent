@@ -58,10 +58,6 @@ export class SettledTracker {
     }
   }
 
-  getRegisteredHandlerCount(): number {
-    return this.handlerTemplates.size;
-  }
-
   async onCommandStarted(command: Command): Promise<void> {
     const { type: commandType, correlationId, requestId } = command;
 
