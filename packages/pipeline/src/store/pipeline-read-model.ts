@@ -75,8 +75,6 @@ export class PipelineReadModel {
     let aggregateStatus: NodeStatus;
     if (pendingCount > 0) {
       aggregateStatus = 'running';
-    } else if (endedCount === 0) {
-      aggregateStatus = 'idle';
     } else if (hasError) {
       aggregateStatus = 'error';
     } else {
