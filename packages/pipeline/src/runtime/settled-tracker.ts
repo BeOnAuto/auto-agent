@@ -170,11 +170,7 @@ export class SettledTracker {
       return;
     }
 
-    const template = this.handlerTemplates.get(instanceDoc.templateId);
-    if (!template) {
-      return;
-    }
-
+    const template = this.handlerTemplates.get(instanceDoc.templateId)!;
     const eventsByCommandType = this.collectEventsFromDoc(instanceDoc);
 
     try {

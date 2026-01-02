@@ -245,5 +245,52 @@ describe('SettledInstanceProjection', () => {
         expect(result.status).toBe('cleaned');
       });
     });
+
+    describe('null document assertions', () => {
+      it('should throw when applying SettledCommandStarted to null document', () => {
+        const event: SettledCommandStartedEvent = {
+          type: 'SettledCommandStarted',
+          data: { templateId: 't1', correlationId: 'c1', commandType: 'Cmd' },
+        };
+        expect(() => evolve(null, event)).toThrow('Cannot apply SettledCommandStarted to null document');
+      });
+
+      it('should throw when applying SettledEventReceived to null document', () => {
+        const event: SettledEventReceivedEvent = {
+          type: 'SettledEventReceived',
+          data: {
+            templateId: 't1',
+            correlationId: 'c1',
+            commandType: 'Cmd',
+            event: { type: 'E', correlationId: 'c1', data: {} },
+          },
+        };
+        expect(() => evolve(null, event)).toThrow('Cannot apply SettledEventReceived to null document');
+      });
+
+      it('should throw when applying SettledHandlerFired to null document', () => {
+        const event: SettledHandlerFiredEvent = {
+          type: 'SettledHandlerFired',
+          data: { templateId: 't1', correlationId: 'c1', persist: false },
+        };
+        expect(() => evolve(null, event)).toThrow('Cannot apply SettledHandlerFired to null document');
+      });
+
+      it('should throw when applying SettledInstanceReset to null document', () => {
+        const event: SettledInstanceResetEvent = {
+          type: 'SettledInstanceReset',
+          data: { templateId: 't1', correlationId: 'c1' },
+        };
+        expect(() => evolve(null, event)).toThrow('Cannot apply SettledInstanceReset to null document');
+      });
+
+      it('should throw when applying SettledInstanceCleaned to null document', () => {
+        const event: SettledInstanceCleanedEvent = {
+          type: 'SettledInstanceCleaned',
+          data: { templateId: 't1', correlationId: 'c1' },
+        };
+        expect(() => evolve(null, event)).toThrow('Cannot apply SettledInstanceCleaned to null document');
+      });
+    });
   });
 });
