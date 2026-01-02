@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc && tsx ../../scripts/fix-esm-imports.ts",
     "test": "vitest run --reporter=dot",
+    "test:coverage": "vitest run --reporter=dot --coverage --coverage.reporter=text",
     "test:e2e": "vitest run --reporter=dot --include 'src/**/*.e2e.specs.ts'",
     "type-check": "tsc --noEmit",
     "prepublishOnly": "npm run build",

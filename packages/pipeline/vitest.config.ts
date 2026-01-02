@@ -18,7 +18,7 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       exclude: [
         'src/**/*.specs.ts',
-        'src/index.ts',
+        'src/**/index.ts',
         'src/core/descriptors.ts',
         'src/graph/types.ts',
         'src/runtime/context.ts',
