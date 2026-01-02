@@ -10,10 +10,6 @@ interface SSEClient {
 export class SSEManager {
   private clients = new Map<string, SSEClient>();
 
-  get clientCount(): number {
-    return this.clients.size;
-  }
-
   addClient(id: string, response: Response, correlationIdFilter?: string): void {
     response.writeHead(200, {
       'Content-Type': 'text/event-stream',
