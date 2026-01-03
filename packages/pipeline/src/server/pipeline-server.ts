@@ -294,6 +294,27 @@ export class PipelineServer {
       const correlationIdFilter = req.query.correlationId as string | undefined;
       this.sseManager.addClient(clientId, res, correlationIdFilter);
     });
+
+    this.app.post('/execute', (req, res) => {
+      void (async () => {
+        const { command, payload } = req.body as {
+          command: string;
+          payload: Record<string, unknown>;
+        };
+
+        const handler = this.commandHandlers.get(command);
+        if (!handler) {
+          res.status(400).json({ error: `Unknown command: ${command}` });
+          return;
+        }
+
+        const resultEvent = await handler.handle({ type: command, data: payload });
+        const events = Array.isArray(resultEvent) ? resultEvent : [resultEvent];
+        const firstEvent = events[0];
+
+        res.json({ event: firstEvent.type, data: firstEvent.data });
+      })();
+    });
   }
 
   private buildCombinedGraph(): GraphIR {
