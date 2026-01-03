@@ -1962,5 +1962,30 @@ describe('PipelineServer', () => {
 
       await server.stop();
     });
+
+    it('should return first event when handler returns array', async () => {
+      const handler = {
+        name: 'MultiEventCmd',
+        handle: async () => [
+          { type: 'FirstEvent', data: { order: 1 } },
+          { type: 'SecondEvent', data: { order: 2 } },
+        ],
+      };
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      await server.start();
+
+      const response = await fetch(`http://localhost:${server.port}/execute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: 'MultiEventCmd', payload: {} }),
+      });
+
+      const data = (await response.json()) as { event: string; data: Record<string, unknown> };
+      expect(response.status).toBe(200);
+      expect(data).toEqual({ event: 'FirstEvent', data: { order: 1 } });
+
+      await server.stop();
+    });
   });
 });
