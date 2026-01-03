@@ -1,5 +1,14 @@
 # @auto-engineer/cli
 
+## 0.16.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/narrative@0.16.0
+  - @auto-engineer/pipeline@0.16.0
+  - @auto-engineer/file-store@0.16.0
+
 ## 0.15.0
 
 ### Minor Changes

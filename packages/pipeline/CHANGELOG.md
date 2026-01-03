@@ -1,5 +1,17 @@
 # @auto-engineer/pipeline
 
+## 0.16.0
+
+### Minor Changes
+
+- Adds new endpoints for on.auto
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.16.0
+  - @auto-engineer/message-bus@0.16.0
+
 ## 0.15.0
 
 ### Minor Changes
