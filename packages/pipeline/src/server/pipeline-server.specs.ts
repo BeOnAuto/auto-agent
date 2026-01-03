@@ -1945,5 +1945,22 @@ describe('PipelineServer', () => {
 
       await server.stop();
     });
+
+    it('should return 400 for unknown command', async () => {
+      const server = new PipelineServer({ port: 0 });
+      await server.start();
+
+      const response = await fetch(`http://localhost:${server.port}/execute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: 'NonExistentCmd', payload: {} }),
+      });
+
+      const data = (await response.json()) as { error: string };
+      expect(response.status).toBe(400);
+      expect(data).toEqual({ error: 'Unknown command: NonExistentCmd' });
+
+      await server.stop();
+    });
   });
 });
