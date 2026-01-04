@@ -371,5 +371,17 @@ export default autoConfig({
       expect(templateJson.type).toBe('template');
       expect(templateJson.preset).toBe('minimal');
     });
+
+    it('should have auto.config.ts with required plugins', async () => {
+      const templatesDir = path.join(__dirname, '..', 'templates');
+      const minimalDir = path.join(templatesDir, 'minimal');
+
+      const autoConfigPath = path.join(minimalDir, 'auto.config.ts');
+      expect(await fs.pathExists(autoConfigPath)).toBe(true);
+
+      const content = await fs.readFile(autoConfigPath, 'utf8');
+      expect(content).toContain('@auto-engineer/server-checks');
+      expect(content).toContain('@auto-engineer/pipeline');
+    });
   });
 });
