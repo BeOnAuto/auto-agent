@@ -1,5 +1,12 @@
 # @auto-engineer/frontend-checks
 
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.15.1
+
 ## 0.15.0
 
 ### Minor Changes

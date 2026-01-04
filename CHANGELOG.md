@@ -2,6 +2,8 @@
 
 # @auto-engineer/ai-gateway
 
+## 0.15.1
+
 ## 0.15.0
 
 ### Minor Changes
@@ -296,6 +298,15 @@
 
 # @auto-engineer/cli
 
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/narrative@0.15.1
+  - @auto-engineer/file-store@0.15.1
+  - @auto-engineer/pipeline@0.15.1
+
 ## 0.15.0
 
 ### Minor Changes
@@ -323,6 +334,14 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/ai-gateway@0.15.1
+  - @auto-engineer/message-bus@0.15.1
 
 ## 0.15.0
 
@@ -955,6 +974,13 @@
 
 # create-auto-app
 
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/id@0.15.1
+
 ## 0.15.0
 
 ### Minor Changes
@@ -1351,6 +1377,13 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.15.1
 
 ## 0.15.0
 
@@ -2013,6 +2046,14 @@
 
 # @auto-engineer/dev-server
 
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/cli@0.15.1
+  - @auto-engineer/message-bus@0.15.1
+
 ## 0.15.0
 
 ### Minor Changes
@@ -2160,6 +2201,8 @@
   - @auto-engineer/message-bus@0.11.13
 
 # @auto-engineer/file-store
+
+## 0.15.1
 
 ## 0.15.0
 
@@ -2412,6 +2455,13 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.15.1
 
 ## 0.15.0
 
@@ -3032,6 +3082,14 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/ai-gateway@0.15.1
+  - @auto-engineer/message-bus@0.15.1
 
 ## 0.15.0
 
@@ -3765,6 +3823,14 @@
 
 # @auto-engineer/frontend-implementer
 
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/ai-gateway@0.15.1
+  - @auto-engineer/message-bus@0.15.1
+
 ## 0.15.0
 
 ### Minor Changes
@@ -4494,6 +4560,8 @@
 
 # @auto-engineer/id
 
+## 0.15.1
+
 ## 0.15.0
 
 ### Minor Changes
@@ -4683,6 +4751,15 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/narrative@0.15.1
+  - @auto-engineer/ai-gateway@0.15.1
+  - @auto-engineer/message-bus@0.15.1
 
 ## 0.15.0
 
@@ -5447,6 +5524,8 @@
 
 # @auto-engineer/message-bus
 
+## 0.15.1
+
 ## 0.15.0
 
 ### Minor Changes
@@ -5745,6 +5824,13 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.15.1
 
 ## 0.15.0
 
@@ -6192,6 +6278,17 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 0.15.1
+
+### Patch Changes
+
+- add first-class Module support for type ownership
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.15.1
+  - @auto-engineer/id@0.15.1
+  - @auto-engineer/message-bus@0.15.1
 
 ## 0.15.0
 
@@ -7049,6 +7146,7 @@
 ### Patch Changes
 
 - [`988ab04`](https://github.com/SamHatoum/auto-engineer/commit/988ab04530d41e116df9196434c0e57ff2ee11a8) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Fix export:schema command and add comprehensive debug logging
+
   - Fixed export-schema command to use npx tsx for TypeScript support
   - Added proper JSON extraction from stdout to handle integration logs
   - Resolved issue where export:schema produced empty schemas despite valid flow definitions
@@ -7078,6 +7176,14 @@
 
 # @auto-engineer/pipeline
 
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.15.1
+  - @auto-engineer/message-bus@0.15.1
+
 ## 0.15.0
 
 ### Minor Changes
@@ -7104,6 +7210,14 @@
   - @auto-engineer/message-store@0.14.0
 
 # @auto-engineer/server-checks
+
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/cli@0.15.1
+  - @auto-engineer/message-bus@0.15.1
 
 ## 0.15.0
 
@@ -7689,6 +7803,14 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/narrative@0.15.1
+  - @auto-engineer/message-bus@0.15.1
 
 ## 0.15.0
 
@@ -8424,6 +8546,13 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/narrative@0.15.1
+
 ## 0.15.0
 
 ### Minor Changes
@@ -8436,6 +8565,14 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/ai-gateway@0.15.1
+  - @auto-engineer/message-bus@0.15.1
 
 ## 0.15.0
 
