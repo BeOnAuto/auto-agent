@@ -353,8 +353,8 @@ export default autoConfig({
 
   describe('Minimal Template', () => {
     it('should have valid template.json with correct metadata', async () => {
-      const templatesDir = path.join(__dirname, '..', 'templates');
-      const minimalDir = path.join(templatesDir, 'minimal');
+      const examplesDir = path.join(__dirname, '..', '..', '..', 'examples');
+      const minimalDir = path.join(examplesDir, 'minimal');
 
       expect(await fs.pathExists(minimalDir)).toBe(true);
 
@@ -373,8 +373,8 @@ export default autoConfig({
     });
 
     it('should have auto.config.ts with required plugins', async () => {
-      const templatesDir = path.join(__dirname, '..', 'templates');
-      const minimalDir = path.join(templatesDir, 'minimal');
+      const examplesDir = path.join(__dirname, '..', '..', '..', 'examples');
+      const minimalDir = path.join(examplesDir, 'minimal');
 
       const autoConfigPath = path.join(minimalDir, 'auto.config.ts');
       expect(await fs.pathExists(autoConfigPath)).toBe(true);
@@ -385,8 +385,8 @@ export default autoConfig({
     });
 
     it('should have package.json with required dependencies', async () => {
-      const templatesDir = path.join(__dirname, '..', 'templates');
-      const minimalDir = path.join(templatesDir, 'minimal');
+      const examplesDir = path.join(__dirname, '..', '..', '..', 'examples');
+      const minimalDir = path.join(examplesDir, 'minimal');
 
       const packageJson = (await fs.readJson(path.join(minimalDir, 'package.json'))) as {
         dependencies: Record<string, string>;
@@ -398,8 +398,8 @@ export default autoConfig({
     });
 
     it('should have server directory with TypeScript configuration', async () => {
-      const templatesDir = path.join(__dirname, '..', 'templates');
-      const minimalDir = path.join(templatesDir, 'minimal');
+      const examplesDir = path.join(__dirname, '..', '..', '..', 'examples');
+      const minimalDir = path.join(examplesDir, 'minimal');
       const serverDir = path.join(minimalDir, 'server');
 
       expect(await fs.pathExists(serverDir)).toBe(true);
