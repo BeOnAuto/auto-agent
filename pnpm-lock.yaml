@@ -148,6 +148,22 @@ importers:
         specifier: ^3.12.7
         version: 3.14.0
 
+  examples/minimal:
+    dependencies:
+      '@auto-engineer/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@auto-engineer/pipeline':
+        specifier: workspace:*
+        version: link:../../packages/pipeline
+      '@auto-engineer/server-checks':
+        specifier: workspace:*
+        version: link:../../packages/server-checks
+    devDependencies:
+      '@types/node':
+        specifier: ^22.15.29
+        version: 22.18.0
+
   packages/ai-gateway:
     dependencies:
       '@ai-sdk/anthropic':
