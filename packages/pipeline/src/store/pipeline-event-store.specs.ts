@@ -170,6 +170,54 @@ describe('PipelineEventStore', () => {
         await close();
       }
     });
+
+    it('should track message stats through CommandDispatched and DomainEventEmitted', async () => {
+      const { eventStore, readModel, close } = createPipelineEventStore();
+      try {
+        await eventStore.appendToStream('pipeline-c1', [
+          {
+            type: 'CommandDispatched',
+            data: {
+              correlationId: 'c1',
+              requestId: 'r1',
+              commandType: 'CreateUser',
+              commandData: { name: 'Alice' },
+              timestamp: new Date(),
+            },
+          },
+          {
+            type: 'CommandDispatched',
+            data: {
+              correlationId: 'c1',
+              requestId: 'r2',
+              commandType: 'UpdateUser',
+              commandData: { name: 'Bob' },
+              timestamp: new Date(),
+            },
+          },
+          {
+            type: 'DomainEventEmitted',
+            data: {
+              correlationId: 'c1',
+              requestId: 'r1',
+              eventType: 'UserCreated',
+              eventData: { userId: '123' },
+              timestamp: new Date(),
+            },
+          },
+        ]);
+
+        const stats = await readModel.getStats();
+
+        expect(stats).toEqual({
+          totalMessages: 3,
+          totalCommands: 2,
+          totalEvents: 1,
+        });
+      } finally {
+        await close();
+      }
+    });
   });
 
   describe('settled instance projection', () => {

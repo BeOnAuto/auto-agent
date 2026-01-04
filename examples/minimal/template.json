@@ -1,0 +1,7 @@
+{
+  "name": "minimal",
+  "displayName": "Minimal",
+  "description": "Minimal template for testing auto-engineer with a single plugin",
+  "type": "template",
+  "preset": "minimal"
+}

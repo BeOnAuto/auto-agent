@@ -6,6 +6,7 @@ import type {
   RunAwaitHandlerDescriptor,
   SettledHandlerDescriptor,
 } from '../core/descriptors';
+import { dispatch } from '../core/types';
 import { define } from './define';
 
 describe('define()', () => {
@@ -191,7 +192,7 @@ describe('run() and awaitAll() - Scatter-Gather', () => {
   it('should return RunBuilder from TriggerBuilder.run()', () => {
     const builder = define('test')
       .on('BatchReady')
-      .run([{ commandType: 'ProcessItem', data: { id: 1 } }]);
+      .run([dispatch('ProcessItem', { id: 1 })]);
 
     expect(builder).toBeDefined();
     expect(typeof builder.awaitAll).toBe('function');

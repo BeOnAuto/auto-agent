@@ -207,7 +207,33 @@ describe('filterGraph', () => {
     });
   });
 
-  describe('P9: edge cases', () => {
+  describe('P9: direct edge preservation with maintainEdges', () => {
+    it('should preserve direct edges between non-filtered nodes', () => {
+      const graph: GraphIR = {
+        nodes: [
+          { id: 'evt:A', type: 'event', label: 'A' },
+          { id: 'evt:B', type: 'event', label: 'B' },
+          { id: 'cmd:C', type: 'command', label: 'C' },
+        ],
+        edges: [
+          { from: 'evt:A', to: 'evt:B' },
+          { from: 'evt:B', to: 'cmd:C' },
+        ],
+      };
+
+      const result = filterGraph(graph, { excludeTypes: ['command'], maintainEdges: true });
+
+      expect(result).toEqual({
+        nodes: [
+          { id: 'evt:A', type: 'event', label: 'A' },
+          { id: 'evt:B', type: 'event', label: 'B' },
+        ],
+        edges: [{ from: 'evt:A', to: 'evt:B' }],
+      });
+    });
+  });
+
+  describe('P10: edge cases', () => {
     it('should return empty graph when all nodes filtered', () => {
       const graph: GraphIR = {
         nodes: [{ id: 'evt:A', type: 'event', label: 'A' }],

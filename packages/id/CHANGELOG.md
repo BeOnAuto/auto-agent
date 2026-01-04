@@ -1,6 +1,12 @@
 # @auto-engineer/id
 
-## 0.15.1
+## 0.17.0
+
+### Minor Changes
+
+- Adds new minimal example
+
+## 0.16.0
 
 ## 0.15.0
 

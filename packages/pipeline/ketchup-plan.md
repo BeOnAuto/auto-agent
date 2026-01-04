@@ -2,6 +2,148 @@
 
 ## TODO
 
+### Phase 11: 100% Test Coverage (Bursts 93-102)
+
+**Goal**: Achieve 100% test coverage by testing uncovered code or removing dead code.
+
+**Current Coverage**: 96.53% lines, 97.13% branches, 94.94% functions
+
+---
+
+#### Burst 93: Exclude barrel exports from coverage
+
+| Value | Remove false positives from coverage report |
+| Approach | Change `src/index.ts` to `src/**/index.ts` in vitest.config.ts |
+| Size | S |
+
+---
+
+#### Burst 94: Test config/pipeline-config.ts
+
+| Value | 0% → 100% coverage for config module |
+| Approach | Test pipelineConfig() identity fn and loadPipelineConfig() with mocked loader |
+| Size | M |
+
+```typescript
+it('should return config unchanged', () => {
+  const config = { plugins: [], pipeline: mockPipeline };
+  expect(pipelineConfig(config)).toBe(config);
+});
+
+it('should load plugins and adapt handlers', async () => {
+  const config = { plugins: ['./test-plugin'], pipeline: mockPipeline };
+  const result = await loadPipelineConfig(config, '/workspace');
+  expect(result.handlers).toBeDefined();
+  expect(result.pipeline).toBe(mockPipeline);
+});
+```
+
+---
+
+#### Burst 95: Test filter-graph.ts addEdgeIfNew (lines 63-69)
+
+| Value | Cover duplicate edge scenario |
+| Approach | Test graph with duplicate edges when maintainEdges=true |
+| Size | S |
+
+```typescript
+it('should deduplicate edges when reconnecting', () => {
+  const graph = {
+    nodes: [{ id: 'a', type: 'command', label: 'A' }, { id: 'b', type: 'event', label: 'B' }, { id: 'c', type: 'command', label: 'C' }],
+    edges: [{ from: 'a', to: 'b' }, { from: 'a', to: 'b' }] // Duplicate
+  };
+  const result = filterGraph(graph, { excludeTypes: [], maintainEdges: true });
+  // Edges should be deduplicated
+});
+```
+
+---
+
+#### Burst 96: Test await-tracker-projection.ts null document errors (lines 48-49, 60-61)
+
+| Value | Cover error paths |
+| Approach | Test evolve() throws when applying events to null document |
+| Size | S |
+
+```typescript
+it('should throw when applying AwaitItemCompleted to null', () => {
+  expect(() => evolve(null, { type: 'AwaitItemCompleted', data: { correlationId: 'c1', key: 'k', result: {} } }))
+    .toThrow('Cannot apply AwaitItemCompleted to null document');
+});
+
+it('should throw when applying AwaitCompleted to null', () => {
+  expect(() => evolve(null, { type: 'AwaitCompleted', data: { correlationId: 'c1' } }))
+    .toThrow('Cannot apply AwaitCompleted to null document');
+});
+```
+
+---
+
+#### Burst 97: Remove or test phased-executor.ts getActiveSessionCount (lines 99-101)
+
+| Value | Remove dead code or add test |
+| Approach | Check if used; if not, remove; if used, test |
+| Size | S |
+
+---
+
+#### Burst 98: Test pipeline-runtime.ts fallback path (line 46)
+
+| Value | Cover when ctx.startPhased is undefined |
+| Approach | Call handleEvent with context missing startPhased |
+| Size | S |
+
+```typescript
+it('should fallback to executeForEachPhasedHandler when ctx.startPhased undefined', async () => {
+  const ctx = { correlationId: 'c1', emit: vi.fn(), sendCommand: vi.fn() }; // No startPhased
+  await runtime.handleEvent(event, ctx);
+  expect(ctx.sendCommand).toHaveBeenCalled(); // Fallback dispatched commands
+});
+```
+
+---
+
+#### Burst 99: Remove or test settled-tracker.ts getRegisteredHandlerCount (lines 62-63)
+
+| Value | Remove dead code or add test |
+| Approach | Check if used; if not, remove; if used, test |
+| Size | S |
+
+---
+
+#### Burst 100: Test sse-manager.ts clientCount getter (lines 14-15)
+
+| Value | Cover getter or remove if dead |
+| Approach | Check usage; test or remove |
+| Size | S |
+
+```typescript
+it('should return client count', () => {
+  const manager = new SSEManager();
+  expect(manager.clientCount).toBe(0);
+  manager.addClient('c1', mockResponse);
+  expect(manager.clientCount).toBe(1);
+});
+```
+
+---
+
+#### Burst 101: Test pipeline-read-model.ts line 79 branch
+
+| Value | Cover endedCount === 0 with no pending items |
+| Approach | Create scenario where items exist but all are running then all complete to idle |
+| Size | S |
+
+---
+
+#### Burst 102: Final verification - run coverage, all at 100%
+
+| Value | Confirm 100% coverage achieved |
+| Approach | Run pnpm test:coverage, verify all thresholds pass |
+| Size | S |
+
+---
+
 ### Phase 10: SQLite Event Store Persistence (Bursts 88-92)
 
 **Goal**: Replace in-memory event store with SQLite for persistence. Events survive restarts; projections rebuilt from event stream on startup.

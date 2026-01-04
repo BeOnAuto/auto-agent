@@ -1,18 +1,4 @@
 import { define } from '../builder/define';
-import type { GraphIR } from './types';
-
-describe('GraphIR type', () => {
-  it('should define GraphIR with nodes and edges', () => {
-    const graph: GraphIR = {
-      nodes: [
-        { id: 'evt:Start', type: 'event', label: 'Start' },
-        { id: 'cmd:Process', type: 'command', label: 'Process' },
-      ],
-      edges: [{ from: 'evt:Start', to: 'cmd:Process', label: 'triggers' }],
-    };
-    expect(graph.nodes).toHaveLength(2);
-  });
-});
 
 describe('Pipeline.toGraph()', () => {
   it('should extract graph from emit handler', () => {

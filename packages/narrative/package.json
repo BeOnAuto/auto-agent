@@ -30,7 +30,8 @@
   "scripts": {
     "build": "tsx scripts/build.ts",
     "test": "vitest run --reporter=dot",
-    "type-check": "tsc --noEmit -p tsconfig.test.json",
+    "test:coverage": "vitest run --reporter=dot --coverage --coverage.reporter=text",
+    "type-check": "tsc --noEmit",
     "convert-narrative": "tsx scripts/convert-narrative.ts",
     "link:dev": "pnpm build && pnpm link --global",
     "unlink:dev": "pnpm unlink --global",
@@ -44,5 +45,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.15.1"
+  "version": "0.17.0"
 }

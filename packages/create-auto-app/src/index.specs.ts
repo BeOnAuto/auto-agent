@@ -350,4 +350,62 @@ export default autoConfig({
       expect(presetOptions.packageManager).toBe('npm');
     });
   });
+
+  describe('Minimal Template', () => {
+    it('should have valid template.json with correct metadata', async () => {
+      const templatesDir = path.join(__dirname, '..', 'templates');
+      const minimalDir = path.join(templatesDir, 'minimal');
+
+      expect(await fs.pathExists(minimalDir)).toBe(true);
+
+      const templateJson = (await fs.readJson(path.join(minimalDir, 'template.json'))) as {
+        name: string;
+        displayName: string;
+        description: string;
+        type: string;
+        preset: string;
+      };
+
+      expect(templateJson.name).toBe('minimal');
+      expect(templateJson.displayName).toBe('Minimal');
+      expect(templateJson.type).toBe('template');
+      expect(templateJson.preset).toBe('minimal');
+    });
+
+    it('should have auto.config.ts with required plugins', async () => {
+      const templatesDir = path.join(__dirname, '..', 'templates');
+      const minimalDir = path.join(templatesDir, 'minimal');
+
+      const autoConfigPath = path.join(minimalDir, 'auto.config.ts');
+      expect(await fs.pathExists(autoConfigPath)).toBe(true);
+
+      const content = await fs.readFile(autoConfigPath, 'utf8');
+      expect(content).toContain('@auto-engineer/server-checks');
+      expect(content).toContain('@auto-engineer/pipeline');
+    });
+
+    it('should have package.json with required dependencies', async () => {
+      const templatesDir = path.join(__dirname, '..', 'templates');
+      const minimalDir = path.join(templatesDir, 'minimal');
+
+      const packageJson = (await fs.readJson(path.join(minimalDir, 'package.json'))) as {
+        dependencies: Record<string, string>;
+      };
+
+      expect(packageJson.dependencies['@auto-engineer/server-checks']).toBeDefined();
+      expect(packageJson.dependencies['@auto-engineer/pipeline']).toBeDefined();
+      expect(packageJson.dependencies['@auto-engineer/cli']).toBeDefined();
+    });
+
+    it('should have server directory with TypeScript configuration', async () => {
+      const templatesDir = path.join(__dirname, '..', 'templates');
+      const minimalDir = path.join(templatesDir, 'minimal');
+      const serverDir = path.join(minimalDir, 'server');
+
+      expect(await fs.pathExists(serverDir)).toBe(true);
+      expect(await fs.pathExists(path.join(serverDir, 'tsconfig.json'))).toBe(true);
+      expect(await fs.pathExists(path.join(serverDir, 'package.json'))).toBe(true);
+      expect(await fs.pathExists(path.join(serverDir, 'src', 'index.ts'))).toBe(true);
+    });
+  });
 });

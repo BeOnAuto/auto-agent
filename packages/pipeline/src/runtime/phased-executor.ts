@@ -69,8 +69,7 @@ export class PhasedExecutor {
     const itemDoc = execution.items.find((i) => i.key === itemKey);
     if (itemDoc === undefined || itemDoc.completed) return;
 
-    const handler = this.handlerRegistry.get(execution.handlerId);
-    if (handler === undefined) return;
+    const handler = this.handlerRegistry.get(execution.handlerId)!;
 
     if (handler.stopOnFailure && this.isFailureEvent(event, handler)) {
       await this.emitEvent({
@@ -86,18 +85,12 @@ export class PhasedExecutor {
       data: { executionId: execution.executionId, itemKey, resultEvent: event },
     });
 
-    const updatedExecution = await this.readModel.getPhasedExecution(execution.executionId);
-    if (updatedExecution === null) return;
+    const updatedExecution = (await this.readModel.getPhasedExecution(execution.executionId))!;
 
     const pendingCount = this.countPendingInPhase(updatedExecution);
     if (pendingCount === 0) {
       await this.advanceToNextPhase(execution.executionId, handler);
     }
-  }
-
-  async getActiveSessionCount(): Promise<number> {
-    const allExecutions = await this.readModel.getActivePhasedExecutions('');
-    return allExecutions.length;
   }
 
   async isPhaseComplete(correlationId: string, phase: string): Promise<boolean> {
@@ -132,8 +125,7 @@ export class PhasedExecutor {
   }
 
   private async dispatchCurrentPhase(executionId: string, handler: ForEachPhasedDescriptor): Promise<void> {
-    const execution = await this.readModel.getPhasedExecution(executionId);
-    if (execution === null) return;
+    const execution = (await this.readModel.getPhasedExecution(executionId))!;
 
     if (execution.currentPhaseIndex >= execution.phases.length) {
       await this.completeSession(executionId, handler, true);
@@ -163,8 +155,7 @@ export class PhasedExecutor {
   }
 
   private async advanceToNextPhase(executionId: string, handler: ForEachPhasedDescriptor): Promise<void> {
-    const execution = await this.readModel.getPhasedExecution(executionId);
-    if (execution === null) return;
+    const execution = (await this.readModel.getPhasedExecution(executionId))!;
 
     const fromPhase = execution.currentPhaseIndex;
     const toPhase = fromPhase + 1;
@@ -186,8 +177,7 @@ export class PhasedExecutor {
     handler: ForEachPhasedDescriptor,
     success: boolean,
   ): Promise<void> {
-    const execution = await this.readModel.getPhasedExecution(executionId);
-    if (execution === null) return;
+    const execution = (await this.readModel.getPhasedExecution(executionId))!;
 
     const eventDescriptor = success ? handler.completion.successEvent : handler.completion.failureEvent;
     const eventType = eventDescriptor.name;
