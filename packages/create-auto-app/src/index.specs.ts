@@ -396,5 +396,16 @@ export default autoConfig({
       expect(packageJson.dependencies['@auto-engineer/pipeline']).toBeDefined();
       expect(packageJson.dependencies['@auto-engineer/cli']).toBeDefined();
     });
+
+    it('should have server directory with TypeScript configuration', async () => {
+      const templatesDir = path.join(__dirname, '..', 'templates');
+      const minimalDir = path.join(templatesDir, 'minimal');
+      const serverDir = path.join(minimalDir, 'server');
+
+      expect(await fs.pathExists(serverDir)).toBe(true);
+      expect(await fs.pathExists(path.join(serverDir, 'tsconfig.json'))).toBe(true);
+      expect(await fs.pathExists(path.join(serverDir, 'package.json'))).toBe(true);
+      expect(await fs.pathExists(path.join(serverDir, 'src', 'index.ts'))).toBe(true);
+    });
   });
 });
