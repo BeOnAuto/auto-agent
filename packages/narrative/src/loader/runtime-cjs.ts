@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module';
 import createDebug from 'debug';
 import { integrationRegistry } from '../integration-registry';
 import { registry } from '../narrative-registry';
@@ -16,8 +17,8 @@ function nodeRequire(spec: string): unknown {
   if (!isNode()) {
     throw new Error('Node require unavailable in browser');
   }
-  const req = (0, eval)('require') as (id: string) => unknown;
-  return req(spec);
+  const require = createRequire(import.meta.url);
+  return require(spec);
 }
 
 function makeIntegration(): Integration {

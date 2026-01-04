@@ -71,7 +71,9 @@ export {
   ExperienceSliceSchema,
   IntegrationSchema,
   MessageFieldSchema,
+  MessageRefSchema,
   MessageSchema,
+  ModuleSchema,
   modelSchema as SpecsSystemSchema,
   modelSchema,
   NarrativeNamesSchema as NarrativeNamesSystemSchema,
@@ -91,6 +93,7 @@ export {
 
 // Testing helpers
 export { createNarrativeSpec, given as testGiven, when as testWhen } from './testing';
+export type { GeneratedNarratives } from './transformers/model-to-narrative';
 export { modelToNarrative } from './transformers/model-to-narrative';
 
 import type {
@@ -98,7 +101,9 @@ import type {
   ExampleSchema,
   ExperienceSliceSchema,
   MessageFieldSchema,
+  MessageRefSchema,
   MessageSchema,
+  ModuleSchema,
   modelSchema,
   NarrativeSchema,
   QuerySliceSchema,
@@ -121,6 +126,8 @@ export type MessageField = z.infer<typeof MessageFieldSchema>;
 export type Rule = z.infer<typeof RuleSchema>;
 export type Spec = z.infer<typeof SpecSchema>;
 export type Step = z.infer<typeof StepSchema>;
+export type Module = z.infer<typeof ModuleSchema>;
+export type MessageRef = z.infer<typeof MessageRefSchema>;
 
 // ID assignment utilities
 export { addAutoIds, hasAllIds } from './id';

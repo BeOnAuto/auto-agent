@@ -79,6 +79,7 @@ describe('addAutoIds', () => {
     ],
     messages: [],
     integrations: [],
+    modules: [],
   };
 
   const AUTO_ID_REGEX = /^[A-Za-z0-9_]{9}$/;
@@ -161,6 +162,7 @@ describe('addAutoIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
     const result = addAutoIds(modelWithoutServer);
@@ -207,6 +209,7 @@ describe('addAutoIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
     const result = addAutoIds(modelWithExperienceSlice);
@@ -262,6 +265,7 @@ describe('addAutoIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
     const result = addAutoIds(modelWithMultipleFlowsSameSource);
@@ -320,6 +324,7 @@ describe('addAutoIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
     const result = addAutoIds(modelWithSpecs);
@@ -372,6 +377,7 @@ describe('addAutoIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
     const result = addAutoIds(modelWithSteps);
@@ -427,6 +433,7 @@ describe('addAutoIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
     const result = addAutoIds(modelWithExistingExampleId);
@@ -480,6 +487,7 @@ describe('addAutoIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
     const result = addAutoIds(modelWithErrorSteps);
@@ -515,6 +523,7 @@ describe('addAutoIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
     const result = addAutoIds(modelWithClientSpecs);
@@ -557,6 +566,7 @@ describe('addAutoIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
     const result = addAutoIds(modelWithDescribe);
@@ -603,6 +613,7 @@ describe('addAutoIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
     const result = addAutoIds(modelWithNestedSpecs);
@@ -647,6 +658,7 @@ describe('addAutoIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
     const originalSpec = modelWithClientSpecs.narratives[0].slices[0];
@@ -655,5 +667,173 @@ describe('addAutoIds', () => {
     if ('client' in originalSpec && originalSpec.client?.specs != null) {
       expect(originalSpec.client.specs[0].id).toBeUndefined();
     }
+  });
+
+  describe('module ID generation', () => {
+    const AUTO_ID_REGEX = /^[A-Za-z0-9_]{9}$/;
+
+    it('should assign ID to derived module equal to sourceFile', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [],
+        messages: [],
+        integrations: [],
+        modules: [
+          {
+            id: '',
+            sourceFile: 'orders.narrative.ts',
+            isDerived: true,
+            contains: { narrativeIds: [] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+
+      const result = addAutoIds(model);
+
+      expect(result.modules[0].id).toBe('orders.narrative.ts');
+    });
+
+    it('should generate auto ID for authored module without ID', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [],
+        messages: [],
+        integrations: [],
+        modules: [
+          {
+            id: '',
+            sourceFile: 'features/orders.ts',
+            isDerived: false,
+            contains: { narrativeIds: [] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+
+      const result = addAutoIds(model);
+
+      expect(result.modules[0].id).toMatch(AUTO_ID_REGEX);
+    });
+
+    it('should preserve existing ID for authored module', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [],
+        messages: [],
+        integrations: [],
+        modules: [
+          {
+            id: 'EXISTING-MODULE-001',
+            sourceFile: 'features/orders.ts',
+            isDerived: false,
+            contains: { narrativeIds: [] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+
+      const result = addAutoIds(model);
+
+      expect(result.modules[0].id).toBe('EXISTING-MODULE-001');
+    });
+
+    it('should not mutate original modules', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [],
+        messages: [],
+        integrations: [],
+        modules: [
+          {
+            id: '',
+            sourceFile: 'test.ts',
+            isDerived: false,
+            contains: { narrativeIds: [] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+
+      const originalId = model.modules[0].id;
+      addAutoIds(model);
+
+      expect(model.modules[0].id).toBe(originalId);
+    });
+
+    it('should generate unique IDs for multiple authored modules', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [],
+        messages: [],
+        integrations: [],
+        modules: [
+          {
+            id: '',
+            sourceFile: 'orders.ts',
+            isDerived: false,
+            contains: { narrativeIds: [] },
+            declares: { messages: [] },
+          },
+          {
+            id: '',
+            sourceFile: 'users.ts',
+            isDerived: false,
+            contains: { narrativeIds: [] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+
+      const result = addAutoIds(model);
+
+      expect(result.modules[0].id).toMatch(AUTO_ID_REGEX);
+      expect(result.modules[1].id).toMatch(AUTO_ID_REGEX);
+      expect(result.modules[0].id).not.toBe(result.modules[1].id);
+    });
+
+    it('should handle mixed derived and authored modules', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [],
+        messages: [],
+        integrations: [],
+        modules: [
+          {
+            id: '',
+            sourceFile: 'derived.narrative.ts',
+            isDerived: true,
+            contains: { narrativeIds: [] },
+            declares: { messages: [] },
+          },
+          {
+            id: '',
+            sourceFile: 'authored.ts',
+            isDerived: false,
+            contains: { narrativeIds: [] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+
+      const result = addAutoIds(model);
+
+      expect(result.modules[0].id).toBe('derived.narrative.ts');
+      expect(result.modules[1].id).toMatch(AUTO_ID_REGEX);
+    });
+
+    it('should handle empty modules array', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+
+      const result = addAutoIds(model);
+
+      expect(result.modules).toEqual([]);
+    });
   });
 });

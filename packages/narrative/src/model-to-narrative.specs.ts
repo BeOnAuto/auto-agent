@@ -3,9 +3,14 @@ import type { Model } from './index';
 import schema from './samples/seasonal-assistant.schema.json';
 import { modelToNarrative } from './transformers/model-to-narrative';
 
+function getCode(result: Awaited<ReturnType<typeof modelToNarrative>>): string {
+  return result.files.map((f) => f.code).join('\n');
+}
+
 describe('modelToNarrative', () => {
   it('should create a full flow DSL from a model', async () => {
-    const code = await modelToNarrative(schema as Model);
+    const result = await modelToNarrative({ ...schema, modules: [] } as Model);
+    const code = getCode(result);
 
     expect(code).toEqual(`import {
   command,
@@ -384,9 +389,10 @@ narrative('Seasonal Assistant', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(experienceModel);
+    const code = getCode(await modelToNarrative(experienceModel));
 
     expect(code).toEqual(`import { experience, it, narrative } from '@auto-engineer/narrative';
 narrative('Test Experience Flow', 'TEST-001', () => {
@@ -428,9 +434,10 @@ narrative('Test Experience Flow', 'TEST-001', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(modelWithoutIds);
+    const code = getCode(await modelToNarrative(modelWithoutIds));
 
     expect(code).toEqual(`import { describe, experience, it, narrative } from '@auto-engineer/narrative';
 narrative('Test Flow without IDs', () => {
@@ -501,9 +508,10 @@ narrative('Test Flow without IDs', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(modelWithIds);
+    const code = getCode(await modelToNarrative(modelWithIds));
 
     expect(code).toEqual(`import { describe, experience, it, narrative, query, specs } from '@auto-engineer/narrative';
 narrative('Test Flow with IDs', 'FLOW-123', () => {
@@ -601,9 +609,10 @@ narrative('Test Flow with IDs', 'FLOW-123', () => {
         },
       ],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(modelWithRuleIds);
+    const code = getCode(await modelToNarrative(modelWithRuleIds));
 
     expect(code).toEqual(`import { command, example, narrative, rule, specs } from '@auto-engineer/narrative';
 import type { Command, Event } from '@auto-engineer/narrative';
@@ -673,9 +682,10 @@ narrative('Test Flow with Rule IDs', 'FLOW-456', () => {
         },
       ],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(modelWithDateTypes);
+    const code = getCode(await modelToNarrative(modelWithDateTypes));
 
     expect(code).toEqual(`import { narrative } from '@auto-engineer/narrative';
 import type { Event } from '@auto-engineer/narrative';
@@ -926,9 +936,10 @@ narrative('Questionnaire Flow', 'QUEST-001', () => {});
         },
       ],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(questionnairesModel);
+    const code = getCode(await modelToNarrative(questionnairesModel));
 
     expect(code).toEqual(`import {
   data,
@@ -1166,9 +1177,10 @@ narrative('Questionnaires', 'Q9m2Kp4Lx', () => {
         },
       ],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(modelWithDuplicateRules);
+    const code = getCode(await modelToNarrative(modelWithDuplicateRules));
 
     expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
@@ -1370,9 +1382,10 @@ narrative('Test Flow', 'TEST-FLOW', () => {
         },
       ],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(modelWithMultiGiven);
+    const code = getCode(await modelToNarrative(modelWithMultiGiven));
 
     expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
@@ -1581,9 +1594,10 @@ narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
         },
       ],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(modelWithReferencedStates);
+    const code = getCode(await modelToNarrative(modelWithReferencedStates));
 
     expect(
       code,
@@ -1735,9 +1749,10 @@ narrative('Referenced States Flow', 'REF-STATES', () => {
         },
       ],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(modelWithDateFields);
+    const code = getCode(await modelToNarrative(modelWithDateFields));
 
     expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
@@ -1839,9 +1854,10 @@ narrative('Date Handling Flow', 'DATE-FLOW', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(modelWithMultipleFlowsSameSource);
+    const code = getCode(await modelToNarrative(modelWithMultipleFlowsSameSource));
 
     expect(code).toEqual(`import { experience, it, narrative } from '@auto-engineer/narrative';
 narrative('Home Screen', () => {
@@ -2000,9 +2016,10 @@ narrative('Response Analytics', () => {
         },
       ],
       integrations: [],
+      modules: [],
     };
 
-    const code = await modelToNarrative(modelWithEmptyWhen);
+    const code = getCode(await modelToNarrative(modelWithEmptyWhen));
 
     expect(code).toEqual(`import { example, narrative, query, rule, specs } from '@auto-engineer/narrative';
 import type { Event, State } from '@auto-engineer/narrative';
@@ -2132,9 +2149,10 @@ narrative('Todo List Summary', 'TODO-001', () => {
           },
         ],
         integrations: [],
+        modules: [],
       };
 
-      const code = await modelToNarrative(modelWithSingletonProjection);
+      const code = getCode(await modelToNarrative(modelWithSingletonProjection));
 
       expect(code).toEqual(`import { data, narrative, query, source, specs } from '@auto-engineer/narrative';
 import type { State } from '@auto-engineer/narrative';
@@ -2208,9 +2226,10 @@ narrative('Todo Summary Flow', 'TODO-SUMMARY', () => {
           },
         ],
         integrations: [],
+        modules: [],
       };
 
-      const code = await modelToNarrative(modelWithRegularProjection);
+      const code = getCode(await modelToNarrative(modelWithRegularProjection));
 
       expect(code).toEqual(`import { data, narrative, query, source, specs } from '@auto-engineer/narrative';
 import type { State } from '@auto-engineer/narrative';
@@ -2285,9 +2304,10 @@ narrative('Todo Flow', 'TODO-FLOW', () => {
           },
         ],
         integrations: [],
+        modules: [],
       };
 
-      const code = await modelToNarrative(modelWithCompositeProjection);
+      const code = getCode(await modelToNarrative(modelWithCompositeProjection));
 
       expect(code).toEqual(`import { data, narrative, query, source, specs } from '@auto-engineer/narrative';
 import type { State } from '@auto-engineer/narrative';
@@ -2443,9 +2463,10 @@ narrative('User Project Flow', 'USER-PROJECT-FLOW', () => {
           },
         ],
         integrations: [],
+        modules: [],
       };
 
-      const code = await modelToNarrative(modelWithAllProjectionTypes);
+      const code = getCode(await modelToNarrative(modelWithAllProjectionTypes));
 
       expect(code).toEqual(`import { data, narrative, query, source, specs } from '@auto-engineer/narrative';
 import type { State } from '@auto-engineer/narrative';
@@ -2486,6 +2507,435 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
   });
 });
 `);
+    });
+  });
+
+  describe('modules', () => {
+    it('generates multiple files for derived modules with different sourceFiles', async () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          { name: 'Orders', id: 'orders-flow', sourceFile: 'orders.narrative.ts', slices: [] },
+          { name: 'Users', id: 'users-flow', sourceFile: 'users.narrative.ts', slices: [] },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [
+          {
+            id: 'orders.narrative.ts',
+            sourceFile: 'orders.narrative.ts',
+            isDerived: true,
+            contains: { narrativeIds: ['orders-flow'] },
+            declares: { messages: [] },
+          },
+          {
+            id: 'users.narrative.ts',
+            sourceFile: 'users.narrative.ts',
+            isDerived: true,
+            contains: { narrativeIds: ['users-flow'] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+
+      const result = await modelToNarrative(model);
+
+      expect(result.files).toHaveLength(2);
+      expect(result.files.map((f) => f.path).sort()).toEqual(['orders.narrative.ts', 'users.narrative.ts']);
+
+      const ordersFile = result.files.find((f) => f.path === 'orders.narrative.ts');
+      const usersFile = result.files.find((f) => f.path === 'users.narrative.ts');
+
+      expect(ordersFile?.code).toContain("narrative('Orders', 'orders-flow'");
+      expect(usersFile?.code).toContain("narrative('Users', 'users-flow'");
+    });
+
+    it('duplicates types in each derived module file (no cross-module imports)', async () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          { name: 'Flow A', id: 'flow-a', sourceFile: 'a.narrative.ts', slices: [] },
+          { name: 'Flow B', id: 'flow-b', sourceFile: 'b.narrative.ts', slices: [] },
+        ],
+        messages: [
+          {
+            type: 'event',
+            source: 'internal',
+            name: 'SharedEvent',
+            fields: [{ name: 'id', type: 'string', required: true }],
+          },
+        ],
+        integrations: [],
+        modules: [
+          {
+            id: 'a.narrative.ts',
+            sourceFile: 'a.narrative.ts',
+            isDerived: true,
+            contains: { narrativeIds: ['flow-a'] },
+            declares: { messages: [{ kind: 'event', name: 'SharedEvent' }] },
+          },
+          {
+            id: 'b.narrative.ts',
+            sourceFile: 'b.narrative.ts',
+            isDerived: true,
+            contains: { narrativeIds: ['flow-b'] },
+            declares: { messages: [{ kind: 'event', name: 'SharedEvent' }] },
+          },
+        ],
+      };
+
+      const result = await modelToNarrative(model);
+
+      expect(result.files).toHaveLength(2);
+
+      for (const file of result.files) {
+        expect(file.code).toContain('type SharedEvent = Event<');
+        expect(file.code).not.toContain('import type { SharedEvent }');
+      }
+    });
+
+    it('generates cross-module type imports for authored modules', async () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          { name: 'Shared Types', id: 'shared-types', slices: [] },
+          {
+            name: 'Orders',
+            id: 'orders-flow',
+            slices: [
+              {
+                name: 'create order',
+                type: 'command',
+                client: { specs: [] },
+                server: {
+                  description: 'Creates an order',
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: 'Order Creation',
+                      rules: [
+                        {
+                          name: 'Valid order',
+                          examples: [
+                            {
+                              name: 'Creates order',
+                              steps: [
+                                { keyword: 'When', text: 'CreateOrder' },
+                                { keyword: 'Then', text: 'OrderCreated' },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [
+          {
+            type: 'command',
+            name: 'CreateOrder',
+            fields: [{ name: 'orderId', type: 'string', required: true }],
+          },
+          {
+            type: 'event',
+            source: 'internal',
+            name: 'OrderCreated',
+            fields: [{ name: 'orderId', type: 'string', required: true }],
+          },
+        ],
+        integrations: [],
+        modules: [
+          {
+            id: 'shared',
+            sourceFile: 'shared/types.narrative.ts',
+            isDerived: false,
+            contains: { narrativeIds: ['shared-types'] },
+            declares: { messages: [{ kind: 'event', name: 'OrderCreated' }] },
+          },
+          {
+            id: 'orders',
+            sourceFile: 'features/orders.narrative.ts',
+            isDerived: false,
+            contains: { narrativeIds: ['orders-flow'] },
+            declares: { messages: [{ kind: 'command', name: 'CreateOrder' }] },
+          },
+        ],
+      };
+
+      const result = await modelToNarrative(model);
+
+      expect(result.files).toHaveLength(2);
+
+      const ordersFile = result.files.find((f) => f.path.includes('orders'));
+      expect(ordersFile).toBeDefined();
+
+      expect(ordersFile!.code).toContain("import type { OrderCreated } from '../shared/types.narrative';");
+      expect(ordersFile!.code).toContain('type CreateOrder = Command<');
+      expect(ordersFile!.code).not.toContain('type OrderCreated = Event<');
+    });
+
+    it('generates correct relative import paths for nested directories', async () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          { name: 'Core Types', id: 'core', slices: [] },
+          {
+            name: 'Feature',
+            id: 'feature',
+            slices: [
+              {
+                name: 'do something',
+                type: 'command',
+                client: { specs: [] },
+                server: {
+                  description: 'Does something',
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: 'Feature',
+                      rules: [
+                        {
+                          name: 'Rule',
+                          examples: [
+                            {
+                              name: 'Example',
+                              steps: [{ keyword: 'Then', text: 'CoreEvent' }],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [
+          {
+            type: 'event',
+            source: 'internal',
+            name: 'CoreEvent',
+            fields: [{ name: 'id', type: 'string', required: true }],
+          },
+        ],
+        integrations: [],
+        modules: [
+          {
+            id: 'core',
+            sourceFile: 'src/core/types.narrative.ts',
+            isDerived: false,
+            contains: { narrativeIds: ['core'] },
+            declares: { messages: [{ kind: 'event', name: 'CoreEvent' }] },
+          },
+          {
+            id: 'feature',
+            sourceFile: 'src/features/sub/feature.narrative.ts',
+            isDerived: false,
+            contains: { narrativeIds: ['feature'] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+
+      const result = await modelToNarrative(model);
+
+      const featureFile = result.files.find((f) => f.path.includes('feature'));
+      expect(featureFile).toBeDefined();
+      expect(featureFile!.code).toContain("import type { CoreEvent } from '../../core/types.narrative';");
+    });
+
+    it('groups multiple imported types from same module into single import', async () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          { name: 'Shared', id: 'shared', slices: [] },
+          {
+            name: 'Consumer',
+            id: 'consumer',
+            slices: [
+              {
+                name: 'process',
+                type: 'command',
+                client: { specs: [] },
+                server: {
+                  description: 'Processes',
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: 'Processing',
+                      rules: [
+                        {
+                          name: 'Rule',
+                          examples: [
+                            {
+                              name: 'Example',
+                              steps: [
+                                { keyword: 'Given', text: 'EventA' },
+                                { keyword: 'Then', text: 'EventB' },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [
+          { type: 'event', source: 'internal', name: 'EventA', fields: [] },
+          { type: 'event', source: 'internal', name: 'EventB', fields: [] },
+        ],
+        integrations: [],
+        modules: [
+          {
+            id: 'shared',
+            sourceFile: 'shared.narrative.ts',
+            isDerived: false,
+            contains: { narrativeIds: ['shared'] },
+            declares: {
+              messages: [
+                { kind: 'event', name: 'EventA' },
+                { kind: 'event', name: 'EventB' },
+              ],
+            },
+          },
+          {
+            id: 'consumer',
+            sourceFile: 'consumer.narrative.ts',
+            isDerived: false,
+            contains: { narrativeIds: ['consumer'] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+
+      const result = await modelToNarrative(model);
+
+      const consumerFile = result.files.find((f) => f.path.includes('consumer'));
+      expect(consumerFile).toBeDefined();
+
+      expect(consumerFile!.code).toMatch(/import type \{ EventA, EventB \} from/);
+      expect(consumerFile!.code.match(/import type \{/g)?.length).toBe(1);
+    });
+
+    it('sorts cross-module imports alphabetically by path', async () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          { name: 'Types Z', id: 'z-types', slices: [] },
+          { name: 'Types A', id: 'a-types', slices: [] },
+          {
+            name: 'Consumer',
+            id: 'consumer',
+            slices: [
+              {
+                name: 'process',
+                type: 'command',
+                client: { specs: [] },
+                server: {
+                  description: 'Processes',
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: 'Processing',
+                      rules: [
+                        {
+                          name: 'Rule',
+                          examples: [
+                            {
+                              name: 'Example',
+                              steps: [
+                                { keyword: 'Given', text: 'ZEvent' },
+                                { keyword: 'Then', text: 'AEvent' },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [
+          { type: 'event', source: 'internal', name: 'ZEvent', fields: [] },
+          { type: 'event', source: 'internal', name: 'AEvent', fields: [] },
+        ],
+        integrations: [],
+        modules: [
+          {
+            id: 'z-types',
+            sourceFile: 'z-types.narrative.ts',
+            isDerived: false,
+            contains: { narrativeIds: ['z-types'] },
+            declares: { messages: [{ kind: 'event', name: 'ZEvent' }] },
+          },
+          {
+            id: 'a-types',
+            sourceFile: 'a-types.narrative.ts',
+            isDerived: false,
+            contains: { narrativeIds: ['a-types'] },
+            declares: { messages: [{ kind: 'event', name: 'AEvent' }] },
+          },
+          {
+            id: 'consumer',
+            sourceFile: 'consumer.narrative.ts',
+            isDerived: false,
+            contains: { narrativeIds: ['consumer'] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+
+      const result = await modelToNarrative(model);
+
+      const consumerFile = result.files.find((f) => f.path.includes('consumer'));
+      expect(consumerFile).toBeDefined();
+
+      const importLines = consumerFile!.code.split('\n').filter((line) => line.startsWith('import type {'));
+
+      expect(importLines).toHaveLength(2);
+      expect(importLines[0]).toContain('a-types');
+      expect(importLines[1]).toContain('z-types');
+    });
+
+    it('derives modules when model has empty modules array', async () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          { name: 'Flow A', id: 'flow-a', sourceFile: 'a.narrative.ts', slices: [] },
+          { name: 'Flow B', id: 'flow-b', sourceFile: 'b.narrative.ts', slices: [] },
+        ],
+        messages: [
+          {
+            type: 'event',
+            source: 'internal',
+            name: 'TestEvent',
+            fields: [{ name: 'id', type: 'string', required: true }],
+          },
+        ],
+        integrations: [],
+        modules: [],
+      };
+
+      const result = await modelToNarrative(model);
+
+      expect(result.files).toHaveLength(2);
+      expect(result.files.map((f) => f.path).sort()).toEqual(['a.narrative.ts', 'b.narrative.ts']);
+
+      for (const file of result.files) {
+        expect(file.code).toContain('type TestEvent = Event<');
+      }
     });
   });
 });

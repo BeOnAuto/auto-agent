@@ -34,6 +34,7 @@ describe('hasAllIds', () => {
     ],
     messages: [],
     integrations: [],
+    modules: [],
   });
 
   const createModelWithIds = (): Model => ({
@@ -71,6 +72,7 @@ describe('hasAllIds', () => {
     ],
     messages: [],
     integrations: [],
+    modules: [],
   });
 
   const createModelWithFullIds = (): Model => ({
@@ -131,6 +133,7 @@ describe('hasAllIds', () => {
     ],
     messages: [],
     integrations: [],
+    modules: [],
   });
 
   const createMultipleFlowsModel = (includeAllIds: boolean, includeAllSliceIds: boolean): Model => ({
@@ -178,6 +181,7 @@ describe('hasAllIds', () => {
     ],
     messages: [],
     integrations: [],
+    modules: [],
   });
 
   it('should return false for models without IDs', () => {
@@ -310,6 +314,7 @@ describe('hasAllIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
     expect(hasAllIds(model)).toBe(false);
   });
@@ -335,6 +340,7 @@ describe('hasAllIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
     expect(hasAllIds(model)).toBe(false);
   });
@@ -366,6 +372,7 @@ describe('hasAllIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
     expect(hasAllIds(model)).toBe(false);
   });
@@ -398,6 +405,7 @@ describe('hasAllIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
     expect(hasAllIds(model)).toBe(false);
   });
@@ -438,7 +446,86 @@ describe('hasAllIds', () => {
       ],
       messages: [],
       integrations: [],
+      modules: [],
     };
     expect(hasAllIds(model)).toBe(true);
+  });
+
+  describe('module ID validation', () => {
+    it('should return true when all modules have IDs', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [],
+        messages: [],
+        integrations: [],
+        modules: [
+          {
+            id: 'module-1',
+            sourceFile: 'test.ts',
+            isDerived: false,
+            contains: { narrativeIds: [] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+      expect(hasAllIds(model)).toBe(true);
+    });
+
+    it('should return false when module has empty ID', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [],
+        messages: [],
+        integrations: [],
+        modules: [
+          {
+            id: '',
+            sourceFile: 'test.ts',
+            isDerived: false,
+            contains: { narrativeIds: [] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+      expect(hasAllIds(model)).toBe(false);
+    });
+
+    it('should return false when any module is missing ID among valid narratives', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [{ name: 'Test', id: 'FLOW-001', slices: [] }],
+        messages: [],
+        integrations: [],
+        modules: [
+          {
+            id: '',
+            sourceFile: 'test.ts',
+            isDerived: true,
+            contains: { narrativeIds: ['FLOW-001'] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+      expect(hasAllIds(model)).toBe(false);
+    });
+
+    it('should return true for derived module with valid ID', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [],
+        messages: [],
+        integrations: [],
+        modules: [
+          {
+            id: 'derived.ts',
+            sourceFile: 'derived.ts',
+            isDerived: true,
+            contains: { narrativeIds: [] },
+            declares: { messages: [] },
+          },
+        ],
+      };
+      expect(hasAllIds(model)).toBe(true);
+    });
   });
 });

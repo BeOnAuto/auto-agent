@@ -1,5 +1,32 @@
 import { z } from 'zod';
 
+// Message reference for module type ownership
+export const MessageRefSchema = z
+  .object({
+    kind: z.enum(['command', 'event', 'state']).describe('Message kind'),
+    name: z.string().describe('Message name'),
+  })
+  .describe('Reference to a message type');
+
+// Module schema for type ownership and file grouping
+export const ModuleSchema = z
+  .object({
+    id: z.string().describe('Unique module identifier. For derived modules, equals sourceFile'),
+    sourceFile: z.string().describe('Output file path for this module'),
+    isDerived: z.boolean().describe('True if auto-derived from sourceFile grouping, false if user-authored'),
+    contains: z
+      .object({
+        narrativeIds: z.array(z.string()).describe('IDs of narratives in this module'),
+      })
+      .describe('Narratives contained in this module'),
+    declares: z
+      .object({
+        messages: z.array(MessageRefSchema).describe('Message types owned by this module'),
+      })
+      .describe('Types declared/owned by this module'),
+  })
+  .describe('Module for grouping narratives and owning types');
+
 const IntegrationSchema = z
   .object({
     name: z.string().describe('Integration name (e.g., MailChimp, Twilio)'),
@@ -373,6 +400,7 @@ export const modelSchema = z
     narratives: z.array(NarrativeSchema),
     messages: z.array(MessageSchema),
     integrations: z.array(IntegrationSchema).optional(),
+    modules: z.array(ModuleSchema).describe('Modules for type ownership and file grouping'),
   })
   .describe('Complete system specification with all implementation details');
 

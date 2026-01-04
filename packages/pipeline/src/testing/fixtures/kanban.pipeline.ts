@@ -27,6 +27,10 @@ interface CheckEventData {
   target: string;
 }
 
+function isCheckEventData(data: unknown): data is CheckEventData {
+  return typeof data === 'object' && data !== null && 'target' in data && typeof data.target === 'string';
+}
+
 const MAX_RETRIES = 3;
 const retryState = new Map<string, number>();
 
@@ -40,8 +44,11 @@ function collectErrors(events: Event[]): string[] {
 
 function extractSlicePath(events: Record<string, Event[]>): string {
   const firstEvent = events.CheckTests?.[0] ?? events.CheckTypes?.[0] ?? events.CheckLint?.[0];
-  const data = firstEvent?.data as CheckEventData | undefined;
-  return data?.target ?? 'unknown';
+  const data = firstEvent?.data;
+  if (isCheckEventData(data)) {
+    return data.target;
+  }
+  return 'unknown';
 }
 
 function gatherAllCheckEvents(events: Record<string, Event[]>): Event[] {

@@ -151,7 +151,7 @@ export const getNarratives = async (
       typeMap: new Map(),
       typesByFile: new Map(),
       givenTypesByFile: new Map(),
-      toModel: () => ({ variant: 'specs' as const, narratives: [], messages: [] }),
+      toModel: () => ({ variant: 'specs' as const, narratives: [], messages: [], modules: [] }),
     };
   }
 

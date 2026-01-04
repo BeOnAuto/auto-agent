@@ -2,8 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "composite": false,
+    "rootDir": ".",
     "types": ["vitest/globals", "node"]
   },
-  "include": ["src/**/*", "**/*.specs.ts", "**/*.spec.ts", "**/*.test.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

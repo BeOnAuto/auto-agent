@@ -660,7 +660,8 @@ flow('questionnaires-test', () => {
     });
 
     const model = flows.toModel();
-    const code = await modelToNarrative(model);
+    const result = await modelToNarrative(model);
+    const code = result.files.map((f) => f.code).join('\n');
 
     expect(code).not.toMatch(/\.when<>\(\{\}\)/);
     expect(code).not.toMatch(/\.when<\s*\{\s*}\s*>\(\{}\)/);
@@ -1240,6 +1241,218 @@ function validateThenEvents(example: unknown): void {
     });
   }
 }
+
+describe('modules in toModel()', () => {
+  it('should derive modules from narratives with different sourceFiles', async () => {
+    const memoryVfs = new InMemoryFileStore();
+
+    const ordersContent = `
+import { flow, command, specs, rule, example, type Command, type Event } from '@auto-engineer/narrative';
+
+type CreateOrder = Command<'CreateOrder', { orderId: string }>;
+type OrderCreated = Event<'OrderCreated', { orderId: string; createdAt: Date }>;
+
+flow('Orders', () => {
+  command('create order')
+    .server(() => {
+      specs(() => {
+        rule('creates an order', () => {
+          example('order created')
+            .when<CreateOrder>({ orderId: 'order-001' })
+            .then<OrderCreated>({ orderId: 'order-001', createdAt: new Date('2030-01-01T09:00:00Z') });
+        });
+      });
+    });
+});
+`;
+
+    const usersContent = `
+import { flow, command, specs, rule, example, type Command, type Event } from '@auto-engineer/narrative';
+
+type CreateUser = Command<'CreateUser', { userId: string; name: string }>;
+type UserCreated = Event<'UserCreated', { userId: string; name: string; createdAt: Date }>;
+
+flow('Users', () => {
+  command('create user')
+    .server(() => {
+      specs(() => {
+        rule('creates a user', () => {
+          example('user created')
+            .when<CreateUser>({ userId: 'user-001', name: 'Alice' })
+            .then<UserCreated>({ userId: 'user-001', name: 'Alice', createdAt: new Date('2030-01-01T09:00:00Z') });
+        });
+      });
+    });
+});
+`;
+
+    await memoryVfs.write('/test/orders.narrative.ts', new TextEncoder().encode(ordersContent));
+    await memoryVfs.write('/test/users.narrative.ts', new TextEncoder().encode(usersContent));
+
+    const flows = await getNarratives({
+      vfs: memoryVfs,
+      root: '/test',
+      pattern: /\.narrative\.ts$/,
+      fastFsScan: true,
+    });
+    const model = flows.toModel();
+
+    expect(model.modules).toBeDefined();
+    expect(model.modules.length).toBe(2);
+
+    const sourceFiles = model.modules.map((m) => m.sourceFile);
+    expect(sourceFiles.some((sf) => sf.includes('orders.narrative.ts'))).toBe(true);
+    expect(sourceFiles.some((sf) => sf.includes('users.narrative.ts'))).toBe(true);
+
+    const ordersModule = model.modules.find((m) => m.sourceFile.includes('orders.narrative.ts'));
+    const usersModule = model.modules.find((m) => m.sourceFile.includes('users.narrative.ts'));
+
+    expect(ordersModule).toBeDefined();
+    expect(ordersModule?.isDerived).toBe(true);
+
+    expect(usersModule).toBeDefined();
+    expect(usersModule?.isDerived).toBe(true);
+  });
+
+  it('should include all messages in derived module declarations', async () => {
+    const memoryVfs = new InMemoryFileStore();
+
+    const content = `
+import { flow, command, specs, rule, example, type Command, type Event } from '@auto-engineer/narrative';
+
+type CreateOrder = Command<'CreateOrder', { orderId: string }>;
+type OrderCreated = Event<'OrderCreated', { orderId: string }>;
+
+flow('Orders', () => {
+  command('create order')
+    .server(() => {
+      specs(() => {
+        rule('creates order', () => {
+          example('order created')
+            .when<CreateOrder>({ orderId: 'order-001' })
+            .then<OrderCreated>({ orderId: 'order-001' });
+        });
+      });
+    });
+});
+`;
+
+    await memoryVfs.write('/test/orders.narrative.ts', new TextEncoder().encode(content));
+
+    const flows = await getNarratives({
+      vfs: memoryVfs,
+      root: '/test',
+      pattern: /\.narrative\.ts$/,
+      fastFsScan: true,
+    });
+    const model = flows.toModel();
+
+    expect(model.modules).toHaveLength(1);
+    const mod = model.modules[0];
+
+    const declaredNames = mod.declares.messages.map((m) => m.name);
+    expect(declaredNames).toContain('CreateOrder');
+    expect(declaredNames).toContain('OrderCreated');
+  });
+
+  it('should group narratives from same sourceFile into one module', async () => {
+    const memoryVfs = new InMemoryFileStore();
+
+    const content = `
+import { flow, command, query, specs, rule, example, type Command, type Event, type State } from '@auto-engineer/narrative';
+
+type CreateTodo = Command<'CreateTodo', { todoId: string }>;
+type TodoCreated = Event<'TodoCreated', { todoId: string }>;
+type TodoList = State<'TodoList', { todos: string[] }>;
+
+flow('Create Todos', () => {
+  command('add todo')
+    .server(() => {
+      specs(() => {
+        rule('adds todo', () => {
+          example('todo added')
+            .when<CreateTodo>({ todoId: 'todo-001' })
+            .then<TodoCreated>({ todoId: 'todo-001' });
+        });
+      });
+    });
+});
+
+flow('View Todos', () => {
+  query('list todos')
+    .server(() => {
+      specs(() => {
+        rule('shows todos', () => {
+          example('todos listed')
+            .given<TodoCreated>({ todoId: 'todo-001' })
+            .when({})
+            .then<TodoList>({ todos: ['todo-001'] });
+        });
+      });
+    });
+});
+`;
+
+    await memoryVfs.write('/test/todos.narrative.ts', new TextEncoder().encode(content));
+
+    const flows = await getNarratives({
+      vfs: memoryVfs,
+      root: '/test',
+      pattern: /\.narrative\.ts$/,
+      fastFsScan: true,
+    });
+    const model = flows.toModel();
+
+    expect(model.modules).toHaveLength(1);
+    expect(model.modules[0].contains.narrativeIds).toHaveLength(2);
+
+    const narrativeNames = model.narratives.map((n) => n.name);
+    expect(narrativeNames).toContain('Create Todos');
+    expect(narrativeNames).toContain('View Todos');
+  });
+
+  it('should validate model with modules passes schema', async () => {
+    const memoryVfs = new InMemoryFileStore();
+
+    const content = `
+import { flow, command, specs, rule, example, type Command, type Event } from '@auto-engineer/narrative';
+
+type DoSomething = Command<'DoSomething', { id: string }>;
+type SomethingDone = Event<'SomethingDone', { id: string }>;
+
+flow('Test', () => {
+  command('do something')
+    .server(() => {
+      specs(() => {
+        rule('does something', () => {
+          example('something done')
+            .when<DoSomething>({ id: '001' })
+            .then<SomethingDone>({ id: '001' });
+        });
+      });
+    });
+});
+`;
+
+    await memoryVfs.write('/test/test.narrative.ts', new TextEncoder().encode(content));
+
+    const flows = await getNarratives({
+      vfs: memoryVfs,
+      root: '/test',
+      pattern: /\.narrative\.ts$/,
+      fastFsScan: true,
+    });
+    const model = flows.toModel();
+
+    const parseResult = modelSchema.safeParse(model);
+    if (!parseResult.success) {
+      console.error('Schema validation errors:', parseResult.error.format());
+    }
+    expect(parseResult.success).toBe(true);
+    expect(parseResult.data?.modules).toBeDefined();
+    expect(parseResult.data?.modules.length).toBeGreaterThan(0);
+  });
+});
 
 describe('projection DSL methods', () => {
   it('should generate correct origin for singleton projection', async () => {

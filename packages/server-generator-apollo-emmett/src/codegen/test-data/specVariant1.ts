@@ -225,6 +225,7 @@ const specVariant1: SpecsSchema = {
       },
     },
   ],
+  modules: [],
 };
 
 export default specVariant1;

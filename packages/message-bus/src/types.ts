@@ -1,6 +1,5 @@
 // Core CQRS types
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DefaultRecord = Record<string, any>;
+type DefaultRecord = Record<string, unknown>;
 
 export type Command<CommandType extends string = string, CommandData extends DefaultRecord = DefaultRecord> = Readonly<{
   type: CommandType;

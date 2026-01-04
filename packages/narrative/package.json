@@ -30,7 +30,7 @@
   "scripts": {
     "build": "tsx scripts/build.ts",
     "test": "vitest run --reporter=dot",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc --noEmit -p tsconfig.test.json",
     "convert-narrative": "tsx scripts/convert-narrative.ts",
     "link:dev": "pnpm build && pnpm link --global",
     "unlink:dev": "pnpm unlink --global",

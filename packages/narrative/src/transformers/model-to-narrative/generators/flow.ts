@@ -1,27 +1,28 @@
 import type tsNS from 'typescript';
 import type { z } from 'zod';
 import type {
+  CommandSlice as CommandSliceType,
+  ExperienceSlice as ExperienceSliceType,
+  Narrative,
+  QuerySlice as QuerySliceType,
+  ReactSlice as ReactSliceType,
+} from '../../../index';
+import type {
   ClientSpecNode,
-  CommandSliceSchema,
   DataSinkSchema,
   DataSourceSchema,
   DestinationSchema,
   ExampleSchema,
-  ExperienceSliceSchema,
-  NarrativeSchema,
   OriginSchema,
-  QuerySliceSchema,
-  ReactSliceSchema,
 } from '../../../schema';
 import { jsonToExpr } from '../ast/emit-helpers';
 import { buildConsolidatedGwtSpecBlock, type GWTBlock } from './gwt';
 
-type CommandSlice = z.infer<typeof CommandSliceSchema>;
-type QuerySlice = z.infer<typeof QuerySliceSchema>;
-type ReactSlice = z.infer<typeof ReactSliceSchema>;
-type ExperienceSlice = z.infer<typeof ExperienceSliceSchema>;
+type CommandSlice = CommandSliceType;
+type QuerySlice = QuerySliceType;
+type ReactSlice = ReactSliceType;
+type ExperienceSlice = ExperienceSliceType;
 type Example = z.infer<typeof ExampleSchema>;
-type Narrative = z.infer<typeof NarrativeSchema>;
 type DataSinkItem = z.infer<typeof DataSinkSchema>;
 type DataSourceItem = z.infer<typeof DataSourceSchema>;
 type Destination = z.infer<typeof DestinationSchema>;
