@@ -383,5 +383,18 @@ export default autoConfig({
       expect(content).toContain('@auto-engineer/server-checks');
       expect(content).toContain('@auto-engineer/pipeline');
     });
+
+    it('should have package.json with required dependencies', async () => {
+      const templatesDir = path.join(__dirname, '..', 'templates');
+      const minimalDir = path.join(templatesDir, 'minimal');
+
+      const packageJson = (await fs.readJson(path.join(minimalDir, 'package.json'))) as {
+        dependencies: Record<string, string>;
+      };
+
+      expect(packageJson.dependencies['@auto-engineer/server-checks']).toBeDefined();
+      expect(packageJson.dependencies['@auto-engineer/pipeline']).toBeDefined();
+      expect(packageJson.dependencies['@auto-engineer/cli']).toBeDefined();
+    });
   });
 });

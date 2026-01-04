@@ -1,0 +1,17 @@
+{
+  "name": "minimal-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "auto": "node ../../packages/cli/dist/bin/auto.js",
+    "check:types": "pnpm auto CheckTypes --targetDirectory=./server"
+  },
+  "dependencies": {
+    "@auto-engineer/cli": "workspace:*",
+    "@auto-engineer/pipeline": "workspace:*",
+    "@auto-engineer/server-checks": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29"
+  }
+}
