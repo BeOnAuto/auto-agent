@@ -1,5 +1,11 @@
 # @auto-engineer/ai-gateway
 
+## 0.17.0
+
+### Minor Changes
+
+- Adds new minimal example
+
 ## 0.16.0
 
 ## 0.15.0

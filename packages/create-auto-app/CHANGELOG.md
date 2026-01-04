@@ -1,5 +1,16 @@
 # create-auto-app
 
+## 0.17.0
+
+### Minor Changes
+
+- Adds new minimal example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/id@0.17.0
+
 ## 0.16.0
 
 ### Patch Changes
