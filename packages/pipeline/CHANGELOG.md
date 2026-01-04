@@ -1,5 +1,13 @@
 # @auto-engineer/pipeline
 
+## 0.17.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.17.1
+  - @auto-engineer/message-bus@0.17.1
+
 ## 0.17.0
 
 ### Minor Changes

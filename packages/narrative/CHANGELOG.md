@@ -1,5 +1,16 @@
 # @auto-engineer/flow
 
+## 0.17.1
+
+### Patch Changes
+
+- use conditional TLA import for node:module to fix browser builds
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.17.1
+  - @auto-engineer/id@0.17.1
+  - @auto-engineer/message-bus@0.17.1
+
 ## 0.17.0
 
 ### Minor Changes

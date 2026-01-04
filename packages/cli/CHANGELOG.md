@@ -1,5 +1,14 @@
 # @auto-engineer/cli
 
+## 0.17.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/narrative@0.17.1
+  - @auto-engineer/file-store@0.17.1
+  - @auto-engineer/pipeline@0.17.1
+
 ## 0.17.0
 
 ### Minor Changes

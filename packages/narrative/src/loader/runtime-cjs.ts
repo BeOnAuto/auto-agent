@@ -1,4 +1,3 @@
-import { createRequire } from 'node:module';
 import createDebug from 'debug';
 import { integrationRegistry } from '../integration-registry';
 import { registry } from '../narrative-registry';
@@ -9,15 +8,29 @@ import type { Graph } from './types';
 const debug = createDebug('auto:flow:runtime');
 const dImp = createDebug('auto:flow:runtime:require');
 
+// Conditional Node.js module loading - variable indirection prevents bundler static analysis
+let _createRequire: ((url: string | URL) => NodeRequire) | undefined;
+
+if (isNode()) {
+  try {
+    const id = 'node:module';
+    const nodeModule = await import(/* @vite-ignore */ id);
+    _createRequire = nodeModule.createRequire;
+  } catch {
+    // Graceful degradation - fall back to browser-style behavior
+    // This handles misconfigured Node builds or edge cases
+  }
+}
+
 function isNode(): boolean {
   return typeof process !== 'undefined' && typeof (process as NodeJS.Process | undefined)?.versions?.node === 'string';
 }
 
 function nodeRequire(spec: string): unknown {
-  if (!isNode()) {
+  if (!_createRequire) {
     throw new Error('Node require unavailable in browser');
   }
-  const require = createRequire(import.meta.url);
+  const require = _createRequire(import.meta.url);
   return require(spec);
 }
 
