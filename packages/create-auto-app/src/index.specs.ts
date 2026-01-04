@@ -350,4 +350,26 @@ export default autoConfig({
       expect(presetOptions.packageManager).toBe('npm');
     });
   });
+
+  describe('Minimal Template', () => {
+    it('should have valid template.json with correct metadata', async () => {
+      const templatesDir = path.join(__dirname, '..', 'templates');
+      const minimalDir = path.join(templatesDir, 'minimal');
+
+      expect(await fs.pathExists(minimalDir)).toBe(true);
+
+      const templateJson = (await fs.readJson(path.join(minimalDir, 'template.json'))) as {
+        name: string;
+        displayName: string;
+        description: string;
+        type: string;
+        preset: string;
+      };
+
+      expect(templateJson.name).toBe('minimal');
+      expect(templateJson.displayName).toBe('Minimal');
+      expect(templateJson.type).toBe('template');
+      expect(templateJson.preset).toBe('minimal');
+    });
+  });
 });
