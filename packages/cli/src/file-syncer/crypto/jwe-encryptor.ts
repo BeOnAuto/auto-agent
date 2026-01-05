@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 
 const debug = createDebug('auto:cli:jwe-encryptor');
 
-const PUBLIC_JWKS_URL = 'https://sync-sandbox.rami-632.workers.dev/.well-known/jwks.json';
+const PUBLIC_JWKS_URL = 'https://collaboration-server.on-auto.workers.dev/.well-known/jwks.json';
 const PUBLIC_KEY_CACHE_TTL_MS = 60 * 60 * 300; // 1h
 const JWE_TTL_SECONDS = 1800;
 const AUDIENCE = 'cf-worker-ai';
