@@ -82,6 +82,24 @@ describe('PipelineServer', () => {
       expect(response.headers.get('X-Custom-Header')).toBe('middleware-applied');
       await server.stop();
     });
+
+    it('should allow chaining use() calls', async () => {
+      const server = new PipelineServer({ port: 0 });
+      server
+        .use((_req, res, next) => {
+          res.setHeader('X-First', 'first');
+          next();
+        })
+        .use((_req, res, next) => {
+          res.setHeader('X-Second', 'second');
+          next();
+        });
+      await server.start();
+      const response = await fetch(`http://localhost:${server.port}/health`);
+      expect(response.headers.get('X-First')).toBe('first');
+      expect(response.headers.get('X-Second')).toBe('second');
+      await server.stop();
+    });
   });
 
   describe('health endpoint', () => {

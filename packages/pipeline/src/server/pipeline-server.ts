@@ -139,8 +139,9 @@ export class PipelineServer {
     return Array.from(this.pipelines.keys());
   }
 
-  use(handler: express.RequestHandler): void {
+  use(handler: express.RequestHandler): this {
     this.middleware.push(handler);
+    return this;
   }
 
   async start(): Promise<void> {
