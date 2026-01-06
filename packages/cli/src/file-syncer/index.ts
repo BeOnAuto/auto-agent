@@ -2,7 +2,7 @@ import path from 'node:path';
 import { NodeFileStore } from '@auto-engineer/file-store/node';
 import chokidar from 'chokidar';
 import createDebug from 'debug';
-import type { Server as SocketIOServer } from 'socket.io';
+import type { Socket, Server as SocketIOServer } from 'socket.io';
 import { loadAutoConfig } from '../config-loader.js';
 import { createJWE } from './crypto/jwe-encryptor.js';
 import { getActiveProvider, getProviderEnvHash } from './crypto/provider-resolver.js';
@@ -14,6 +14,12 @@ import { fromWirePath, rebuildWirePathCache, toWirePath } from './utils/path.js'
 const debug = createDebug('auto:cli:file-syncer');
 
 type FileMeta = { hash: string; size: number };
+
+export type SocketMiddleware = (socket: Socket, next: (err?: Error) => void) => void;
+
+export interface FileSyncerConfig {
+  socketMiddleware?: SocketMiddleware;
+}
 
 export class FileSyncer {
   private io: SocketIOServer;
@@ -30,16 +36,22 @@ export class FileSyncer {
   private autoConfigHash: string | null = null;
   private autoConfigContent: unknown = null;
   private providerEnvHash: string | null = null;
+  private socketMiddleware?: SocketMiddleware;
 
-  constructor(io: SocketIOServer, watchDir = '.', _extensions?: string[]) {
+  constructor(io: SocketIOServer, watchDir = '.', _extensions?: string[], config?: FileSyncerConfig) {
     this.io = io;
     this.watchDir = path.resolve(watchDir);
     this.projectRoot = path.dirname(this.watchDir);
     this.vfs = new NodeFileStore();
     this.active = new Map<string, FileMeta>();
+    this.socketMiddleware = config?.socketMiddleware;
   }
 
   start(): void {
+    if (this.socketMiddleware) {
+      this.io.use(this.socketMiddleware);
+    }
+
     const serializeConfig = async (cfg: unknown, fileId: string): Promise<string> => {
       let configWithCreds: unknown = cfg;
 
