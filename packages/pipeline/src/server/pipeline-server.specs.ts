@@ -70,6 +70,20 @@ async function fetchWithStatus(
 }
 
 describe('PipelineServer', () => {
+  describe('middleware', () => {
+    it('should apply middleware before routes on start', async () => {
+      const server = new PipelineServer({ port: 0 });
+      server.use((_req, res, next) => {
+        res.setHeader('X-Custom-Header', 'middleware-applied');
+        next();
+      });
+      await server.start();
+      const response = await fetch(`http://localhost:${server.port}/health`);
+      expect(response.headers.get('X-Custom-Header')).toBe('middleware-applied');
+      await server.stop();
+    });
+  });
+
   describe('health endpoint', () => {
     it('should respond to /health', async () => {
       const server = new PipelineServer({ port: 0 });

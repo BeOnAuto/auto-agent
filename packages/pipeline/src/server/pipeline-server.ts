@@ -56,6 +56,7 @@ export class PipelineServer {
   private readonly sseManager: SSEManager;
   private readonly eventStoreContext: PipelineEventStoreContext;
   private readonly itemKeyExtractors = new Map<string, (data: unknown) => string | undefined>();
+  private readonly middleware: express.RequestHandler[] = [];
 
   constructor(config: PipelineServerConfig) {
     this.requestedPort = config.port;
@@ -98,7 +99,6 @@ export class PipelineServer {
       },
     });
     this.sseManager = new SSEManager();
-    this.setupRoutes();
   }
 
   get port(): number {
@@ -139,10 +139,20 @@ export class PipelineServer {
     return Array.from(this.pipelines.keys());
   }
 
+  use(handler: express.RequestHandler): void {
+    this.middleware.push(handler);
+  }
+
   async start(): Promise<void> {
     if (this.requestedPort === 0) {
       this.actualPort = await getPort();
     }
+
+    for (const handler of this.middleware) {
+      this.app.use(handler);
+    }
+
+    this.setupRoutes();
 
     await new Promise<void>((resolve) => {
       this.httpServer.listen(this.actualPort, () => {
