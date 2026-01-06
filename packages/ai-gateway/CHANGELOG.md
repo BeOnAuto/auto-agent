@@ -1,5 +1,11 @@
 # @auto-engineer/ai-gateway
 
+## 0.18.0
+
+### Minor Changes
+
+- Add middleware support
+
 ## 0.17.1
 
 ## 0.17.0

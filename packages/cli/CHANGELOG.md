@@ -1,5 +1,18 @@
 # @auto-engineer/cli
 
+## 0.18.0
+
+### Minor Changes
+
+- Add middleware support
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.18.0
+  - @auto-engineer/narrative@0.18.0
+  - @auto-engineer/pipeline@0.18.0
+
 ## 0.17.1
 
 ### Patch Changes

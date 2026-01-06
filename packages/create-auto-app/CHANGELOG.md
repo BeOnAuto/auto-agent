@@ -1,5 +1,16 @@
 # create-auto-app
 
+## 0.18.0
+
+### Minor Changes
+
+- Add middleware support
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/id@0.18.0
+
 ## 0.17.1
 
 ### Patch Changes

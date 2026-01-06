@@ -1,5 +1,18 @@
 # @auto-engineer/flow
 
+## 0.18.0
+
+### Minor Changes
+
+- Add middleware support
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.18.0
+  - @auto-engineer/file-store@0.18.0
+  - @auto-engineer/id@0.18.0
+
 ## 0.17.1
 
 ### Patch Changes
@@ -894,7 +907,6 @@
 ### Patch Changes
 
 - [`988ab04`](https://github.com/SamHatoum/auto-engineer/commit/988ab04530d41e116df9196434c0e57ff2ee11a8) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Fix export:schema command and add comprehensive debug logging
-
   - Fixed export-schema command to use npx tsx for TypeScript support
   - Added proper JSON extraction from stdout to handle integration logs
   - Resolved issue where export:schema produced empty schemas despite valid flow definitions

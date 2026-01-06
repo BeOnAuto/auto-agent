@@ -1,5 +1,17 @@
 # @auto-engineer/frontend-implementer
 
+## 0.18.0
+
+### Minor Changes
+
+- Add middleware support
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.18.0
+  - @auto-engineer/ai-gateway@0.18.0
+
 ## 0.17.1
 
 ### Patch Changes
