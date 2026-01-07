@@ -1,0 +1,7 @@
+{
+  "name": "typical",
+  "displayName": "Typical",
+  "description": "A handpicked set of builders curated by the Auto team",
+  "type": "template",
+  "preset": "full"
+}
