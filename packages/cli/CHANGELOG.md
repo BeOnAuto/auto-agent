@@ -1,13 +1,20 @@
 # @auto-engineer/cli
 
-## 0.19.1
+## 0.20.0
+
+### Minor Changes
+
+- Add dual-mode CLI with importable server module
+  - Export `startServer()` function from `@auto-engineer/cli/server` subpath
+  - Support middleware injection via `httpMiddleware` and `socketMiddleware` options
+  - Enable external packages to extend CLI server with custom auth/middleware
 
 ### Patch Changes
 
 - Updated dependencies []:
-  - @auto-engineer/narrative@0.19.1
-  - @auto-engineer/file-store@0.19.1
-  - @auto-engineer/pipeline@0.19.1
+  - @auto-engineer/file-store@0.20.0
+  - @auto-engineer/narrative@0.20.0
+  - @auto-engineer/pipeline@0.20.0
 
 ## 0.19.0
 

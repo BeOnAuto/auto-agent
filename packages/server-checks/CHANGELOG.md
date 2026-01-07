@@ -1,12 +1,12 @@
 # @auto-engineer/server-checks
 
-## 0.19.1
+## 0.20.0
 
 ### Patch Changes
 
 - Updated dependencies []:
-  - @auto-engineer/cli@0.19.1
-  - @auto-engineer/message-bus@0.19.1
+  - @auto-engineer/cli@0.20.0
+  - @auto-engineer/message-bus@0.20.0
 
 ## 0.19.0
 

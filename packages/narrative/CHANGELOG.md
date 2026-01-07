@@ -1,15 +1,13 @@
 # @auto-engineer/flow
 
-## 0.19.1
+## 0.20.0
 
 ### Patch Changes
 
-- add optional id field to DataSink and DataSource
-
 - Updated dependencies []:
-  - @auto-engineer/file-store@0.19.1
-  - @auto-engineer/id@0.19.1
-  - @auto-engineer/message-bus@0.19.1
+  - @auto-engineer/file-store@0.20.0
+  - @auto-engineer/id@0.20.0
+  - @auto-engineer/message-bus@0.20.0
 
 ## 0.19.0
 
@@ -931,7 +929,6 @@
 ### Patch Changes
 
 - [`988ab04`](https://github.com/SamHatoum/auto-engineer/commit/988ab04530d41e116df9196434c0e57ff2ee11a8) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Fix export:schema command and add comprehensive debug logging
-
   - Fixed export-schema command to use npx tsx for TypeScript support
   - Added proper JSON extraction from stdout to handle integration logs
   - Resolved issue where export:schema produced empty schemas despite valid flow definitions

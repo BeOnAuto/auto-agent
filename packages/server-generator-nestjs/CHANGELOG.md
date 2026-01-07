@@ -1,11 +1,11 @@
 # @auto-engineer/server-generator-nestjs
 
-## 0.19.1
+## 0.20.0
 
 ### Patch Changes
 
 - Updated dependencies []:
-  - @auto-engineer/narrative@0.19.1
+  - @auto-engineer/narrative@0.20.0
 
 ## 0.19.0
 
