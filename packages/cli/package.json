@@ -3,6 +3,16 @@
   "type": "module",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    },
+    "./server": {
+      "types": "./dist/src/server.d.ts",
+      "import": "./dist/src/server.js"
+    }
+  },
   "bin": {
     "auto-engineer": "./dist/bin/auto.js",
     "auto": "./dist/bin/auto.js"
