@@ -2,6 +2,12 @@
 
 # @auto-engineer/ai-gateway
 
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
 ## 0.18.0
 
 ### Minor Changes
@@ -312,6 +318,19 @@
 
 # @auto-engineer/cli
 
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.19.0
+  - @auto-engineer/narrative@0.19.0
+  - @auto-engineer/pipeline@0.19.0
+
 ## 0.18.0
 
 ### Minor Changes
@@ -383,6 +402,18 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
+  - @auto-engineer/ai-gateway@0.19.0
 
 ## 0.18.0
 
@@ -1055,6 +1086,17 @@
 
 # create-auto-app
 
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/id@0.19.0
+
 ## 0.18.0
 
 ### Minor Changes
@@ -1487,6 +1529,17 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
 
 ## 0.18.0
 
@@ -2185,6 +2238,18 @@
 
 # @auto-engineer/dev-server
 
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
+  - @auto-engineer/cli@0.19.0
+
 ## 0.18.0
 
 ### Minor Changes
@@ -2372,6 +2437,12 @@
   - @auto-engineer/message-bus@0.11.13
 
 # @auto-engineer/file-store
+
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
 
 ## 0.18.0
 
@@ -2640,6 +2711,17 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
 
 ## 0.18.0
 
@@ -3296,6 +3378,18 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
+  - @auto-engineer/ai-gateway@0.19.0
 
 ## 0.18.0
 
@@ -4069,6 +4163,18 @@
 
 # @auto-engineer/frontend-implementer
 
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
+  - @auto-engineer/ai-gateway@0.19.0
+
 ## 0.18.0
 
 ### Minor Changes
@@ -4838,6 +4944,12 @@
 
 # @auto-engineer/id
 
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
 ## 0.18.0
 
 ### Minor Changes
@@ -5043,6 +5155,19 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
+  - @auto-engineer/ai-gateway@0.19.0
+  - @auto-engineer/narrative@0.19.0
 
 ## 0.18.0
 
@@ -5851,6 +5976,12 @@
 
 # @auto-engineer/message-bus
 
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
 ## 0.18.0
 
 ### Minor Changes
@@ -6165,6 +6296,17 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
 
 ## 0.18.0
 
@@ -6648,6 +6790,19 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
+  - @auto-engineer/file-store@0.19.0
+  - @auto-engineer/id@0.19.0
 
 ## 0.18.0
 
@@ -7585,6 +7740,18 @@
 
 # @auto-engineer/pipeline
 
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
+  - @auto-engineer/file-store@0.19.0
+
 ## 0.18.0
 
 ### Minor Changes
@@ -7655,6 +7822,18 @@
   - @auto-engineer/message-store@0.14.0
 
 # @auto-engineer/server-checks
+
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
+  - @auto-engineer/cli@0.19.0
 
 ## 0.18.0
 
@@ -8280,6 +8459,18 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
+  - @auto-engineer/narrative@0.19.0
 
 ## 0.18.0
 
@@ -9055,6 +9246,17 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/narrative@0.19.0
+
 ## 0.18.0
 
 ### Minor Changes
@@ -9103,6 +9305,18 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
+  - @auto-engineer/ai-gateway@0.19.0
 
 ## 0.18.0
 

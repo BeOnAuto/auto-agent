@@ -1,5 +1,18 @@
 # @auto-engineer/flow
 
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.19.0
+  - @auto-engineer/file-store@0.19.0
+  - @auto-engineer/id@0.19.0
+
 ## 0.18.0
 
 ### Minor Changes

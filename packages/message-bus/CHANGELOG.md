@@ -1,5 +1,11 @@
 # @auto-engineer/message-bus
 
+## 0.19.0
+
+### Minor Changes
+
+- adds "typical" example
+
 ## 0.18.0
 
 ### Minor Changes
