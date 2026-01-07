@@ -451,6 +451,229 @@ describe('hasAllIds', () => {
     expect(hasAllIds(model)).toBe(true);
   });
 
+  describe('data item ID validation', () => {
+    it('should return false when data sink is missing an ID', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'command',
+                name: 'Test slice',
+                id: 'SLICE-001',
+                client: { specs: [] },
+                server: {
+                  description: 'Test server',
+                  specs: [],
+                  data: [
+                    {
+                      __type: 'sink',
+                      target: { type: 'Event', name: 'TestEvent' },
+                      destination: { type: 'stream', pattern: 'test-stream' },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+      expect(hasAllIds(model)).toBe(false);
+    });
+
+    it('should return false when data source is missing an ID', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'query',
+                name: 'Test slice',
+                id: 'SLICE-001',
+                client: { specs: [] },
+                server: {
+                  description: 'Test server',
+                  specs: [],
+                  data: [
+                    {
+                      __type: 'source',
+                      target: { type: 'State', name: 'TestState' },
+                      origin: { type: 'projection', name: 'TestProjection' },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+      expect(hasAllIds(model)).toBe(false);
+    });
+
+    it('should return false when nested _withState source is missing an ID', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'command',
+                name: 'Test slice',
+                id: 'SLICE-001',
+                client: { specs: [] },
+                server: {
+                  description: 'Test server',
+                  specs: [],
+                  data: [
+                    {
+                      __type: 'sink',
+                      id: 'SINK-001',
+                      target: { type: 'Command', name: 'TestCommand' },
+                      destination: { type: 'stream', pattern: 'test-stream' },
+                      _withState: {
+                        target: { type: 'State', name: 'TestState' },
+                        origin: { type: 'projection', name: 'TestProjection' },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+      expect(hasAllIds(model)).toBe(false);
+    });
+
+    it('should return true when all data items have IDs', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'command',
+                name: 'Test slice',
+                id: 'SLICE-001',
+                client: { specs: [] },
+                server: {
+                  description: 'Test server',
+                  specs: [],
+                  data: [
+                    {
+                      __type: 'sink',
+                      id: 'SINK-001',
+                      target: { type: 'Event', name: 'TestEvent' },
+                      destination: { type: 'stream', pattern: 'test-stream' },
+                    },
+                    {
+                      __type: 'source',
+                      id: 'SOURCE-001',
+                      target: { type: 'State', name: 'TestState' },
+                      origin: { type: 'projection', name: 'TestProjection' },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+      expect(hasAllIds(model)).toBe(true);
+    });
+
+    it('should return true when sink with _withState both have IDs', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'command',
+                name: 'Test slice',
+                id: 'SLICE-001',
+                client: { specs: [] },
+                server: {
+                  description: 'Test server',
+                  specs: [],
+                  data: [
+                    {
+                      __type: 'sink',
+                      id: 'SINK-001',
+                      target: { type: 'Command', name: 'TestCommand' },
+                      destination: { type: 'stream', pattern: 'test-stream' },
+                      _withState: {
+                        id: 'SOURCE-001',
+                        target: { type: 'State', name: 'TestState' },
+                        origin: { type: 'projection', name: 'TestProjection' },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+      expect(hasAllIds(model)).toBe(true);
+    });
+
+    it('should return true when slice has no data array', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'command',
+                name: 'Test slice',
+                id: 'SLICE-001',
+                client: { specs: [] },
+                server: {
+                  description: 'Test server',
+                  specs: [],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+      expect(hasAllIds(model)).toBe(true);
+    });
+  });
+
   describe('module ID validation', () => {
     it('should return true when all modules have IDs', () => {
       const model: Model = {

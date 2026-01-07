@@ -112,6 +112,7 @@ export const OriginSchema = z
 
 const DataSinkSchema = z
   .object({
+    id: z.string().optional().describe('Optional unique identifier for the data sink'),
     target: MessageTargetSchema,
     destination: DestinationSchema,
     transform: z.string().optional().describe('Optional transformation function name'),
@@ -125,6 +126,7 @@ const DataSinkSchema = z
 
 const DataSourceSchema = z
   .object({
+    id: z.string().optional().describe('Optional unique identifier for the data source'),
     target: MessageTargetSchema,
     origin: OriginSchema,
     transform: z.string().optional().describe('Optional transformation function name'),

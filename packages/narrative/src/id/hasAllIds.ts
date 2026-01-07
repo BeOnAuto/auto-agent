@@ -40,8 +40,20 @@ function hasClientSpecIds(slice: Slice): boolean {
   return hasClientSpecNodeIds(slice.client.specs);
 }
 
+function hasDataIds(slice: Slice): boolean {
+  if (!('server' in slice) || !slice.server?.data || !Array.isArray(slice.server.data)) return true;
+
+  return slice.server.data.every((item) => {
+    if (!hasValidId(item)) return false;
+    if ('destination' in item && item._withState) {
+      return hasValidId(item._withState);
+    }
+    return true;
+  });
+}
+
 function hasSliceIds(slice: Slice): boolean {
-  return hasValidId(slice) && hasServerSpecIds(slice) && hasClientSpecIds(slice);
+  return hasValidId(slice) && hasServerSpecIds(slice) && hasClientSpecIds(slice) && hasDataIds(slice);
 }
 
 function hasModuleIds(modules: Module[]): boolean {

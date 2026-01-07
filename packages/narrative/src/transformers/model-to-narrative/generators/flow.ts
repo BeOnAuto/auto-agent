@@ -84,13 +84,15 @@ function buildInitialChain(
   ts: typeof import('typescript'),
   f: tsNS.NodeFactory,
   target: DataSinkItem['target'] | DataSourceItem['target'],
+  id?: string,
 ): tsNS.Expression {
   const op = target.type === 'Event' ? 'event' : target.type === 'Command' ? 'command' : 'state';
+  const sinkOrSourceArgs: tsNS.Expression[] = id != null && id !== '' ? [f.createStringLiteral(id)] : [];
   return f.createCallExpression(
     f.createPropertyAccessExpression(
       target.type === 'State'
-        ? f.createCallExpression(f.createIdentifier('source'), undefined, [])
-        : f.createCallExpression(f.createIdentifier('sink'), undefined, []),
+        ? f.createCallExpression(f.createIdentifier('source'), undefined, sinkOrSourceArgs)
+        : f.createCallExpression(f.createIdentifier('sink'), undefined, sinkOrSourceArgs),
       ts.factory.createIdentifier(op),
     ),
     undefined,
@@ -309,7 +311,7 @@ function buildSingleDataItem(
   f: tsNS.NodeFactory,
   it: DataSinkItem | DataSourceItem,
 ): tsNS.Expression {
-  let chain = buildInitialChain(ts, f, it.target);
+  let chain = buildInitialChain(ts, f, it.target, it.id);
 
   if ('destination' in it) {
     const sinkItem = it;
@@ -333,11 +335,13 @@ function buildSingleDataItem(
     }
   } else if ('origin' in it) {
     const sourceItem = it;
+    const sourceArgs: tsNS.Expression[] =
+      sourceItem.id != null && sourceItem.id !== '' ? [f.createStringLiteral(sourceItem.id)] : [];
     chain = f.createCallExpression(
       f.createPropertyAccessExpression(
         f.createCallExpression(
           f.createPropertyAccessExpression(
-            f.createCallExpression(f.createIdentifier('source'), undefined, []),
+            f.createCallExpression(f.createIdentifier('source'), undefined, sourceArgs),
             f.createIdentifier('state'),
           ),
           undefined,
@@ -348,6 +352,14 @@ function buildSingleDataItem(
       undefined,
       buildOriginArgs(ts, f, sourceItem.origin),
     );
+
+    if (sourceItem._additionalInstructions != null && sourceItem._additionalInstructions !== '') {
+      chain = f.createCallExpression(
+        f.createPropertyAccessExpression(chain, f.createIdentifier('additionalInstructions')),
+        undefined,
+        [f.createStringLiteral(sourceItem._additionalInstructions)],
+      );
+    }
   }
 
   return chain;

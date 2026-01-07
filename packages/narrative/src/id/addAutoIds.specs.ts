@@ -669,6 +669,274 @@ describe('addAutoIds', () => {
     }
   });
 
+  describe('data item ID generation', () => {
+    const AUTO_ID_REGEX = /^[A-Za-z0-9_]{9}$/;
+
+    it('should assign ID to data sink without ID', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'command',
+                name: 'Test Command',
+                id: 'SLICE-001',
+                client: { specs: [] },
+                server: {
+                  description: 'Test server',
+                  specs: [],
+                  data: [
+                    {
+                      target: { type: 'Event', name: 'TestEvent' },
+                      destination: { type: 'stream', pattern: 'test-stream' },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+
+      const result = addAutoIds(model);
+      const slice = result.narratives[0].slices[0];
+
+      if ('server' in slice && slice.server?.data) {
+        expect(slice.server.data[0].id).toMatch(AUTO_ID_REGEX);
+      }
+    });
+
+    it('should assign ID to data source without ID', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'query',
+                name: 'Test Query',
+                id: 'SLICE-001',
+                client: { specs: [] },
+                server: {
+                  description: 'Test server',
+                  specs: [],
+                  data: [
+                    {
+                      target: { type: 'State', name: 'TestState' },
+                      origin: { type: 'projection', name: 'TestProjection' },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+
+      const result = addAutoIds(model);
+      const slice = result.narratives[0].slices[0];
+
+      if ('server' in slice && slice.server?.data) {
+        expect(slice.server.data[0].id).toMatch(AUTO_ID_REGEX);
+      }
+    });
+
+    it('should assign ID to nested _withState source without ID', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'command',
+                name: 'Test Command',
+                id: 'SLICE-001',
+                client: { specs: [] },
+                server: {
+                  description: 'Test server',
+                  specs: [],
+                  data: [
+                    {
+                      id: 'SINK-001',
+                      target: { type: 'Command', name: 'TestCommand' },
+                      destination: { type: 'stream', pattern: 'test-stream' },
+                      _withState: {
+                        target: { type: 'State', name: 'TestState' },
+                        origin: { type: 'projection', name: 'TestProjection' },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+
+      const result = addAutoIds(model);
+      const slice = result.narratives[0].slices[0];
+
+      if ('server' in slice && slice.server?.data) {
+        const sink = slice.server.data[0];
+        expect(sink.id).toBe('SINK-001');
+        if ('destination' in sink && sink._withState) {
+          expect(sink._withState.id).toMatch(AUTO_ID_REGEX);
+        }
+      }
+    });
+
+    it('should preserve existing data item IDs', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'react',
+                name: 'Test React',
+                id: 'SLICE-001',
+                server: {
+                  specs: [],
+                  data: [
+                    {
+                      id: 'EXISTING-SINK-001',
+                      target: { type: 'Event', name: 'TestEvent' },
+                      destination: { type: 'stream', pattern: 'test-stream' },
+                    },
+                    {
+                      id: 'EXISTING-SOURCE-001',
+                      target: { type: 'State', name: 'TestState' },
+                      origin: { type: 'projection', name: 'TestProjection' },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+
+      const result = addAutoIds(model);
+      const slice = result.narratives[0].slices[0];
+
+      if ('server' in slice && slice.server?.data) {
+        expect(slice.server.data[0].id).toBe('EXISTING-SINK-001');
+        expect(slice.server.data[1].id).toBe('EXISTING-SOURCE-001');
+      }
+    });
+
+    it('should not mutate original data items', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'command',
+                name: 'Test Command',
+                id: 'SLICE-001',
+                client: { specs: [] },
+                server: {
+                  description: 'Test server',
+                  specs: [],
+                  data: [
+                    {
+                      target: { type: 'Event', name: 'TestEvent' },
+                      destination: { type: 'stream', pattern: 'test-stream' },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+
+      const originalSlice = model.narratives[0].slices[0];
+      addAutoIds(model);
+
+      if ('server' in originalSlice && originalSlice.server?.data) {
+        expect(originalSlice.server.data[0].id).toBeUndefined();
+      }
+    });
+
+    it('should generate unique IDs for multiple data items', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'react',
+                name: 'Test React',
+                id: 'SLICE-001',
+                server: {
+                  specs: [],
+                  data: [
+                    {
+                      target: { type: 'Event', name: 'Event1' },
+                      destination: { type: 'stream', pattern: 'stream1' },
+                    },
+                    {
+                      target: { type: 'Event', name: 'Event2' },
+                      destination: { type: 'stream', pattern: 'stream2' },
+                    },
+                    {
+                      target: { type: 'State', name: 'State1' },
+                      origin: { type: 'projection', name: 'Proj1' },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+
+      const result = addAutoIds(model);
+      const slice = result.narratives[0].slices[0];
+
+      if ('server' in slice && slice.server?.data) {
+        const ids = slice.server.data.map((d) => d.id);
+        expect(ids[0]).toMatch(AUTO_ID_REGEX);
+        expect(ids[1]).toMatch(AUTO_ID_REGEX);
+        expect(ids[2]).toMatch(AUTO_ID_REGEX);
+        expect(new Set(ids).size).toBe(3);
+      }
+    });
+  });
+
   describe('module ID generation', () => {
     const AUTO_ID_REGEX = /^[A-Za-z0-9_]{9}$/;
 

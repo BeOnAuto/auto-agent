@@ -55,6 +55,7 @@ export interface FieldSelector {
 abstract class MessageTargetBuilder<TResult> {
   protected target: Partial<MessageTarget> = {};
   protected instructions?: string;
+  protected itemId?: string;
 
   fields(selector: FieldSelector): this {
     this.target.fields = selector as Record<string, unknown>;
@@ -71,13 +72,15 @@ abstract class MessageTargetBuilder<TResult> {
 
 // Event sink builder
 export class EventSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
-  constructor(name: string) {
+  constructor(name: string, id?: string) {
     super();
     this.target = { type: 'Event', name };
+    this.itemId = id;
   }
 
   toStream(pattern: string): ChainableSink {
     const sinkItem: DataSinkItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       destination: { type: 'stream', pattern },
       __type: 'sink' as const,
@@ -88,6 +91,7 @@ export class EventSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
 
   toIntegration(...systems: Integration[]): ChainableSink {
     const sinkItem: DataSinkItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       destination: {
         type: 'integration',
@@ -101,6 +105,7 @@ export class EventSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
 
   toDatabase(collection: string): ChainableSink {
     const sinkItem: DataSinkItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       destination: { type: 'database', collection },
       __type: 'sink' as const,
@@ -111,6 +116,7 @@ export class EventSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
 
   toTopic(name: string): ChainableSink {
     const sinkItem: DataSinkItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       destination: { type: 'topic', name },
       __type: 'sink' as const,
@@ -128,9 +134,10 @@ export class EventSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
 export class CommandSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
   private stateSource?: DataSourceItem;
 
-  constructor(name: string) {
+  constructor(name: string, id?: string) {
     super();
     this.target = { type: 'Command', name };
+    this.itemId = id;
   }
 
   withState(source: DataSourceItem | ChainableSource): this {
@@ -144,6 +151,7 @@ export class CommandSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
     messageType: 'command' | 'query' | 'reaction',
   ): ChainableSink {
     const sinkItem: DataSinkItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       destination: {
         type: 'integration',
@@ -167,6 +175,7 @@ export class CommandSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
 
   hints(hint: string): ChainableSink {
     const sinkItem: DataSinkItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       destination: { type: 'integration', systems: [] },
       transform: hint,
@@ -179,6 +188,7 @@ export class CommandSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
 
   toDatabase(collection: string): ChainableSink {
     const sinkItem: DataSinkItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       destination: { type: 'database', collection },
       __type: 'sink' as const,
@@ -190,6 +200,7 @@ export class CommandSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
 
   toTopic(name: string): ChainableSink {
     const sinkItem: DataSinkItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       destination: { type: 'topic', name },
       __type: 'sink' as const,
@@ -206,13 +217,15 @@ export class CommandSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
 
 // State sink builder
 export class StateSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
-  constructor(name: string) {
+  constructor(name: string, id?: string) {
     super();
     this.target = { type: 'State', name };
+    this.itemId = id;
   }
 
   toDatabase(collection: string): ChainableSink {
     const sinkItem: DataSinkItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       destination: { type: 'database', collection },
       __type: 'sink' as const,
@@ -223,6 +236,7 @@ export class StateSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
 
   toStream(pattern: string): ChainableSink {
     const sinkItem: DataSinkItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       destination: { type: 'stream', pattern },
       __type: 'sink' as const,
@@ -238,13 +252,15 @@ export class StateSinkBuilder extends MessageTargetBuilder<DataSinkItem> {
 
 // State source builder
 export class StateSourceBuilder<S = unknown> extends MessageTargetBuilder<DataSourceItem> {
-  constructor(name: string) {
+  constructor(name: string, id?: string) {
     super();
     this.target = { type: 'State', name };
+    this.itemId = id;
   }
 
   fromSingletonProjection(name: string): ChainableSource {
     const sourceItem: DataSourceItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       origin: { type: 'projection', name, singleton: true },
       __type: 'source' as const,
@@ -259,6 +275,7 @@ export class StateSourceBuilder<S = unknown> extends MessageTargetBuilder<DataSo
       : string,
   >(name: string, idField: K): ChainableSource {
     const sourceItem: DataSourceItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       origin: { type: 'projection', name, idField: idField as string },
       __type: 'source' as const,
@@ -273,6 +290,7 @@ export class StateSourceBuilder<S = unknown> extends MessageTargetBuilder<DataSo
       : string,
   >(name: string, idFields: K[]): ChainableSource {
     const sourceItem: DataSourceItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       origin: { type: 'projection', name, idField: idFields as string[] },
       __type: 'source' as const,
@@ -283,6 +301,7 @@ export class StateSourceBuilder<S = unknown> extends MessageTargetBuilder<DataSo
 
   fromReadModel(name: string): ChainableSource {
     const sourceItem: DataSourceItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       origin: { type: 'readModel', name },
       __type: 'source' as const,
@@ -293,6 +312,7 @@ export class StateSourceBuilder<S = unknown> extends MessageTargetBuilder<DataSo
 
   fromDatabase(collection: string, query?: Record<string, unknown>): ChainableSource {
     const sourceItem: DataSourceItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       origin: { type: 'database', collection, query },
       __type: 'source' as const,
@@ -303,6 +323,7 @@ export class StateSourceBuilder<S = unknown> extends MessageTargetBuilder<DataSo
 
   fromApi(endpoint: string, method?: string): ChainableSource {
     const sourceItem: DataSourceItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       origin: { type: 'api', endpoint, method },
       __type: 'source' as const,
@@ -313,6 +334,7 @@ export class StateSourceBuilder<S = unknown> extends MessageTargetBuilder<DataSo
 
   fromIntegration(...systems: (Integration | string)[]): ChainableSource {
     const sourceItem: DataSourceItem = {
+      ...(this.itemId != null && this.itemId !== '' && { id: this.itemId }),
       target: this.target as MessageTarget,
       origin: createIntegrationOrigin(
         systems.map((s) => (typeof s === 'string' ? s : integrationExportRegistry.getExportNameForIntegration(s))),
@@ -348,14 +370,20 @@ function isValidBuilderResult(obj: unknown): obj is BuilderResult {
 }
 
 export class DataSinkBuilder {
+  private readonly builderId?: string;
+
+  constructor(id?: string) {
+    this.builderId = id;
+  }
+
   event(nameOrBuilder: string | BuilderResult): EventSinkBuilder {
     if (typeof nameOrBuilder === 'string') {
-      return new EventSinkBuilder(nameOrBuilder);
+      return new EventSinkBuilder(nameOrBuilder, this.builderId);
     }
 
     // Handle event builder function
     if (isValidBuilderResult(nameOrBuilder) && nameOrBuilder.__messageCategory === 'event') {
-      return new EventSinkBuilder(nameOrBuilder.type);
+      return new EventSinkBuilder(nameOrBuilder.type, this.builderId);
     }
 
     throw new Error('Invalid event parameter - must be a string or event builder function');
@@ -363,12 +391,12 @@ export class DataSinkBuilder {
 
   command(nameOrBuilder: string | BuilderResult): CommandSinkBuilder {
     if (typeof nameOrBuilder === 'string') {
-      return new CommandSinkBuilder(nameOrBuilder);
+      return new CommandSinkBuilder(nameOrBuilder, this.builderId);
     }
 
     // Handle command builder function
     if (isValidBuilderResult(nameOrBuilder) && nameOrBuilder.__messageCategory === 'command') {
-      return new CommandSinkBuilder(nameOrBuilder.type);
+      return new CommandSinkBuilder(nameOrBuilder.type, this.builderId);
     }
 
     throw new Error('Invalid command parameter - must be a string or command builder function');
@@ -376,12 +404,12 @@ export class DataSinkBuilder {
 
   state(nameOrBuilder: string | BuilderResult): StateSinkBuilder {
     if (typeof nameOrBuilder === 'string') {
-      return new StateSinkBuilder(nameOrBuilder);
+      return new StateSinkBuilder(nameOrBuilder, this.builderId);
     }
 
     // Handle state builder function
     if (isValidBuilderResult(nameOrBuilder) && nameOrBuilder.__messageCategory === 'state') {
-      return new StateSinkBuilder(nameOrBuilder.type);
+      return new StateSinkBuilder(nameOrBuilder.type, this.builderId);
     }
 
     throw new Error('Invalid state parameter - must be a string or state builder function');
@@ -389,16 +417,22 @@ export class DataSinkBuilder {
 }
 
 export class DataSourceBuilder {
+  private readonly builderId?: string;
+
+  constructor(id?: string) {
+    this.builderId = id;
+  }
+
   state<S extends import('./types').State<string, DefaultRecord> = import('./types').State<string, DefaultRecord>>(
     nameOrBuilder: string | BuilderResult,
   ): StateSourceBuilder<S> {
     if (typeof nameOrBuilder === 'string') {
-      return new StateSourceBuilder<S>(nameOrBuilder);
+      return new StateSourceBuilder<S>(nameOrBuilder, this.builderId);
     }
 
     // Handle state builder function
     if (isValidBuilderResult(nameOrBuilder) && nameOrBuilder.__messageCategory === 'state') {
-      return new StateSourceBuilder<S>(nameOrBuilder.type);
+      return new StateSourceBuilder<S>(nameOrBuilder.type, this.builderId);
     }
 
     throw new Error('Invalid state parameter - must be a string or state builder function');
@@ -406,11 +440,14 @@ export class DataSourceBuilder {
 }
 
 // Factory functions for cleaner API
-export const sink = () => new DataSinkBuilder();
-export const source = () => new DataSourceBuilder();
+export const sink = (id?: string) => new DataSinkBuilder(id);
+export const source = (id?: string) => new DataSourceBuilder(id);
 
 // Type-safe sink function that accepts builder results
-export function typedSink(builderResult: BuilderResult): EventSinkBuilder | CommandSinkBuilder | StateSinkBuilder {
+export function typedSink(
+  builderResult: BuilderResult,
+  id?: string,
+): EventSinkBuilder | CommandSinkBuilder | StateSinkBuilder {
   if (!isValidBuilderResult(builderResult)) {
     throw new Error('Invalid builder result - must be from Events, Commands, or State builders');
   }
@@ -419,11 +456,11 @@ export function typedSink(builderResult: BuilderResult): EventSinkBuilder | Comm
 
   switch (__messageCategory) {
     case 'event':
-      return new EventSinkBuilder(messageName);
+      return new EventSinkBuilder(messageName, id);
     case 'command':
-      return new CommandSinkBuilder(messageName);
+      return new CommandSinkBuilder(messageName, id);
     case 'state':
-      return new StateSinkBuilder(messageName);
+      return new StateSinkBuilder(messageName, id);
     default: {
       const category: never = __messageCategory;
       throw new Error(`Unknown message category: ${String(category)}`);
@@ -434,7 +471,7 @@ export function typedSink(builderResult: BuilderResult): EventSinkBuilder | Comm
 // Type-safe source function that accepts builder results
 export function typedSource<
   S extends import('./types').State<string, DefaultRecord> = import('./types').State<string, DefaultRecord>,
->(builderResult: BuilderResult): StateSourceBuilder<S> {
+>(builderResult: BuilderResult, id?: string): StateSourceBuilder<S> {
   if (!isValidBuilderResult(builderResult)) {
     throw new Error('Invalid builder result - must be from State builders');
   }
@@ -443,5 +480,5 @@ export function typedSource<
     throw new Error('Source can only be created from State builders');
   }
 
-  return new StateSourceBuilder<S>(builderResult.type);
+  return new StateSourceBuilder<S>(builderResult.type, id);
 }

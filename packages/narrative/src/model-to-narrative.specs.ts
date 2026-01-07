@@ -2938,4 +2938,180 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
       }
     });
   });
+
+  describe('data item IDs', () => {
+    it('should generate sink id when provided', async () => {
+      const modelWithSinkId: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Order Flow',
+            id: 'ORDER-FLOW',
+            slices: [
+              {
+                name: 'places order',
+                id: 'ORDER-SLICE',
+                type: 'command',
+                client: { specs: [] },
+                server: {
+                  description: 'Order server',
+                  data: [
+                    {
+                      id: 'SINK-001',
+                      target: { type: 'Event', name: 'OrderPlaced' },
+                      destination: { type: 'stream', pattern: 'orders-stream' },
+                    },
+                  ],
+                  specs: [],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [
+          {
+            type: 'event',
+            source: 'internal',
+            name: 'OrderPlaced',
+            fields: [{ name: 'orderId', type: 'string', required: true }],
+          },
+        ],
+        integrations: [],
+        modules: [],
+      };
+
+      const code = getCode(await modelToNarrative(modelWithSinkId));
+      expect(code).toContain("sink('SINK-001').event('OrderPlaced').toStream('orders-stream')");
+    });
+
+    it('should generate source id when provided', async () => {
+      const modelWithSourceId: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Order Flow',
+            id: 'ORDER-FLOW',
+            slices: [
+              {
+                name: 'views order',
+                id: 'ORDER-SLICE',
+                type: 'query',
+                client: { specs: [] },
+                server: {
+                  description: 'Order server',
+                  data: [
+                    {
+                      id: 'SOURCE-001',
+                      target: { type: 'State', name: 'OrderState' },
+                      origin: { type: 'projection', name: 'Orders', idField: 'orderId' },
+                    },
+                  ],
+                  specs: [],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [
+          {
+            type: 'state',
+            name: 'OrderState',
+            fields: [{ name: 'orderId', type: 'string', required: true }],
+          },
+        ],
+        integrations: [],
+        modules: [],
+      };
+
+      const code = getCode(await modelToNarrative(modelWithSourceId));
+      expect(code).toContain("source('SOURCE-001').state('OrderState').fromProjection('Orders', 'orderId')");
+    });
+
+    it('should not generate id when not provided', async () => {
+      const modelWithoutId: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Order Flow',
+            id: 'ORDER-FLOW',
+            slices: [
+              {
+                name: 'places order',
+                id: 'ORDER-SLICE',
+                type: 'command',
+                client: { specs: [] },
+                server: {
+                  description: 'Order server',
+                  data: [
+                    {
+                      target: { type: 'Event', name: 'OrderPlaced' },
+                      destination: { type: 'stream', pattern: 'orders-stream' },
+                    },
+                  ],
+                  specs: [],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [
+          {
+            type: 'event',
+            source: 'internal',
+            name: 'OrderPlaced',
+            fields: [{ name: 'orderId', type: 'string', required: true }],
+          },
+        ],
+        integrations: [],
+        modules: [],
+      };
+
+      const code = getCode(await modelToNarrative(modelWithoutId));
+      expect(code).toContain("sink().event('OrderPlaced').toStream('orders-stream')");
+      expect(code).not.toContain("sink('')");
+    });
+
+    it('should generate _additionalInstructions on source items', async () => {
+      const modelWithSourceInstructions: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Order Flow',
+            id: 'ORDER-FLOW',
+            slices: [
+              {
+                name: 'views order',
+                id: 'ORDER-SLICE',
+                type: 'query',
+                client: { specs: [] },
+                server: {
+                  description: 'Order server',
+                  data: [
+                    {
+                      target: { type: 'State', name: 'OrderState' },
+                      origin: { type: 'projection', name: 'Orders', idField: 'orderId' },
+                      _additionalInstructions: 'Filter by active orders only',
+                    },
+                  ],
+                  specs: [],
+                },
+              },
+            ],
+          },
+        ],
+        messages: [
+          {
+            type: 'state',
+            name: 'OrderState',
+            fields: [{ name: 'orderId', type: 'string', required: true }],
+          },
+        ],
+        integrations: [],
+        modules: [],
+      };
+
+      const code = getCode(await modelToNarrative(modelWithSourceInstructions));
+      expect(code).toContain(".additionalInstructions('Filter by active orders only')");
+    });
+  });
 });

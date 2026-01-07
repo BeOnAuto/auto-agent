@@ -77,11 +77,30 @@ function processClientSpecs(slice: Slice): Slice {
   return modifiedSlice;
 }
 
+function processDataItems(slice: Slice): Slice {
+  if (!('server' in slice) || !slice.server?.data || !Array.isArray(slice.server.data)) return slice;
+
+  const modifiedSlice = structuredClone(slice);
+  if ('server' in modifiedSlice && modifiedSlice.server?.data && Array.isArray(modifiedSlice.server.data)) {
+    modifiedSlice.server.data = modifiedSlice.server.data.map((item) => {
+      const itemCopy = { ...item };
+      ensureId(itemCopy);
+      if ('destination' in itemCopy && itemCopy._withState) {
+        itemCopy._withState = { ...itemCopy._withState };
+        ensureId(itemCopy._withState);
+      }
+      return itemCopy;
+    });
+  }
+  return modifiedSlice;
+}
+
 function processSlice(slice: Slice): Slice {
   let sliceCopy = { ...slice };
   ensureId(sliceCopy);
   sliceCopy = processServerSpecs(sliceCopy);
   sliceCopy = processClientSpecs(sliceCopy);
+  sliceCopy = processDataItems(sliceCopy);
   return sliceCopy;
 }
 

@@ -1712,4 +1712,73 @@ flow('All Projection Patterns', () => {
       });
     }
   });
+
+  it('should capture optional id on data sink and source items', async () => {
+    const memoryVfs = new InMemoryFileStore();
+
+    const flowContent = `
+import { flow, command, query, specs, rule, example, data, sink, source, type Event, type State } from '@auto-engineer/narrative';
+
+type OrderPlaced = Event<'OrderPlaced', { orderId: string; amount: number }>;
+type OrderState = State<'OrderState', { orderId: string; status: string }>;
+
+flow('Data Item IDs', () => {
+  command('places order')
+    .server(() => {
+      specs(() => {
+        rule('order is placed', () => {
+          example('places order')
+            .when({})
+            .then<OrderPlaced>({ orderId: 'ord-001', amount: 100 });
+        });
+      });
+      data([
+        sink('SINK-001').event('OrderPlaced').toStream('orders-stream'),
+      ]);
+    });
+
+  query('views order status')
+    .server(() => {
+      specs(() => {
+        rule('shows order status', () => {
+          example('order status')
+            .given<OrderPlaced>({ orderId: 'ord-001', amount: 100 })
+            .when({})
+            .then<OrderState>({ orderId: 'ord-001', status: 'pending' });
+        });
+      });
+      data([
+        source('SOURCE-001').state<OrderState>('OrderState').fromProjection('Orders', 'orderId'),
+      ]);
+    });
+});
+    `;
+
+    await memoryVfs.write('/test/data-ids.narrative.ts', new TextEncoder().encode(flowContent));
+
+    const flows = await getNarratives({ vfs: memoryVfs, root: '/test', pattern, fastFsScan: true });
+    const model = flows.toModel();
+
+    const parseResult = modelSchema.safeParse(model);
+    expect(parseResult.success).toBe(true);
+
+    const dataIdsFlow = model.narratives.find((f) => f.name === 'Data Item IDs');
+    expect(dataIdsFlow).toBeDefined();
+
+    if (!dataIdsFlow) return;
+
+    const commandSlice = dataIdsFlow.slices.find((s) => s.name === 'places order');
+    if (commandSlice?.type === 'command') {
+      const sinkData = commandSlice.server.data;
+      expect(sinkData).toHaveLength(1);
+      expect(sinkData?.[0].id).toBe('SINK-001');
+    }
+
+    const querySlice = dataIdsFlow.slices.find((s) => s.name === 'views order status');
+    if (querySlice?.type === 'query') {
+      const sourceData = querySlice.server.data as DataSource[] | undefined;
+      expect(sourceData).toHaveLength(1);
+      expect(sourceData?.[0].id).toBe('SOURCE-001');
+    }
+  });
 });

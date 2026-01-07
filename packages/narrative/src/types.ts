@@ -130,6 +130,7 @@ export const createApiOrigin = (endpoint: string, method?: string): ApiOrigin =>
 export const createIntegrationOrigin = (systems: string[]): IntegrationOrigin => ({ type: 'integration', systems });
 
 export interface DataSink {
+  id?: string;
   target: MessageTarget;
   destination: Destination;
   transform?: string;
@@ -138,6 +139,7 @@ export interface DataSink {
 }
 
 export interface DataSource {
+  id?: string;
   target: MessageTarget;
   origin: Origin;
   transform?: string;
