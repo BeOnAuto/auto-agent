@@ -1,5 +1,5 @@
 import * as fs from 'node:fs';
-import { createServer, type Server as HttpServer } from 'node:http';
+import type { Server as HttpServer } from 'node:http';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { CommandHandlerWithMetadata, Pipeline } from '@auto-engineer/pipeline';
@@ -33,7 +33,6 @@ export interface ServerHandle {
   fileSyncer: FileSyncer;
   httpServer: HttpServer;
   actualPort: number;
-  syncPort: number;
   stop: () => Promise<void>;
 }
 
@@ -188,30 +187,9 @@ async function loadCommandHandlers(plugins: string[]): Promise<CommandHandlerWit
   return handlers;
 }
 
-async function startFileSyncServer(
-  syncPort: number,
-  watchDir: string,
-  socketMiddleware?: SocketMiddleware,
-): Promise<{ fileSyncer: FileSyncer; httpServer: HttpServer }> {
-  const httpServer = createServer();
-  const io = new SocketIOServer(httpServer, {
-    cors: { origin: '*' },
-  });
-
-  const fileSyncer = new FileSyncer(io, watchDir, undefined, { socketMiddleware });
-  fileSyncer.start();
-
-  return new Promise((resolve) => {
-    httpServer.listen(syncPort, () => {
-      resolve({ fileSyncer, httpServer });
-    });
-  });
-}
-
 export async function startServer(opts: StartServerOptions): Promise<ServerHandle> {
   const port = opts.port;
   const actualPort = await getPort({ port: port === 0 ? undefined : portNumbers(port, port + 100) });
-  const syncPort = await getPort({ port: portNumbers(actualPort + 1, actualPort + 100) });
 
   const configPath = opts.configPath ?? findConfigFile();
   if (!configPath) {
@@ -236,13 +214,20 @@ export async function startServer(opts: StartServerOptions): Promise<ServerHandl
   pipelineServer.registerPipeline(config.pipeline);
 
   const watchDir = path.dirname(configPath);
-  const { fileSyncer, httpServer } = await startFileSyncServer(syncPort, watchDir, opts.socketMiddleware);
+
+  const httpServer = pipelineServer.getHttpServer();
+  const io = new SocketIOServer(httpServer, {
+    cors: { origin: '*' },
+    path: '/file-sync',
+  });
+
+  const fileSyncer = new FileSyncer(io, watchDir, undefined, { socketMiddleware: opts.socketMiddleware });
+  fileSyncer.start();
 
   await pipelineServer.start();
 
   const stop = async (): Promise<void> => {
     fileSyncer.stop();
-    httpServer.close();
     await pipelineServer.stop();
   };
 
@@ -250,7 +235,6 @@ export async function startServer(opts: StartServerOptions): Promise<ServerHandl
     fileSyncer,
     httpServer,
     actualPort,
-    syncPort,
     stop,
   };
 }

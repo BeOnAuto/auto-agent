@@ -68,7 +68,7 @@ async function startServer(opts: { port: string; debug?: boolean; config?: strin
     console.log(`  ${chalk.gray('Pipeline:')} http://localhost:${handle.actualPort}/pipeline`);
     console.log(`  ${chalk.gray('Diagram:')}  http://localhost:${handle.actualPort}/pipeline/diagram`);
     console.log(`  ${chalk.gray('Events:')}   http://localhost:${handle.actualPort}/events (SSE)`);
-    console.log(`  ${chalk.gray('FileSync:')} ws://localhost:${handle.syncPort} (Socket.IO)`);
+    console.log(`  ${chalk.gray('FileSync:')} ws://localhost:${handle.actualPort}/file-sync (Socket.IO)`);
     console.log(chalk.gray('\nPress Ctrl+C to stop'));
   } catch (error) {
     spinner.fail('Failed to start server');

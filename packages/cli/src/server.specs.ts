@@ -16,7 +16,7 @@ describe('startServer', () => {
     }
   });
 
-  it('returns a ServerHandle with ports and stop function', async () => {
+  it('returns a ServerHandle with single port for both HTTP and WebSocket', async () => {
     const configPath = path.join(fixturesDir, 'auto.config.ts');
 
     handle = await startServer({
@@ -25,10 +25,8 @@ describe('startServer', () => {
     });
 
     expect(handle.actualPort).toBeGreaterThan(0);
-    expect(handle.syncPort).toBeGreaterThan(0);
-    expect(handle.syncPort).not.toBe(handle.actualPort);
-    expect(typeof handle.stop).toBe('function');
-    expect(handle.fileSyncer).toBeDefined();
-    expect(handle.httpServer).toBeDefined();
+    expect(handle.stop).toBeTypeOf('function');
+    expect(handle.fileSyncer.stop).toBeTypeOf('function');
+    expect(handle.httpServer.close).toBeTypeOf('function');
   });
 });
