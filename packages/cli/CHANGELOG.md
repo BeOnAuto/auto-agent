@@ -1,5 +1,18 @@
 # @auto-engineer/cli
 
+## 0.21.0
+
+### Minor Changes
+
+- Unifies ports on cli
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.21.0
+  - @auto-engineer/narrative@0.21.0
+  - @auto-engineer/pipeline@0.21.0
+
 ## 0.20.0
 
 ### Minor Changes

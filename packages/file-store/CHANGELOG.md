@@ -1,5 +1,11 @@
 # @auto-engineer/file-store
 
+## 0.21.0
+
+### Minor Changes
+
+- Unifies ports on cli
+
 ## 0.20.0
 
 ## 0.19.0

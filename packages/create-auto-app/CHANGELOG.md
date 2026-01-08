@@ -1,5 +1,16 @@
 # create-auto-app
 
+## 0.21.0
+
+### Minor Changes
+
+- Unifies ports on cli
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/id@0.21.0
+
 ## 0.20.0
 
 ### Patch Changes

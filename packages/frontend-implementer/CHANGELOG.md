@@ -1,5 +1,17 @@
 # @auto-engineer/frontend-implementer
 
+## 0.21.0
+
+### Minor Changes
+
+- Unifies ports on cli
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.21.0
+  - @auto-engineer/ai-gateway@0.21.0
+
 ## 0.20.0
 
 ### Patch Changes

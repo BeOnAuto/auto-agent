@@ -1,5 +1,17 @@
 # @auto-engineer/server-generator-apollo-emmett
 
+## 0.21.0
+
+### Minor Changes
+
+- Unifies ports on cli
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/message-bus@0.21.0
+  - @auto-engineer/narrative@0.21.0
+
 ## 0.20.0
 
 ### Patch Changes
