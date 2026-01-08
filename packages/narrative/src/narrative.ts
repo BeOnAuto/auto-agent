@@ -18,7 +18,7 @@ import {
   startServerBlock,
 } from './narrative-context';
 import { registry } from './narrative-registry';
-import type { DataItem } from './types';
+import type { Data, DataItem } from './types';
 
 const debug = createDebug('auto:narrative:narrative');
 if ('color' in debug && typeof debug === 'object') {
@@ -214,20 +214,24 @@ export interface SliceTypeValueInterface {
   readonly value: 'command' | 'query' | 'react';
 }
 
-export function data(items: DataItem[]): void {
+export function data(config: Data | DataItem[]): void {
   const slice = getCurrentSlice();
   if (!slice) throw new Error('No active slice for data configuration');
+
+  // Normalize to Data structure - cast needed since DataItem includes __type discriminator
+  // which gets stripped by setSliceData
+  const dataConfig: Data = Array.isArray(config) ? { items: config as unknown as Data['items'] } : config;
 
   const sliceType = slice.type;
 
   if (sliceType === SliceType.QUERY) {
-    const hasSink = items.some((item) => '__type' in item && item.__type === 'sink');
+    const hasSink = dataConfig.items.some((item) => '__type' in item && item.__type === 'sink');
     if (hasSink) {
       throw new Error('Query slices cannot have data sinks, only sources');
     }
   }
 
-  setSliceData(items);
+  setSliceData(dataConfig);
 }
 
 export { narrative as flow };

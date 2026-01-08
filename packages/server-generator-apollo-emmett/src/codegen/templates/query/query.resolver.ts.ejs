@@ -1,6 +1,6 @@
 <%
-const target = slice?.server?.data?.[0]?.target;
-const projection = slice?.server?.data?.[0]?.origin;
+const target = slice?.server?.data?.items?.[0]?.target;
+const projection = slice?.server?.data?.items?.[0]?.origin;
 const isSingleton = projection?.singleton === true;
 const queryName = parsedRequest?.queryName ?? camelCase(sliceName);
 const viewType = target?.name ? pascalCase(target.name) : 'UnknownView';

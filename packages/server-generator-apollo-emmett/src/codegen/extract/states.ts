@@ -16,13 +16,14 @@ function createStateMessage(stateName: string, allMessages: MessageDefinition[])
   };
 }
 
-function hasServerData(slice: Slice): slice is Slice & { server: { data: unknown[] } } {
+function hasServerData(slice: Slice): slice is Slice & { server: { data: { items: unknown[] } } } {
   return (
     'server' in slice &&
     Boolean(slice.server) &&
     'data' in slice.server &&
-    Array.isArray(slice.server.data) &&
-    slice.server.data.length > 0
+    slice.server.data?.items != null &&
+    Array.isArray(slice.server.data.items) &&
+    slice.server.data.items.length > 0
   );
 }
 
@@ -31,7 +32,7 @@ export function extractStatesFromTarget(slice: Slice, allMessages: MessageDefini
     return [];
   }
 
-  const targets = slice.server.data
+  const targets = slice.server.data.items
     .map((d) => (d as DataItem).target?.name)
     .filter((name): name is string => typeof name === 'string');
   const uniqueTargets = Array.from(new Set(targets));
@@ -47,7 +48,7 @@ export function extractStatesFromData(slice: Slice, allMessages: MessageDefiniti
   const states: Message[] = [];
   const seenStates = new Set<string>();
 
-  for (const dataItem of slice.server.data) {
+  for (const dataItem of slice.server.data.items) {
     const item = dataItem as DataItem;
     if (!('origin' in item) || typeof item.target?.name !== 'string') {
       continue;

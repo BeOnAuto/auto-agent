@@ -59,18 +59,20 @@ describe('generateScaffoldFilePlans', () => {
                     ],
                   },
                 ],
-                data: [
-                  {
-                    target: {
-                      type: 'Event',
-                      name: 'ListingCreated',
+                data: {
+                  items: [
+                    {
+                      target: {
+                        type: 'Event',
+                        name: 'ListingCreated',
+                      },
+                      destination: {
+                        type: 'stream',
+                        pattern: 'listings-${propertyId}',
+                      },
                     },
-                    destination: {
-                      type: 'stream',
-                      pattern: 'listings-${propertyId}',
-                    },
-                  },
-                ],
+                  ],
+                },
               },
             },
           ],

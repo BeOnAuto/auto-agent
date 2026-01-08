@@ -1,5 +1,5 @@
 <%
-const integrationData = (slice.server?.data ?? []).filter(d => d.destination?.type === 'integration');
+const integrationData = (slice.server?.data?.items ?? []).filter(d => d.destination?.type === 'integration');
 
 const integrationImports = new Map();
 const integrationSideEffectImports = new Set();
@@ -23,7 +23,7 @@ for (const d of integrationData) {
     }
 }
 
-const additionalInstructions = (slice.server?.data ?? [])
+const additionalInstructions = (slice.server?.data?.items ?? [])
         .map(d => d._additionalInstructions)
         .filter(Boolean);
 

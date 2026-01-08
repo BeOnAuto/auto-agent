@@ -18,19 +18,21 @@ describe('state.ts.ejs', () => {
               },
               server: {
                 description: 'Projects available items',
-                data: [
-                  {
-                    origin: {
-                      type: 'projection',
-                      name: 'ItemCreated',
-                      idField: 'id',
+                data: {
+                  items: [
+                    {
+                      origin: {
+                        type: 'projection',
+                        name: 'ItemCreated',
+                        idField: 'id',
+                      },
+                      target: {
+                        type: 'State',
+                        name: 'AvailableItems',
+                      },
                     },
-                    target: {
-                      type: 'State',
-                      name: 'AvailableItems',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [],
               },
             },

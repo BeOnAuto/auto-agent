@@ -58,18 +58,20 @@ describe('generateScaffoldFilePlans', () => {
                     ],
                   },
                 ],
-                data: [
-                  {
-                    target: {
-                      type: 'Event',
-                      name: 'ListingCreated',
+                data: {
+                  items: [
+                    {
+                      target: {
+                        type: 'Event',
+                        name: 'ListingCreated',
+                      },
+                      destination: {
+                        type: 'stream',
+                        pattern: 'listings-${propertyId}',
+                      },
                     },
-                    destination: {
-                      type: 'stream',
-                      pattern: 'listings-${propertyId}',
-                    },
-                  },
-                ],
+                  ],
+                },
               },
             },
           ],
@@ -149,43 +151,45 @@ describe('generateScaffoldFilePlans', () => {
               },
               server: {
                 description: '',
-                data: [
-                  {
-                    target: {
-                      type: 'Command',
-                      name: 'SuggestItems',
-                    },
-                    destination: {
-                      type: 'integration',
-                      systems: ['AI'],
-                      message: {
-                        name: 'DoChat',
-                        type: 'command',
-                      },
-                    },
-                    _additionalInstructions: 'Ensure systemPrompt includes product catalogue guidance',
-                    _withState: {
+                data: {
+                  items: [
+                    {
                       target: {
-                        type: 'State',
-                        name: 'Products',
+                        type: 'Command',
+                        name: 'SuggestItems',
                       },
-                      origin: {
+                      destination: {
                         type: 'integration',
-                        systems: ['product-catalog'],
+                        systems: ['AI'],
+                        message: {
+                          name: 'DoChat',
+                          type: 'command',
+                        },
+                      },
+                      _additionalInstructions: 'Ensure systemPrompt includes product catalogue guidance',
+                      _withState: {
+                        target: {
+                          type: 'State',
+                          name: 'Products',
+                        },
+                        origin: {
+                          type: 'integration',
+                          systems: ['product-catalog'],
+                        },
                       },
                     },
-                  },
-                  {
-                    target: {
-                      type: 'Event',
-                      name: 'ItemsSuggested',
+                    {
+                      target: {
+                        type: 'Event',
+                        name: 'ItemsSuggested',
+                      },
+                      destination: {
+                        type: 'stream',
+                        pattern: 'session-${sessionId}',
+                      },
                     },
-                    destination: {
-                      type: 'stream',
-                      pattern: 'session-${sessionId}',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',

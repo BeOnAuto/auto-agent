@@ -83,19 +83,21 @@ describe('projection.specs.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                data: [
-                  {
-                    origin: {
-                      type: 'projection',
-                      idField: 'propertyId',
-                      name: 'AvailablePropertiesProjection',
+                data: {
+                  items: [
+                    {
+                      origin: {
+                        type: 'projection',
+                        idField: 'propertyId',
+                        name: 'AvailablePropertiesProjection',
+                      },
+                      target: {
+                        type: 'State',
+                        name: 'AvailableListings',
+                      },
                     },
-                    target: {
-                      type: 'State',
-                      name: 'AvailableListings',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',
@@ -261,19 +263,21 @@ describe('projection.specs.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                data: [
-                  {
-                    target: {
-                      type: 'State',
-                      name: 'QuestionnaireProgress',
+                data: {
+                  items: [
+                    {
+                      target: {
+                        type: 'State',
+                        name: 'QuestionnaireProgress',
+                      },
+                      origin: {
+                        type: 'projection',
+                        name: 'Questionnaires',
+                        idField: 'questionnaire-participantId',
+                      },
                     },
-                    origin: {
-                      type: 'projection',
-                      name: 'Questionnaires',
-                      idField: 'questionnaire-participantId',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',
@@ -544,12 +548,14 @@ describe('projection.specs.ts.ejs', () => {
                     ],
                   },
                 ],
-                data: [
-                  {
-                    origin: { name: 'Questionnaires', idField: 'questionnaireId-participantId' },
-                    target: { name: 'QuestionnaireProgress' },
-                  },
-                ],
+                data: {
+                  items: [
+                    {
+                      origin: { name: 'Questionnaires', idField: 'questionnaireId-participantId' },
+                      target: { name: 'QuestionnaireProgress' },
+                    },
+                  ],
+                },
               },
             },
           ],
@@ -702,19 +708,21 @@ describe('projection.specs.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                data: [
-                  {
-                    target: {
-                      type: 'State',
-                      name: 'TodoSummary',
+                data: {
+                  items: [
+                    {
+                      target: {
+                        type: 'State',
+                        name: 'TodoSummary',
+                      },
+                      origin: {
+                        type: 'projection',
+                        name: 'TodoSummaryProjection',
+                        singleton: true,
+                      },
                     },
-                    origin: {
-                      type: 'projection',
-                      name: 'TodoSummaryProjection',
-                      singleton: true,
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',
@@ -887,19 +895,21 @@ describe('projection.specs.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                data: [
-                  {
-                    target: {
-                      type: 'State',
-                      name: 'UserProject',
+                data: {
+                  items: [
+                    {
+                      target: {
+                        type: 'State',
+                        name: 'UserProject',
+                      },
+                      origin: {
+                        type: 'projection',
+                        name: 'UserProjectsProjection',
+                        idField: ['userId', 'projectId'],
+                      },
                     },
-                    origin: {
-                      type: 'projection',
-                      name: 'UserProjectsProjection',
-                      idField: ['userId', 'projectId'],
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',

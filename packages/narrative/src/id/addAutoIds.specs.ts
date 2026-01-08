@@ -688,12 +688,14 @@ describe('addAutoIds', () => {
                 server: {
                   description: 'Test server',
                   specs: [],
-                  data: [
-                    {
-                      target: { type: 'Event', name: 'TestEvent' },
-                      destination: { type: 'stream', pattern: 'test-stream' },
-                    },
-                  ],
+                  data: {
+                    items: [
+                      {
+                        target: { type: 'Event', name: 'TestEvent' },
+                        destination: { type: 'stream', pattern: 'test-stream' },
+                      },
+                    ],
+                  },
                 },
               },
             ],
@@ -708,7 +710,8 @@ describe('addAutoIds', () => {
       const slice = result.narratives[0].slices[0];
 
       if ('server' in slice && slice.server?.data) {
-        expect(slice.server.data[0].id).toMatch(AUTO_ID_REGEX);
+        expect(slice.server.data.id).toMatch(AUTO_ID_REGEX);
+        expect(slice.server.data.items[0].id).toMatch(AUTO_ID_REGEX);
       }
     });
 
@@ -728,12 +731,14 @@ describe('addAutoIds', () => {
                 server: {
                   description: 'Test server',
                   specs: [],
-                  data: [
-                    {
-                      target: { type: 'State', name: 'TestState' },
-                      origin: { type: 'projection', name: 'TestProjection' },
-                    },
-                  ],
+                  data: {
+                    items: [
+                      {
+                        target: { type: 'State', name: 'TestState' },
+                        origin: { type: 'projection', name: 'TestProjection' },
+                      },
+                    ],
+                  },
                 },
               },
             ],
@@ -748,7 +753,8 @@ describe('addAutoIds', () => {
       const slice = result.narratives[0].slices[0];
 
       if ('server' in slice && slice.server?.data) {
-        expect(slice.server.data[0].id).toMatch(AUTO_ID_REGEX);
+        expect(slice.server.data.id).toMatch(AUTO_ID_REGEX);
+        expect(slice.server.data.items[0].id).toMatch(AUTO_ID_REGEX);
       }
     });
 
@@ -768,17 +774,19 @@ describe('addAutoIds', () => {
                 server: {
                   description: 'Test server',
                   specs: [],
-                  data: [
-                    {
-                      id: 'SINK-001',
-                      target: { type: 'Command', name: 'TestCommand' },
-                      destination: { type: 'stream', pattern: 'test-stream' },
-                      _withState: {
-                        target: { type: 'State', name: 'TestState' },
-                        origin: { type: 'projection', name: 'TestProjection' },
+                  data: {
+                    items: [
+                      {
+                        id: 'SINK-001',
+                        target: { type: 'Command', name: 'TestCommand' },
+                        destination: { type: 'stream', pattern: 'test-stream' },
+                        _withState: {
+                          target: { type: 'State', name: 'TestState' },
+                          origin: { type: 'projection', name: 'TestProjection' },
+                        },
                       },
-                    },
-                  ],
+                    ],
+                  },
                 },
               },
             ],
@@ -793,7 +801,7 @@ describe('addAutoIds', () => {
       const slice = result.narratives[0].slices[0];
 
       if ('server' in slice && slice.server?.data) {
-        const sink = slice.server.data[0];
+        const sink = slice.server.data.items[0];
         expect(sink.id).toBe('SINK-001');
         if ('destination' in sink && sink._withState) {
           expect(sink._withState.id).toMatch(AUTO_ID_REGEX);
@@ -815,18 +823,21 @@ describe('addAutoIds', () => {
                 id: 'SLICE-001',
                 server: {
                   specs: [],
-                  data: [
-                    {
-                      id: 'EXISTING-SINK-001',
-                      target: { type: 'Event', name: 'TestEvent' },
-                      destination: { type: 'stream', pattern: 'test-stream' },
-                    },
-                    {
-                      id: 'EXISTING-SOURCE-001',
-                      target: { type: 'State', name: 'TestState' },
-                      origin: { type: 'projection', name: 'TestProjection' },
-                    },
-                  ],
+                  data: {
+                    id: 'EXISTING-DATA-001',
+                    items: [
+                      {
+                        id: 'EXISTING-SINK-001',
+                        target: { type: 'Event', name: 'TestEvent' },
+                        destination: { type: 'stream', pattern: 'test-stream' },
+                      },
+                      {
+                        id: 'EXISTING-SOURCE-001',
+                        target: { type: 'State', name: 'TestState' },
+                        origin: { type: 'projection', name: 'TestProjection' },
+                      },
+                    ],
+                  },
                 },
               },
             ],
@@ -841,8 +852,9 @@ describe('addAutoIds', () => {
       const slice = result.narratives[0].slices[0];
 
       if ('server' in slice && slice.server?.data) {
-        expect(slice.server.data[0].id).toBe('EXISTING-SINK-001');
-        expect(slice.server.data[1].id).toBe('EXISTING-SOURCE-001');
+        expect(slice.server.data.id).toBe('EXISTING-DATA-001');
+        expect(slice.server.data.items[0].id).toBe('EXISTING-SINK-001');
+        expect(slice.server.data.items[1].id).toBe('EXISTING-SOURCE-001');
       }
     });
 
@@ -862,12 +874,14 @@ describe('addAutoIds', () => {
                 server: {
                   description: 'Test server',
                   specs: [],
-                  data: [
-                    {
-                      target: { type: 'Event', name: 'TestEvent' },
-                      destination: { type: 'stream', pattern: 'test-stream' },
-                    },
-                  ],
+                  data: {
+                    items: [
+                      {
+                        target: { type: 'Event', name: 'TestEvent' },
+                        destination: { type: 'stream', pattern: 'test-stream' },
+                      },
+                    ],
+                  },
                 },
               },
             ],
@@ -882,7 +896,8 @@ describe('addAutoIds', () => {
       addAutoIds(model);
 
       if ('server' in originalSlice && originalSlice.server?.data) {
-        expect(originalSlice.server.data[0].id).toBeUndefined();
+        expect(originalSlice.server.data.id).toBeUndefined();
+        expect(originalSlice.server.data.items[0].id).toBeUndefined();
       }
     });
 
@@ -900,20 +915,22 @@ describe('addAutoIds', () => {
                 id: 'SLICE-001',
                 server: {
                   specs: [],
-                  data: [
-                    {
-                      target: { type: 'Event', name: 'Event1' },
-                      destination: { type: 'stream', pattern: 'stream1' },
-                    },
-                    {
-                      target: { type: 'Event', name: 'Event2' },
-                      destination: { type: 'stream', pattern: 'stream2' },
-                    },
-                    {
-                      target: { type: 'State', name: 'State1' },
-                      origin: { type: 'projection', name: 'Proj1' },
-                    },
-                  ],
+                  data: {
+                    items: [
+                      {
+                        target: { type: 'Event', name: 'Event1' },
+                        destination: { type: 'stream', pattern: 'stream1' },
+                      },
+                      {
+                        target: { type: 'Event', name: 'Event2' },
+                        destination: { type: 'stream', pattern: 'stream2' },
+                      },
+                      {
+                        target: { type: 'State', name: 'State1' },
+                        origin: { type: 'projection', name: 'Proj1' },
+                      },
+                    ],
+                  },
                 },
               },
             ],
@@ -928,7 +945,8 @@ describe('addAutoIds', () => {
       const slice = result.narratives[0].slices[0];
 
       if ('server' in slice && slice.server?.data) {
-        const ids = slice.server.data.map((d) => d.id);
+        expect(slice.server.data.id).toMatch(AUTO_ID_REGEX);
+        const ids = slice.server.data.items.map((d) => d.id);
         expect(ids[0]).toMatch(AUTO_ID_REGEX);
         expect(ids[1]).toMatch(AUTO_ID_REGEX);
         expect(ids[2]).toMatch(AUTO_ID_REGEX);

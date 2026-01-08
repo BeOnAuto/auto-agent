@@ -452,7 +452,7 @@ describe('hasAllIds', () => {
   });
 
   describe('data item ID validation', () => {
-    it('should return false when data sink is missing an ID', () => {
+    it('should return false when data wrapper is missing an ID', () => {
       const model: Model = {
         variant: 'specs',
         narratives: [
@@ -468,13 +468,15 @@ describe('hasAllIds', () => {
                 server: {
                   description: 'Test server',
                   specs: [],
-                  data: [
-                    {
-                      __type: 'sink',
-                      target: { type: 'Event', name: 'TestEvent' },
-                      destination: { type: 'stream', pattern: 'test-stream' },
-                    },
-                  ],
+                  data: {
+                    items: [
+                      {
+                        id: 'SINK-001',
+                        target: { type: 'Event', name: 'TestEvent' },
+                        destination: { type: 'stream', pattern: 'test-stream' },
+                      },
+                    ],
+                  },
                 },
               },
             ],
@@ -487,7 +489,44 @@ describe('hasAllIds', () => {
       expect(hasAllIds(model)).toBe(false);
     });
 
-    it('should return false when data source is missing an ID', () => {
+    it('should return false when data sink item is missing an ID', () => {
+      const model: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            name: 'Test Flow',
+            id: 'FLOW-001',
+            slices: [
+              {
+                type: 'command',
+                name: 'Test slice',
+                id: 'SLICE-001',
+                client: { specs: [] },
+                server: {
+                  description: 'Test server',
+                  specs: [],
+                  data: {
+                    id: 'DATA-001',
+                    items: [
+                      {
+                        target: { type: 'Event', name: 'TestEvent' },
+                        destination: { type: 'stream', pattern: 'test-stream' },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        ],
+        messages: [],
+        integrations: [],
+        modules: [],
+      };
+      expect(hasAllIds(model)).toBe(false);
+    });
+
+    it('should return false when data source item is missing an ID', () => {
       const model: Model = {
         variant: 'specs',
         narratives: [
@@ -503,13 +542,15 @@ describe('hasAllIds', () => {
                 server: {
                   description: 'Test server',
                   specs: [],
-                  data: [
-                    {
-                      __type: 'source',
-                      target: { type: 'State', name: 'TestState' },
-                      origin: { type: 'projection', name: 'TestProjection' },
-                    },
-                  ],
+                  data: {
+                    id: 'DATA-001',
+                    items: [
+                      {
+                        target: { type: 'State', name: 'TestState' },
+                        origin: { type: 'projection', name: 'TestProjection' },
+                      },
+                    ],
+                  },
                 },
               },
             ],
@@ -538,18 +579,20 @@ describe('hasAllIds', () => {
                 server: {
                   description: 'Test server',
                   specs: [],
-                  data: [
-                    {
-                      __type: 'sink',
-                      id: 'SINK-001',
-                      target: { type: 'Command', name: 'TestCommand' },
-                      destination: { type: 'stream', pattern: 'test-stream' },
-                      _withState: {
-                        target: { type: 'State', name: 'TestState' },
-                        origin: { type: 'projection', name: 'TestProjection' },
+                  data: {
+                    id: 'DATA-001',
+                    items: [
+                      {
+                        id: 'SINK-001',
+                        target: { type: 'Command', name: 'TestCommand' },
+                        destination: { type: 'stream', pattern: 'test-stream' },
+                        _withState: {
+                          target: { type: 'State', name: 'TestState' },
+                          origin: { type: 'projection', name: 'TestProjection' },
+                        },
                       },
-                    },
-                  ],
+                    ],
+                  },
                 },
               },
             ],
@@ -578,20 +621,21 @@ describe('hasAllIds', () => {
                 server: {
                   description: 'Test server',
                   specs: [],
-                  data: [
-                    {
-                      __type: 'sink',
-                      id: 'SINK-001',
-                      target: { type: 'Event', name: 'TestEvent' },
-                      destination: { type: 'stream', pattern: 'test-stream' },
-                    },
-                    {
-                      __type: 'source',
-                      id: 'SOURCE-001',
-                      target: { type: 'State', name: 'TestState' },
-                      origin: { type: 'projection', name: 'TestProjection' },
-                    },
-                  ],
+                  data: {
+                    id: 'DATA-001',
+                    items: [
+                      {
+                        id: 'SINK-001',
+                        target: { type: 'Event', name: 'TestEvent' },
+                        destination: { type: 'stream', pattern: 'test-stream' },
+                      },
+                      {
+                        id: 'SOURCE-001',
+                        target: { type: 'State', name: 'TestState' },
+                        origin: { type: 'projection', name: 'TestProjection' },
+                      },
+                    ],
+                  },
                 },
               },
             ],
@@ -620,19 +664,21 @@ describe('hasAllIds', () => {
                 server: {
                   description: 'Test server',
                   specs: [],
-                  data: [
-                    {
-                      __type: 'sink',
-                      id: 'SINK-001',
-                      target: { type: 'Command', name: 'TestCommand' },
-                      destination: { type: 'stream', pattern: 'test-stream' },
-                      _withState: {
-                        id: 'SOURCE-001',
-                        target: { type: 'State', name: 'TestState' },
-                        origin: { type: 'projection', name: 'TestProjection' },
+                  data: {
+                    id: 'DATA-001',
+                    items: [
+                      {
+                        id: 'SINK-001',
+                        target: { type: 'Command', name: 'TestCommand' },
+                        destination: { type: 'stream', pattern: 'test-stream' },
+                        _withState: {
+                          id: 'SOURCE-001',
+                          target: { type: 'State', name: 'TestState' },
+                          origin: { type: 'projection', name: 'TestProjection' },
+                        },
                       },
-                    },
-                  ],
+                    ],
+                  },
                 },
               },
             ],
@@ -645,7 +691,7 @@ describe('hasAllIds', () => {
       expect(hasAllIds(model)).toBe(true);
     });
 
-    it('should return true when slice has no data array', () => {
+    it('should return true when slice has no data', () => {
       const model: Model = {
         variant: 'specs',
         narratives: [

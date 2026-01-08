@@ -159,6 +159,11 @@ export interface DataItem {
   __type: 'sink' | 'source';
 }
 
+export interface Data {
+  id?: string;
+  items: (DataSink | DataSource)[];
+}
+
 export type DefaultRecord = Record<string, unknown>;
 
 export type State<

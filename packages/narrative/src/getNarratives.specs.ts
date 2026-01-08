@@ -4,7 +4,7 @@ import { InMemoryFileStore } from '@auto-engineer/file-store';
 import { NodeFileStore } from '@auto-engineer/file-store/node';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { getNarratives } from './getNarratives';
-import { type DataSource, type Example, type Model, modelToNarrative, type Narrative, type QuerySlice } from './index';
+import { type Example, type Model, modelToNarrative, type Narrative, type QuerySlice } from './index';
 import { modelSchema } from './schema';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -112,12 +112,12 @@ describe('getNarratives', (_mode) => {
         /query items\(\$itemId: String!\) {\s+items\(itemId: \$itemId\) {\s+id\s+description\s+}/,
       );
 
-      const data = viewItemSlice?.server?.data as DataSource[] | undefined;
-      if (!data || !Array.isArray(data)) throw new Error('No data found in view items slice');
+      const data = viewItemSlice?.server?.data;
+      if (!data || !Array.isArray(data.items)) throw new Error('No data found in view items slice');
 
-      expect(data).toHaveLength(1);
-      expect(data[0].target).toMatchObject({ type: 'State', name: 'items' });
-      expect(data[0].origin).toMatchObject({ name: 'ItemsProjection', type: 'projection' });
+      expect(data.items).toHaveLength(1);
+      expect(data.items[0].target).toMatchObject({ type: 'State', name: 'items' });
+      expect(data.items[0].origin).toMatchObject({ name: 'ItemsProjection', type: 'projection' });
 
       const specs = viewItemSlice?.server?.specs;
       if (specs == null || specs.length === 0 || specs[0].feature === '')
@@ -224,7 +224,7 @@ describe('getNarratives', (_mode) => {
       f.slices.some((s) => {
         if (s.type === 'command' || s.type === 'query') {
           return (
-            s.server.data?.some(
+            s.server.data?.items?.some(
               (d) =>
                 ('destination' in d && d.destination?.type === 'integration') ||
                 ('origin' in d && d.origin?.type === 'integration'),
@@ -1494,17 +1494,17 @@ flow('Projection Test', () => {
 
     if (summarySlice?.type !== 'query') return;
 
-    const data = summarySlice.server.data as DataSource[] | undefined;
+    const data = summarySlice.server.data;
     expect(data).toBeDefined();
-    expect(data).toHaveLength(1);
+    expect(data?.items).toHaveLength(1);
 
-    expect(data?.[0].origin).toMatchObject({
+    expect(data?.items?.[0].origin).toMatchObject({
       type: 'projection',
       name: 'TodoSummary',
       singleton: true,
     });
 
-    expect(data?.[0].origin).not.toHaveProperty('idField');
+    expect(data?.items?.[0].origin).not.toHaveProperty('idField');
   });
 
   it('should generate correct origin for regular projection with single idField', async () => {
@@ -1546,17 +1546,17 @@ flow('Projection Test', () => {
 
     if (todoSlice?.type !== 'query') return;
 
-    const data = todoSlice.server.data as DataSource[] | undefined;
+    const data = todoSlice.server.data;
     expect(data).toBeDefined();
-    expect(data).toHaveLength(1);
+    expect(data?.items).toHaveLength(1);
 
-    expect(data?.[0].origin).toMatchObject({
+    expect(data?.items?.[0].origin).toMatchObject({
       type: 'projection',
       name: 'Todos',
       idField: 'todoId',
     });
 
-    expect(data?.[0].origin).not.toHaveProperty('singleton');
+    expect(data?.items?.[0].origin).not.toHaveProperty('singleton');
   });
 
   it('should generate correct origin for composite projection with multiple idFields', async () => {
@@ -1598,17 +1598,17 @@ flow('Projection Test', () => {
 
     if (userProjectSlice?.type !== 'query') return;
 
-    const data = userProjectSlice.server.data as DataSource[] | undefined;
+    const data = userProjectSlice.server.data;
     expect(data).toBeDefined();
-    expect(data).toHaveLength(1);
+    expect(data?.items).toHaveLength(1);
 
-    expect(data?.[0].origin).toMatchObject({
+    expect(data?.items?.[0].origin).toMatchObject({
       type: 'projection',
       name: 'UserProjects',
       idField: ['userId', 'projectId'],
     });
 
-    expect(data?.[0].origin).not.toHaveProperty('singleton');
+    expect(data?.items?.[0].origin).not.toHaveProperty('singleton');
   });
 
   it('should validate all three projection patterns together', async () => {
@@ -1684,8 +1684,8 @@ flow('All Projection Patterns', () => {
 
     const summarySlice = projectionFlow.slices.find((s) => s.name === 'views summary');
     if (summarySlice?.type === 'query') {
-      const data = summarySlice.server.data as DataSource[] | undefined;
-      expect(data?.[0].origin).toMatchObject({
+      const data = summarySlice.server.data;
+      expect(data?.items?.[0].origin).toMatchObject({
         type: 'projection',
         name: 'TodoSummary',
         singleton: true,
@@ -1694,8 +1694,8 @@ flow('All Projection Patterns', () => {
 
     const todoSlice = projectionFlow.slices.find((s) => s.name === 'views todo');
     if (todoSlice?.type === 'query') {
-      const data = todoSlice.server.data as DataSource[] | undefined;
-      expect(data?.[0].origin).toMatchObject({
+      const data = todoSlice.server.data;
+      expect(data?.items?.[0].origin).toMatchObject({
         type: 'projection',
         name: 'Todos',
         idField: 'todoId',
@@ -1704,8 +1704,8 @@ flow('All Projection Patterns', () => {
 
     const userProjectSlice = projectionFlow.slices.find((s) => s.name === 'views user project todos');
     if (userProjectSlice?.type === 'query') {
-      const data = userProjectSlice.server.data as DataSource[] | undefined;
-      expect(data?.[0].origin).toMatchObject({
+      const data = userProjectSlice.server.data;
+      expect(data?.items?.[0].origin).toMatchObject({
         type: 'projection',
         name: 'UserProjectTodos',
         idField: ['userId', 'projectId'],
@@ -1770,15 +1770,15 @@ flow('Data Item IDs', () => {
     const commandSlice = dataIdsFlow.slices.find((s) => s.name === 'places order');
     if (commandSlice?.type === 'command') {
       const sinkData = commandSlice.server.data;
-      expect(sinkData).toHaveLength(1);
-      expect(sinkData?.[0].id).toBe('SINK-001');
+      expect(sinkData?.items).toHaveLength(1);
+      expect(sinkData?.items?.[0].id).toBe('SINK-001');
     }
 
     const querySlice = dataIdsFlow.slices.find((s) => s.name === 'views order status');
     if (querySlice?.type === 'query') {
-      const sourceData = querySlice.server.data as DataSource[] | undefined;
-      expect(sourceData).toHaveLength(1);
-      expect(sourceData?.[0].id).toBe('SOURCE-001');
+      const sourceData = querySlice.server.data;
+      expect(sourceData?.items).toHaveLength(1);
+      expect(sourceData?.items?.[0].id).toBe('SOURCE-001');
     }
   });
 });

@@ -72,12 +72,14 @@ describe('react.specs.ts.ejs (react slice)', () => {
               name: 'Send notification to host',
               server: {
                 description: 'Sends a host notification command in response to BookingRequested',
-                data: [
-                  {
-                    target: { type: 'Command', name: 'NotifyHost' },
-                    destination: { type: 'stream', pattern: 'booking-${hostId}' },
-                  },
-                ],
+                data: {
+                  items: [
+                    {
+                      target: { type: 'Command', name: 'NotifyHost' },
+                      destination: { type: 'stream', pattern: 'booking-${hostId}' },
+                    },
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',

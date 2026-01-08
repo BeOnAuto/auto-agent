@@ -368,12 +368,21 @@ function buildSingleDataItem(
 function buildDataItems(
   ts: typeof import('typescript'),
   f: tsNS.NodeFactory,
-  items: Array<DataSinkItem | DataSourceItem>,
+  data: { id?: string; items: Array<DataSinkItem | DataSourceItem> },
 ) {
-  const calls = items.map((it) => buildSingleDataItem(ts, f, it));
+  const calls = data.items.map((it) => buildSingleDataItem(ts, f, it));
+
+  // Build the data object: { id?: string, items: [...] }
+  const properties: tsNS.ObjectLiteralElementLike[] = [];
+
+  if (data.id != null && data.id !== '') {
+    properties.push(f.createPropertyAssignment('id', f.createStringLiteral(data.id)));
+  }
+
+  properties.push(f.createPropertyAssignment('items', f.createArrayLiteralExpression(calls, false)));
 
   return f.createExpressionStatement(
-    f.createCallExpression(f.createIdentifier('data'), undefined, [f.createArrayLiteralExpression(calls, false)]),
+    f.createCallExpression(f.createIdentifier('data'), undefined, [f.createObjectLiteralExpression(properties, false)]),
   );
 }
 
@@ -668,8 +677,8 @@ function buildServerStatements(
 ): tsNS.Statement[] {
   const statements: tsNS.Statement[] = [];
 
-  if (server.data !== null && server.data !== undefined && server.data.length > 0) {
-    statements.push(buildDataItems(ts, f, server.data as Array<DataSinkItem | DataSourceItem>));
+  if (server.data?.items && server.data.items.length > 0) {
+    statements.push(buildDataItems(ts, f, server.data as { id?: string; items: Array<DataSinkItem | DataSourceItem> }));
   }
 
   if (server.specs !== null && server.specs !== undefined) {

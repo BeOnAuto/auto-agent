@@ -134,6 +134,13 @@ const DataSourceSchema = z
   })
   .describe('Data source configuration for inbound data flow');
 
+export const DataSchema = z
+  .object({
+    id: z.string().optional().describe('Optional unique identifier for the data configuration'),
+    items: z.array(z.union([DataSinkSchema, DataSourceSchema])).describe('Array of data sinks and sources'),
+  })
+  .describe('Data configuration containing sinks and sources');
+
 const MessageFieldSchema = z
   .object({
     name: z.string(),
@@ -262,7 +269,7 @@ const CommandSliceSchema = BaseSliceSchema.extend({
   request: z.string().describe('Command request (GraphQL, REST endpoint, or other query format)').optional(),
   server: z.object({
     description: z.string(),
-    data: z.array(DataSinkSchema).optional().describe('Data sinks for command slices'),
+    data: DataSchema.optional().describe('Data configuration for command slices'),
     specs: z.array(SpecSchema).describe('Server-side specifications with rules and examples'),
   }),
 }).describe('Command slice handling user actions and business logic');
@@ -275,7 +282,7 @@ const QuerySliceSchema = BaseSliceSchema.extend({
   request: z.string().describe('Query request (GraphQL, REST endpoint, or other query format)').optional(),
   server: z.object({
     description: z.string(),
-    data: z.array(DataSourceSchema).optional().describe('Data sources for query slices'),
+    data: DataSchema.optional().describe('Data configuration for query slices'),
     specs: z.array(SpecSchema).describe('Server-side specifications with rules and examples'),
   }),
 }).describe('Query slice for reading data and maintaining projections');
@@ -284,10 +291,7 @@ const ReactSliceSchema = BaseSliceSchema.extend({
   type: z.literal('react'),
   server: z.object({
     description: z.string().optional(),
-    data: z
-      .array(z.union([DataSinkSchema, DataSourceSchema]))
-      .optional()
-      .describe('Data items for react slices (mix of sinks and sources)'),
+    data: DataSchema.optional().describe('Data configuration for react slices'),
     specs: z.array(SpecSchema).describe('Server-side specifications with rules and examples'),
   }),
 }).describe('React slice for automated responses to events');

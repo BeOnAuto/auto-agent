@@ -29,19 +29,21 @@ describe('query.resolver.ts.ejs', () => {
               },
               server: {
                 description: '',
-                data: [
-                  {
-                    origin: {
-                      type: 'projection',
-                      idField: 'propertyId',
-                      name: 'AvailablePropertiesProjection',
+                data: {
+                  items: [
+                    {
+                      origin: {
+                        type: 'projection',
+                        idField: 'propertyId',
+                        name: 'AvailablePropertiesProjection',
+                      },
+                      target: {
+                        type: 'State',
+                        name: 'AvailableListings',
+                      },
                     },
-                    target: {
-                      type: 'State',
-                      name: 'AvailableListings',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [],
               },
             },
@@ -152,19 +154,21 @@ describe('query.resolver.ts.ejs', () => {
               client: { specs: [] },
               server: {
                 description: '',
-                data: [
-                  {
-                    origin: {
-                      type: 'projection',
-                      idField: 'sessionId',
-                      name: 'SuggestedItemsProjection',
+                data: {
+                  items: [
+                    {
+                      origin: {
+                        type: 'projection',
+                        idField: 'sessionId',
+                        name: 'SuggestedItemsProjection',
+                      },
+                      target: {
+                        type: 'State',
+                        name: 'SuggestedItems',
+                      },
                     },
-                    target: {
-                      type: 'State',
-                      name: 'SuggestedItems',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [],
               },
             },
@@ -268,12 +272,14 @@ describe('query.resolver.ts.ejs', () => {
                 'query QuestionnaireProgress($participantId: ID!) {\n  questionnaireProgress(participantId: $participantId) {\n    questionnaireId\n    participantId\n    status\n    currentQuestionId\n    remainingQuestions\n    answers {\n      questionId\n      value\n    }\n  }\n}',
               server: {
                 description: '',
-                data: [
-                  {
-                    target: { type: 'State', name: 'QuestionnaireProgress' },
-                    origin: { type: 'projection', name: 'Questionnaires', idField: 'questionnaire-participantId' },
-                  },
-                ],
+                data: {
+                  items: [
+                    {
+                      target: { type: 'State', name: 'QuestionnaireProgress' },
+                      origin: { type: 'projection', name: 'Questionnaires', idField: 'questionnaire-participantId' },
+                    },
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',
@@ -449,19 +455,21 @@ describe('query.resolver.ts.ejs', () => {
               },
               server: {
                 description: '',
-                data: [
-                  {
-                    origin: {
-                      type: 'projection',
-                      idField: 'productId',
-                      name: 'ProductPricesProjection',
+                data: {
+                  items: [
+                    {
+                      origin: {
+                        type: 'projection',
+                        idField: 'productId',
+                        name: 'ProductPricesProjection',
+                      },
+                      target: {
+                        type: 'State',
+                        name: 'ProductPrice',
+                      },
                     },
-                    target: {
-                      type: 'State',
-                      name: 'ProductPrice',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [],
               },
             },
@@ -512,19 +520,21 @@ describe('query.resolver.ts.ejs', () => {
               },
               server: {
                 description: '',
-                data: [
-                  {
-                    origin: {
-                      type: 'projection',
-                      idField: 'userId',
-                      name: 'StatsProjection',
+                data: {
+                  items: [
+                    {
+                      origin: {
+                        type: 'projection',
+                        idField: 'userId',
+                        name: 'StatsProjection',
+                      },
+                      target: {
+                        type: 'State',
+                        name: 'Stats',
+                      },
                     },
-                    target: {
-                      type: 'State',
-                      name: 'Stats',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [],
               },
             },
@@ -572,19 +582,21 @@ describe('query.resolver.ts.ejs', () => {
               },
               server: {
                 description: '',
-                data: [
-                  {
-                    origin: {
-                      type: 'projection',
-                      idField: 'productId',
-                      name: 'ProductsProjection',
+                data: {
+                  items: [
+                    {
+                      origin: {
+                        type: 'projection',
+                        idField: 'productId',
+                        name: 'ProductsProjection',
+                      },
+                      target: {
+                        type: 'State',
+                        name: 'Product',
+                      },
                     },
-                    target: {
-                      type: 'State',
-                      name: 'Product',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [],
               },
             },
@@ -636,19 +648,21 @@ describe('query.resolver.ts.ejs', () => {
               },
               server: {
                 description: '',
-                data: [
-                  {
-                    origin: {
-                      type: 'projection',
-                      name: 'TodoSummary',
-                      singleton: true,
+                data: {
+                  items: [
+                    {
+                      origin: {
+                        type: 'projection',
+                        name: 'TodoSummary',
+                        singleton: true,
+                      },
+                      target: {
+                        type: 'State',
+                        name: 'TodoListSummary',
+                      },
                     },
-                    target: {
-                      type: 'State',
-                      name: 'TodoListSummary',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [],
               },
             },
