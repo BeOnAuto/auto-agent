@@ -36,5 +36,5 @@
     "@auto-engineer/cli": "workspace:*",
     "playwright": "^1.54.1"
   },
-  "version": "0.21.0"
+  "version": "0.21.2"
 }

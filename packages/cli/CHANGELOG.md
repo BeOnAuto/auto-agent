@@ -1,5 +1,16 @@
 # @auto-engineer/cli
 
+## 0.21.2
+
+### Patch Changes
+
+- Combine WebSocket and Pipeline servers to serve from single port - file-sync now available at /file-sync path on same port as pipeline server
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.21.2
+  - @auto-engineer/narrative@0.21.2
+  - @auto-engineer/pipeline@0.21.2
+
 ## 0.21.0
 
 ### Minor Changes
