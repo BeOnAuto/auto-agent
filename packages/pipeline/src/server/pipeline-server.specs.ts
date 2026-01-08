@@ -70,6 +70,15 @@ async function fetchWithStatus(
 }
 
 describe('PipelineServer', () => {
+  describe('getHttpServer', () => {
+    it('should return the underlying HTTP server', async () => {
+      const server = new PipelineServer({ port: 0 });
+      const httpServer = server.getHttpServer();
+      expect(httpServer.listen).toBeTypeOf('function');
+      expect(httpServer.close).toBeTypeOf('function');
+    });
+  });
+
   describe('middleware', () => {
     it('should apply middleware before routes on start', async () => {
       const server = new PipelineServer({ port: 0 });

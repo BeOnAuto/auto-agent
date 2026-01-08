@@ -105,6 +105,10 @@ export class PipelineServer {
     return this.actualPort;
   }
 
+  getHttpServer(): HttpServer {
+    return this.httpServer;
+  }
+
   registerCommandHandlers(handlers: CommandHandlerWithMetadata[]): void {
     for (const handler of handlers) {
       this.commandHandlers.set(handler.name, handler);
