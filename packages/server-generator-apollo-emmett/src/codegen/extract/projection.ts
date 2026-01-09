@@ -26,7 +26,7 @@ function isProjectionOrigin(origin: unknown): origin is ProjectionOrigin {
 
 function extractProjectionField<K extends keyof ProjectionOrigin>(slice: Slice, fieldName: K): string | undefined {
   if (!('server' in slice)) return undefined;
-  const dataSource = slice.server?.data?.[0];
+  const dataSource = slice.server?.data?.items?.[0];
   if (!hasOrigin(dataSource)) return undefined;
 
   const origin = dataSource.origin;
@@ -50,7 +50,7 @@ export function extractProjectionName(slice: Slice): string | undefined {
 
 export function extractProjectionSingleton(slice: Slice): boolean {
   if (!('server' in slice)) return false;
-  const dataSource = slice.server?.data?.[0];
+  const dataSource = slice.server?.data?.items?.[0];
   if (!hasOrigin(dataSource)) return false;
 
   const origin = dataSource.origin;

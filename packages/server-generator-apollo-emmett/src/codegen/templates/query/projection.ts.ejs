@@ -1,5 +1,5 @@
 <%
-const origin = slice.server?.data?.[0]?.origin;
+const origin = slice.server?.data?.items?.[0]?.origin;
 const isSingleton = origin?.singleton === true;
 const idField = origin?.idField;
 const isCompositeKey = Array.isArray(idField);
@@ -9,7 +9,7 @@ inMemorySingleStreamProjection,
 type ReadEvent,
 type InMemoryReadEventMetadata,
 } from '@event-driven-io/emmett';
-import type { <%= pascalCase(slice.server?.data?.[0]?.target?.name || 'UnknownState') %> } from './state';<%
+import type { <%= pascalCase(slice.server?.data?.items?.[0]?.target?.name || 'UnknownState') %> } from './state';<%
 if (eventImportGroups.length > 0) {
     for (const group of eventImportGroups) {
 %>
@@ -20,7 +20,7 @@ import type { <%= group.eventTypes.join(', ') %> } from '<%= group.importPath %>
 
 // Collect enums used in state fields
 const stateEnums = [];
-const targetName = slice.server?.data?.[0]?.target?.name;
+const targetName = slice.server?.data?.items?.[0]?.target?.name;
 if (targetName && messages) {
     const targetDef = messages.find(m => m.name === targetName);
     if (targetDef?.fields) {
@@ -52,14 +52,14 @@ interface Internal<%= pascalCase(targetName || 'State') %> extends <%= pascalCas
 type AllEvents = <%= allEventTypes %>;
 
 export const projection = inMemorySingleStreamProjection<
-<%= pascalCase(slice.server?.data?.[0]?.target?.name || 'UnknownState') %>,
+<%= pascalCase(slice.server?.data?.items?.[0]?.target?.name || 'UnknownState') %>,
 AllEvents
 >({
-collectionName: '<%= pascalCase(slice.server?.data?.[0]?.origin?.name || "unknown-collection") %>',
+collectionName: '<%= pascalCase(slice.server?.data?.items?.[0]?.origin?.name || "unknown-collection") %>',
 canHandle: [<%- events.map(e => `'${e.type}'`).join(', ') %>],
 getDocumentId: (<%- isSingleton ? '_event' : 'event' %>) => <%
 if (isSingleton) {
-%>'<%= toKebabCase(slice.server?.data?.[0]?.target?.name || 'singleton') %>'<%
+%>'<%= toKebabCase(slice.server?.data?.items?.[0]?.target?.name || 'singleton') %>'<%
 } else if (isCompositeKey) {
     const template = compositeKeyFields.map((field, index) =>
         index === 0 ? `\${event.data.${field}}` : `-\${event.data.${field}}`
@@ -71,12 +71,12 @@ if (isSingleton) {
 }
 %>,
 evolve: (
-document: <%= pascalCase(slice.server?.data?.[0]?.target?.name || 'UnknownState') %> | null,
+document: <%= pascalCase(slice.server?.data?.items?.[0]?.target?.name || 'UnknownState') %> | null,
 event: ReadEvent<AllEvents, InMemoryReadEventMetadata>
-): <%= pascalCase(slice.server?.data?.[0]?.target?.name || 'UnknownState') %> | null => {
+): <%= pascalCase(slice.server?.data?.items?.[0]?.target?.name || 'UnknownState') %> | null => {
 switch (event.type) {
 <% for (const event of events) {
-    const targetName = slice.server?.data?.[0]?.target?.name;
+    const targetName = slice.server?.data?.items?.[0]?.target?.name;
     const queryGwt = slice.type === 'query'
             ? queryGwtMapping.find(gwt => {
                     const inGiven = gwt.given && gwt.given.some(g => g.eventRef === event.type);
@@ -87,7 +87,7 @@ switch (event.type) {
     const example = slice.type === 'query'
             ? queryGwt?.then.find(t => t.stateRef === targetName)?.exampleData
             : gwtMapping[event.type]?.[0]?.then?.[0]?.exampleData;
-    const targetDef = messages.find(m => m.name === slice.server?.data?.[0]?.target?.name);
+    const targetDef = messages.find(m => m.name === slice.server?.data?.items?.[0]?.target?.name);
     const targetFields = Object.fromEntries((targetDef?.fields ?? []).map(f => [f.name, f]));
     let usedFields = [];
     let isRemovalEvent = false;

@@ -153,16 +153,18 @@ describe('mutation.resolver.ts.ejs', () => {
                 'mutation AnswerQuestion($input: AnswerQuestionInput!) {\\n  answerQuestion(input: $input) {\\n    success\\n  }\\n}',
               server: {
                 description: '',
-                data: [
-                  {
-                    target: { type: 'Event', name: 'QuestionAnswered' },
-                    destination: { type: 'stream', pattern: 'questionnaire-participantId' },
-                  },
-                  {
-                    target: { type: 'Event', name: 'QuestionnaireEditRejected' },
-                    destination: { type: 'stream', pattern: 'questionnaire-participantId' },
-                  },
-                ],
+                data: {
+                  items: [
+                    {
+                      target: { type: 'Event', name: 'QuestionAnswered' },
+                      destination: { type: 'stream', pattern: 'questionnaire-participantId' },
+                    },
+                    {
+                      target: { type: 'Event', name: 'QuestionnaireEditRejected' },
+                      destination: { type: 'stream', pattern: 'questionnaire-participantId' },
+                    },
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',

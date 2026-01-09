@@ -1,5 +1,5 @@
 <%_
-const targetName = slice?.server?.data?.[0]?.target?.name || 'UnknownState';
+const targetName = slice?.server?.data?.items?.[0]?.target?.name || 'UnknownState';
 const TargetType = pascalCase(targetName);
 const projName = projectionName || "UnknownProjection";
 const idField = projectionIdField ?? 'id';

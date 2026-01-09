@@ -240,9 +240,12 @@ function processSliceIntegrations(
 ): void {
   // Integrations: from data & via
   if ('server' in slice && slice.server != null && 'data' in slice.server && slice.server.data !== undefined) {
-    slice.server.data.forEach((d: unknown) => {
-      processDataItemIntegrations(d, integrations, messages);
-    });
+    const dataItems = slice.server.data.items;
+    if (Array.isArray(dataItems)) {
+      dataItems.forEach((d: unknown) => {
+        processDataItemIntegrations(d, integrations, messages);
+      });
+    }
   }
   if ('via' in slice && slice.via) {
     slice.via.forEach((integrationName: string) => {

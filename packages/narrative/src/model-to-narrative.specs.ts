@@ -29,7 +29,6 @@ describe('modelToNarrative', () => {
 } from '@auto-engineer/narrative';
 import type { Command, Event, State } from '@auto-engineer/narrative';
 import { AI, ProductCatalog } from '../server/src/integrations';
-import type { Products } from '../server/src/integrations';
 type EnterShoppingCriteria = Command<
   'EnterShoppingCriteria',
   {
@@ -49,6 +48,19 @@ type SuggestShoppingItems = Command<
   {
     sessionId: string;
     prompt: string;
+  }
+>;
+type Products = State<
+  'Products',
+  {
+    products: {
+      productId: string;
+      name: string;
+      category: string;
+      price: number;
+      tags: Array<string>;
+      imageUrl: string;
+    }[];
   }
 >;
 type ShoppingItemsSuggested = Event<
@@ -119,7 +131,7 @@ narrative('Seasonal Assistant', () => {
 }\`),
     )
     .server(() => {
-      data([sink().event('ShoppingCriteriaEntered').toStream('shopping-session-\${sessionId}')]);
+      data({ items: [sink().event('ShoppingCriteriaEntered').toStream('shopping-session-\${sessionId}')] });
       specs('When shopper submits criteria, a shopping session is started', () => {
         rule('Valid criteria should start a shopping session', () => {
           example('User submits shopping criteria for children')
@@ -154,16 +166,18 @@ narrative('Seasonal Assistant', () => {
     });
   });
   command('selects items relevant to the shopping criteria').server(() => {
-    data([
-      sink()
-        .command('SuggestShoppingItems')
-        .toIntegration(AI, 'DoChat', 'command')
-        .withState(source().state('Products').fromIntegration(ProductCatalog))
-        .additionalInstructions(
-          'add the following to the DoChat: schemaName: Products, systemPrompt: use the PRODUCT_CATALOGUE_PRODUCTS MCP tool to get product data',
-        ),
-      sink().event('ShoppingItemsSuggested').toStream('shopping-session-\${sessionId}'),
-    ]);
+    data({
+      items: [
+        sink()
+          .command('SuggestShoppingItems')
+          .toIntegration(AI, 'DoChat', 'command')
+          .withState(source().state('Products').fromIntegration(ProductCatalog))
+          .additionalInstructions(
+            'add the following to the DoChat: schemaName: Products, systemPrompt: use the PRODUCT_CATALOGUE_PRODUCTS MCP tool to get product data',
+          ),
+        sink().event('ShoppingItemsSuggested').toStream('shopping-session-\${sessionId}'),
+      ],
+    });
     specs('When chat is triggered, AI suggests items based on product catalog', () => {
       rule('AI should suggest relevant items from available products', () => {
         example('Product catalog with matching items generates suggestions')
@@ -262,7 +276,7 @@ narrative('Seasonal Assistant', () => {
 }\`),
     )
     .server(() => {
-      data([source().state('SuggestedItems').fromProjection('SuggestedItemsProjection', 'sessionId')]);
+      data({ items: [source().state('SuggestedItems').fromProjection('SuggestedItemsProjection', 'sessionId')] });
       specs('Suggested items are available for viewing', () => {
         rule('Items should be available for viewing after suggestion', () => {
           example('Item becomes available after AI suggestion event')
@@ -336,7 +350,7 @@ narrative('Seasonal Assistant', () => {
       });
     })
     .server(() => {
-      data([sink().event('ItemsAddedToCart').toStream('shopping-session-\${sessionId}')]);
+      data({ items: [sink().event('ItemsAddedToCart').toStream('shopping-session-\${sessionId}')] });
       specs('When shopper accepts items, they are added to cart', () => {
         rule('Accepted items should be added to the shopping cart', () => {
           example('User selects all suggested items for cart')
@@ -753,19 +767,21 @@ narrative('Questionnaire Flow', 'QUEST-001', () => {});
                 'query QuestionnaireProgress($participantId: ID!) {\n  questionnaireProgress(participantId: $participantId) {\n    questionnaireId\n    participantId\n    currentQuestionId\n    remainingQuestions\n    status\n    answers {\n      questionId\n      value\n    }\n  }\n}',
               server: {
                 description: '',
-                data: [
-                  {
-                    target: {
-                      type: 'State',
-                      name: 'QuestionnaireProgress',
+                data: {
+                  items: [
+                    {
+                      target: {
+                        type: 'State',
+                        name: 'QuestionnaireProgress',
+                      },
+                      origin: {
+                        type: 'projection',
+                        name: 'Questionnaires',
+                        idField: 'questionnaire-participantId',
+                      },
                     },
-                    origin: {
-                      type: 'projection',
-                      name: 'Questionnaires',
-                      idField: 'questionnaire-participantId',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',
@@ -1018,7 +1034,11 @@ narrative('Questionnaires', 'Q9m2Kp4Lx', () => {
 }\`),
     )
     .server(() => {
-      data([source().state('QuestionnaireProgress').fromProjection('Questionnaires', 'questionnaire-participantId')]);
+      data({
+        items: [
+          source().state('QuestionnaireProgress').fromProjection('Questionnaires', 'questionnaire-participantId'),
+        ],
+      });
       specs(() => {
         rule('questionnaires show current progress', 'r1A3Bp9W', () => {
           example('a question has already been answered')
@@ -1497,30 +1517,32 @@ narrative('Multi Given Flow', 'MULTI-GIVEN', () => {
               },
               server: {
                 description: 'Server for referenced states',
-                data: [
-                  {
-                    target: {
-                      type: 'State',
-                      name: 'QuestionnaireProgress',
+                data: {
+                  items: [
+                    {
+                      target: {
+                        type: 'State',
+                        name: 'QuestionnaireProgress',
+                      },
+                      origin: {
+                        type: 'projection',
+                        name: 'QuestionnaireProjection',
+                        idField: 'participantId',
+                      },
                     },
-                    origin: {
-                      type: 'projection',
-                      name: 'QuestionnaireProjection',
-                      idField: 'participantId',
+                    {
+                      target: {
+                        type: 'State',
+                        name: 'QuestionnaireConfig',
+                      },
+                      origin: {
+                        type: 'database',
+                        collection: 'ConfigStore',
+                        query: { questionnaireId: '$questionnaireId' },
+                      },
                     },
-                  },
-                  {
-                    target: {
-                      type: 'State',
-                      name: 'QuestionnaireConfig',
-                    },
-                    origin: {
-                      type: 'database',
-                      collection: 'ConfigStore',
-                      query: { questionnaireId: '$questionnaireId' },
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',
@@ -1622,10 +1644,12 @@ type QuestionnaireConfig = State<
 >;
 narrative('Referenced States Flow', 'REF-STATES', () => {
   query('query with database states', 'REF-SLICE').server(() => {
-    data([
-      source().state('QuestionnaireProgress').fromProjection('QuestionnaireProjection', 'participantId'),
-      source().state('QuestionnaireConfig').fromDatabase('ConfigStore', { questionnaireId: '$questionnaireId' }),
-    ]);
+    data({
+      items: [
+        source().state('QuestionnaireProgress').fromProjection('QuestionnaireProjection', 'participantId'),
+        source().state('QuestionnaireConfig').fromDatabase('ConfigStore', { questionnaireId: '$questionnaireId' }),
+      ],
+    });
     specs('Database State Rules', () => {
       rule('questionnaire config is available when referenced', 'RefState', () => {
         example('config from database is accessible')
@@ -2112,19 +2136,21 @@ narrative('Todo List Summary', 'TODO-001', () => {
                 },
                 server: {
                   description: 'Summary server',
-                  data: [
-                    {
-                      target: {
-                        type: 'State',
-                        name: 'TodoListSummary',
+                  data: {
+                    items: [
+                      {
+                        target: {
+                          type: 'State',
+                          name: 'TodoListSummary',
+                        },
+                        origin: {
+                          type: 'projection',
+                          name: 'TodoSummary',
+                          singleton: true,
+                        },
                       },
-                      origin: {
-                        type: 'projection',
-                        name: 'TodoSummary',
-                        singleton: true,
-                      },
-                    },
-                  ],
+                    ],
+                  },
                   specs: [
                     {
                       type: 'gherkin',
@@ -2165,7 +2191,7 @@ type TodoListSummary = State<
 >;
 narrative('Todo Summary Flow', 'TODO-SUMMARY', () => {
   query('views todo summary', 'SUMMARY-SLICE').server(() => {
-    data([source().state('TodoListSummary').fromSingletonProjection('TodoSummary')]);
+    data({ items: [source().state('TodoListSummary').fromSingletonProjection('TodoSummary')] });
     specs('Summary Rules', () => {});
   });
 });
@@ -2189,19 +2215,21 @@ narrative('Todo Summary Flow', 'TODO-SUMMARY', () => {
                 },
                 server: {
                   description: 'Todo server',
-                  data: [
-                    {
-                      target: {
-                        type: 'State',
-                        name: 'TodoState',
+                  data: {
+                    items: [
+                      {
+                        target: {
+                          type: 'State',
+                          name: 'TodoState',
+                        },
+                        origin: {
+                          type: 'projection',
+                          name: 'Todos',
+                          idField: 'todoId',
+                        },
                       },
-                      origin: {
-                        type: 'projection',
-                        name: 'Todos',
-                        idField: 'todoId',
-                      },
-                    },
-                  ],
+                    ],
+                  },
                   specs: [
                     {
                       type: 'gherkin',
@@ -2242,7 +2270,7 @@ type TodoState = State<
 >;
 narrative('Todo Flow', 'TODO-FLOW', () => {
   query('views todo', 'TODO-SLICE').server(() => {
-    data([source().state('TodoState').fromProjection('Todos', 'todoId')]);
+    data({ items: [source().state('TodoState').fromProjection('Todos', 'todoId')] });
     specs('Todo Rules', () => {});
   });
 });
@@ -2266,19 +2294,21 @@ narrative('Todo Flow', 'TODO-FLOW', () => {
                 },
                 server: {
                   description: 'User project server',
-                  data: [
-                    {
-                      target: {
-                        type: 'State',
-                        name: 'UserProjectState',
+                  data: {
+                    items: [
+                      {
+                        target: {
+                          type: 'State',
+                          name: 'UserProjectState',
+                        },
+                        origin: {
+                          type: 'projection',
+                          name: 'UserProjects',
+                          idField: ['userId', 'projectId'],
+                        },
                       },
-                      origin: {
-                        type: 'projection',
-                        name: 'UserProjects',
-                        idField: ['userId', 'projectId'],
-                      },
-                    },
-                  ],
+                    ],
+                  },
                   specs: [
                     {
                       type: 'gherkin',
@@ -2321,7 +2351,9 @@ type UserProjectState = State<
 >;
 narrative('User Project Flow', 'USER-PROJECT-FLOW', () => {
   query('views user project', 'USER-PROJECT-SLICE').server(() => {
-    data([source().state('UserProjectState').fromCompositeProjection('UserProjects', ['userId', 'projectId'])]);
+    data({
+      items: [source().state('UserProjectState').fromCompositeProjection('UserProjects', ['userId', 'projectId'])],
+    });
     specs('User Project Rules', () => {});
   });
 });
@@ -2345,19 +2377,21 @@ narrative('User Project Flow', 'USER-PROJECT-FLOW', () => {
                 },
                 server: {
                   description: 'Summary server',
-                  data: [
-                    {
-                      target: {
-                        type: 'State',
-                        name: 'TodoListSummary',
+                  data: {
+                    items: [
+                      {
+                        target: {
+                          type: 'State',
+                          name: 'TodoListSummary',
+                        },
+                        origin: {
+                          type: 'projection',
+                          name: 'TodoSummary',
+                          singleton: true,
+                        },
                       },
-                      origin: {
-                        type: 'projection',
-                        name: 'TodoSummary',
-                        singleton: true,
-                      },
-                    },
-                  ],
+                    ],
+                  },
                   specs: [
                     {
                       type: 'gherkin',
@@ -2376,19 +2410,21 @@ narrative('User Project Flow', 'USER-PROJECT-FLOW', () => {
                 },
                 server: {
                   description: 'Todo server',
-                  data: [
-                    {
-                      target: {
-                        type: 'State',
-                        name: 'TodoState',
+                  data: {
+                    items: [
+                      {
+                        target: {
+                          type: 'State',
+                          name: 'TodoState',
+                        },
+                        origin: {
+                          type: 'projection',
+                          name: 'Todos',
+                          idField: 'todoId',
+                        },
                       },
-                      origin: {
-                        type: 'projection',
-                        name: 'Todos',
-                        idField: 'todoId',
-                      },
-                    },
-                  ],
+                    ],
+                  },
                   specs: [
                     {
                       type: 'gherkin',
@@ -2407,19 +2443,21 @@ narrative('User Project Flow', 'USER-PROJECT-FLOW', () => {
                 },
                 server: {
                   description: 'User project server',
-                  data: [
-                    {
-                      target: {
-                        type: 'State',
-                        name: 'UserProjectTodos',
+                  data: {
+                    items: [
+                      {
+                        target: {
+                          type: 'State',
+                          name: 'UserProjectTodos',
+                        },
+                        origin: {
+                          type: 'projection',
+                          name: 'UserProjectTodos',
+                          idField: ['userId', 'projectId'],
+                        },
                       },
-                      origin: {
-                        type: 'projection',
-                        name: 'UserProjectTodos',
-                        idField: ['userId', 'projectId'],
-                      },
-                    },
-                  ],
+                    ],
+                  },
                   specs: [
                     {
                       type: 'gherkin',
@@ -2494,15 +2532,17 @@ type UserProjectTodos = State<
 >;
 narrative('All Projection Types', 'ALL-PROJ', () => {
   query('views summary', 'SUMMARY-SLICE').server(() => {
-    data([source().state('TodoListSummary').fromSingletonProjection('TodoSummary')]);
+    data({ items: [source().state('TodoListSummary').fromSingletonProjection('TodoSummary')] });
     specs('Summary Rules', () => {});
   });
   query('views todo', 'TODO-SLICE').server(() => {
-    data([source().state('TodoState').fromProjection('Todos', 'todoId')]);
+    data({ items: [source().state('TodoState').fromProjection('Todos', 'todoId')] });
     specs('Todo Rules', () => {});
   });
   query('views user project todos', 'USER-PROJECT-SLICE').server(() => {
-    data([source().state('UserProjectTodos').fromCompositeProjection('UserProjectTodos', ['userId', 'projectId'])]);
+    data({
+      items: [source().state('UserProjectTodos').fromCompositeProjection('UserProjectTodos', ['userId', 'projectId'])],
+    });
     specs('User Project Rules', () => {});
   });
 });
@@ -2955,13 +2995,15 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
                 client: { specs: [] },
                 server: {
                   description: 'Order server',
-                  data: [
-                    {
-                      id: 'SINK-001',
-                      target: { type: 'Event', name: 'OrderPlaced' },
-                      destination: { type: 'stream', pattern: 'orders-stream' },
-                    },
-                  ],
+                  data: {
+                    items: [
+                      {
+                        id: 'SINK-001',
+                        target: { type: 'Event', name: 'OrderPlaced' },
+                        destination: { type: 'stream', pattern: 'orders-stream' },
+                      },
+                    ],
+                  },
                   specs: [],
                 },
               },
@@ -2999,13 +3041,15 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
                 client: { specs: [] },
                 server: {
                   description: 'Order server',
-                  data: [
-                    {
-                      id: 'SOURCE-001',
-                      target: { type: 'State', name: 'OrderState' },
-                      origin: { type: 'projection', name: 'Orders', idField: 'orderId' },
-                    },
-                  ],
+                  data: {
+                    items: [
+                      {
+                        id: 'SOURCE-001',
+                        target: { type: 'State', name: 'OrderState' },
+                        origin: { type: 'projection', name: 'Orders', idField: 'orderId' },
+                      },
+                    ],
+                  },
                   specs: [],
                 },
               },
@@ -3042,12 +3086,14 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
                 client: { specs: [] },
                 server: {
                   description: 'Order server',
-                  data: [
-                    {
-                      target: { type: 'Event', name: 'OrderPlaced' },
-                      destination: { type: 'stream', pattern: 'orders-stream' },
-                    },
-                  ],
+                  data: {
+                    items: [
+                      {
+                        target: { type: 'Event', name: 'OrderPlaced' },
+                        destination: { type: 'stream', pattern: 'orders-stream' },
+                      },
+                    ],
+                  },
                   specs: [],
                 },
               },
@@ -3086,13 +3132,15 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
                 client: { specs: [] },
                 server: {
                   description: 'Order server',
-                  data: [
-                    {
-                      target: { type: 'State', name: 'OrderState' },
-                      origin: { type: 'projection', name: 'Orders', idField: 'orderId' },
-                      _additionalInstructions: 'Filter by active orders only',
-                    },
-                  ],
+                  data: {
+                    items: [
+                      {
+                        target: { type: 'State', name: 'OrderState' },
+                        origin: { type: 'projection', name: 'Orders', idField: 'orderId' },
+                        _additionalInstructions: 'Filter by active orders only',
+                      },
+                    ],
+                  },
                   specs: [],
                 },
               },

@@ -26,18 +26,20 @@
           "request": "mutation EnterShoppingCriteria($input: EnterShoppingCriteriaInput!) {\n  enterShoppingCriteria(input: $input) {\n    success\n    error {\n      type\n      message\n    }\n  }\n}",
           "server": {
             "description": "",
-            "data": [
-              {
-                "target": {
-                  "type": "Event",
-                  "name": "ShoppingCriteriaEntered"
-                },
-                "destination": {
-                  "type": "stream",
-                  "pattern": "shopping-session-${sessionId}"
+            "data": {
+              "items": [
+                {
+                  "target": {
+                    "type": "Event",
+                    "name": "ShoppingCriteriaEntered"
+                  },
+                  "destination": {
+                    "type": "stream",
+                    "pattern": "shopping-session-${sessionId}"
+                  }
                 }
-              }
-            ],
+              ]
+            },
             "specs": {
               "name": "When shopper submits criteria, a shopping session is started",
               "rules": [
@@ -114,43 +116,45 @@
           },
           "server": {
             "description": "",
-            "data": [
-              {
-                "target": {
-                  "type": "Command",
-                  "name": "SuggestShoppingItems"
-                },
-                "destination": {
-                  "type": "integration",
-                  "systems": ["AI"],
-                  "message": {
-                    "name": "DoChat",
-                    "type": "command"
-                  }
-                },
-                "_additionalInstructions": "add the following to the DoChat: schemaName: Products, systemPrompt: use the PRODUCT_CATALOGUE_PRODUCTS MCP tool to get product data",
-                "_withState": {
+            "data": {
+              "items": [
+                {
                   "target": {
-                    "type": "State",
-                    "name": "Products"
+                    "type": "Command",
+                    "name": "SuggestShoppingItems"
                   },
-                  "origin": {
+                  "destination": {
                     "type": "integration",
-                    "systems": ["ProductCatalog"]
+                    "systems": ["AI"],
+                    "message": {
+                      "name": "DoChat",
+                      "type": "command"
+                    }
+                  },
+                  "_additionalInstructions": "add the following to the DoChat: schemaName: Products, systemPrompt: use the PRODUCT_CATALOGUE_PRODUCTS MCP tool to get product data",
+                  "_withState": {
+                    "target": {
+                      "type": "State",
+                      "name": "Products"
+                    },
+                    "origin": {
+                      "type": "integration",
+                      "systems": ["ProductCatalog"]
+                    }
+                  }
+                },
+                {
+                  "target": {
+                    "type": "Event",
+                    "name": "ShoppingItemsSuggested"
+                  },
+                  "destination": {
+                    "type": "stream",
+                    "pattern": "shopping-session-${sessionId}"
                   }
                 }
-              },
-              {
-                "target": {
-                  "type": "Event",
-                  "name": "ShoppingItemsSuggested"
-                },
-                "destination": {
-                  "type": "stream",
-                  "pattern": "shopping-session-${sessionId}"
-                }
-              }
-            ],
+              ]
+            },
             "specs": {
               "name": "When chat is triggered, AI suggests items based on product catalog",
               "rules": [
@@ -268,19 +272,21 @@
           "request": "query GetSuggestedItems($sessionId: ID!) {\n  suggestedItems(sessionId: $sessionId) {\n    items {\n      productId\n      name\n      quantity\n      reason\n    }\n  }\n}",
           "server": {
             "description": "",
-            "data": [
-              {
-                "target": {
-                  "type": "State",
-                  "name": "SuggestedItems"
-                },
-                "origin": {
-                  "type": "projection",
-                  "name": "SuggestedItemsProjection",
-                  "idField": "sessionId"
+            "data": {
+              "items": [
+                {
+                  "target": {
+                    "type": "State",
+                    "name": "SuggestedItems"
+                  },
+                  "origin": {
+                    "type": "projection",
+                    "name": "SuggestedItemsProjection",
+                    "idField": "sessionId"
+                  }
                 }
-              }
-            ],
+              ]
+            },
             "specs": {
               "name": "Suggested items are available for viewing",
               "rules": [
@@ -380,18 +386,20 @@
           },
           "server": {
             "description": "",
-            "data": [
-              {
-                "target": {
-                  "type": "Event",
-                  "name": "ItemsAddedToCart"
-                },
-                "destination": {
-                  "type": "stream",
-                  "pattern": "shopping-session-${sessionId}"
+            "data": {
+              "items": [
+                {
+                  "target": {
+                    "type": "Event",
+                    "name": "ItemsAddedToCart"
+                  },
+                  "destination": {
+                    "type": "stream",
+                    "pattern": "shopping-session-${sessionId}"
+                  }
                 }
-              }
-            ],
+              ]
+            },
             "specs": {
               "name": "When shopper accepts items, they are added to cart",
               "rules": [

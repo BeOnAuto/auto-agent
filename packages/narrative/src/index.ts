@@ -2,10 +2,11 @@ import type { z } from 'zod';
 
 // Apollo GraphQL
 export { gql } from 'graphql-tag';
-export { DataSinkSchema, DataSourceSchema, MessageTargetSchema } from './schema';
+export { DataSchema, DataSinkSchema, DataSourceSchema, MessageTargetSchema } from './schema';
 // Core types and utilities
 export type {
   Command,
+  Data,
   DataItem,
   DataSink,
   DataSinkItem,

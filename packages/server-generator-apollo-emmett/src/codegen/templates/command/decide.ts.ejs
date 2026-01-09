@@ -9,7 +9,7 @@ const fallbackEvents = Object.values(gwtMapping).flatMap(scenarios =>
 );
 const uniqueEventTypes = [...new Set(fallbackEvents.map(e => pascalCase(e.eventRef)))];
 
-const integrationData = (slice.server?.data ?? []).filter(d => d.destination?.type === 'integration');
+const integrationData = (slice.server?.data?.items ?? []).filter(d => d.destination?.type === 'integration');
 const integration = integrationData[0];
 const integrationReturnType = integration?._withState?.target?.name;
 const integrationReturnSystem = integration?._withState?.origin?.systems?.[0];

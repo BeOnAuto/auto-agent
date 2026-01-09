@@ -70,24 +70,26 @@ const specVariant1: SpecsSchema = {
           },
           server: {
             description: 'Project items based on ItemCreated',
-            data: [
-              {
-                origin: {
-                  type: 'projection',
-                  name: 'ItemCreated',
-                  idField: 'id',
-                },
-                target: {
-                  type: 'State',
-                  name: 'AvailableItems',
-                  fields: {
-                    id: { type: 'string' },
-                    description: { type: 'string' },
-                    addedAt: { type: 'Date' },
+            data: {
+              items: [
+                {
+                  origin: {
+                    type: 'projection',
+                    name: 'ItemCreated',
+                    idField: 'id',
+                  },
+                  target: {
+                    type: 'State',
+                    name: 'AvailableItems',
+                    fields: {
+                      id: { type: 'string' },
+                      description: { type: 'string' },
+                      addedAt: { type: 'Date' },
+                    },
                   },
                 },
-              },
-            ],
+              ],
+            },
             specs: [
               {
                 type: 'gherkin',

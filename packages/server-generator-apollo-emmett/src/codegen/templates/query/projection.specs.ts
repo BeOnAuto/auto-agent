@@ -87,19 +87,21 @@ describe('projection.ts.ejs', () => {
               },
               server: {
                 description: 'projection for available listings',
-                data: [
-                  {
-                    target: {
-                      type: 'State',
-                      name: 'AvailableListings',
+                data: {
+                  items: [
+                    {
+                      target: {
+                        type: 'State',
+                        name: 'AvailableListings',
+                      },
+                      origin: {
+                        type: 'projection',
+                        name: 'AvailablePropertiesProjection',
+                        idField: 'propertyId',
+                      },
                     },
-                    origin: {
-                      type: 'projection',
-                      name: 'AvailablePropertiesProjection',
-                      idField: 'propertyId',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',
@@ -309,19 +311,21 @@ describe('projection.ts.ejs', () => {
               },
               server: {
                 description: '',
-                data: [
-                  {
-                    origin: {
-                      type: 'projection',
-                      idField: 'sessionId',
-                      name: 'WishlistProjection',
+                data: {
+                  items: [
+                    {
+                      origin: {
+                        type: 'projection',
+                        idField: 'sessionId',
+                        name: 'WishlistProjection',
+                      },
+                      target: {
+                        type: 'State',
+                        name: 'Wishlist',
+                      },
                     },
-                    target: {
-                      type: 'State',
-                      name: 'Wishlist',
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [],
               },
             },
@@ -450,19 +454,21 @@ describe('projection.ts.ejs', () => {
               },
               server: {
                 description: 'singleton projection for todo summary',
-                data: [
-                  {
-                    target: {
-                      type: 'State',
-                      name: 'TodoSummary',
+                data: {
+                  items: [
+                    {
+                      target: {
+                        type: 'State',
+                        name: 'TodoSummary',
+                      },
+                      origin: {
+                        type: 'projection',
+                        name: 'TodoSummaryProjection',
+                        singleton: true,
+                      },
                     },
-                    origin: {
-                      type: 'projection',
-                      name: 'TodoSummaryProjection',
-                      singleton: true,
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',
@@ -665,19 +671,21 @@ describe('projection.ts.ejs', () => {
               },
               server: {
                 description: 'composite key projection for user projects',
-                data: [
-                  {
-                    target: {
-                      type: 'State',
-                      name: 'UserProject',
+                data: {
+                  items: [
+                    {
+                      target: {
+                        type: 'State',
+                        name: 'UserProject',
+                      },
+                      origin: {
+                        type: 'projection',
+                        name: 'UserProjectsProjection',
+                        idField: ['userId', 'projectId'],
+                      },
                     },
-                    origin: {
-                      type: 'projection',
-                      name: 'UserProjectsProjection',
-                      idField: ['userId', 'projectId'],
-                    },
-                  },
-                ],
+                  ],
+                },
                 specs: [
                   {
                     type: 'gherkin',

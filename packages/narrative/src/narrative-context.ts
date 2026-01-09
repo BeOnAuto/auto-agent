@@ -3,7 +3,7 @@ import type { z } from 'zod';
 import type { CommandSlice, ExperienceSlice, Narrative, QuerySlice, Slice } from './index';
 import type { GivenTypeInfo } from './loader/ts-utils';
 import type { ClientSpecNode, ExampleSchema, RuleSchema, SpecSchema, StepSchema } from './schema';
-import type { DataItem, DataSink, DataSinkItem, DataSource, DataSourceItem } from './types';
+import type { Data, DataItem, DataSink, DataSource } from './types';
 
 type Step = z.infer<typeof StepSchema>;
 type Example = z.infer<typeof ExampleSchema>;
@@ -281,28 +281,34 @@ export function setQueryRequest(request: string): void {
   slice.request = request;
 }
 
-export function setSliceData(data: DataItem[]): void {
+export function setSliceData(data: Data): void {
   const slice = getCurrentSlice();
   if (!slice) throw new Error('No active slice');
-  const sinks = data.filter((item): item is DataSinkItem => item.__type === 'sink');
-  const sources = data.filter((item): item is DataSourceItem => item.__type === 'source');
+  if (!('server' in slice)) throw new Error('Data can only be set on slices with a server');
 
-  if (slice.type === 'command') {
-    // Command slices only have sinks in their data
-    slice.server.data = sinks.length > 0 ? sinks : undefined;
-  } else if (slice.type === 'query') {
-    // Query slices only have sources in their data
-    slice.server.data = sources.length > 0 ? sources : undefined;
-  } else if (slice.type === 'react') {
-    slice.server.data = data.length > 0 ? stripTypeDiscriminator(data) : undefined;
+  const items = data.items;
+  if (items.length === 0) {
+    slice.server.data = undefined;
+    return;
   }
+
+  // Strip __type discriminator (if present) and build the data object
+  const strippedItems = stripTypeDiscriminator(items);
+
+  slice.server.data = {
+    ...(data.id != null && data.id !== '' && { id: data.id }),
+    items: strippedItems,
+  };
 }
 
-function stripTypeDiscriminator(items: DataItem[]): (DataSink | DataSource)[] {
+function stripTypeDiscriminator(items: (DataSink | DataSource | DataItem)[]): (DataSink | DataSource)[] {
   return items.map((item) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { __type, ...rest } = item;
-    return rest as DataSink | DataSource;
+    if ('__type' in item) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __type, ...rest } = item;
+      return rest as DataSink | DataSource;
+    }
+    return item as DataSink | DataSource;
   });
 }
 

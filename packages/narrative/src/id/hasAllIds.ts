@@ -41,9 +41,15 @@ function hasClientSpecIds(slice: Slice): boolean {
 }
 
 function hasDataIds(slice: Slice): boolean {
-  if (!('server' in slice) || !slice.server?.data || !Array.isArray(slice.server.data)) return true;
+  if (!('server' in slice) || !slice.server?.data) return true;
 
-  return slice.server.data.every((item) => {
+  // Validate the data wrapper has an ID
+  if (!hasValidId(slice.server.data)) return false;
+
+  // Validate each item in the items array
+  if (!Array.isArray(slice.server.data.items)) return true;
+
+  return slice.server.data.items.every((item) => {
     if (!hasValidId(item)) return false;
     if ('destination' in item && item._withState) {
       return hasValidId(item._withState);

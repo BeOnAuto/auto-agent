@@ -64,12 +64,12 @@ function processStreamSink(item: unknown, exampleData: Record<string, unknown>) 
 
 export function getStreamFromSink(slice: Slice): { streamPattern?: string; streamId?: string } {
   if (!('server' in slice)) return {};
-  if (slice.server == null || !('data' in slice.server) || !Array.isArray(slice.server.data)) {
+  if (slice.server?.data?.items == null || !Array.isArray(slice.server.data.items)) {
     return {};
   }
   const gwtSpecs = extractGwtSpecsFromSlice(slice);
   const exampleData = extractExampleDataFromSpecs(slice, gwtSpecs);
-  const serverData = slice.server.data;
+  const serverData = slice.server.data.items;
 
   for (const item of serverData) {
     const result = processStreamSink(item, exampleData);

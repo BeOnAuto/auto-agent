@@ -537,7 +537,7 @@ async function prepareTemplateData(
     messages: allMessages,
     message:
       slice.type === 'query' && allMessages
-        ? allMessages.find((m) => m.name === slice.server?.data?.[0]?.target?.name)
+        ? allMessages.find((m) => m.name === slice.server?.data?.items?.[0]?.target?.name)
         : undefined,
     integrations,
     eventImportGroups,
