@@ -1,5 +1,18 @@
 # @auto-engineer/cli
 
+## 0.22.0
+
+### Minor Changes
+
+- Adds id field to data sink and data source
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/file-store@0.22.0
+  - @auto-engineer/narrative@0.22.0
+  - @auto-engineer/pipeline@0.22.0
+
 ## 0.21.2
 
 ### Patch Changes

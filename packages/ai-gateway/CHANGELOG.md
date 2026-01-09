@@ -1,5 +1,11 @@
 # @auto-engineer/ai-gateway
 
+## 0.22.0
+
+### Minor Changes
+
+- Adds id field to data sink and data source
+
 ## 0.21.2
 
 ## 0.21.0

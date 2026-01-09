@@ -1,5 +1,18 @@
 # @auto-engineer/information-architect
 
+## 0.22.0
+
+### Minor Changes
+
+- Adds id field to data sink and data source
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @auto-engineer/ai-gateway@0.22.0
+  - @auto-engineer/message-bus@0.22.0
+  - @auto-engineer/narrative@0.22.0
+
 ## 0.21.2
 
 ### Patch Changes
