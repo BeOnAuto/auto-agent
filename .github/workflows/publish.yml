@@ -55,12 +55,19 @@ jobs:
       - name: Check for changesets
         id: check_changesets
         run: |
-          if ls .changeset/*.md 1> /dev/null 2>&1 && [ "$(ls -A .changeset/*.md | grep -v README.md)" ]; then
+          # Use release-automation CLI to check for changesets
+          if pnpm release-automation check --require-changesets; then
             echo "has_changesets=true" >> $GITHUB_OUTPUT
             echo "📦 Changesets detected"
           else
-            echo "has_changesets=false" >> $GITHUB_OUTPUT
-            echo "✨ No changesets to process"
+            EXIT_CODE=$?
+            if [ $EXIT_CODE -eq 10 ]; then
+              echo "has_changesets=false" >> $GITHUB_OUTPUT
+              echo "✨ No changesets to process"
+            else
+              echo "❌ Error checking changesets (exit code: $EXIT_CODE)"
+              exit $EXIT_CODE
+            fi
           fi
 
       - name: Version packages
