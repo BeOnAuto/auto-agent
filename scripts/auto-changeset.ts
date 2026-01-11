@@ -145,11 +145,24 @@ function determineBumpType(
 }
 
 /**
- * Use Claude CLI to generate a changelog description
+ * Check if Claude CLI is available
  */
-function generateChangelogWithClaude(
+function isClaudeCliAvailable(): boolean {
+	try {
+		execSync("which claude", { stdio: "pipe" });
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * Generate changelog using Anthropic API
+ */
+async function generateChangelogWithAnthropicAPI(
 	commits: ConventionalCommit[],
-): string {
+	apiKey: string,
+): Promise<string> {
 	const commitSummary = commits
 		.map(
 			(c) =>
@@ -178,31 +191,158 @@ Example format:
 Now generate the changelog for the commits above:`;
 
 	try {
-		// Write prompt to a temporary file
-		const tempFile = join(process.cwd(), `.changeset-prompt-${Date.now()}.txt`);
-		writeFileSync(tempFile, prompt);
+		// Use node's https module to call Anthropic API
+		const https = await import("https");
 
-		// Call Claude CLI - it should be available in the environment
-		const result = execSync(
-			`claude -p "$(cat ${tempFile})" --no-stream --output-only`,
-			{
-				encoding: "utf8",
-				stdio: ["pipe", "pipe", "pipe"],
-			},
-		);
+		const data = JSON.stringify({
+			model: "claude-3-5-haiku-20241022",
+			max_tokens: 500,
+			messages: [{ role: "user", content: prompt }],
+		});
 
-		// Clean up temp file
-		execSync(`rm ${tempFile}`);
+		return new Promise((resolve, reject) => {
+			const options = {
+				hostname: "api.anthropic.com",
+				port: 443,
+				path: "/v1/messages",
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"x-api-key": apiKey,
+					"anthropic-version": "2023-06-01",
+					"Content-Length": data.length,
+				},
+			};
 
-		return result.trim();
+			const req = https.request(options, (res) => {
+				let body = "";
+				res.on("data", (chunk) => (body += chunk));
+				res.on("end", () => {
+					if (res.statusCode === 200) {
+						const response = JSON.parse(body);
+						resolve(response.content[0].text.trim());
+					} else {
+						reject(new Error(`API error: ${res.statusCode} ${body}`));
+					}
+				});
+			});
+
+			req.on("error", reject);
+			req.write(data);
+			req.end();
+		});
 	} catch (error) {
-		console.error("Error calling Claude CLI:", error);
-		// Fallback to simple bullet list
-		return commits
-			.map((c) => `- ${c.subject}`)
-			.slice(0, 5)
-			.join("\n");
+		throw error;
 	}
+}
+
+/**
+ * Generate simple changelog from commit messages (fallback)
+ */
+function generateSimpleChangelog(commits: ConventionalCommit[]): string {
+	// Group commits by type
+	const features = commits.filter((c) => c.type === "feat");
+	const fixes = commits.filter((c) => c.type === "fix");
+	const others = commits.filter((c) => !["feat", "fix"].includes(c.type));
+
+	const lines: string[] = [];
+
+	if (features.length > 0) {
+		lines.push(
+			...features.map((c) => `- ${c.scope ? `**${c.scope}**: ` : ""}${c.subject}`),
+		);
+	}
+
+	if (fixes.length > 0) {
+		lines.push(
+			...fixes.map((c) => `- ${c.scope ? `**${c.scope}**: ` : ""}${c.subject}`),
+		);
+	}
+
+	if (others.length > 0 && lines.length < 3) {
+		lines.push(
+			...others.map((c) => `- ${c.scope ? `**${c.scope}**: ` : ""}${c.subject}`).slice(0, 5 - lines.length),
+		);
+	}
+
+	return lines.slice(0, 5).join("\n");
+}
+
+/**
+ * Use Claude CLI or API to generate a changelog description
+ */
+async function generateChangelog(
+	commits: ConventionalCommit[],
+): Promise<string> {
+	// Check for Claude CLI first (fastest)
+	if (isClaudeCliAvailable()) {
+		const commitSummary = commits
+			.map(
+				(c) =>
+					`- ${c.type}${c.scope ? `(${c.scope})` : ""}: ${c.subject}\n  ${c.body || "(no additional details)"}`,
+			)
+			.join("\n\n");
+
+		const prompt = `You are analyzing git commits to generate a changelog entry. Here are the commits:
+
+${commitSummary}
+
+Generate a concise changelog description as bullet points. Rules:
+- Use 2-5 bullet points maximum
+- Focus on user-facing changes and impact
+- Group related changes together
+- Use clear, non-technical language where possible
+- Start each bullet with a dash and capitalize the first word
+- Do NOT include commit hashes, types, or scopes
+- Do NOT use markdown formatting besides the dashes
+
+Example format:
+- Added user authentication with OAuth support
+- Fixed critical bug in data synchronization
+- Improved performance of search queries by 50%
+
+Now generate the changelog for the commits above:`;
+
+		try {
+			const tempFile = join(
+				process.cwd(),
+				`.changeset-prompt-${Date.now()}.txt`,
+			);
+			writeFileSync(tempFile, prompt);
+
+			const result = execSync(
+				`claude -p "$(cat ${tempFile})" --no-stream --output-only`,
+				{
+					encoding: "utf8",
+					stdio: ["pipe", "pipe", "pipe"],
+				},
+			);
+
+			execSync(`rm ${tempFile}`);
+			console.log("✨ Generated changelog with Claude CLI");
+			return result.trim();
+		} catch (error) {
+			console.warn("⚠️  Claude CLI failed, trying API...");
+		}
+	}
+
+	// Check for Anthropic API key
+	const apiKey = process.env.ANTHROPIC_API_KEY;
+	if (apiKey) {
+		try {
+			console.log("🔑 Using Anthropic API...");
+			const result = await generateChangelogWithAnthropicAPI(commits, apiKey);
+			console.log("✨ Generated changelog with Anthropic API");
+			return result;
+		} catch (error) {
+			console.warn("⚠️  Anthropic API failed, using fallback...");
+		}
+	}
+
+	// Fallback to simple changelog
+	console.log("📝 Using simple changelog generation (no AI available)");
+	console.log("   Tip: Install Claude CLI or set ANTHROPIC_API_KEY for AI-generated changelogs");
+	return generateSimpleChangelog(commits);
 }
 
 /**
@@ -256,7 +396,7 @@ ${data.description}
 /**
  * Main function
  */
-function main() {
+async function main() {
 	console.log("🔍 Checking for commits that need changesets...");
 
 	const commitHashes = getCommitsSinceLastChangeset();
@@ -291,9 +431,9 @@ function main() {
 	const bumpType = determineBumpType(commits);
 	console.log(`📊 Determined version bump: ${bumpType}`);
 
-	// Generate changelog with Claude
-	console.log("🤖 Generating changelog with Claude CLI...");
-	const description = generateChangelogWithClaude(commits);
+	// Generate changelog
+	console.log("🤖 Generating changelog...");
+	const description = await generateChangelog(commits);
 
 	// Create changeset
 	createChangesetFile({
@@ -309,4 +449,7 @@ function main() {
 	console.log("---");
 }
 
-main();
+main().catch((error) => {
+	console.error("❌ Error:", error);
+	process.exit(1);
+});
