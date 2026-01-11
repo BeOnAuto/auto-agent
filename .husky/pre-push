@@ -32,3 +32,6 @@ if [ "${AUTO_CHANGESET_AMEND:-true}" = "true" ]; then
     echo "✅ Changesets added to commit!"
   fi
 fi
+
+# Exit successfully
+exit 0
