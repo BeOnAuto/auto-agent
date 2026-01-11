@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Auto-generate changesets before push
+echo "🔄 Auto-generating changesets..."
+tsx scripts/auto-changeset.ts
+
+# Check if any changesets were created
+if [ -n "$(git status --porcelain .changeset/*.md 2>/dev/null)" ]; then
+  echo "📦 Staging new changesets..."
+  git add .changeset/*.md
+
+  # Amend the last commit to include the changesets
+  echo "✏️  Amending commit with changesets..."
+  git commit --amend --no-edit --no-verify
+
+  echo "✅ Changesets added to commit!"
+else
+  echo "✨ No new changesets to add"
+fi

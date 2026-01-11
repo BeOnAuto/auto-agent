@@ -20,7 +20,6 @@
     "clean:check": "pnpm clean && pnpm check",
     "link:dev": "pnpm --filter @auto-engineer/* run link:dev",
     "unlink:dev": "pnpm --filter @auto-engineer/* run unlink:dev",
-    "changeset": "changeset",
     "changeset:prepare-changelog": "tsx scripts/prepare-changelog.ts",
     "version": "changeset version && pnpm changeset:prepare-changelog",
     "release": "pnpm publish -r",
