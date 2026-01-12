@@ -8,7 +8,7 @@ fi
 
 # Auto-generate changesets before push
 echo "🔄 Auto-generating changesets..."
-pnpm release-automation generate
+pnpm tsx packages/release-automation/bin/release-automation.ts generate
 
 # Check exit code
 EXIT_CODE=$?

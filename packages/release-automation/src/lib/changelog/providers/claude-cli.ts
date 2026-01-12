@@ -22,7 +22,7 @@ export class ClaudeCliProvider implements ChangelogProvider {
     try {
       writeFileSync(tempFile, prompt);
 
-      const result = execSync(`claude -p "$(cat ${tempFile})" --no-stream --output-only`, {
+      const result = execSync(`claude -p "$(cat ${tempFile})"`, {
         encoding: 'utf8',
         stdio: ['pipe', 'pipe', 'pipe'],
       });
