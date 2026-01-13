@@ -1,5 +1,15 @@
 # @auto-engineer/release-automation
 
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
 ## 0.23.0
 
 ### Minor Changes

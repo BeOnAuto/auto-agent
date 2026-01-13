@@ -2,6 +2,16 @@
 
 # @auto-engineer/ai-gateway
 
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
 ## 0.23.0
 
 ### Minor Changes
@@ -355,6 +365,23 @@
 
 # @auto-engineer/cli
 
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/file-store@0.24.0
+  - @auto-engineer/narrative@0.24.0
+  - @auto-engineer/pipeline@0.24.0
+
 ## 0.23.0
 
 ### Minor Changes
@@ -518,6 +545,22 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/ai-gateway@0.24.0
+  - @auto-engineer/message-bus@0.24.0
 
 ## 0.23.0
 
@@ -1267,6 +1310,21 @@
 
 # create-auto-app
 
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/id@0.24.0
+
 ## 0.23.0
 
 ### Minor Changes
@@ -1770,6 +1828,21 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/message-bus@0.24.0
 
 ## 0.23.0
 
@@ -2539,6 +2612,22 @@
 
 # @auto-engineer/dev-server
 
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/cli@0.24.0
+  - @auto-engineer/message-bus@0.24.0
+
 ## 0.23.0
 
 ### Minor Changes
@@ -2803,6 +2892,16 @@
   - @auto-engineer/message-bus@0.11.13
 
 # @auto-engineer/file-store
+
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
 
 ## 0.23.0
 
@@ -3114,6 +3213,21 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/message-bus@0.24.0
 
 ## 0.23.0
 
@@ -3841,6 +3955,22 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/ai-gateway@0.24.0
+  - @auto-engineer/message-bus@0.24.0
 
 ## 0.23.0
 
@@ -4691,6 +4821,22 @@
 
 # @auto-engineer/frontend-implementer
 
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/ai-gateway@0.24.0
+  - @auto-engineer/message-bus@0.24.0
+
 ## 0.23.0
 
 ### Minor Changes
@@ -5537,6 +5683,16 @@
 
 # @auto-engineer/id
 
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
 ## 0.23.0
 
 ### Minor Changes
@@ -5785,6 +5941,23 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/ai-gateway@0.24.0
+  - @auto-engineer/message-bus@0.24.0
+  - @auto-engineer/narrative@0.24.0
 
 ## 0.23.0
 
@@ -6676,6 +6849,16 @@
 
 # @auto-engineer/message-bus
 
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
 ## 0.23.0
 
 ### Minor Changes
@@ -7033,6 +7216,21 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/message-bus@0.24.0
 
 ## 0.23.0
 
@@ -7587,6 +7785,23 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/file-store@0.24.0
+  - @auto-engineer/id@0.24.0
+  - @auto-engineer/message-bus@0.24.0
 
 ## 0.23.0
 
@@ -8607,6 +8822,22 @@
 
 # @auto-engineer/pipeline
 
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/file-store@0.24.0
+  - @auto-engineer/message-bus@0.24.0
+
 ## 0.23.0
 
 ### Minor Changes
@@ -8755,6 +8986,16 @@
 
 # @auto-engineer/release-automation
 
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
 ## 0.23.0
 
 ### Minor Changes
@@ -8771,6 +9012,22 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/cli@0.24.0
+  - @auto-engineer/message-bus@0.24.0
 
 ## 0.23.0
 
@@ -9473,6 +9730,22 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/message-bus@0.24.0
+  - @auto-engineer/narrative@0.24.0
 
 ## 0.23.0
 
@@ -10325,6 +10598,21 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/narrative@0.24.0
+
 ## 0.23.0
 
 ### Minor Changes
@@ -10444,6 +10732,22 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 0.24.0
+
+### Minor Changes
+
+- [`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: adds id field to data
+  - **cli**: consolidate servers onto single port
+  - **pipeline**: add getHttpServer() method to PipelineServer
+  - **cli**: update package.json exports for server and add types
+  - **cli**: update Ketchup Plan and streamline startServer implementation
+
+### Patch Changes
+
+- Updated dependencies [[`9f33c48`](https://github.com/BeOnAuto/auto-engineer/commit/9f33c48a5e345b4e0735951c2b77d47d5e936d78)]:
+  - @auto-engineer/ai-gateway@0.24.0
+  - @auto-engineer/message-bus@0.24.0
 
 ## 0.23.0
 
