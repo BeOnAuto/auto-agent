@@ -96,8 +96,8 @@ jobs:
       - name: Create Git Tags
         if: steps.publish.outputs.published == 'true'
         run: |
-          # Get the version from package.json
-          VERSION=$(node -p "require('./package.json').version")
+          # Get version from CLI package (all packages have same version in fixed mode)
+          VERSION=$(node -p "require('./packages/cli/package.json').version")
           COMMIT=$(git rev-parse HEAD)
 
           echo "Creating tags for version: $VERSION at commit: $COMMIT"
@@ -110,25 +110,16 @@ jobs:
 
               echo "Creating tag: $TAG"
               git tag -a "$TAG" -m "Release $PACKAGE_NAME@$VERSION" $COMMIT
-              git push origin "$TAG"
+              git push --no-verify origin "$TAG"
 
               echo "✅ Created and pushed tag: $TAG"
             fi
           done
 
-          # Also tag create-auto-app
-          if [ -f "packages/create-auto-app/package.json" ]; then
-            TAG="create-auto-app@${VERSION}"
-            echo "Creating tag: $TAG"
-            git tag -a "$TAG" -m "Release create-auto-app@$VERSION" $COMMIT
-            git push origin "$TAG"
-            echo "✅ Created and pushed tag: $TAG"
-          fi
-
       - name: Create GitHub Release
         if: steps.publish.outputs.published == 'true'
         run: |
-          VERSION=$(node -p "require('./package.json').version")
+          VERSION=$(node -p "require('./packages/cli/package.json').version")
 
           # Get the changelog for this version
           CHANGELOG=$(awk "/^## ${VERSION}\$/,/^## [0-9]/" CHANGELOG.md | sed '1d;$d')
