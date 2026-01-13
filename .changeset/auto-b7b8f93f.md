@@ -22,6 +22,6 @@
 "create-auto-app": patch
 ---
 
-- Fixed version reading to use CLI package instead of root package.json
-- Improved tag push workflow by skipping pre-push hooks
-- Cleaned up duplicate tagging for create-auto-app package
+- **global**: read version from cli package and skip hooks for tag push
+- **global**: version packages
+- **global**: merge publish workflow into build-and-test
