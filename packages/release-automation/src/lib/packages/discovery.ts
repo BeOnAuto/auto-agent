@@ -1,5 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { minimatch } from 'minimatch';
 import type { ChangesetConfig } from '../../types/index.js';
 
 /**
@@ -7,7 +8,8 @@ import type { ChangesetConfig } from '../../types/index.js';
  */
 export async function discoverPackages(changesetConfigPath = '.changeset/config.json'): Promise<string[]> {
   const config = await readChangesetConfig(changesetConfigPath);
-  return getFixedGroupPackages(config);
+  const patterns = getFixedGroupPackages(config);
+  return expandPackageGlobs(patterns);
 }
 
 /**
@@ -30,34 +32,51 @@ export async function readChangesetConfig(configPath = '.changeset/config.json')
 }
 
 /**
- * Get all packages from fixed groups
+ * Get all packages from fixed groups (returns raw patterns)
  */
 export function getFixedGroupPackages(config: ChangesetConfig): string[] {
   if (!config.fixed || config.fixed.length === 0) {
     return [];
   }
-
-  // Flatten all fixed groups and expand globs
-  const allPackages = config.fixed.flat();
-
-  // For now, we'll just return the patterns as-is
-  // In a real implementation, you'd expand globs like "@auto-engineer/*"
-  // to actual package names by reading package.json files
-  return allPackages;
+  return config.fixed.flat();
 }
 
 /**
- * Expand glob patterns in package names
- * For simplicity, we're not implementing full glob expansion
- * The patterns in changeset config should match package names
+ * Expand glob patterns to actual package names
  */
-export async function expandPackageGlobs(patterns: string[]): Promise<string[]> {
-  // Simple implementation: just return patterns as-is
-  // A more sophisticated version would:
-  // 1. Find all package.json files in packages/
-  // 2. Read package names
-  // 3. Match against glob patterns
-  // 4. Return matching package names
+export function expandPackageGlobs(patterns: string[]): string[] {
+  const packagesDir = join(process.cwd(), 'packages');
+  if (!existsSync(packagesDir)) {
+    return patterns.filter((p) => !p.includes('*'));
+  }
 
-  return patterns;
+  const packageNames: string[] = [];
+  const dirs = readdirSync(packagesDir, { withFileTypes: true });
+
+  for (const dir of dirs) {
+    if (!dir.isDirectory()) continue;
+    const pkgJsonPath = join(packagesDir, dir.name, 'package.json');
+    if (!existsSync(pkgJsonPath)) continue;
+
+    try {
+      const pkgJson = JSON.parse(readFileSync(pkgJsonPath, 'utf8'));
+      if (pkgJson.name) {
+        packageNames.push(pkgJson.name);
+      }
+    } catch {
+      // Skip invalid package.json
+    }
+  }
+
+  const result: string[] = [];
+  for (const pattern of patterns) {
+    if (pattern.includes('*')) {
+      const matches = packageNames.filter((name) => minimatch(name, pattern));
+      result.push(...matches);
+    } else {
+      result.push(pattern);
+    }
+  }
+
+  return [...new Set(result)];
 }
