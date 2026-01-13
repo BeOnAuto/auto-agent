@@ -80,6 +80,8 @@ jobs:
           git add .
           git commit -m "chore(global): version packages" || echo "No changes to commit"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm
         if: steps.check_changesets.outputs.has_changesets == 'true'
