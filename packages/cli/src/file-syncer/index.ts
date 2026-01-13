@@ -24,7 +24,6 @@ export interface FileSyncerConfig {
 export class FileSyncer {
   private io: SocketIOServer;
   private watchDir: string;
-  private projectRoot: string;
   private vfs: NodeFileStore;
   private active: Map<string, FileMeta>;
   private watcher?: chokidar.FSWatcher;
@@ -41,7 +40,6 @@ export class FileSyncer {
   constructor(io: SocketIOServer, watchDir = '.', _extensions?: string[], config?: FileSyncerConfig) {
     this.io = io;
     this.watchDir = path.resolve(watchDir);
-    this.projectRoot = path.dirname(this.watchDir);
     this.vfs = new NodeFileStore();
     this.active = new Map<string, FileMeta>();
     this.socketMiddleware = config?.socketMiddleware;
@@ -94,7 +92,7 @@ export class FileSyncer {
 
     const getVirtualConfigWirePath = () => {
       const virtualPath = path.join(this.watchDir, 'auto.config.json');
-      return toWirePath(virtualPath, this.projectRoot);
+      return toWirePath(virtualPath, this.watchDir);
     };
 
     const compute = async () => {
@@ -107,7 +105,7 @@ export class FileSyncer {
       const result = await resolveSyncFileSet({
         vfs: this.vfs,
         watchDir: this.watchDir,
-        projectRoot: this.projectRoot,
+        projectRoot: this.watchDir,
       });
       this.cachedDesiredSet = result;
       this.lastComputeTime = now;
@@ -123,7 +121,7 @@ export class FileSyncer {
           console.warn(`[sync] Skipping file due to read failure: ${abs}`);
           continue;
         }
-        const wire = toWirePath(abs, this.projectRoot);
+        const wire = toWirePath(abs, this.watchDir);
         const size = await statSize(this.vfs, abs);
         const hash = await md5(this.vfs, abs);
         if (hash === null) {
@@ -159,7 +157,7 @@ export class FileSyncer {
             continue;
           }
           this.active.set(abs, { hash, size });
-          const wire = toWirePath(abs, this.projectRoot);
+          const wire = toWirePath(abs, this.watchDir);
           outgoing.push({ event: prev ? 'change' : 'add', path: wire, content });
         }
       }
@@ -171,7 +169,7 @@ export class FileSyncer {
       for (const abs of Array.from(this.active.keys())) {
         if (!desired.has(abs)) {
           this.active.delete(abs);
-          const wire = toWirePath(abs, this.projectRoot);
+          const wire = toWirePath(abs, this.watchDir);
           toDelete.push({ event: 'delete', path: wire });
         }
       }
@@ -235,7 +233,7 @@ export class FileSyncer {
           if (this.autoConfigContent !== null) {
             debug('Auto config removed, emitting delete');
             const virtualPath = path.join(this.watchDir, 'auto.config.json');
-            const virtualWirePath = toWirePath(virtualPath, this.projectRoot);
+            const virtualWirePath = toWirePath(virtualPath, this.watchDir);
             this.io.emit('file-change', { event: 'delete', path: virtualWirePath });
             this.autoConfigContent = null;
             this.autoConfigHash = null;
@@ -350,7 +348,7 @@ export class FileSyncer {
 
         if (wasFresh) {
           // Rebuild wire path cache for external mappings to support reconnection
-          const files = Array.from(this.active.keys()).map((abs) => ({ abs, projectRoot: this.projectRoot }));
+          const files = Array.from(this.active.keys()).map((abs) => ({ abs, projectRoot: this.watchDir }));
           rebuildWirePathCache(files);
         }
 
@@ -362,7 +360,7 @@ export class FileSyncer {
       }
 
       socket.on('client-file-change', async (msg: { event: 'write' | 'delete'; path: string; content?: string }) => {
-        const abs = fromWirePath(msg.path, this.projectRoot);
+        const abs = fromWirePath(msg.path, this.watchDir);
         // Block client edits to the virtual auto.config.json (one-way TS -> JSON)
         const virtualAbs = path.join(this.watchDir, 'auto.config.json');
         if (path.resolve(abs) === path.resolve(virtualAbs)) {

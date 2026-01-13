@@ -3,6 +3,7 @@ import createJiti from 'jiti';
 export interface AutoConfig {
   fileId?: string;
   plugins?: string[];
+  root?: string;
   fileSync?: {
     enabled?: boolean;
     dir?: string;
