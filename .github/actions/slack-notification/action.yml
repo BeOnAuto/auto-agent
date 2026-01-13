@@ -40,6 +40,18 @@ runs:
           echo "mention=*$GITHUB_USER*" >> $GITHUB_OUTPUT
         fi
 
+    - name: Escape commit message for JSON (failure)
+      if: inputs.job-status == 'failure'
+      id: escape-failure
+      shell: bash
+      run: |
+        MSG=$(cat <<'EOFMSG'
+        ${{ github.event.head_commit.message }}
+        EOFMSG
+        )
+        ESCAPED=$(echo "$MSG" | head -1 | jq -Rs '.[:-1]' | sed 's/^"//;s/"$//')
+        echo "message=$ESCAPED" >> $GITHUB_OUTPUT
+
     - name: Notify on failure
       if: inputs.job-status == 'failure'
       uses: slackapi/slack-github-action@v1.26.0
@@ -53,13 +65,25 @@ runs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "🚨 *${{ inputs.job-name }} Failed*\n*Repository:* `${{ github.repository }}`\n*Branch:* `${{ github.ref_name }}`\n*Triggered by:* ${{ steps.find-slack-user.outputs.mention }}\n*Commit:* ${{ github.event.head_commit.message }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Failed Run>"
+                  "text": "🚨 *${{ inputs.job-name }} Failed*\n*Repository:* `${{ github.repository }}`\n*Branch:* `${{ github.ref_name }}`\n*Triggered by:* ${{ steps.find-slack-user.outputs.mention }}\n*Commit:* ${{ steps.escape-failure.outputs.message }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Failed Run>"
                 }
               }
             ]
           }
       env:
         SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
+
+    - name: Escape commit message for JSON (success)
+      if: inputs.job-status == 'success'
+      id: escape-success
+      shell: bash
+      run: |
+        MSG=$(cat <<'EOFMSG'
+        ${{ github.event.head_commit.message }}
+        EOFMSG
+        )
+        ESCAPED=$(echo "$MSG" | head -1 | jq -Rs '.[:-1]' | sed 's/^"//;s/"$//')
+        echo "message=$ESCAPED" >> $GITHUB_OUTPUT
 
     - name: Notify on success
       if: inputs.job-status == 'success'
@@ -74,7 +98,7 @@ runs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "✅ *${{ inputs.job-name }} Succeeded*\n*Repository:* `${{ github.repository }}`\n*Branch:* `${{ github.ref_name }}`\n*Triggered by:* *${{ github.actor }}*\n*Commit:* ${{ github.event.head_commit.message }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
+                  "text": "✅ *${{ inputs.job-name }} Succeeded*\n*Repository:* `${{ github.repository }}`\n*Branch:* `${{ github.ref_name }}`\n*Triggered by:* *${{ github.actor }}*\n*Commit:* ${{ steps.escape-success.outputs.message }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
                 }
               }
             ]
