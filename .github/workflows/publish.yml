@@ -87,6 +87,7 @@ jobs:
         if: steps.check_changesets.outputs.has_changesets == 'true'
         id: publish
         run: |
+          git pull --rebase
           pnpm release
           echo "published=true" >> $GITHUB_OUTPUT
         env:
