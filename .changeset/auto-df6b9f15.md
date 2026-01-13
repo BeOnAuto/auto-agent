@@ -22,4 +22,8 @@
 "create-auto-app": minor
 ---
 
-- **global**: create @auto-engineer/release-automation package
+- **packages/narrative**: adds id field to data
+- **cli**: consolidate servers onto single port
+- **pipeline**: add getHttpServer() method to PipelineServer
+- **cli**: update package.json exports for server and add types
+- **cli**: update Ketchup Plan and streamline startServer implementation
