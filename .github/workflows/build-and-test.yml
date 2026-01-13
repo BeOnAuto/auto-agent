@@ -55,74 +55,20 @@ jobs:
           NODE_OPTIONS: "--max-old-space-size=8192"
         run: pnpm build
 
-      - name: Send build failure notification
-        if: failure()
-        uses: ./.github/actions/slack-notification
-        with:
-          job-name: "Build"
-          job-status: "failure"
-          slack-channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
-          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-
-  test:
-    runs-on: ubuntu-latest
-    needs: [build-and-test]
-    env:
-      NEXT_PUBLIC_V0_URL: https://v0.dev
-      NEXT_PUBLIC_APP_URL: http://localhost:4000
-      NPM_CONFIG_FETCH_RETRIES: "5"
-      NPM_CONFIG_FETCH_RETRY_MINTIMEOUT: "30000"
-      NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: "120000"
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 10.15.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
-          cache: "pnpm"
-          registry-url: "https://registry.npmjs.org"
-          scope: "@auto-engineer"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Pre-fetch deps
-        run: pnpm fetch --network-concurrency=8
-
-      - name: Install dependencies
-        run: |
-          set -e
-          for i in 1 2 3; do
-            pnpm install --network-concurrency=8 --reporter=append && break
-            echo "pnpm install failed (attempt $i), backing off..."
-            sleep $((i*30))
-          done
-
       - name: Lint, format, test
         run: pnpm check
 
-      - name: Send test failure notification
+      - name: Send failure notification
         if: failure()
         uses: ./.github/actions/slack-notification
         with:
-          job-name: "Tests"
+          job-name: "Build & Test"
           job-status: "failure"
           slack-channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  notify-success:
-    runs-on: ubuntu-latest
-    needs: [build-and-test, test]
-    if: success()
-    steps:
-      - uses: actions/checkout@v4
-
       - name: Send success notification
+        if: success()
         uses: ./.github/actions/slack-notification
         with:
           job-name: "Build & Test"

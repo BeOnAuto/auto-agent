@@ -41,6 +41,7 @@ jobs:
         run: |
           pnpm install --no-frozen-lockfile
           pnpm build
+          pnpm install --no-frozen-lockfile
 
       - name: Update lockfile if needed
         run: |
