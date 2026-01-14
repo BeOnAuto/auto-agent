@@ -14,6 +14,10 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
     env:
       NEXT_PUBLIC_V0_URL: https://v0.dev
       NEXT_PUBLIC_APP_URL: http://localhost:4000
@@ -25,10 +29,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
+
       - uses: pnpm/action-setup@v2
         with:
           version: 10.15.0
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20.x"
@@ -55,6 +61,10 @@ jobs:
           NODE_OPTIONS: "--max-old-space-size=8192"
         run: pnpm build
 
+      - name: Re-install to link bins
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: pnpm install --no-frozen-lockfile
+
       - name: Lint, format, test
         run: pnpm check
 
@@ -76,55 +86,11 @@ jobs:
           slack-channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  release:
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-    permissions:
-      contents: write
-      pull-requests: write
-      id-token: write
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
-          registry-url: "https://registry.npmjs.org"
-          scope: "@auto-engineer"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10.15.0
-
-      - name: Install Dependencies
-        run: |
-          pnpm install --no-frozen-lockfile
-          pnpm build
-          pnpm install --no-frozen-lockfile
-
-      - name: Update lockfile if needed
-        run: |
-          if ! git diff --exit-code pnpm-lock.yaml >/dev/null 2>&1; then
-            echo "Lockfile was updated during install"
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            git add pnpm-lock.yaml
-            git commit -m "chore(root): update lockfile"
-          fi
-
+      # Release steps - only run on main branch pushes
       - name: Check for changesets
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         id: check_changesets
         run: |
-          # Use release-automation CLI to check for changesets
           if pnpm release-automation check --require-changesets; then
             echo "has_changesets=true" >> $GITHUB_OUTPUT
             echo "📦 Changesets detected"
@@ -140,7 +106,7 @@ jobs:
           fi
 
       - name: Version packages
-        if: steps.check_changesets.outputs.has_changesets == 'true'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.check_changesets.outputs.has_changesets == 'true'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -152,7 +118,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm
-        if: steps.check_changesets.outputs.has_changesets == 'true'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.check_changesets.outputs.has_changesets == 'true'
         id: publish
         run: |
           git pull --rebase
@@ -162,15 +128,13 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Git Tags
-        if: steps.publish.outputs.published == 'true'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.publish.outputs.published == 'true'
         run: |
-          # Get version from CLI package (all packages have same version in fixed mode)
           VERSION=$(node -p "require('./packages/cli/package.json').version")
           COMMIT=$(git rev-parse HEAD)
 
           echo "Creating tags for version: $VERSION at commit: $COMMIT"
 
-          # Create tags for all packages with the same version (fixed versioning)
           for package_json in packages/*/package.json; do
             if [ -f "$package_json" ]; then
               PACKAGE_NAME=$(node -p "require('./$package_json').name")
@@ -185,14 +149,11 @@ jobs:
           done
 
       - name: Create GitHub Release
-        if: steps.publish.outputs.published == 'true'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.publish.outputs.published == 'true'
         run: |
           VERSION=$(node -p "require('./packages/cli/package.json').version")
-
-          # Get the changelog for this version
           CHANGELOG=$(awk "/^## ${VERSION}\$/,/^## [0-9]/" CHANGELOG.md | sed '1d;$d')
 
-          # Create a GitHub release
           gh release create "v${VERSION}" \
             --title "v${VERSION}" \
             --notes "${CHANGELOG}" \
