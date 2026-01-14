@@ -1,5 +1,19 @@
 # @auto-engineer/ai-gateway
 
+## 0.26.1
+
+### Patch Changes
+
+- [`55262c8`](https://github.com/BeOnAuto/auto-engineer/commit/55262c8b74a0e5bf4e2bde2dc393486ddef7ed1c) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Merged the publish workflow into the build-and-test workflow for faster, more streamlined releases
+  - Eliminated workflow trigger delays by running release jobs directly after successful builds on main branch
+
+- [`f3a86f3`](https://github.com/BeOnAuto/auto-engineer/commit/f3a86f39e11b1bf0161372f2a6ccdca710967430) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: read version from cli package and skip hooks for tag push
+  - **global**: version packages
+  - **global**: merge publish workflow into build-and-test
+
+- [`65817de`](https://github.com/BeOnAuto/auto-engineer/commit/65817debd6cc7333e1a1d165433a2e23441a4270) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Consolidated CI workflow into a single job, reducing release build time from ~4 minutes to ~1 minute
+  - Release steps now run conditionally only on main branch pushes
+
 ## 0.26.0
 
 ### Minor Changes
