@@ -2,6 +2,16 @@
 
 # @auto-engineer/ai-gateway
 
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
 ## 0.26.1
 
 ### Patch Changes
@@ -405,6 +415,21 @@
 
 # @auto-engineer/cli
 
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/file-store@0.26.2
+  - @auto-engineer/narrative@0.26.2
+  - @auto-engineer/pipeline@0.26.2
+
 ## 0.26.1
 
 ### Patch Changes
@@ -640,6 +665,20 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/ai-gateway@0.26.2
+  - @auto-engineer/message-bus@0.26.2
 
 ## 0.26.1
 
@@ -1457,6 +1496,19 @@
 
 # create-auto-app
 
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/id@0.26.2
+
 ## 0.26.1
 
 ### Patch Changes
@@ -2024,6 +2076,19 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/message-bus@0.26.2
 
 ## 0.26.1
 
@@ -2857,6 +2922,20 @@
 
 # @auto-engineer/dev-server
 
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/cli@0.26.2
+  - @auto-engineer/message-bus@0.26.2
+
 ## 0.26.1
 
 ### Patch Changes
@@ -3189,6 +3268,16 @@
   - @auto-engineer/message-bus@0.11.13
 
 # @auto-engineer/file-store
+
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
 
 ## 0.26.1
 
@@ -3550,6 +3639,19 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/message-bus@0.26.2
 
 ## 0.26.1
 
@@ -4341,6 +4443,20 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/ai-gateway@0.26.2
+  - @auto-engineer/message-bus@0.26.2
 
 ## 0.26.1
 
@@ -5259,6 +5375,20 @@
 
 # @auto-engineer/frontend-implementer
 
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/ai-gateway@0.26.2
+  - @auto-engineer/message-bus@0.26.2
+
 ## 0.26.1
 
 ### Patch Changes
@@ -6173,6 +6303,16 @@
 
 # @auto-engineer/id
 
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
 ## 0.26.1
 
 ### Patch Changes
@@ -6471,6 +6611,21 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/ai-gateway@0.26.2
+  - @auto-engineer/message-bus@0.26.2
+  - @auto-engineer/narrative@0.26.2
 
 ## 0.26.1
 
@@ -7434,6 +7589,16 @@
 
 # @auto-engineer/message-bus
 
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
 ## 0.26.1
 
 ### Patch Changes
@@ -7841,6 +8006,19 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/message-bus@0.26.2
 
 ## 0.26.1
 
@@ -8459,6 +8637,21 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/file-store@0.26.2
+  - @auto-engineer/id@0.26.2
+  - @auto-engineer/message-bus@0.26.2
 
 ## 0.26.1
 
@@ -9551,6 +9744,20 @@
 
 # @auto-engineer/pipeline
 
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/file-store@0.26.2
+  - @auto-engineer/message-bus@0.26.2
+
 ## 0.26.1
 
 ### Patch Changes
@@ -9767,6 +9974,16 @@
 
 # @auto-engineer/release-automation
 
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
 ## 0.26.1
 
 ### Patch Changes
@@ -9833,6 +10050,20 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/cli@0.26.2
+  - @auto-engineer/message-bus@0.26.2
 
 ## 0.26.1
 
@@ -10603,6 +10834,20 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/message-bus@0.26.2
+  - @auto-engineer/narrative@0.26.2
 
 ## 0.26.1
 
@@ -11523,6 +11768,19 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/narrative@0.26.2
+
 ## 0.26.1
 
 ### Patch Changes
@@ -11706,6 +11964,20 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/ai-gateway@0.26.2
+  - @auto-engineer/message-bus@0.26.2
 
 ## 0.26.1
 

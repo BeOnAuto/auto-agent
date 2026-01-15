@@ -23,5 +23,4 @@
 ---
 
 - **global**: version packages
-- **global**: consolidate CI into single job
-- **global**: merge publish workflow into build-and-test
+- **narrative**: remove redundant id field from Module, use sourceFile as identifier

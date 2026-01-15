@@ -1,5 +1,19 @@
 # @auto-engineer/pipeline
 
+## 0.26.2
+
+### Patch Changes
+
+- [`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: consolidate CI into single job
+  - **global**: merge publish workflow into build-and-test
+
+- [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Simplified module identification by using source file path instead of separate ID field
+
+- Updated dependencies [[`6fc3c3f`](https://github.com/BeOnAuto/auto-engineer/commit/6fc3c3f3b83a534963749a21b56d53b34f65ed97), [`21d6645`](https://github.com/BeOnAuto/auto-engineer/commit/21d6645c53ae0da46e7557a9dac058e7da0afd67)]:
+  - @auto-engineer/file-store@0.26.2
+  - @auto-engineer/message-bus@0.26.2
+
 ## 0.26.1
 
 ### Patch Changes
