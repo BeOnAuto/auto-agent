@@ -70,7 +70,7 @@ function collectUsedMessageKeysForModule(module: Module, model: Model): Set<stri
 }
 
 function findDeclaringModule(messageKey: string, allModules: Module[], currentModule: Module): Module | undefined {
-  const authoredModules = allModules.filter((m) => !m.isDerived && m.id !== currentModule.id);
+  const authoredModules = allModules.filter((m) => !m.isDerived && m.sourceFile !== currentModule.sourceFile);
 
   for (const mod of authoredModules) {
     const declares = mod.declares.messages.some((m) => toMessageKey(m.kind, m.name) === messageKey);

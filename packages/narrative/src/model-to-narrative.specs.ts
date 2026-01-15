@@ -2562,14 +2562,12 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
         integrations: [],
         modules: [
           {
-            id: 'orders.narrative.ts',
             sourceFile: 'orders.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['orders-flow'] },
             declares: { messages: [] },
           },
           {
-            id: 'users.narrative.ts',
             sourceFile: 'users.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['users-flow'] },
@@ -2608,14 +2606,12 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
         integrations: [],
         modules: [
           {
-            id: 'a.narrative.ts',
             sourceFile: 'a.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['flow-a'] },
             declares: { messages: [{ kind: 'event', name: 'SharedEvent' }] },
           },
           {
-            id: 'b.narrative.ts',
             sourceFile: 'b.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['flow-b'] },
@@ -2690,14 +2686,12 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
         integrations: [],
         modules: [
           {
-            id: 'shared',
             sourceFile: 'shared/types.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['shared-types'] },
             declares: { messages: [{ kind: 'event', name: 'OrderCreated' }] },
           },
           {
-            id: 'orders',
             sourceFile: 'features/orders.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['orders-flow'] },
@@ -2766,14 +2760,12 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
         integrations: [],
         modules: [
           {
-            id: 'core',
             sourceFile: 'src/core/types.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['core'] },
             declares: { messages: [{ kind: 'event', name: 'CoreEvent' }] },
           },
           {
-            id: 'feature',
             sourceFile: 'src/features/sub/feature.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['feature'] },
@@ -2836,7 +2828,6 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
         integrations: [],
         modules: [
           {
-            id: 'shared',
             sourceFile: 'shared.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['shared'] },
@@ -2848,7 +2839,6 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
             },
           },
           {
-            id: 'consumer',
             sourceFile: 'consumer.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['consumer'] },
@@ -2914,21 +2904,18 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
         integrations: [],
         modules: [
           {
-            id: 'z-types',
             sourceFile: 'z-types.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['z-types'] },
             declares: { messages: [{ kind: 'event', name: 'ZEvent' }] },
           },
           {
-            id: 'a-types',
             sourceFile: 'a-types.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['a-types'] },
             declares: { messages: [{ kind: 'event', name: 'AEvent' }] },
           },
           {
-            id: 'consumer',
             sourceFile: 'consumer.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['consumer'] },

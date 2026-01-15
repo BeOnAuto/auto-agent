@@ -1,4 +1,4 @@
-import type { ClientSpecNode, Example, Model, Module, Rule, Slice, Spec, Step } from '../index';
+import type { ClientSpecNode, Example, Model, Rule, Slice, Spec, Step } from '../index';
 import { generateAutoId } from './generators';
 
 function ensureId(item: { id?: string }): void {
@@ -110,18 +110,6 @@ function processSlice(slice: Slice): Slice {
   return sliceCopy;
 }
 
-function processModules(modules: Module[]): Module[] {
-  return modules.map((module) => {
-    const moduleCopy = { ...module };
-    if (module.isDerived) {
-      moduleCopy.id = module.sourceFile;
-    } else {
-      ensureId(moduleCopy);
-    }
-    return moduleCopy;
-  });
-}
-
 export function addAutoIds(specs: Model): Model {
   const result = structuredClone(specs);
   result.narratives = result.narratives.map((narrative) => {
@@ -130,8 +118,5 @@ export function addAutoIds(specs: Model): Model {
     narrativeCopy.slices = narrative.slices.map(processSlice);
     return narrativeCopy;
   });
-  if (result.modules) {
-    result.modules = processModules(result.modules);
-  }
   return result;
 }

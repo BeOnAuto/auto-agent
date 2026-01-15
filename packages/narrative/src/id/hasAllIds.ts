@@ -1,4 +1,4 @@
-import type { ClientSpecNode, Example, Model, Module, Rule, Slice, Spec, Step } from '../index';
+import type { ClientSpecNode, Example, Model, Rule, Slice, Spec, Step } from '../index';
 
 function hasValidId(item: { id?: string }): boolean {
   return item.id !== undefined && item.id !== '';
@@ -62,14 +62,6 @@ function hasSliceIds(slice: Slice): boolean {
   return hasValidId(slice) && hasServerSpecIds(slice) && hasClientSpecIds(slice) && hasDataIds(slice);
 }
 
-function hasModuleIds(modules: Module[]): boolean {
-  return modules.every(hasValidId);
-}
-
 export function hasAllIds(specs: Model): boolean {
-  const narrativesValid = specs.narratives.every(
-    (narrative) => hasValidId(narrative) && narrative.slices.every(hasSliceIds),
-  );
-  const modulesValid = hasModuleIds(specs.modules ?? []);
-  return narrativesValid && modulesValid;
+  return specs.narratives.every((narrative) => hasValidId(narrative) && narrative.slices.every(hasSliceIds));
 }

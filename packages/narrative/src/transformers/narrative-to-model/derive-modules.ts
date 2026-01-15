@@ -12,7 +12,6 @@ export function deriveModules(narratives: Narrative[], messages: Message[]): Mod
       .sort((a, b) => `${a.kind}:${a.name}`.localeCompare(`${b.kind}:${b.name}`));
 
     return {
-      id: sourceFile,
       sourceFile,
       isDerived: true,
       contains: { narrativeIds },

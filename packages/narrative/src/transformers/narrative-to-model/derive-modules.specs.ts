@@ -24,7 +24,6 @@ describe('deriveModules', () => {
 
     expect(modules).toHaveLength(1);
     expect(modules[0].sourceFile).toBe('generated.narrative.ts');
-    expect(modules[0].id).toBe('generated.narrative.ts');
   });
 
   it('generates synthetic narrative IDs when narratives have no ID', () => {

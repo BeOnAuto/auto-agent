@@ -3,8 +3,7 @@ import { toMessageKey } from './ordering';
 
 export interface ValidationError {
   type:
-    | 'duplicate_id'
-    | 'derived_id_mismatch'
+    | 'duplicate_sourceFile'
     | 'narrative_unassigned'
     | 'narrative_multi_assigned'
     | 'message_multi_declared'
@@ -21,8 +20,7 @@ export function validateModules(model: Model): ValidationError[] {
     return errors;
   }
 
-  errors.push(...validateUniqueModuleIds(modules));
-  errors.push(...validateDerivedModuleIds(modules));
+  errors.push(...validateUniqueSourceFiles(modules));
 
   const authoredModules = modules.filter((m) => !m.isDerived);
   if (authoredModules.length === 0) {
@@ -35,34 +33,19 @@ export function validateModules(model: Model): ValidationError[] {
   return errors;
 }
 
-function validateUniqueModuleIds(modules: Model['modules']): ValidationError[] {
+function validateUniqueSourceFiles(modules: Model['modules']): ValidationError[] {
   const errors: ValidationError[] = [];
-  const idCounts = new Map<string, number>();
+  const sourceFileCounts = new Map<string, number>();
 
   for (const module of modules) {
-    idCounts.set(module.id, (idCounts.get(module.id) ?? 0) + 1);
+    sourceFileCounts.set(module.sourceFile, (sourceFileCounts.get(module.sourceFile) ?? 0) + 1);
   }
 
-  for (const [id, count] of idCounts) {
+  for (const [sourceFile, count] of sourceFileCounts) {
     if (count > 1) {
       errors.push({
-        type: 'duplicate_id',
-        message: `Module ID '${id}' is used by ${count} modules`,
-      });
-    }
-  }
-
-  return errors;
-}
-
-function validateDerivedModuleIds(modules: Model['modules']): ValidationError[] {
-  const errors: ValidationError[] = [];
-
-  for (const module of modules) {
-    if (module.isDerived && module.id !== module.sourceFile) {
-      errors.push({
-        type: 'derived_id_mismatch',
-        message: `Derived module ID '${module.id}' must equal sourceFile '${module.sourceFile}'`,
+        type: 'duplicate_sourceFile',
+        message: `Module sourceFile '${sourceFile}' is used by ${count} modules`,
       });
     }
   }
@@ -79,23 +62,23 @@ function validateNarrativeAssignments(authoredModules: Model['modules'], model: 
       if (!narrativeAssignments.has(narrativeId)) {
         narrativeAssignments.set(narrativeId, []);
       }
-      narrativeAssignments.get(narrativeId)!.push(module.id);
+      narrativeAssignments.get(narrativeId)!.push(module.sourceFile);
     }
   }
 
   const modelNarrativeIds = new Set(model.narratives.map((n) => n.id).filter((id): id is string => id !== undefined));
 
-  for (const [narrativeId, moduleIds] of narrativeAssignments) {
+  for (const [narrativeId, moduleSourceFiles] of narrativeAssignments) {
     if (!modelNarrativeIds.has(narrativeId)) {
       errors.push({
         type: 'narrative_not_found',
-        message: `Narrative '${narrativeId}' referenced by module(s) [${moduleIds.join(', ')}] does not exist`,
+        message: `Narrative '${narrativeId}' referenced by module(s) [${moduleSourceFiles.join(', ')}] does not exist`,
       });
     }
-    if (moduleIds.length > 1) {
+    if (moduleSourceFiles.length > 1) {
       errors.push({
         type: 'narrative_multi_assigned',
-        message: `Narrative '${narrativeId}' is assigned to multiple modules: [${moduleIds.join(', ')}]`,
+        message: `Narrative '${narrativeId}' is assigned to multiple modules: [${moduleSourceFiles.join(', ')}]`,
       });
     }
   }
@@ -123,15 +106,15 @@ function validateMessageDeclarations(authoredModules: Model['modules'], model: M
       if (!messageDeclarations.has(key)) {
         messageDeclarations.set(key, []);
       }
-      messageDeclarations.get(key)!.push(module.id);
+      messageDeclarations.get(key)!.push(module.sourceFile);
     }
   }
 
-  for (const [msgKey, moduleIds] of messageDeclarations) {
-    if (moduleIds.length > 1) {
+  for (const [msgKey, moduleSourceFiles] of messageDeclarations) {
+    if (moduleSourceFiles.length > 1) {
       errors.push({
         type: 'message_multi_declared',
-        message: `Message '${msgKey}' is declared by multiple modules: [${moduleIds.join(', ')}]`,
+        message: `Message '${msgKey}' is declared by multiple modules: [${moduleSourceFiles.join(', ')}]`,
       });
     }
   }

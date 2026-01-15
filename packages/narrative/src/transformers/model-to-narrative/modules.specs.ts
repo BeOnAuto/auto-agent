@@ -33,14 +33,12 @@ describe('module functionality', () => {
         integrations: [],
         modules: [
           {
-            id: 'orders.narrative.ts',
             sourceFile: 'orders.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['orders-flow'] },
             declares: { messages: [{ kind: 'event', name: 'SharedEvent' }] },
           },
           {
-            id: 'users.narrative.ts',
             sourceFile: 'users.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['users-flow'] },
@@ -132,7 +130,6 @@ describe('module functionality', () => {
         integrations: [],
         modules: [
           {
-            id: 'shared',
             sourceFile: 'shared/types.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['shared-types'] },
@@ -141,7 +138,6 @@ describe('module functionality', () => {
             },
           },
           {
-            id: 'orders',
             sourceFile: 'features/orders.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['orders-flow'] },
@@ -166,22 +162,20 @@ describe('module functionality', () => {
   });
 
   describe('validation', () => {
-    it('detects duplicate module IDs', () => {
+    it('detects duplicate sourceFiles', () => {
       const model: Model = {
         variant: 'specs',
         narratives: [],
         messages: [],
         modules: [
           {
-            id: 'same-id',
-            sourceFile: 'file1.ts',
+            sourceFile: 'same-file.ts',
             isDerived: false,
             contains: { narrativeIds: [] },
             declares: { messages: [] },
           },
           {
-            id: 'same-id',
-            sourceFile: 'file2.ts',
+            sourceFile: 'same-file.ts',
             isDerived: false,
             contains: { narrativeIds: [] },
             declares: { messages: [] },
@@ -192,30 +186,8 @@ describe('module functionality', () => {
       const errors = validateModules(model);
 
       expect(errors).toHaveLength(1);
-      expect(errors[0].type).toBe('duplicate_id');
-      expect(errors[0].message).toContain('same-id');
-    });
-
-    it('detects derived module ID not matching sourceFile', () => {
-      const model: Model = {
-        variant: 'specs',
-        narratives: [],
-        messages: [],
-        modules: [
-          {
-            id: 'wrong-id',
-            sourceFile: 'correct-path.ts',
-            isDerived: true,
-            contains: { narrativeIds: [] },
-            declares: { messages: [] },
-          },
-        ],
-      };
-
-      const errors = validateModules(model);
-
-      expect(errors).toHaveLength(1);
-      expect(errors[0].type).toBe('derived_id_mismatch');
+      expect(errors[0].type).toBe('duplicate_sourceFile');
+      expect(errors[0].message).toContain('same-file.ts');
     });
 
     it('detects narrative assigned to multiple authored modules', () => {
@@ -225,14 +197,12 @@ describe('module functionality', () => {
         messages: [],
         modules: [
           {
-            id: 'module-a',
             sourceFile: 'a.ts',
             isDerived: false,
             contains: { narrativeIds: ['test-narrative'] },
             declares: { messages: [] },
           },
           {
-            id: 'module-b',
             sourceFile: 'b.ts',
             isDerived: false,
             contains: { narrativeIds: ['test-narrative'] },
@@ -253,14 +223,12 @@ describe('module functionality', () => {
         messages: [{ type: 'event', source: 'internal', name: 'SharedEvent', fields: [] }],
         modules: [
           {
-            id: 'module-a',
             sourceFile: 'a.ts',
             isDerived: false,
             contains: { narrativeIds: [] },
             declares: { messages: [{ kind: 'event', name: 'SharedEvent' }] },
           },
           {
-            id: 'module-b',
             sourceFile: 'b.ts',
             isDerived: false,
             contains: { narrativeIds: [] },
@@ -281,14 +249,12 @@ describe('module functionality', () => {
         messages: [{ type: 'event', source: 'internal', name: 'SharedEvent', fields: [] }],
         modules: [
           {
-            id: 'file1.ts',
             sourceFile: 'file1.ts',
             isDerived: true,
             contains: { narrativeIds: [] },
             declares: { messages: [{ kind: 'event', name: 'SharedEvent' }] },
           },
           {
-            id: 'file2.ts',
             sourceFile: 'file2.ts',
             isDerived: true,
             contains: { narrativeIds: [] },
@@ -322,7 +288,6 @@ describe('module functionality', () => {
         messages: [],
         modules: [
           {
-            id: 'module-a',
             sourceFile: 'a.ts',
             isDerived: false,
             contains: { narrativeIds: ['nonexistent-narrative'] },
@@ -344,7 +309,6 @@ describe('module functionality', () => {
         messages: [],
         modules: [
           {
-            id: 'module-a',
             sourceFile: 'a.ts',
             isDerived: false,
             contains: { narrativeIds: [] },
@@ -366,7 +330,6 @@ describe('module functionality', () => {
         messages: [{ type: 'event', source: 'internal', name: 'UndeclaredEvent', fields: [] }],
         modules: [
           {
-            id: 'module-a',
             sourceFile: 'a.ts',
             isDerived: false,
             contains: { narrativeIds: [] },
@@ -382,7 +345,7 @@ describe('module functionality', () => {
     });
 
     it('throwOnValidationErrors throws when errors exist', () => {
-      const errors = [{ type: 'duplicate_id' as const, message: 'Test error' }];
+      const errors = [{ type: 'duplicate_sourceFile' as const, message: 'Test error' }];
 
       expect(() => throwOnValidationErrors(errors)).toThrow('Module validation failed');
       expect(() => throwOnValidationErrors(errors)).toThrow('Test error');
@@ -423,7 +386,6 @@ describe('module functionality', () => {
         integrations: [],
         modules: [
           {
-            id: 'orders.narrative.ts',
             sourceFile: 'orders.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['orders-flow'] },
@@ -435,7 +397,6 @@ describe('module functionality', () => {
             },
           },
           {
-            id: 'users.narrative.ts',
             sourceFile: 'users.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['users-flow'] },
@@ -479,14 +440,12 @@ describe('module functionality', () => {
         integrations: [],
         modules: [
           {
-            id: 'a.narrative.ts',
             sourceFile: 'a.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['flow-a'] },
             declares: { messages: [{ kind: 'event', name: 'SharedEvent' }] },
           },
           {
-            id: 'b.narrative.ts',
             sourceFile: 'b.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['flow-b'] },
@@ -554,14 +513,12 @@ describe('module functionality', () => {
         integrations: [],
         modules: [
           {
-            id: 'shared',
             sourceFile: 'shared/types.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['shared-types'] },
             declares: { messages: [{ kind: 'event', name: 'OrderCreated' }] },
           },
           {
-            id: 'orders',
             sourceFile: 'features/orders.narrative.ts',
             isDerived: false,
             contains: { narrativeIds: ['orders-flow'] },
@@ -594,21 +551,18 @@ describe('module functionality', () => {
         integrations: [],
         modules: [
           {
-            id: 'z.narrative.ts',
             sourceFile: 'z.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['z'] },
             declares: { messages: [] },
           },
           {
-            id: 'a.narrative.ts',
             sourceFile: 'a.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['a'] },
             declares: { messages: [] },
           },
           {
-            id: 'm.narrative.ts',
             sourceFile: 'm.narrative.ts',
             isDerived: true,
             contains: { narrativeIds: ['m'] },

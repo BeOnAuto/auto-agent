@@ -11,8 +11,7 @@ export const MessageRefSchema = z
 // Module schema for type ownership and file grouping
 export const ModuleSchema = z
   .object({
-    id: z.string().describe('Unique module identifier. For derived modules, equals sourceFile'),
-    sourceFile: z.string().describe('Output file path for this module'),
+    sourceFile: z.string().describe('Output file path for this module (also serves as unique identifier)'),
     isDerived: z.boolean().describe('True if auto-derived from sourceFile grouping, false if user-authored'),
     contains: z
       .object({
