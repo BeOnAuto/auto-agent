@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { CommandHandlerWithMetadata, Pipeline } from '@auto-engineer/pipeline';
 import { PipelineServer } from '@auto-engineer/pipeline';
-import type { RequestHandler } from 'express';
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import getPort, { portNumbers } from 'get-port';
 import createJiti from 'jiti';
 import { Server as SocketIOServer } from 'socket.io';
@@ -27,6 +27,7 @@ export interface StartServerOptions {
   configPath?: string;
   httpMiddleware?: RequestHandler[];
   socketMiddleware?: SocketMiddleware;
+  onPipelineActivity?: (reason: string) => void;
 }
 
 export interface ServerHandle {
@@ -203,6 +204,16 @@ export async function startServer(opts: StartServerOptions): Promise<ServerHandl
 
   const commandHandlers = await loadCommandHandlers(config.plugins);
   const pipelineServer = new PipelineServer({ port: actualPort });
+
+  if (opts.onPipelineActivity) {
+    const activityCallback = opts.onPipelineActivity;
+    pipelineServer.use((req: Request, _res: Response, next: NextFunction) => {
+      if (req.method === 'POST' && req.path === '/command' && req.body?.type) {
+        activityCallback(`pipeline:command:${req.body.type}`);
+      }
+      next();
+    });
+  }
 
   if (opts.httpMiddleware) {
     for (const middleware of opts.httpMiddleware) {
