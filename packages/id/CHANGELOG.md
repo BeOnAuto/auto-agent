@@ -1,5 +1,12 @@
 # @auto-engineer/id
 
+## 0.26.3
+
+### Patch Changes
+
+- [`e2539a5`](https://github.com/BeOnAuto/auto-engineer/commit/e2539a5c1e0648ae297d4f49680b4699fd67f075) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **narrative**: remove redundant id field from Module, use sourceFile as identifier
+
 ## 0.26.2
 
 ### Patch Changes
