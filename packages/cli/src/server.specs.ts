@@ -30,27 +30,32 @@ describe('startServer', () => {
     expect(handle.httpServer.close).toBeTypeOf('function');
   });
 
-  it('calls onPipelineActivity callback when command is dispatched', async () => {
-    const configPath = path.join(fixturesDir, 'auto.config.ts');
-    const onPipelineActivity = vi.fn();
+  it('calls onEvent callback when command handler emits events', async () => {
+    const configPath = path.join(fixturesDir, 'auto-with-commands.config.ts');
+    const onEvent = vi.fn();
 
     handle = await startServer({
       port: 0,
       configPath,
-      onPipelineActivity,
+      onEvent,
     });
 
-    const response = await fetch(`http://localhost:${handle.actualPort}/command`, {
+    await fetch(`http://localhost:${handle.actualPort}/command`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        type: 'TestCommand',
-        data: { foo: 'bar' },
+        type: 'ConfigCommand',
+        data: {},
       }),
     });
 
-    expect(response.status).toBe(404);
-    expect(onPipelineActivity).toHaveBeenCalledWith('pipeline:command:TestCommand');
+    await new Promise((r) => setTimeout(r, 100));
+
+    expect(onEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'ConfigCommandDone',
+      }),
+    );
   });
 
   it('loads COMMANDS from config file and registers them as handlers', async () => {
