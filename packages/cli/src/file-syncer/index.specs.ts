@@ -1,6 +1,22 @@
 import * as path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import type { Server as SocketIOServer } from 'socket.io';
+import { describe, expect, it, vi } from 'vitest';
+import { FileSyncer } from './index.js';
 import { fromWirePath, toWirePath } from './utils/path.js';
+
+describe('FileSyncer', () => {
+  describe('broadcastSuspend', () => {
+    it('emits worker:suspending to all connected clients', () => {
+      const emitFn = vi.fn();
+      const io = { emit: emitFn } as unknown as SocketIOServer;
+      const syncer = new FileSyncer(io, '/app');
+
+      syncer.broadcastSuspend();
+
+      expect(emitFn).toHaveBeenCalledWith('worker:suspending');
+    });
+  });
+});
 
 describe('wire path roundtrip with watchDir as root', () => {
   it('roundtrips file paths correctly when using watchDir as base', () => {
