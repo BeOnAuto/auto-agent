@@ -1,5 +1,17 @@
 # create-auto-app
 
+## 1.1.0
+
+### Minor Changes
+
+- [`6b4be43`](https://github.com/BeOnAuto/auto-engineer/commit/6b4be43ce12cf8562f7202ce7272bcbb0bca9a85) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **cli**: expose messageBus on ServerHandle, remove onEvent option
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`6b4be43`](https://github.com/BeOnAuto/auto-engineer/commit/6b4be43ce12cf8562f7202ce7272bcbb0bca9a85)]:
+  - @auto-engineer/id@1.1.0
+
 ## 1.0.2
 
 ### Patch Changes
