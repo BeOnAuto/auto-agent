@@ -109,6 +109,10 @@ export class PipelineServer {
     return this.httpServer;
   }
 
+  getMessageBus(): MessageBus {
+    return this.messageBus;
+  }
+
   registerCommandHandlers(handlers: CommandHandlerWithMetadata[]): void {
     for (const handler of handlers) {
       this.commandHandlers.set(handler.name, handler);

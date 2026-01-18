@@ -79,6 +79,22 @@ describe('PipelineServer', () => {
     });
   });
 
+  describe('getMessageBus', () => {
+    it('should return the message bus with registered command handlers', () => {
+      const handler = {
+        name: 'BusTestCmd',
+        handle: async () => ({ type: 'BusTestDone', data: {} }),
+      };
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+
+      const messageBus = server.getMessageBus();
+      const registeredHandlers = messageBus.getCommandHandlers();
+
+      expect(registeredHandlers.BusTestCmd).toEqual(handler);
+    });
+  });
+
   describe('middleware', () => {
     it('should apply middleware before routes on start', async () => {
       const server = new PipelineServer({ port: 0 });
