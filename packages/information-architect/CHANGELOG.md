@@ -1,5 +1,16 @@
 # @auto-engineer/information-architect
 
+## 1.1.1
+
+### Patch Changes
+
+- [`0d9693f`](https://github.com/BeOnAuto/auto-engineer/commit/0d9693fee7c2a4105b104204b96773ffaebaecd6) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **root**: check remote status before generating changesets
+  - **global**: version packages
+- Updated dependencies [[`0d9693f`](https://github.com/BeOnAuto/auto-engineer/commit/0d9693fee7c2a4105b104204b96773ffaebaecd6)]:
+  - @auto-engineer/ai-gateway@1.1.1
+  - @auto-engineer/message-bus@1.1.1
+  - @auto-engineer/narrative@1.1.1
+
 ## 1.1.0
 
 ### Minor Changes
