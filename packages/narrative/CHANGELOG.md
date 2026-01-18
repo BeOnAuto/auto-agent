@@ -1,5 +1,19 @@
 # @auto-engineer/flow
 
+## 1.0.2
+
+### Patch Changes
+
+- [`d7d07cb`](https://github.com/BeOnAuto/auto-engineer/commit/d7d07cb7c699496d61b6794391aa6a57d7a1af44) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: remove completed ketchup plan
+  - **global**: version packages
+  - **global**: update ketchup plan - Burst 4 complete
+  - **pipeline**: update ketchup plan - Burst 4 blocked on CLI publish
+- Updated dependencies [[`d7d07cb`](https://github.com/BeOnAuto/auto-engineer/commit/d7d07cb7c699496d61b6794391aa6a57d7a1af44)]:
+  - @auto-engineer/file-store@1.0.2
+  - @auto-engineer/id@1.0.2
+  - @auto-engineer/message-bus@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes
