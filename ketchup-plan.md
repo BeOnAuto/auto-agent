@@ -3,7 +3,6 @@
 ## TODO
 
 - [ ] Burst 3b: Wire cli.ts to connect preSuspendHandler (blocked on CLI publish)
-- [ ] Burst 8: Pipeline UI shows "Sleeping" with wake link when suspended
 - [ ] Burst 9: dispatchCommand auto-wakes before sending commands
 - [ ] Burst 10: AI generation (wire connect) auto-wakes before connecting
 
@@ -16,3 +15,4 @@
 - [x] Burst 5: WorkerWakeContext provides suspended state and wake() function (on.auto-2: 40b2e82)
 - [x] Burst 6: workspace-context uses WorkerWakeContext for suspend handling (on.auto-2: 3cc304f)
 - [x] Burst 7: use-node-status-events stops reconnecting when suspended (on.auto-2: 522e547)
+- [x] Burst 8: Pipeline UI shows "Sleeping" with wake link when suspended (on.auto-2: 1a8b896)
