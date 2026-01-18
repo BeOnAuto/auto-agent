@@ -5,15 +5,15 @@ import { FileSyncer } from './index.js';
 import { fromWirePath, toWirePath } from './utils/path.js';
 
 describe('FileSyncer', () => {
-  describe('broadcastSuspend', () => {
-    it('emits worker:suspending to all connected clients', () => {
+  describe('broadcastShutdown', () => {
+    it('emits worker:shutdown to all connected clients', () => {
       const emitFn = vi.fn();
       const io = { emit: emitFn } as unknown as SocketIOServer;
       const syncer = new FileSyncer(io, '/app');
 
-      syncer.broadcastSuspend();
+      syncer.broadcastShutdown();
 
-      expect(emitFn).toHaveBeenCalledWith('worker:suspending');
+      expect(emitFn).toHaveBeenCalledWith('worker:shutdown');
     });
   });
 });
