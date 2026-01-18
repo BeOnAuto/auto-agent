@@ -52,4 +52,24 @@ describe('startServer', () => {
     expect(response.status).toBe(404);
     expect(onPipelineActivity).toHaveBeenCalledWith('pipeline:command:TestCommand');
   });
+
+  it('loads COMMANDS from config file and registers them as handlers', async () => {
+    const configPath = path.join(fixturesDir, 'auto-with-commands.config.ts');
+
+    handle = await startServer({
+      port: 0,
+      configPath,
+    });
+
+    const response = await fetch(`http://localhost:${handle.actualPort}/command`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'ConfigCommand',
+        data: {},
+      }),
+    });
+
+    expect(response.status).toBe(200);
+  });
 });

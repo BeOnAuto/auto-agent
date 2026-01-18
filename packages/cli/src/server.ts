@@ -15,6 +15,7 @@ export type { SocketMiddleware };
 interface PipelineConfig {
   plugins: string[];
   pipeline: Pipeline;
+  COMMANDS?: CommandHandlerWithMetadata[];
 }
 
 interface PluginModule {
@@ -202,7 +203,9 @@ export async function startServer(opts: StartServerOptions): Promise<ServerHandl
     throw new Error(`Failed to load pipeline config from ${configPath}`);
   }
 
-  const commandHandlers = await loadCommandHandlers(config.plugins);
+  const pluginHandlers = await loadCommandHandlers(config.plugins);
+  const configHandlers = config.COMMANDS ?? [];
+  const commandHandlers = [...pluginHandlers, ...configHandlers];
   const pipelineServer = new PipelineServer({ port: actualPort });
 
   if (opts.onPipelineActivity) {
