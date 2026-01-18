@@ -23,5 +23,7 @@
 ---
 
 - **global**: version packages
+- **global**: remove completed ketchup plan
+- **global**: version packages
 - **global**: update ketchup plan - Burst 4 complete
 - **pipeline**: update ketchup plan - Burst 4 blocked on CLI publish

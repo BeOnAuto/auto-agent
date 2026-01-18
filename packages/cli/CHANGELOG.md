@@ -1,5 +1,21 @@
 # @auto-engineer/cli
 
+## 1.0.1
+
+### Patch Changes
+
+- [`f8360ec`](https://github.com/BeOnAuto/auto-engineer/commit/f8360ec5e39297cbfd1a2ffb13ec83592ce12b13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **global**: update ketchup plan - Burst 4 complete
+  - **pipeline**: update ketchup plan - Burst 4 blocked on CLI publish
+
+- [`17c8146`](https://github.com/BeOnAuto/auto-engineer/commit/17c814614c42f24f7a6fe1dc407ed4298994ea4d) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Looking at these commits, they are both internal housekeeping changes related to a "ketchup plan" (which appears to be a development workflow tracking document based on the CLAUDE.md context). These are not user-facing changes.
+  - Updated internal development tracking documentation
+
+- Updated dependencies [[`f8360ec`](https://github.com/BeOnAuto/auto-engineer/commit/f8360ec5e39297cbfd1a2ffb13ec83592ce12b13), [`17c8146`](https://github.com/BeOnAuto/auto-engineer/commit/17c814614c42f24f7a6fe1dc407ed4298994ea4d)]:
+  - @auto-engineer/file-store@1.0.1
+  - @auto-engineer/narrative@1.0.1
+  - @auto-engineer/pipeline@1.0.1
+
 ## 1.0.0
 
 ### Major Changes
