@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import type { Server as HttpServer } from 'node:http';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { CommandHandlerWithMetadata, Event, Pipeline } from '@auto-engineer/pipeline';
+import type { CommandHandlerWithMetadata, MessageBus, Pipeline } from '@auto-engineer/pipeline';
 import { PipelineServer } from '@auto-engineer/pipeline';
 import type { RequestHandler } from 'express';
 import getPort, { portNumbers } from 'get-port';
@@ -28,13 +28,13 @@ export interface StartServerOptions {
   configPath?: string;
   httpMiddleware?: RequestHandler[];
   socketMiddleware?: SocketMiddleware;
-  onEvent?: (event: { type: string; correlationId?: string }) => void;
 }
 
 export interface ServerHandle {
   fileSyncer: FileSyncer;
   httpServer: HttpServer;
   actualPort: number;
+  messageBus: MessageBus;
   stop: () => Promise<void>;
 }
 
@@ -208,16 +208,6 @@ export async function startServer(opts: StartServerOptions): Promise<ServerHandl
   const commandHandlers = [...pluginHandlers, ...configHandlers];
   const pipelineServer = new PipelineServer({ port: actualPort });
 
-  if (opts.onEvent) {
-    const eventCallback = opts.onEvent;
-    pipelineServer.getMessageBus().subscribeAll({
-      name: 'ExternalEventCallback',
-      handle: async (event: Event) => {
-        eventCallback({ type: event.type, correlationId: event.correlationId });
-      },
-    });
-  }
-
   if (opts.httpMiddleware) {
     for (const middleware of opts.httpMiddleware) {
       pipelineServer.use(middleware);
@@ -249,6 +239,7 @@ export async function startServer(opts: StartServerOptions): Promise<ServerHandl
     fileSyncer,
     httpServer,
     actualPort,
+    messageBus: pipelineServer.getMessageBus(),
     stop,
   };
 }

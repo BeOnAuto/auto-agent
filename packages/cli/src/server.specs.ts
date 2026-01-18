@@ -1,6 +1,6 @@
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { type ServerHandle, startServer } from './server.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -30,14 +30,20 @@ describe('startServer', () => {
     expect(handle.httpServer.close).toBeTypeOf('function');
   });
 
-  it('calls onEvent callback when command handler emits events', async () => {
+  it('exposes messageBus that receives events from command handlers', async () => {
     const configPath = path.join(fixturesDir, 'auto-with-commands.config.ts');
-    const onEvent = vi.fn();
+    const events: { type: string }[] = [];
 
     handle = await startServer({
       port: 0,
       configPath,
-      onEvent,
+    });
+
+    handle.messageBus.subscribeAll({
+      name: 'TestSubscriber',
+      handle: async (event) => {
+        events.push({ type: event.type });
+      },
     });
 
     await fetch(`http://localhost:${handle.actualPort}/command`, {
@@ -51,11 +57,7 @@ describe('startServer', () => {
 
     await new Promise((r) => setTimeout(r, 100));
 
-    expect(onEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'ConfigCommandDone',
-      }),
-    );
+    expect(events).toContainEqual({ type: 'ConfigCommandDone' });
   });
 
   it('loads COMMANDS from config file and registers them as handlers', async () => {
