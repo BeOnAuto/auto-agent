@@ -1,5 +1,6 @@
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { type Socket as ClientSocket, io as ioClient } from 'socket.io-client';
 import { afterEach, describe, expect, it } from 'vitest';
 import { type ServerHandle, startServer } from './server.js';
 
@@ -8,12 +9,46 @@ const fixturesDir = path.join(__dirname, '__fixtures__');
 
 describe('startServer', () => {
   let handle: ServerHandle | null = null;
+  let clientSocket: ClientSocket | null = null;
 
   afterEach(async () => {
+    if (clientSocket) {
+      clientSocket.disconnect();
+      clientSocket = null;
+    }
     if (handle) {
       await handle.stop();
       handle = null;
     }
+  });
+
+  it('onPreSuspend sends worker:suspending to connected clients', async () => {
+    const configPath = path.join(fixturesDir, 'auto.config.ts');
+
+    handle = await startServer({
+      port: 0,
+      configPath,
+    });
+
+    const receivedEvents: string[] = [];
+    clientSocket = ioClient(`http://localhost:${handle.actualPort}`, {
+      path: '/file-sync',
+      autoConnect: true,
+    });
+
+    await new Promise<void>((resolve) => {
+      clientSocket.on('connect', resolve);
+    });
+
+    clientSocket.on('worker:suspending', () => {
+      receivedEvents.push('worker:suspending');
+    });
+
+    handle.onPreSuspend();
+
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(receivedEvents).toEqual(['worker:suspending']);
   });
 
   it('returns a ServerHandle with single port for both HTTP and WebSocket', async () => {

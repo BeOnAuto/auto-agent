@@ -36,6 +36,7 @@ export interface ServerHandle {
   actualPort: number;
   messageBus: MessageBus;
   stop: () => Promise<void>;
+  onPreSuspend: () => void;
 }
 
 function findConfigFile(): string | null {
@@ -235,11 +236,16 @@ export async function startServer(opts: StartServerOptions): Promise<ServerHandl
     await pipelineServer.stop();
   };
 
+  const onPreSuspend = (): void => {
+    fileSyncer.broadcastSuspend();
+  };
+
   return {
     fileSyncer,
     httpServer,
     actualPort,
     messageBus: pipelineServer.getMessageBus(),
     stop,
+    onPreSuspend,
   };
 }
