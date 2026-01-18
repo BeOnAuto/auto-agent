@@ -1,5 +1,18 @@
 # @auto-engineer/server-implementer
 
+## 1.2.0
+
+### Minor Changes
+
+- [`d1865ee`](https://github.com/BeOnAuto/auto-engineer/commit/d1865eeaf0f18e311c61cca0e233d68a6c2f57a9) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - Graceful Worker Suspend with UI Disconnect (#41)
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`d1865ee`](https://github.com/BeOnAuto/auto-engineer/commit/d1865eeaf0f18e311c61cca0e233d68a6c2f57a9)]:
+  - @auto-engineer/ai-gateway@1.2.0
+  - @auto-engineer/message-bus@1.2.0
+
 ## 1.1.2
 
 ### Patch Changes
