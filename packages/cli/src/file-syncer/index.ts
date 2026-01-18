@@ -427,4 +427,8 @@ export class FileSyncer {
       clearTimeout(this.autoConfigDebounce);
     }
   }
+
+  broadcastSuspend(): void {
+    this.io.emit('worker:suspending');
+  }
 }
