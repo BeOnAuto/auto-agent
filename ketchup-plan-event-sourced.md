@@ -8,7 +8,7 @@ The current `onPipelineActivity` callback intercepts HTTP POST /command via midd
 
 ## TODO
 
-- [ ] Burst 4: Wire up cli.ts with onEvent callback (on.auto-1) - BLOCKED: requires @auto-engineer/cli to be published first
+(none - all bursts completed)
 
 ## DONE
 
@@ -17,3 +17,4 @@ The current `onPipelineActivity` callback intercepts HTTP POST /command via midd
 - [x] Burst 3a: Add publishEvent calls when PipelineServer broadcasts events (c75811a)
 - [x] Burst 3b: Add COMMANDS support to config loading (79ec90e)
 - [x] Burst 3c: Replace onPipelineActivity with onEvent using subscribeAll (98c7423)
+- [x] Burst 4: Wire up cli.ts with onEvent callback in on.auto-1 (a25b5c6)
