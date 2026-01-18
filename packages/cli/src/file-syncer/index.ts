@@ -428,7 +428,7 @@ export class FileSyncer {
     }
   }
 
-  broadcastSuspend(): void {
-    this.io.emit('worker:suspending');
+  broadcastShutdown(): void {
+    this.io.emit('worker:shutdown');
   }
 }

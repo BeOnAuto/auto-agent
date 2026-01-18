@@ -22,7 +22,7 @@ describe('startServer', () => {
     }
   });
 
-  it('onPreSuspend sends worker:suspending to connected clients', async () => {
+  it('onPreShutdown sends worker:shutdown to connected clients', async () => {
     const configPath = path.join(fixturesDir, 'auto.config.ts');
 
     handle = await startServer({
@@ -40,15 +40,15 @@ describe('startServer', () => {
       clientSocket.on('connect', resolve);
     });
 
-    clientSocket.on('worker:suspending', () => {
-      receivedEvents.push('worker:suspending');
+    clientSocket.on('worker:shutdown', () => {
+      receivedEvents.push('worker:shutdown');
     });
 
-    handle.onPreSuspend();
+    handle.onPreShutdown();
 
     await new Promise((r) => setTimeout(r, 50));
 
-    expect(receivedEvents).toEqual(['worker:suspending']);
+    expect(receivedEvents).toEqual(['worker:shutdown']);
   });
 
   it('returns a ServerHandle with single port for both HTTP and WebSocket', async () => {
