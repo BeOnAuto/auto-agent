@@ -1,5 +1,25 @@
 # @auto-engineer/dev-server
 
+## 1.0.0
+
+### Major Changes
+
+- [`b00fcec`](https://github.com/BeOnAuto/auto-engineer/commit/b00fcece918f10c391ac24606baf0ac1d882bff9) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added event subscription API to pipeline server, allowing external code to subscribe to all pipeline events via `getMessageBus()` and `subscribeAll()`
+  - Replaced `onPipelineActivity` callback with `onEvent` in CLI server options for true event-sourced activity tracking (breaking change)
+  - Added support for loading command handlers directly from config files via `COMMANDS` array export
+
+- [`e46d374`](https://github.com/BeOnAuto/auto-engineer/commit/e46d374fbaea0ed20b865cca3961966448e704e3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **cli**: replace onPipelineActivity with onEvent using subscribeAll
+  - **cli**: load COMMANDS from config file as command handlers
+  - **pipeline**: publish events to message bus when command handlers emit
+  - **pipeline**: export MessageBus, EventHandler, EventSubscription types
+  - **pipeline**: add getMessageBus() method to PipelineServer
+
+### Patch Changes
+
+- Updated dependencies [[`b00fcec`](https://github.com/BeOnAuto/auto-engineer/commit/b00fcece918f10c391ac24606baf0ac1d882bff9), [`e46d374`](https://github.com/BeOnAuto/auto-engineer/commit/e46d374fbaea0ed20b865cca3961966448e704e3)]:
+  - @auto-engineer/cli@1.0.0
+  - @auto-engineer/message-bus@1.0.0
+
 ## 0.26.3
 
 ### Patch Changes
