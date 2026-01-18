@@ -6,6 +6,30 @@ if [ "${AUTO_CHANGESET_ENABLED:-true}" = "false" ]; then
   exit 0
 fi
 
+# Fetch remote to check if we're behind
+echo "🔍 Checking remote status..."
+git fetch origin main --quiet 2>/dev/null || git fetch origin --quiet 2>/dev/null
+
+# Get the current branch being pushed
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Check if local is behind remote (push will fail anyway)
+LOCAL=$(git rev-parse HEAD)
+REMOTE=$(git rev-parse origin/main 2>/dev/null || echo "")
+BASE=$(git merge-base HEAD origin/main 2>/dev/null || echo "")
+
+if [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ] && [ "$BASE" = "$LOCAL" ]; then
+  echo "⚠️  Local branch is behind remote. Skipping changeset generation."
+  echo "   Run 'git pull --rebase' first, then push again."
+  exit 1
+fi
+
+if [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ] && [ "$BASE" != "$LOCAL" ] && [ "$BASE" != "$REMOTE" ]; then
+  echo "⚠️  Local branch has diverged from remote. Skipping changeset generation."
+  echo "   Run 'git pull --rebase' or 'git reset --hard origin/main' first."
+  exit 1
+fi
+
 # Auto-generate changesets before push
 echo "🔄 Auto-generating changesets..."
 pnpm tsx packages/release-automation/bin/release-automation.ts generate
