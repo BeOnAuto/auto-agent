@@ -1,3 +1,4 @@
+export type { EventHandler, EventSubscription, MessageBus } from '@auto-engineer/message-bus';
 export type {
   CompletionConfig,
   EmitChain,

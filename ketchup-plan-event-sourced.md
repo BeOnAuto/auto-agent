@@ -8,9 +8,10 @@ The current `onPipelineActivity` callback intercepts HTTP POST /command via midd
 
 ## TODO
 
-- [ ] Burst 1: Add getMessageBus() method to PipelineServer (auto-engineer-1)
 - [ ] Burst 2: Export MessageBus type from pipeline package (auto-engineer-1)
 - [ ] Burst 3: Replace onPipelineActivity with onEvent using subscribeAll (auto-engineer-1)
 - [ ] Burst 4: Wire up cli.ts with onEvent callback (on.auto-1)
 
 ## DONE
+
+- [x] Burst 1: Add getMessageBus() method to PipelineServer (06beb24)
