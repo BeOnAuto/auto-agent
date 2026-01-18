@@ -919,6 +919,7 @@ export class PipelineServer {
 
     for (const eventWithIds of eventsWithIds) {
       this.sseManager.broadcast(eventWithIds);
+      await this.messageBus.publishEvent(eventWithIds);
 
       const sourceCommand = this.eventCommandMapper.getSourceCommand(eventWithIds.type);
       if (sourceCommand !== undefined) {

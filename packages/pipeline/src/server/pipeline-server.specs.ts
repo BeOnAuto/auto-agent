@@ -93,6 +93,35 @@ describe('PipelineServer', () => {
 
       expect(registeredHandlers.BusTestCmd).toEqual(handler);
     });
+
+    it('should publish events to message bus when command handler emits events', async () => {
+      const handler = {
+        name: 'PublishTestCmd',
+        handle: async () => ({ type: 'PublishTestDone', data: { value: 42 } }),
+      };
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([handler]);
+      await server.start();
+
+      const receivedEvents: Array<{ type: string }> = [];
+      server.getMessageBus().subscribeAll({
+        name: 'TestSubscriber',
+        handle: async (event) => {
+          receivedEvents.push({ type: event.type });
+        },
+      });
+
+      await fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'PublishTestCmd', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 100));
+      await server.stop();
+
+      expect(receivedEvents).toContainEqual({ type: 'PublishTestDone' });
+    });
   });
 
   describe('middleware', () => {
