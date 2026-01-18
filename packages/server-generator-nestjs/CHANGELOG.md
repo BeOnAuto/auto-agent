@@ -1,5 +1,14 @@
 # @auto-engineer/server-generator-nestjs
 
+## 1.1.2
+
+### Patch Changes
+
+- [`1695c1d`](https://github.com/BeOnAuto/auto-engineer/commit/1695c1d715bfcf404e5dcf0ed503a6aa78648c66) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **root**: use new commit instead of amend for changesets
+  - **global**: version packages
+- Updated dependencies [[`1695c1d`](https://github.com/BeOnAuto/auto-engineer/commit/1695c1d715bfcf404e5dcf0ed503a6aa78648c66)]:
+  - @auto-engineer/narrative@1.1.2
+
 ## 1.1.1
 
 ### Patch Changes
