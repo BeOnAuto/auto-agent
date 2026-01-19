@@ -2,6 +2,16 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
 ## 1.3.1
 
 ### Patch Changes
@@ -502,6 +512,21 @@
 
 # @auto-engineer/cli
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/file-store@1.3.2
+  - @auto-engineer/narrative@1.3.2
+  - @auto-engineer/pipeline@1.3.2
+
 ## 1.3.1
 
 ### Patch Changes
@@ -891,6 +916,20 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/ai-gateway@1.3.2
+  - @auto-engineer/message-bus@1.3.2
 
 ## 1.3.1
 
@@ -1851,6 +1890,19 @@
 
 # create-auto-app
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/id@1.3.2
+
 ## 1.3.1
 
 ### Patch Changes
@@ -2550,6 +2602,19 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/message-bus@1.3.2
 
 ## 1.3.1
 
@@ -3515,6 +3580,20 @@
 
 # @auto-engineer/dev-server
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/cli@1.3.2
+  - @auto-engineer/message-bus@1.3.2
+
 ## 1.3.1
 
 ### Patch Changes
@@ -3991,6 +4070,16 @@
 
 # @auto-engineer/file-store
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
 ## 1.3.1
 
 ### Patch Changes
@@ -4448,6 +4537,19 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/message-bus@1.3.2
 
 ## 1.3.1
 
@@ -5371,6 +5473,20 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/ai-gateway@1.3.2
+  - @auto-engineer/message-bus@1.3.2
 
 ## 1.3.1
 
@@ -6432,6 +6548,20 @@
 
 # @auto-engineer/frontend-implementer
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/ai-gateway@1.3.2
+  - @auto-engineer/message-bus@1.3.2
+
 ## 1.3.1
 
 ### Patch Changes
@@ -7489,6 +7619,16 @@
 
 # @auto-engineer/id
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
 ## 1.3.1
 
 ### Patch Changes
@@ -7884,6 +8024,21 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/ai-gateway@1.3.2
+  - @auto-engineer/message-bus@1.3.2
+  - @auto-engineer/narrative@1.3.2
 
 ## 1.3.1
 
@@ -9001,6 +9156,16 @@
 
 # @auto-engineer/message-bus
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
 ## 1.3.1
 
 ### Patch Changes
@@ -9505,6 +9670,19 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/message-bus@1.3.2
 
 ## 1.3.1
 
@@ -10255,6 +10433,21 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/file-store@1.3.2
+  - @auto-engineer/id@1.3.2
+  - @auto-engineer/message-bus@1.3.2
 
 ## 1.3.1
 
@@ -11501,6 +11694,20 @@
 
 # @auto-engineer/pipeline
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/file-store@1.3.2
+  - @auto-engineer/message-bus@1.3.2
+
 ## 1.3.1
 
 ### Patch Changes
@@ -11860,6 +12067,16 @@
 
 # @auto-engineer/release-automation
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
 ## 1.3.1
 
 ### Patch Changes
@@ -12023,6 +12240,20 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/cli@1.3.2
+  - @auto-engineer/message-bus@1.3.2
 
 ## 1.3.1
 
@@ -12936,6 +13167,20 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/message-bus@1.3.2
+  - @auto-engineer/narrative@1.3.2
 
 ## 1.3.1
 
@@ -13999,6 +14244,19 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/narrative@1.3.2
+
 ## 1.3.1
 
 ### Patch Changes
@@ -14314,6 +14572,20 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/ai-gateway@1.3.2
+  - @auto-engineer/message-bus@1.3.2
 
 ## 1.3.1
 

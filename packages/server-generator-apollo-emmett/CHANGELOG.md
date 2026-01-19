@@ -1,5 +1,19 @@
 # @auto-engineer/server-generator-apollo-emmett
 
+## 1.3.2
+
+### Patch Changes
+
+- [`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: republish with correct workspace dependency resolution
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed an issue where empty action chains could cause errors in the narrative system
+
+- Updated dependencies [[`f382d2a`](https://github.com/BeOnAuto/auto-engineer/commit/f382d2a5e02cba90a4a772088dd1d46fd9470929), [`4c060da`](https://github.com/BeOnAuto/auto-engineer/commit/4c060da8da6f08f0d689f513c9b3e67af46766de)]:
+  - @auto-engineer/message-bus@1.3.2
+  - @auto-engineer/narrative@1.3.2
+
 ## 1.3.1
 
 ### Patch Changes
