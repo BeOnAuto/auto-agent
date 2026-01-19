@@ -2,6 +2,17 @@
 
 # @auto-engineer/ai-gateway
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
 ## 1.2.0
 
 ### Minor Changes
@@ -485,6 +496,22 @@
 
 # @auto-engineer/cli
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/file-store@2.0.0
+  - @auto-engineer/narrative@2.0.0
+  - @auto-engineer/pipeline@2.0.0
+
 ## 1.2.0
 
 ### Minor Changes
@@ -847,6 +874,21 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/ai-gateway@2.0.0
+  - @auto-engineer/message-bus@2.0.0
 
 ## 1.2.0
 
@@ -1782,6 +1824,20 @@
 
 # create-auto-app
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/id@2.0.0
+
 ## 1.2.0
 
 ### Minor Changes
@@ -2458,6 +2514,20 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/message-bus@2.0.0
 
 ## 1.2.0
 
@@ -3400,6 +3470,21 @@
 
 # @auto-engineer/dev-server
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/cli@2.0.0
+  - @auto-engineer/message-bus@2.0.0
+
 ## 1.2.0
 
 ### Minor Changes
@@ -3851,6 +3936,17 @@
 
 # @auto-engineer/file-store
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
 ## 1.2.0
 
 ### Minor Changes
@@ -4291,6 +4387,20 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/message-bus@2.0.0
 
 ## 1.2.0
 
@@ -5191,6 +5301,21 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/ai-gateway@2.0.0
+  - @auto-engineer/message-bus@2.0.0
 
 ## 1.2.0
 
@@ -6227,6 +6352,21 @@
 
 # @auto-engineer/frontend-implementer
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/ai-gateway@2.0.0
+  - @auto-engineer/message-bus@2.0.0
+
 ## 1.2.0
 
 ### Minor Changes
@@ -7259,6 +7399,17 @@
 
 # @auto-engineer/id
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
 ## 1.2.0
 
 ### Minor Changes
@@ -7637,6 +7788,22 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/ai-gateway@2.0.0
+  - @auto-engineer/message-bus@2.0.0
+  - @auto-engineer/narrative@2.0.0
 
 ## 1.2.0
 
@@ -8727,6 +8894,17 @@
 
 # @auto-engineer/message-bus
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
 ## 1.2.0
 
 ### Minor Changes
@@ -9214,6 +9392,20 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/message-bus@2.0.0
 
 ## 1.2.0
 
@@ -9941,6 +10133,22 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/file-store@2.0.0
+  - @auto-engineer/id@2.0.0
+  - @auto-engineer/message-bus@2.0.0
 
 ## 1.2.0
 
@@ -11160,6 +11368,21 @@
 
 # @auto-engineer/pipeline
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/file-store@2.0.0
+  - @auto-engineer/message-bus@2.0.0
+
 ## 1.2.0
 
 ### Minor Changes
@@ -11494,6 +11717,17 @@
 
 # @auto-engineer/release-automation
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
 ## 1.2.0
 
 ### Minor Changes
@@ -11640,6 +11874,21 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/cli@2.0.0
+  - @auto-engineer/message-bus@2.0.0
 
 ## 1.2.0
 
@@ -12528,6 +12777,21 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/message-bus@2.0.0
+  - @auto-engineer/narrative@2.0.0
 
 ## 1.2.0
 
@@ -13566,6 +13830,20 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/narrative@2.0.0
+
 ## 1.2.0
 
 ### Minor Changes
@@ -13858,6 +14136,21 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
+- Updated dependencies [[`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a), [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6)]:
+  - @auto-engineer/ai-gateway@2.0.0
+  - @auto-engineer/message-bus@2.0.0
 
 ## 1.2.0
 

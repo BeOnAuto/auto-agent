@@ -1,5 +1,16 @@
 # @auto-engineer/id
 
+## 2.0.0
+
+### Major Changes
+
+- [`c3a1f4f`](https://github.com/BeOnAuto/auto-engineer/commit/c3a1f4f51bdda9cd97f839c0f9a3d2664518388a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **global**: version packages
+  - **cli**: rename suspend hooks to generic shutdown hooks (#42)
+
+### Patch Changes
+
+- [`6770053`](https://github.com/BeOnAuto/auto-engineer/commit/67700538ddd17656eb0de17b1a16d5f7e4ca14f6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed incorrect argument order in test code generation for it/describe blocks
+
 ## 1.2.0
 
 ### Minor Changes
