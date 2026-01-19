@@ -2,6 +2,12 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
 ## 2.0.0
 
 ### Major Changes
@@ -496,6 +502,17 @@
 
 # @auto-engineer/cli
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/file-store@1.3.1
+  - @auto-engineer/narrative@1.3.1
+  - @auto-engineer/pipeline@1.3.1
+
 ## 2.0.0
 
 ### Major Changes
@@ -874,6 +891,16 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/ai-gateway@1.3.1
+  - @auto-engineer/message-bus@1.3.1
 
 ## 2.0.0
 
@@ -1824,6 +1851,15 @@
 
 # create-auto-app
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/id@1.3.1
+
 ## 2.0.0
 
 ### Major Changes
@@ -2514,6 +2550,15 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/message-bus@1.3.1
 
 ## 2.0.0
 
@@ -3470,6 +3515,16 @@
 
 # @auto-engineer/dev-server
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/cli@1.3.1
+  - @auto-engineer/message-bus@1.3.1
+
 ## 2.0.0
 
 ### Major Changes
@@ -3936,6 +3991,12 @@
 
 # @auto-engineer/file-store
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
 ## 2.0.0
 
 ### Major Changes
@@ -4387,6 +4448,15 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/message-bus@1.3.1
 
 ## 2.0.0
 
@@ -5301,6 +5371,16 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/ai-gateway@1.3.1
+  - @auto-engineer/message-bus@1.3.1
 
 ## 2.0.0
 
@@ -6352,6 +6432,16 @@
 
 # @auto-engineer/frontend-implementer
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/ai-gateway@1.3.1
+  - @auto-engineer/message-bus@1.3.1
+
 ## 2.0.0
 
 ### Major Changes
@@ -7399,6 +7489,12 @@
 
 # @auto-engineer/id
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
 ## 2.0.0
 
 ### Major Changes
@@ -7788,6 +7884,17 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/ai-gateway@1.3.1
+  - @auto-engineer/message-bus@1.3.1
+  - @auto-engineer/narrative@1.3.1
 
 ## 2.0.0
 
@@ -8894,6 +9001,12 @@
 
 # @auto-engineer/message-bus
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
 ## 2.0.0
 
 ### Major Changes
@@ -9392,6 +9505,15 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/message-bus@1.3.1
 
 ## 2.0.0
 
@@ -10133,6 +10255,17 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/file-store@1.3.1
+  - @auto-engineer/id@1.3.1
+  - @auto-engineer/message-bus@1.3.1
 
 ## 2.0.0
 
@@ -11368,6 +11501,16 @@
 
 # @auto-engineer/pipeline
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/file-store@1.3.1
+  - @auto-engineer/message-bus@1.3.1
+
 ## 2.0.0
 
 ### Major Changes
@@ -11717,6 +11860,12 @@
 
 # @auto-engineer/release-automation
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
 ## 2.0.0
 
 ### Major Changes
@@ -11874,6 +12023,16 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/cli@1.3.1
+  - @auto-engineer/message-bus@1.3.1
 
 ## 2.0.0
 
@@ -12777,6 +12936,16 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/message-bus@1.3.1
+  - @auto-engineer/narrative@1.3.1
 
 ## 2.0.0
 
@@ -13830,6 +13999,15 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/narrative@1.3.1
+
 ## 2.0.0
 
 ### Major Changes
@@ -14136,6 +14314,16 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/ai-gateway@1.3.1
+  - @auto-engineer/message-bus@1.3.1
 
 ## 2.0.0
 

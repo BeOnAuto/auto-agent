@@ -1,5 +1,16 @@
 # @auto-engineer/information-architect
 
+## 1.3.1
+
+### Patch Changes
+
+- [`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed workspace dependency resolution for the narrative package to ensure correct publishing
+
+- Updated dependencies [[`f6ec207`](https://github.com/BeOnAuto/auto-engineer/commit/f6ec207cd6cd3457aca2ab8202677101fe531cd6)]:
+  - @auto-engineer/ai-gateway@1.3.1
+  - @auto-engineer/message-bus@1.3.1
+  - @auto-engineer/narrative@1.3.1
+
 ## 2.0.0
 
 ### Major Changes
