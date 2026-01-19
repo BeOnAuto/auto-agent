@@ -1,5 +1,7 @@
 import type { z } from 'zod';
 
+// Republished to fix workspace:* dependency resolution in 1.3.0
+
 // Apollo GraphQL
 export { gql } from 'graphql-tag';
 export { DataSchema, DataSinkSchema, DataSourceSchema, MessageTargetSchema } from './schema';
