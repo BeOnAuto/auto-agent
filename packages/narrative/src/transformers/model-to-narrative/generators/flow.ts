@@ -37,11 +37,9 @@ function buildClientSpecNode(
   if (node.type === 'it') {
     const args: tsNS.Expression[] = [];
 
+    args.push(f.createStringLiteral(node.title));
     if (node.id !== undefined && node.id !== '') {
       args.push(f.createStringLiteral(node.id));
-      args.push(f.createStringLiteral(node.title));
-    } else {
-      args.push(f.createStringLiteral(node.title));
     }
 
     return f.createExpressionStatement(f.createCallExpression(f.createIdentifier('it'), undefined, args));
@@ -50,11 +48,9 @@ function buildClientSpecNode(
 
     const args: tsNS.Expression[] = [];
 
+    args.push(f.createStringLiteral(node.title ?? ''));
     if (node.id !== undefined && node.id !== '') {
       args.push(f.createStringLiteral(node.id));
-      args.push(f.createStringLiteral(node.title ?? ''));
-    } else {
-      args.push(f.createStringLiteral(node.title ?? ''));
     }
 
     args.push(
