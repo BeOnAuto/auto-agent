@@ -123,6 +123,9 @@ function chainThenCall(
   g: GWTBlock,
   messages?: Array<{ type: string; name: string; fields: Array<{ name: string; type: string; required: boolean }> }>,
 ): tsNS.Expression {
+  if (g.then.length === 0) {
+    return base;
+  }
   const firstThenItem = g.then[0];
   const thenTypeRef = getThenTypeRef(firstThenItem);
   const typeInfo = messages && thenTypeRef ? getFieldTypeInfo(messages, thenTypeRef) : undefined;
