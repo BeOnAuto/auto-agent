@@ -1,5 +1,18 @@
 # @auto-engineer/frontend-checks
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/message-bus@1.3.3
+
 ## 1.3.2
 
 ### Patch Changes

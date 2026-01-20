@@ -2,6 +2,16 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
 ## 1.3.2
 
 ### Patch Changes
@@ -512,6 +522,21 @@
 
 # @auto-engineer/cli
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/file-store@1.3.3
+  - @auto-engineer/narrative@1.3.3
+  - @auto-engineer/pipeline@1.3.3
+
 ## 1.3.2
 
 ### Patch Changes
@@ -916,6 +941,20 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/ai-gateway@1.3.3
+  - @auto-engineer/message-bus@1.3.3
 
 ## 1.3.2
 
@@ -1890,6 +1929,19 @@
 
 # create-auto-app
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/id@1.3.3
+
 ## 1.3.2
 
 ### Patch Changes
@@ -2602,6 +2654,19 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/message-bus@1.3.3
 
 ## 1.3.2
 
@@ -3580,6 +3645,20 @@
 
 # @auto-engineer/dev-server
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/cli@1.3.3
+  - @auto-engineer/message-bus@1.3.3
+
 ## 1.3.2
 
 ### Patch Changes
@@ -4070,6 +4149,16 @@
 
 # @auto-engineer/file-store
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
 ## 1.3.2
 
 ### Patch Changes
@@ -4537,6 +4626,19 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/message-bus@1.3.3
 
 ## 1.3.2
 
@@ -5473,6 +5575,20 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/ai-gateway@1.3.3
+  - @auto-engineer/message-bus@1.3.3
 
 ## 1.3.2
 
@@ -6548,6 +6664,20 @@
 
 # @auto-engineer/frontend-implementer
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/ai-gateway@1.3.3
+  - @auto-engineer/message-bus@1.3.3
+
 ## 1.3.2
 
 ### Patch Changes
@@ -7619,6 +7749,16 @@
 
 # @auto-engineer/id
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
 ## 1.3.2
 
 ### Patch Changes
@@ -8024,6 +8164,21 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/ai-gateway@1.3.3
+  - @auto-engineer/message-bus@1.3.3
+  - @auto-engineer/narrative@1.3.3
 
 ## 1.3.2
 
@@ -9156,6 +9311,16 @@
 
 # @auto-engineer/message-bus
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
 ## 1.3.2
 
 ### Patch Changes
@@ -9670,6 +9835,19 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/message-bus@1.3.3
 
 ## 1.3.2
 
@@ -10433,6 +10611,21 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/file-store@1.3.3
+  - @auto-engineer/id@1.3.3
+  - @auto-engineer/message-bus@1.3.3
 
 ## 1.3.2
 
@@ -11694,6 +11887,20 @@
 
 # @auto-engineer/pipeline
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/file-store@1.3.3
+  - @auto-engineer/message-bus@1.3.3
+
 ## 1.3.2
 
 ### Patch Changes
@@ -12067,6 +12274,16 @@
 
 # @auto-engineer/release-automation
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
 ## 1.3.2
 
 ### Patch Changes
@@ -12240,6 +12457,20 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/cli@1.3.3
+  - @auto-engineer/message-bus@1.3.3
 
 ## 1.3.2
 
@@ -13167,6 +13398,20 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/message-bus@1.3.3
+  - @auto-engineer/narrative@1.3.3
 
 ## 1.3.2
 
@@ -14244,6 +14489,19 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/narrative@1.3.3
+
 ## 1.3.2
 
 ### Patch Changes
@@ -14572,6 +14830,20 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.3.3
+
+### Patch Changes
+
+- [`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle empty then array in chainThenCall
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed handling of negative numbers in expression conversion
+
+- Updated dependencies [[`6832039`](https://github.com/BeOnAuto/auto-engineer/commit/683203980ec147c5b9de506f8a97303b7f5d39c3), [`03cdbfd`](https://github.com/BeOnAuto/auto-engineer/commit/03cdbfdfe934152d5ff7118608ef96ead56b032b)]:
+  - @auto-engineer/ai-gateway@1.3.3
+  - @auto-engineer/message-bus@1.3.3
 
 ## 1.3.2
 
