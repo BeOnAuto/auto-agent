@@ -122,6 +122,31 @@ describe('buildGwtSpecBlock', () => {
 
     expect(code).toMatch(/rule\([^)]+\)\s*=>/);
   });
+
+  it('handles negative numbers in example data', () => {
+    const gwtBlock: GWTBlock & { ruleDescription: string; exampleDescription: string; ruleId: string } = {
+      when: {
+        commandRef: 'AdjustBalance',
+        exampleData: { accountId: 'acc-001', amount: -100, adjustment: -50.5 },
+      },
+      then: [
+        {
+          eventRef: 'BalanceAdjusted',
+          exampleData: { accountId: 'acc-001', newBalance: -150.5, change: -100 },
+        },
+      ],
+      ruleDescription: 'balance can be adjusted with negative amounts',
+      exampleDescription: 'adjusts balance with negative values',
+      ruleId: 'rNegNum01',
+    };
+
+    const result = buildGwtSpecBlock(ts, ts.factory, gwtBlock, 'command');
+    const code = printNode(result);
+
+    expect(code).toContain('-100');
+    expect(code).toContain('-50.5');
+    expect(code).toContain('-150.5');
+  });
 });
 
 describe('buildConsolidatedGwtSpecBlock', () => {

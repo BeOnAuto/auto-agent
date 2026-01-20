@@ -3148,5 +3148,226 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
       const code = getCode(await modelToNarrative(modelWithSourceInstructions));
       expect(code).toContain(".additionalInstructions('Filter by active orders only')");
     });
+
+    it('should generate 3 narrative files for gym membership model', async () => {
+      const gymModel: Model = {
+        variant: 'specs',
+        narratives: [
+          {
+            id: 'mrwDfHhDi',
+            name: 'Gym Membership Registration',
+            slices: [
+              {
+                type: 'command',
+                name: 'Register New Member',
+                id: 'YcOe0aHz3',
+                client: { specs: [] },
+                server: {
+                  description: '',
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: '',
+                      rules: [
+                        {
+                          id: 'ODJGjsU2m',
+                          name: 'Member account creation process',
+                          examples: [
+                            {
+                              id: 'Jdrjvn3HV',
+                              name: 'Create member account',
+                              steps: [
+                                {
+                                  id: 'D1v4V3TEF',
+                                  keyword: 'When',
+                                  text: 'SubmitMembershipRegistration',
+                                  docString: { name: 'John Doe', email: 'john@example.com', phone: '123-456-7890' },
+                                },
+                                {
+                                  id: 'IeXOn8W9v',
+                                  keyword: 'Then',
+                                  text: 'MemberAccountCreated',
+                                  docString: {
+                                    memberId: 'mem_123',
+                                    name: 'John Doe',
+                                    email: 'john@example.com',
+                                    phone: '123-456-7890',
+                                  },
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                  data: {
+                    items: [
+                      {
+                        target: { type: 'Event', name: 'MemberAccountCreated' },
+                        destination: { type: 'stream', pattern: 'members' },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+            sourceFile: '/narratives/gym.narrative.ts',
+          },
+          {
+            id: 'exByqGILR',
+            name: 'Gym Class Booking',
+            slices: [
+              {
+                type: 'command',
+                name: 'Book Gym Class',
+                id: 'iEg3Qjbbp',
+                client: { specs: [] },
+                server: {
+                  description: '',
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: '',
+                      rules: [
+                        {
+                          id: 'c7TfHiadX',
+                          name: 'Class booking process',
+                          examples: [
+                            {
+                              id: '3MoVhLhAU',
+                              name: 'Book a class',
+                              steps: [
+                                {
+                                  id: 'HVYnJHNCl',
+                                  keyword: 'When',
+                                  text: 'BookGymClass',
+                                  docString: { memberId: 'mem_123', classId: 'cls_456', date: '2023-10-15' },
+                                },
+                                {
+                                  id: 'FuS1S7AMA',
+                                  keyword: 'Then',
+                                  text: 'ClassReservationConfirmed',
+                                  docString: {
+                                    reservationId: 'res_789',
+                                    memberId: 'mem_123',
+                                    classId: 'cls_456',
+                                    date: '2023-10-15',
+                                  },
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                  data: {
+                    items: [
+                      {
+                        target: { type: 'Event', name: 'ClassReservationConfirmed' },
+                        destination: { type: 'stream', pattern: 'reservations' },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+            sourceFile: '/narratives/untitled-1.narrative.ts',
+          },
+          {
+            id: 'o0odruqZA',
+            name: 'Gym Check-In',
+            slices: [
+              {
+                type: 'command',
+                name: 'Perform Check-In',
+                id: 'Cxl4UHfbX',
+                client: { specs: [] },
+                server: {
+                  description: '',
+                  specs: [
+                    {
+                      type: 'gherkin',
+                      feature: '',
+                      rules: [
+                        {
+                          id: 'n81cBIt30',
+                          name: 'Check-in process',
+                          examples: [
+                            {
+                              id: 'QiMaBqctq',
+                              name: 'Record check-in',
+                              steps: [
+                                {
+                                  id: 'Pkcushx04',
+                                  keyword: 'When',
+                                  text: 'PerformCheckIn',
+                                  docString: { memberId: 'mem_123', dateTime: '2023-10-15T08:00:00Z' },
+                                },
+                                {
+                                  id: 'Z8Ef9Yo2R',
+                                  keyword: 'Then',
+                                  text: 'CheckInRecorded',
+                                  docString: {
+                                    checkInId: 'chk_123',
+                                    memberId: 'mem_123',
+                                    dateTime: '2023-10-15T08:00:00Z',
+                                  },
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                  data: {
+                    items: [
+                      {
+                        target: { type: 'Event', name: 'CheckInRecorded' },
+                        destination: { type: 'stream', pattern: 'checkins' },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+            sourceFile: '/narratives/untitled-1-2.narrative.ts',
+          },
+        ],
+        messages: [
+          { type: 'command', name: 'SubmitMembershipRegistration', fields: [] },
+          { type: 'command', name: 'BookGymClass', fields: [] },
+          { type: 'command', name: 'PerformCheckIn', fields: [] },
+          { type: 'event', name: 'MemberAccountCreated', fields: [], source: 'internal' },
+          { type: 'event', name: 'ClassReservationConfirmed', fields: [], source: 'internal' },
+          { type: 'event', name: 'CheckInRecorded', fields: [], source: 'internal' },
+        ],
+        modules: [],
+      };
+
+      const result = await modelToNarrative(gymModel);
+
+      // Should generate 3 files, one for each narrative
+      expect(result.files.length).toBe(3);
+
+      // Check file paths match the sourceFile from each narrative
+      const filePaths = result.files.map((f) => f.path);
+      expect(filePaths).toContain('/narratives/gym.narrative.ts');
+      expect(filePaths).toContain('/narratives/untitled-1.narrative.ts');
+      expect(filePaths).toContain('/narratives/untitled-1-2.narrative.ts');
+
+      // Verify each narrative has proper content
+      const code = getCode(result);
+      expect(code).toContain("narrative('Gym Membership Registration'");
+      expect(code).toContain("narrative('Gym Class Booking'");
+      expect(code).toContain("narrative('Gym Check-In'");
+
+      // Check slices are generated for each narrative
+      expect(code).toContain("command('Register New Member'");
+      expect(code).toContain("command('Book Gym Class'");
+      expect(code).toContain("command('Perform Check-In'");
+    });
   });
 });

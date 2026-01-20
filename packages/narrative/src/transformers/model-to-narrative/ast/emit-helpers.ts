@@ -29,6 +29,9 @@ export function jsonToExpr(
     case 'string':
       return f.createStringLiteral(v);
     case 'number':
+      if (v < 0) {
+        return f.createPrefixUnaryExpression(ts.SyntaxKind.MinusToken, f.createNumericLiteral(String(Math.abs(v))));
+      }
       return f.createNumericLiteral(String(v));
     case 'boolean':
       return v ? f.createTrue() : f.createFalse();
