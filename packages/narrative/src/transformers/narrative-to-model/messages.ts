@@ -1,9 +1,9 @@
 import type { Message } from '../../index';
 import type { TypeInfo } from '../../loader/ts-utils';
 
-function mapKindToMessageType(k: 'command' | 'query' | 'reaction'): 'command' | 'event' | 'state' {
+function mapKindToMessageType(k: 'command' | 'query' | 'reaction'): 'command' | 'event' | 'state' | 'query' {
   if (k === 'command') return 'command';
-  if (k === 'query') return 'state';
+  if (k === 'query') return 'query';
   return 'event';
 }
 
@@ -52,7 +52,7 @@ function processStateFields(
 export function createMessage(
   name: string,
   typeInfo: TypeInfo | undefined,
-  messageType: 'command' | 'event' | 'state',
+  messageType: 'command' | 'event' | 'state' | 'query',
 ): Message {
   let fields = buildInitialFields(typeInfo);
 
@@ -75,6 +75,15 @@ export function createMessage(
   if (messageType === 'command') {
     return {
       type: 'command',
+      name,
+      fields,
+      metadata,
+    };
+  }
+
+  if (messageType === 'query') {
+    return {
+      type: 'query',
       name,
       fields,
       metadata,

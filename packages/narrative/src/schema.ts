@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Message reference for module type ownership
 export const MessageRefSchema = z
   .object({
-    kind: z.enum(['command', 'event', 'state']).describe('Message kind'),
+    kind: z.enum(['command', 'event', 'state', 'query']).describe('Message kind'),
     name: z.string().describe('Message name'),
   })
   .describe('Reference to a message type');
@@ -174,7 +174,11 @@ const StateSchema = BaseMessageSchema.extend({
   type: z.literal('state'),
 }).describe('State/Read Model representing a view of data');
 
-const MessageSchema = z.discriminatedUnion('type', [CommandSchema, EventSchema, StateSchema]);
+const QuerySchema = BaseMessageSchema.extend({
+  type: z.literal('query'),
+}).describe('Query representing a read operation');
+
+const MessageSchema = z.discriminatedUnion('type', [CommandSchema, EventSchema, StateSchema, QuerySchema]);
 
 const BaseSliceSchema = z
   .object({
@@ -417,6 +421,7 @@ export {
   CommandSchema,
   EventSchema,
   StateSchema,
+  QuerySchema,
   IntegrationSchema,
   CommandSliceSchema,
   QuerySliceSchema,

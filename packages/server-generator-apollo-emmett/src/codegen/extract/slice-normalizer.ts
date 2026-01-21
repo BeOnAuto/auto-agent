@@ -6,6 +6,7 @@ import {
   extractGwtFromSpecs,
   type GwtConditionWithRule,
   getSliceType,
+  type QueryActionRef,
   type SliceType,
   type StateRef,
 } from './step-converter';
@@ -13,7 +14,7 @@ import {
 interface NormalizedExample {
   description: string;
   given: EventRef[];
-  when: CommandRef | EventRef[];
+  when: CommandRef | EventRef[] | QueryActionRef;
   then: Array<EventRef | StateRef | CommandRef | ErrorRef>;
 }
 

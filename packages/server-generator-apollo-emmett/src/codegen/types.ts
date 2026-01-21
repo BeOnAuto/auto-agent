@@ -17,7 +17,7 @@ export interface Field {
 }
 
 export interface MessageDefinition {
-  type: 'command' | 'event' | 'state';
+  type: 'command' | 'event' | 'state' | 'query';
   name: string;
   fields?: Array<{
     name: string;

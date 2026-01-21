@@ -1,23 +1,26 @@
 import type { Example, Slice, Spec } from '@auto-engineer/narrative';
 import {
   type CommandRef,
+  detectQueryAction,
   type ErrorRef,
   type EventRef,
   getSliceType,
+  isQueryAction,
   isStepWithDocString,
   isStepWithError,
   type MajorKeyword,
+  type QueryActionRef,
   resolveMajorKeyword,
   type SliceType,
   type StateRef,
 } from './step-types';
 
-export type { CommandRef, EventRef, StateRef, ErrorRef, SliceType };
-export { getSliceType };
+export type { CommandRef, EventRef, StateRef, ErrorRef, SliceType, QueryActionRef };
+export { getSliceType, isQueryAction };
 
 export interface GwtResult {
   given: EventRef[];
-  when: CommandRef | EventRef[];
+  when: CommandRef | EventRef[] | QueryActionRef;
   then: Array<EventRef | StateRef | CommandRef | ErrorRef>;
   description: string;
 }
@@ -60,7 +63,7 @@ function parseSteps(example: Example): ParsedSteps {
   return { given, whenItems, thenItems, thenErrors };
 }
 
-function buildGwtResult(sliceType: SliceType, parsed: ParsedSteps, description: string): GwtResult {
+function buildGwtResult(sliceType: SliceType, parsed: ParsedSteps, description: string, slice?: Slice): GwtResult {
   const { given, whenItems, thenItems, thenErrors } = parsed;
 
   if (sliceType === 'command') {
@@ -81,6 +84,19 @@ function buildGwtResult(sliceType: SliceType, parsed: ParsedSteps, description: 
     };
   }
 
+  if (sliceType === 'query' && slice && whenItems.length > 0) {
+    const firstWhenText = whenItems[0]?.text ?? '';
+    if (detectQueryAction(firstWhenText, slice)) {
+      return {
+        given,
+        when: { queryAction: firstWhenText, args: whenItems[0]?.exampleData ?? {} },
+        then: [...thenItems.map((t) => ({ stateRef: t.text, exampleData: t.exampleData })), ...thenErrors],
+        description,
+      };
+    }
+  }
+
+  // Pattern 1: Event-based (default for queries without slice context, or when When is an event)
   return {
     given,
     when: whenItems.map((w) => ({ eventRef: w.text, exampleData: w.exampleData })),
@@ -89,22 +105,22 @@ function buildGwtResult(sliceType: SliceType, parsed: ParsedSteps, description: 
   };
 }
 
-export function stepsToGwt(example: Example, sliceType: SliceType): GwtResult {
+export function stepsToGwt(example: Example, sliceType: SliceType, slice?: Slice): GwtResult {
   const parsed = parseSteps(example);
-  return buildGwtResult(sliceType, parsed, example.name);
+  return buildGwtResult(sliceType, parsed, example.name, slice);
 }
 
 export interface GwtConditionWithRule extends GwtResult {
   ruleDescription: string;
 }
 
-export function extractGwtFromSpecs(specs: Spec[], sliceType: SliceType): GwtConditionWithRule[] {
+export function extractGwtFromSpecs(specs: Spec[], sliceType: SliceType, slice?: Slice): GwtConditionWithRule[] {
   const results: GwtConditionWithRule[] = [];
 
   for (const spec of specs) {
     for (const rule of spec.rules) {
       for (const example of rule.examples) {
-        const gwt = stepsToGwt(example, sliceType);
+        const gwt = stepsToGwt(example, sliceType, slice);
         results.push({
           ...gwt,
           ruleDescription: rule.name,
@@ -120,5 +136,5 @@ export function extractGwtSpecsFromSlice(slice: Slice): GwtConditionWithRule[] {
   if (!('server' in slice)) return [];
   const specs = slice.server?.specs;
   if (!Array.isArray(specs) || specs.length === 0) return [];
-  return extractGwtFromSpecs(specs, getSliceType(slice));
+  return extractGwtFromSpecs(specs, getSliceType(slice), slice);
 }

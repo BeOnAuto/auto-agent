@@ -1,4 +1,8 @@
 import type { Slice, Step, StepWithDocStringSchema, StepWithErrorSchema } from '@auto-engineer/narrative';
+import {
+  detectQueryAction as detectQueryActionFromNarrative,
+  extractQueryNameFromRequest,
+} from '@auto-engineer/narrative';
 import type { z } from 'zod';
 
 export type StepWithDocString = z.infer<typeof StepWithDocStringSchema>;
@@ -48,4 +52,28 @@ export interface StateRef {
 export interface ErrorRef {
   errorType: ErrorType;
   message?: string;
+}
+
+export interface QueryActionRef {
+  queryAction: string;
+  args: Record<string, unknown>;
+}
+
+/**
+ * Type guard to check if a "when" clause is a QueryActionRef.
+ * This is distinct from detectQueryAction which detects from step text.
+ */
+export function isQueryAction(when: unknown): when is QueryActionRef {
+  return typeof when === 'object' && when !== null && 'queryAction' in when;
+}
+
+// Re-export for convenience (narrative package is the source of truth)
+export { extractQueryNameFromRequest };
+
+/**
+ * Detects if the "When" text in a query slice represents a query action (query name)
+ * rather than an event name. Delegates to the narrative package implementation.
+ */
+export function detectQueryAction(whenText: string, slice: Slice): boolean {
+  return detectQueryActionFromNarrative(whenText, slice);
 }

@@ -1036,4 +1036,196 @@ describe('projection.specs.ts.ejs', () => {
       "
     `);
   });
+
+  it('should generate valid projection.ts when When clause is a query action (QueryActionRef)', async () => {
+    const spec: SpecsSchema = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'workout-flow',
+          slices: [
+            {
+              type: 'command',
+              name: 'log-workout',
+              stream: 'workouts-${memberId}',
+              client: { specs: [] },
+              server: {
+                description: '',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Log workout command',
+                    rules: [
+                      {
+                        name: 'Should record workouts',
+                        examples: [
+                          {
+                            name: 'User logs workout',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'LogWorkout',
+                                docString: {
+                                  memberId: 'mem_001',
+                                  caloriesBurned: 250,
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'WorkoutRecorded',
+                                docString: {
+                                  memberId: 'mem_001',
+                                  caloriesBurned: 250,
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+            {
+              type: 'query',
+              name: 'view-workout-history',
+              stream: 'workouts',
+              request:
+                'query GetWorkoutHistory($memberId: ID!) { workoutHistory(memberId: $memberId) { totalCalories } }',
+              client: { specs: [] },
+              server: {
+                description: '',
+                data: {
+                  items: [
+                    {
+                      target: { type: 'State', name: 'WorkoutHistory' },
+                      origin: { type: 'projection', name: 'WorkoutHistoryProjection', idField: 'memberId' },
+                    },
+                  ],
+                },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'View workout history query',
+                    rules: [
+                      {
+                        name: 'Workout history projection',
+                        examples: [
+                          {
+                            name: 'Shows calories after workout recorded',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'WorkoutRecorded',
+                                docString: { memberId: 'mem_001', caloriesBurned: 250 },
+                              },
+                              { keyword: 'When', text: 'GetWorkoutHistory', docString: { memberId: 'mem_001' } },
+                              {
+                                keyword: 'Then',
+                                text: 'WorkoutHistory',
+                                docString: { memberId: 'mem_001', totalCalories: 250 },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [
+        {
+          type: 'command',
+          name: 'LogWorkout',
+          fields: [
+            { name: 'memberId', type: 'string', required: true },
+            { name: 'caloriesBurned', type: 'number', required: true },
+          ],
+        },
+        {
+          type: 'event',
+          name: 'WorkoutRecorded',
+          source: 'internal',
+          fields: [
+            { name: 'memberId', type: 'string', required: true },
+            { name: 'caloriesBurned', type: 'number', required: true },
+          ],
+        },
+        { type: 'query', name: 'GetWorkoutHistory', fields: [{ name: 'memberId', type: 'string', required: true }] },
+        {
+          type: 'state',
+          name: 'WorkoutHistory',
+          fields: [
+            { name: 'memberId', type: 'string', required: true },
+            { name: 'totalCalories', type: 'number', required: true },
+          ],
+        },
+      ],
+    } as SpecsSchema;
+
+    const plans = await generateScaffoldFilePlans(spec.narratives, spec.messages, undefined, 'src/domain/flows');
+    const projectionFile = plans.find((p) => p.outputPath.endsWith('view-workout-history/projection.ts'));
+
+    expect(projectionFile?.contents).toMatchInlineSnapshot(`
+      "import {
+        inMemorySingleStreamProjection,
+        type ReadEvent,
+        type InMemoryReadEventMetadata,
+      } from '@event-driven-io/emmett';
+      import type { WorkoutHistory } from './state';
+      import type { WorkoutRecorded } from '../log-workout/events';
+
+      type AllEvents = WorkoutRecorded;
+
+      export const projection = inMemorySingleStreamProjection<WorkoutHistory, AllEvents>({
+        collectionName: 'WorkoutHistoryProjection',
+        canHandle: ['WorkoutRecorded'],
+        getDocumentId: (event) => event.data.memberId,
+        evolve: (
+          document: WorkoutHistory | null,
+          event: ReadEvent<AllEvents, InMemoryReadEventMetadata>,
+        ): WorkoutHistory | null => {
+          switch (event.type) {
+            case 'WorkoutRecorded': {
+              /**
+               * ## IMPLEMENTATION INSTRUCTIONS ##
+               * Implement how this event updates the projection.
+               *
+               * **IMPORTANT - Internal State Pattern:**
+               * If you need to track state beyond the public WorkoutHistory type (e.g., to calculate
+               * aggregations, track previous values, etc.), follow this pattern:
+               *
+               * 1. Define an extended interface BEFORE the projection:
+               *    interface InternalWorkoutHistory extends WorkoutHistory {
+               *      internalField: SomeType;
+               *    }
+               *
+               * 2. Cast document parameter to extended type:
+               *    const current: InternalWorkoutHistory = document ?? { ...defaults };
+               *
+               * 3. Cast return values to extended type:
+               *    return { ...allFields, internalField } as InternalWorkoutHistory;
+               *
+               * This keeps internal state separate from the public GraphQL schema.
+               */
+              return {
+                memberId: /* TODO: map from event.data */ '',
+                totalCalories: /* TODO: map from event.data */ 0,
+              };
+            }
+            default:
+              return document;
+          }
+        },
+      });
+
+      export default projection;
+      "
+    `);
+  });
 });

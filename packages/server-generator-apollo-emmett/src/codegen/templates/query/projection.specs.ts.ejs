@@ -5,6 +5,33 @@ const projName = projectionName || "UnknownProjection";
 const idField = projectionIdField ?? 'id';
 const uniqueEventTypes = allEventTypesArray;
 
+// Extract query name from the slice's request field for query action detection
+function extractQueryName(request) {
+    if (!request) return null;
+    // Match patterns like: query ViewWorkoutPlan($id: ID!) or query viewWorkoutPlan
+    const queryMatch = request.match(/query\s+(\w+)/i);
+    if (queryMatch) return queryMatch[1];
+    // For JSON AST format
+    if (request.startsWith('{') && request.includes('"kind"')) {
+        try {
+            const ast = JSON.parse(request);
+            if (ast?.definitions) {
+                const opDef = ast.definitions.find(d => d.kind === 'OperationDefinition');
+                if (opDef?.name?.value) return opDef.name.value;
+            }
+        } catch (e) {}
+    }
+    return null;
+}
+
+// Detect if a "When" step text is a query action (matches query name from request)
+// If no query name can be extracted, returns false (treats as event - safe default)
+function isQueryAction(whenText, queryName) {
+    if (!whenText || !queryName) return false;
+    return whenText === queryName || whenText.toLowerCase() === queryName.toLowerCase();
+}
+
+const queryName = extractQueryName(slice?.request);
 const ruleGroups = new Map();
 
 if (Array.isArray(slice?.server?.specs)) {
@@ -21,11 +48,19 @@ if (Array.isArray(slice?.server?.specs)) {
                 const whenSteps = example.steps?.filter(step => step.keyword === 'When') || [];
                 const thenSteps = example.steps?.filter(step => step.keyword === 'Then') || [];
 
+                // Check if the first "When" step is a query action
+                const firstWhenText = whenSteps[0]?.text || '';
+                const isQueryActionPattern = isQueryAction(firstWhenText, queryName);
+
                 ruleGroups.get(ruleDescription).push({
                     description: example.name || 'should handle events correctly',
                     given: givenSteps.map(step => ({ eventRef: step.text, exampleData: step.docString || {} })),
-                    when: whenSteps.map(step => ({ eventRef: step.text, exampleData: step.docString || {} })),
-                    then: thenSteps.map(step => ({ stateRef: step.text, exampleData: step.docString || {} }))
+                    // For query action pattern, use empty when array (query actions don't produce events)
+                    when: isQueryActionPattern
+                        ? { queryAction: firstWhenText, args: whenSteps[0]?.docString || {} }
+                        : whenSteps.map(step => ({ eventRef: step.text, exampleData: step.docString || {} })),
+                    then: thenSteps.map(step => ({ stateRef: step.text, exampleData: step.docString || {} })),
+                    isQueryActionPattern
                 });
             }
         }
@@ -39,11 +74,15 @@ if (Array.isArray(slice?.server?.specs)) {
         }
 
         for (const example of rule.examples || []) {
+            // Check if when is already a QueryActionRef
+            const isQueryActionPattern = example.when && !Array.isArray(example.when) && 'queryAction' in example.when;
+
             ruleGroups.get(ruleDescription).push({
                 description: example.description || 'should handle events correctly',
                 given: example.given || [],
                 when: example.when || [],
-                then: example.then || []
+                then: example.then || [],
+                isQueryActionPattern
             });
         }
     }
@@ -70,7 +109,11 @@ describe('<%= ruleDescription %>', () => {
 
 <% for (const testCase of ruleTests) {
   const givenEvents = Array.isArray(testCase.given) ? testCase.given : [];
-  const whenEvents = Array.isArray(testCase.when) ? testCase.when : (testCase.when ? [testCase.when] : []);
+  // For query action pattern, whenEvents is empty since query actions don't produce events
+  const isQueryActionTest = testCase.isQueryActionPattern;
+  const whenEvents = isQueryActionTest
+    ? []
+    : (Array.isArray(testCase.when) ? testCase.when : (testCase.when ? [testCase.when] : []));
   const thenStates = Array.isArray(testCase.then) ? testCase.then : [];
   const allTestEvents = [...givenEvents, ...whenEvents].filter(e => e.eventRef && e.eventRef !== '');
 
@@ -78,7 +121,10 @@ describe('<%= ruleDescription %>', () => {
     const expectedState = thenStates.find(t => t.stateRef === targetName);
     if (!expectedState) continue;
 
-    const description = testCase.description || 'should handle events correctly';
+    // For query action pattern, use a more descriptive test name
+    const description = testCase.description || (isQueryActionTest
+      ? 'should return correct state when queried'
+      : 'should handle events correctly');
 _%>
 
   it('<%= description %>', () =>

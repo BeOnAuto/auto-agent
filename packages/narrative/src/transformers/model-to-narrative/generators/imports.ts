@@ -35,6 +35,7 @@ export function buildImports(
     command: 'Command',
     event: 'Event',
     state: 'State',
+    query: 'Query',
   };
 
   const flowTypeNames = Array.from(usedMessageTypes)

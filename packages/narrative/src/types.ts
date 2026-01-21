@@ -228,4 +228,9 @@ export type Event<
   readonly kind?: 'Event';
 };
 
+export type Query<QueryType extends string, QueryData extends Record<string, unknown> = Record<string, unknown>> = {
+  type: QueryType;
+  data: QueryData;
+};
+
 export type ExtractStateData<T> = T extends State<string, infer Data, DefaultRecord | undefined> ? Data : never;

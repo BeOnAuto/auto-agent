@@ -104,7 +104,7 @@ function extractMessagesForQuery(slice: Slice, allMessages: MessageDefinition[])
   const specs = slice.server?.specs;
   const hasSpecs = Array.isArray(specs) && specs.length > 0;
 
-  const gwtSpecs = hasSpecs ? extractGwtFromSpecs(specs, 'query') : [];
+  const gwtSpecs = hasSpecs ? extractGwtFromSpecs(specs, 'query', slice) : [];
   debugQuery('  Found %d GWT specs', gwtSpecs.length);
 
   const projectionIdField = extractProjectionIdField(slice);

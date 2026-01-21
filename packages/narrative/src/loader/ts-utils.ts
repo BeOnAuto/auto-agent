@@ -77,7 +77,7 @@ export function parseImports(ts: typeof import('typescript'), fileName: string, 
 
 export interface TypeInfo {
   stringLiteral: string;
-  classification?: 'command' | 'event' | 'state';
+  classification?: 'command' | 'event' | 'state' | 'query';
   dataFields?: { name: string; type: string; required: boolean }[];
 }
 
@@ -93,7 +93,7 @@ export interface GivenTypeInfo {
   column: number;
   ordinal: number; // Sequential position within the file
   typeName: string;
-  classification: 'command' | 'event' | 'state';
+  classification: 'command' | 'event' | 'state' | 'query';
 }
 
 function extractDataFieldsFromTypeLiteral(
@@ -136,7 +136,7 @@ function processTypeAlias(
   const baseName = getBaseName(typeRef.typeName);
   if (typeof baseName !== 'string') return;
 
-  if (!['Command', 'Event', 'State'].includes(baseName)) return;
+  if (!['Command', 'Event', 'State', 'Query'].includes(baseName)) return;
 
   const typeArgs = typeRef.typeArguments ?? [];
   if (typeArgs.length === 0) return;
@@ -145,7 +145,7 @@ function processTypeAlias(
   if (!ts.isLiteralTypeNode(firstArg) || !ts.isStringLiteral(firstArg.literal)) return;
 
   const stringLiteral = firstArg.literal.text;
-  const classification = baseName.toLowerCase() as 'command' | 'event' | 'state';
+  const classification = baseName.toLowerCase() as 'command' | 'event' | 'state' | 'query';
 
   // Try to extract the data fields from the 2nd generic arg (if present)
   let dataFields: { name: string; type: string; required: boolean }[] | undefined;
@@ -271,7 +271,7 @@ function extractDataFields(
   return dataFields;
 }
 
-function inferClassificationFromName(stringLiteral: string): 'command' | 'event' | 'state' | undefined {
+function inferClassificationFromName(stringLiteral: string): 'command' | 'event' | 'state' | 'query' | undefined {
   const eventPatterns = ['ed', 'Created', 'Updated', 'Deleted', 'Placed', 'Added', 'Removed', 'Changed'];
   if (eventPatterns.some((pattern) => stringLiteral.endsWith(pattern))) {
     return 'event';
@@ -280,6 +280,11 @@ function inferClassificationFromName(stringLiteral: string): 'command' | 'event'
   const commandPatterns = ['Create', 'Update', 'Delete', 'Place', 'Add', 'Remove', 'Enter', 'Submit', 'Suggest'];
   if (commandPatterns.some((pattern) => stringLiteral.startsWith(pattern))) {
     return 'command';
+  }
+
+  // Query patterns: View*, Get*, List*, Find*, Search*, Fetch*
+  if (/^(View|Get|List|Find|Search|Fetch)[A-Z]/.test(stringLiteral)) {
+    return 'query';
   }
 
   const statePatterns = ['Summary', 'View', 'Items', 'List', 'Data', 'Info'];
@@ -463,7 +468,7 @@ function classifyBaseGeneric(
   ts: typeof import('typescript'),
   checker: import('typescript').TypeChecker,
   typeRef: import('typescript').TypeReferenceNode,
-): 'event' | 'command' | 'state' | null {
+): 'event' | 'command' | 'state' | 'query' | null {
   // Resolve base symbol (handles aliases and qualified names)
   let sym: import('typescript').Symbol | undefined;
   if (ts.isIdentifier(typeRef.typeName) || ts.isQualifiedName(typeRef.typeName)) {
@@ -476,6 +481,7 @@ function classifyBaseGeneric(
   if (base.endsWith('Event')) return 'event';
   if (base.endsWith('Command')) return 'command';
   if (base.endsWith('State')) return 'state';
+  if (base.endsWith('Query')) return 'query';
   return null;
 }
 
@@ -483,7 +489,7 @@ function tryUnwrapDirectGeneric(
   ts: typeof import('typescript'),
   typeArg: import('typescript').TypeReferenceNode,
   checker: import('typescript').TypeChecker,
-): { typeName: string; classification: 'event' | 'command' | 'state' } | null {
+): { typeName: string; classification: 'event' | 'command' | 'state' | 'query' } | null {
   if (typeArg.typeArguments === undefined || typeArg.typeArguments.length === 0) return null;
 
   const kind = classifyBaseGeneric(ts, checker, typeArg);
@@ -504,7 +510,7 @@ function tryUnwrapTypeAlias(
   typeArg: import('typescript').TypeReferenceNode,
   typeMap: Map<string, TypeInfo>,
   typesByFile: Map<string, Map<string, TypeInfo>>,
-): { typeName: string; classification: 'event' | 'command' | 'state' } | null {
+): { typeName: string; classification: 'event' | 'command' | 'state' | 'query' } | null {
   if (!ts.isIdentifier(typeArg.typeName)) return null;
 
   const typeName = typeArg.typeName.text;
@@ -526,7 +532,7 @@ function tryUnwrapGeneric(
   checker: import('typescript').TypeChecker,
   typeMap: Map<string, TypeInfo>,
   typesByFile: Map<string, Map<string, TypeInfo>>,
-): { typeName: string; classification: 'event' | 'command' | 'state' } | null {
+): { typeName: string; classification: 'event' | 'command' | 'state' | 'query' } | null {
   if (!ts.isTypeReferenceNode(typeArg)) return null;
 
   return tryUnwrapDirectGeneric(ts, typeArg, checker) ?? tryUnwrapTypeAlias(ts, typeArg, typeMap, typesByFile);
@@ -554,7 +560,7 @@ function createGivenTypeInfo(
   node: import('typescript').CallExpression,
   ordinal: number,
   typeName: string,
-  classification: 'event' | 'command' | 'state',
+  classification: 'event' | 'command' | 'state' | 'query',
 ): GivenTypeInfo {
   const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
   return {

@@ -1,5 +1,6 @@
 import type { CommandRef, ErrorRef, EventRef, Message, MessageDefinition } from '../types';
 import { extractFieldsFromMessage } from './fields';
+import type { QueryActionRef } from './step-converter';
 
 function createCommandMessage(
   commandRef: string,
@@ -22,7 +23,7 @@ function createCommandMessage(
 export function extractCommandsFromGwt(
   gwtSpecs: Array<{
     given?: Array<EventRef | unknown>;
-    when?: CommandRef | EventRef | unknown[];
+    when?: CommandRef | EventRef | QueryActionRef | unknown[];
     then: Array<EventRef | unknown | ErrorRef>;
   }>,
   allMessages: MessageDefinition[],
@@ -85,7 +86,7 @@ function processCommandExample(
 export function extractCommandsFromThen(
   gwtSpecs: Array<{
     given?: Array<EventRef | unknown>;
-    when?: CommandRef | EventRef | unknown[];
+    when?: CommandRef | EventRef | QueryActionRef | unknown[];
     then: Array<EventRef | unknown | ErrorRef>;
   }>,
   allMessages: MessageDefinition[],

@@ -19,6 +19,7 @@ export type {
   Integration,
   MessageTarget,
   Origin,
+  Query,
   State,
 } from './types';
 export { createIntegration } from './types';
@@ -81,6 +82,7 @@ export {
   modelSchema,
   NarrativeNamesSchema as NarrativeNamesSystemSchema,
   NarrativeSchema,
+  QuerySchema,
   QuerySliceSchema,
   ReactSliceSchema,
   RuleSchema,
@@ -135,3 +137,5 @@ export type MessageRef = z.infer<typeof MessageRefSchema>;
 // ID assignment utilities
 export { addAutoIds, hasAllIds } from './id';
 export type { ClientSpecNode } from './schema';
+
+export { detectQueryAction, extractQueryNameFromRequest } from './transformers/narrative-to-model/spec-processors';

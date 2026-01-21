@@ -12,7 +12,7 @@ import { resolveInferredType } from './type-inference';
 
 type TypeResolver = (
   t: string,
-  expected?: 'command' | 'event' | 'state',
+  expected?: 'command' | 'event' | 'state' | 'query',
   exampleData?: unknown,
 ) => { resolvedName: string; typeInfo: TypeInfo | undefined };
 
@@ -47,7 +47,7 @@ function getTypesForNarrative(
 function tryResolveFromNarrativeTypes(
   t: string,
   narrativeSpecificTypes: Map<string, TypeInfo>,
-  expected?: 'command' | 'event' | 'state',
+  expected?: 'command' | 'event' | 'state' | 'query',
   exampleData?: unknown,
 ): { resolvedName: string; typeInfo: TypeInfo | undefined } {
   if (t !== 'InferredType') {
@@ -68,7 +68,7 @@ function tryFallbackToUnionTypes(
   resolvedName: string,
   typeInfo: TypeInfo | undefined,
   unionTypes: Map<string, TypeInfo>,
-  expected?: 'command' | 'event' | 'state',
+  expected?: 'command' | 'event' | 'state' | 'query',
   exampleData?: unknown,
 ): { resolvedName: string; typeInfo: TypeInfo | undefined } {
   if (resolvedName !== 'InferredType' && typeInfo) {
@@ -88,7 +88,7 @@ function tryFallbackToUnionTypes(
 function tryResolveFromUnionTypes(
   t: string,
   unionTypes: Map<string, TypeInfo>,
-  expected?: 'command' | 'event' | 'state',
+  expected?: 'command' | 'event' | 'state' | 'query',
   exampleData?: unknown,
 ): { resolvedName: string; typeInfo: TypeInfo | undefined } {
   if (t !== 'InferredType') {
@@ -110,7 +110,7 @@ function createTypeResolver(
 ) {
   return (
     t: string,
-    expected?: 'command' | 'event' | 'state',
+    expected?: 'command' | 'event' | 'state' | 'query',
     exampleData?: unknown,
   ): { resolvedName: string; typeInfo: TypeInfo | undefined } => {
     if (narrativeSpecificTypes) {

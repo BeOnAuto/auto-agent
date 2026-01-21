@@ -1,6 +1,6 @@
 import type { Slice } from '@auto-engineer/narrative';
 import type { CommandRef, EventRef, GwtCondition } from '../types';
-import { extractGwtSpecsFromSlice, type GwtConditionWithRule } from './step-converter';
+import { extractGwtSpecsFromSlice, type GwtConditionWithRule, type QueryActionRef } from './step-converter';
 
 export function buildCommandGwtMapping(slice: Slice): Record<string, (GwtCondition & { failingFields?: string[] })[]> {
   if (slice.type !== 'command') {
@@ -12,7 +12,7 @@ export function buildCommandGwtMapping(slice: Slice): Record<string, (GwtConditi
   return enhanceMapping(mapping);
 }
 
-function isCommandRef(when: CommandRef | EventRef[]): when is CommandRef {
+function isCommandRef(when: CommandRef | EventRef[] | QueryActionRef): when is CommandRef {
   return !Array.isArray(when) && 'commandRef' in when;
 }
 

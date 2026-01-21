@@ -7,9 +7,62 @@ import { preferNewFields } from './normalize';
 
 const log = debug('auto:flow:spec-processors');
 
+/**
+ * Extracts the query name from a GraphQL request string.
+ * Supports both SDL strings and JSON-serialized AST.
+ */
+export function extractQueryNameFromRequest(request: string | undefined): string | null {
+  if (!request) return null;
+  const queryMatch = request.match(/query\s+(\w+)/i);
+  if (queryMatch) {
+    return queryMatch[1];
+  }
+  if (request.startsWith('{') && request.includes('"kind"')) {
+    try {
+      const ast = JSON.parse(request) as unknown;
+      if (
+        typeof ast === 'object' &&
+        ast !== null &&
+        'definitions' in ast &&
+        Array.isArray((ast as { definitions: unknown[] }).definitions)
+      ) {
+        const definitions = (ast as { definitions: Array<{ kind?: string; name?: { value?: string } }> }).definitions;
+        const opDef = definitions.find((d) => d.kind === 'OperationDefinition');
+        if (opDef?.name?.value) {
+          return opDef.name.value;
+        }
+      }
+    } catch {}
+  }
+
+  return null;
+}
+
+/**
+ * Detects if the "When" text in a query slice represents a query action (query name)
+ * rather than an event name.
+ *
+ * Detection is based solely on matching the query name extracted from slice.request.
+ * If no query name can be extracted, returns false (treats as event - safe default).
+ *
+ * @param whenText - The text from the "When" step
+ * @param slice - The slice object containing type and optional request field
+ * @returns true if the "When" text matches the query name from slice.request
+ */
+export function detectQueryAction(whenText: string, slice: { type: string; request?: string }): boolean {
+  if (slice.type !== 'query') return false;
+  if (!whenText) return false;
+
+  const queryName = extractQueryNameFromRequest(slice.request);
+  if (!queryName) return false;
+
+  // Exact match or case-insensitive match
+  return whenText === queryName || whenText.toLowerCase() === queryName.toLowerCase();
+}
+
 type TypeResolver = (
   t: string,
-  expected?: 'command' | 'event' | 'state',
+  expected?: 'command' | 'event' | 'state' | 'query',
   exampleData?: unknown,
 ) => { resolvedName: string; typeInfo: TypeInfo | undefined };
 
@@ -316,7 +369,7 @@ function processSingleWhen(
     stateRef?: string;
     exampleData?: unknown;
   },
-  slice: { type: string },
+  slice: { type: string; request?: string },
   resolveTypeAndInfo: TypeResolver,
   messages: Map<string, Message>,
   exampleShapeHints: ExampleShapeHints,
@@ -326,6 +379,23 @@ function processSingleWhen(
   }
 
   const originalCommandRef = when.commandRef;
+
+  // Check if this is a query action
+  // Query actions represent the act of executing the query - create a query message for them
+  if (detectQueryAction(originalCommandRef, slice)) {
+    log('DEBUG processSingleWhen: detected query action, creating query message:', originalCommandRef);
+    const { typeInfo } = resolveTypeAndInfo(originalCommandRef, 'query', when.exampleData);
+    const msg = createMessage(originalCommandRef, typeInfo, 'query');
+    const existing = messages.get(originalCommandRef);
+    if (!existing || preferNewFields(msg.fields, existing.fields)) {
+      messages.set(originalCommandRef, msg);
+    }
+    if (when.exampleData !== undefined) {
+      collectExampleHintsForData(originalCommandRef, when.exampleData, exampleShapeHints);
+    }
+    return;
+  }
+
   const expected = slice.type === 'command' ? 'command' : 'event';
 
   log('DEBUG processSingleWhen:', {
@@ -418,7 +488,7 @@ function processCommandRefInArray(
     stateRef?: string;
     exampleData?: unknown;
   },
-  slice: { type: string },
+  slice: { type: string; request?: string },
   resolveTypeAndInfo: TypeResolver,
   messages: Map<string, Message>,
   exampleShapeHints: ExampleShapeHints,
@@ -428,6 +498,23 @@ function processCommandRefInArray(
   }
 
   const originalCommandRef = item.commandRef;
+
+  // Check if this is a query action (query name like ViewWorkoutPlan)
+  // Query actions represent the act of executing the query - create a query message for them
+  if (detectQueryAction(originalCommandRef, slice)) {
+    log('DEBUG processCommandRefInArray: detected query action, creating query message:', originalCommandRef);
+    const { typeInfo } = resolveTypeAndInfo(originalCommandRef, 'query', item.exampleData);
+    const msg = createMessage(originalCommandRef, typeInfo, 'query');
+    const existing = messages.get(originalCommandRef);
+    if (!existing || preferNewFields(msg.fields, existing.fields)) {
+      messages.set(originalCommandRef, msg);
+    }
+    if (item.exampleData !== undefined) {
+      collectExampleHintsForData(originalCommandRef, item.exampleData, exampleShapeHints);
+    }
+    return;
+  }
+
   const expected = slice.type === 'command' ? 'command' : 'event';
   const { resolvedName, typeInfo } = resolveTypeAndInfo(originalCommandRef, expected, item.exampleData);
 
@@ -497,7 +584,7 @@ export function processWhen(
         stateRef?: string;
         exampleData?: unknown;
       }>,
-  slice: { type: string },
+  slice: { type: string; request?: string },
   resolveTypeAndInfo: TypeResolver,
   messages: Map<string, Message>,
   exampleShapeHints: ExampleShapeHints,

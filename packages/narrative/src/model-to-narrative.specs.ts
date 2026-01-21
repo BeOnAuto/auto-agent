@@ -658,6 +658,59 @@ narrative('Test Flow with Rule IDs', 'FLOW-456', () => {
 `);
   });
 
+  it('should correctly generate Query type alias for query messages', async () => {
+    const modelWithQueryMessage: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Workout Flow',
+          id: 'FLOW-001',
+          slices: [],
+        },
+      ],
+      messages: [
+        {
+          type: 'query',
+          name: 'GetWorkoutHistory',
+          fields: [
+            { name: 'memberId', type: 'string', required: true },
+            { name: 'limit', type: 'number', required: false },
+          ],
+          metadata: { version: 1 },
+        },
+        {
+          type: 'event',
+          name: 'WorkoutRecorded',
+          fields: [{ name: 'workoutId', type: 'string', required: true }],
+          source: 'internal',
+          metadata: { version: 1 },
+        },
+      ],
+      integrations: [],
+      modules: [],
+    };
+
+    const code = getCode(await modelToNarrative(modelWithQueryMessage));
+
+    expect(code).toEqual(`import { narrative } from '@auto-engineer/narrative';
+import type { Event, Query } from '@auto-engineer/narrative';
+type GetWorkoutHistory = Query<
+  'GetWorkoutHistory',
+  {
+    memberId: string;
+    limit?: number;
+  }
+>;
+type WorkoutRecorded = Event<
+  'WorkoutRecorded',
+  {
+    workoutId: string;
+  }
+>;
+narrative('Workout Flow', 'FLOW-001', () => {});
+`);
+  });
+
   it('should correctly resolve Date types in messages', async () => {
     const modelWithDateTypes: Model = {
       variant: 'specs',

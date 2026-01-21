@@ -2,7 +2,7 @@ import type tsNS from 'typescript';
 import { typeFromString } from '../ast/emit-helpers';
 
 type Message = {
-  type: 'command' | 'event' | 'state';
+  type: 'command' | 'event' | 'state' | 'query';
   name: string;
   fields: { name: string; type: string; required: boolean }[];
 };
@@ -33,10 +33,9 @@ export function buildTypeAliases(ts: typeof tsNS, messages: Message[]): tsNS.Sta
 
     const name = f.createIdentifier(m.name);
 
-    const rhs = f.createTypeReferenceNode(
-      m.type === 'event' ? 'Event' : m.type === 'command' ? 'Command' : 'State',
-      typeArgs,
-    );
+    const baseTypeName =
+      m.type === 'event' ? 'Event' : m.type === 'command' ? 'Command' : m.type === 'query' ? 'Query' : 'State';
+    const rhs = f.createTypeReferenceNode(baseTypeName, typeArgs);
 
     return f.createTypeAliasDeclaration(
       undefined, // No export keyword

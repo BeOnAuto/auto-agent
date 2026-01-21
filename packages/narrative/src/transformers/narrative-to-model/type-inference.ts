@@ -64,7 +64,7 @@ function tryMatchCandidates(candidates: TypeInfo[], dataKeys: Set<string>): stri
 function tryResolveByExampleData(
   candidates: TypeInfo[],
   all: TypeInfo[],
-  expectedMessageType: 'command' | 'event' | 'state' | undefined,
+  expectedMessageType: 'command' | 'event' | 'state' | 'query' | undefined,
   exampleData: unknown,
 ): string | null {
   if (exampleData === null || typeof exampleData !== 'object' || exampleData === undefined) {
@@ -85,7 +85,7 @@ function tryResolveByExampleData(
 
 function tryResolveByExpectedType(
   candidates: TypeInfo[],
-  expectedMessageType: 'command' | 'event' | 'state' | undefined,
+  expectedMessageType: 'command' | 'event' | 'state' | 'query' | undefined,
 ): string | null {
   if (!expectedMessageType || candidates.length === 0) {
     return null;
@@ -98,7 +98,7 @@ function tryResolveByExpectedType(
 function resolveFromCandidates(
   candidates: TypeInfo[],
   all: TypeInfo[],
-  expectedMessageType?: 'command' | 'event' | 'state',
+  expectedMessageType?: 'command' | 'event' | 'state' | 'query',
   exampleData?: unknown,
 ): string | null {
   if (candidates.length === 1) return candidates[0].stringLiteral;
@@ -112,7 +112,7 @@ function resolveFromCandidates(
 export function resolveInferredType(
   typeName: string,
   flowTypeMap?: Map<string, TypeInfo>,
-  expectedMessageType?: 'command' | 'event' | 'state',
+  expectedMessageType?: 'command' | 'event' | 'state' | 'query',
   exampleData?: unknown,
 ): string {
   if (typeName !== 'InferredType' || flowTypeMap === undefined) return typeName;

@@ -80,7 +80,7 @@ switch (event.type) {
     const queryGwt = slice.type === 'query'
             ? queryGwtMapping.find(gwt => {
                     const inGiven = gwt.given && gwt.given.some(g => g.eventRef === event.type);
-                    const inWhen = gwt.when.some(g => g.eventRef === event.type);
+                    const inWhen = Array.isArray(gwt.when) ? gwt.when.some(g => g.eventRef === event.type) : false;
                     return inGiven || inWhen;
             })
             : undefined;
