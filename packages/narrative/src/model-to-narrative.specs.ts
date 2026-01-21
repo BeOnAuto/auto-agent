@@ -3370,4 +3370,74 @@ narrative('All Projection Types', 'ALL-PROJ', () => {
       expect(code).toContain("command('Perform Check-In'");
     });
   });
+
+  it('generates all declared types for authored modules regardless of usage analysis', async () => {
+    const model: Model = {
+      variant: 'specs',
+      narratives: [
+        {
+          id: 'narrative-1',
+          name: 'Gym Goal Setting',
+          slices: [
+            {
+              type: 'command',
+              name: 'Set Fitness Goal',
+              client: { specs: [] },
+              server: {
+                description: 'Set a fitness goal',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Goal Setting',
+                    rules: [
+                      {
+                        name: 'Create goal',
+                        examples: [
+                          {
+                            name: 'Create fitness goal',
+                            steps: [
+                              { keyword: 'When', text: 'SetFitnessGoal', docString: { name: 'Lose weight' } },
+                              { keyword: 'Then', text: 'FitnessGoalCreated', docString: { goalId: '123' } },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+          sourceFile: '/narratives/goal-setting.narrative.ts',
+        },
+      ],
+      messages: [
+        { type: 'command', name: 'SetFitnessGoal', fields: [] },
+        { type: 'event', name: 'FitnessGoalCreated', fields: [], source: 'internal' },
+        { type: 'state', name: 'FitnessGoalsView', fields: [] },
+      ],
+      modules: [
+        {
+          sourceFile: '/narratives/goal-setting.narrative.ts',
+          isDerived: false,
+          contains: { narrativeIds: ['narrative-1'] },
+          declares: {
+            messages: [
+              { kind: 'command', name: 'SetFitnessGoal' },
+              { kind: 'event', name: 'FitnessGoalCreated' },
+              { kind: 'state', name: 'FitnessGoalsView' },
+            ],
+          },
+        },
+      ],
+    };
+
+    const result = await modelToNarrative(model);
+    const code = getCode(result);
+
+    // All 3 declared types should be generated
+    expect(code).toContain("type SetFitnessGoal = Command<'SetFitnessGoal'");
+    expect(code).toContain("type FitnessGoalCreated = Event<'FitnessGoalCreated'");
+    expect(code).toContain("type FitnessGoalsView = State<'FitnessGoalsView'");
+  });
 });

@@ -102,13 +102,22 @@ function generateModuleCode(
 
   const usedMessages = messages.filter((msg) => {
     const isImportedFromIntegration = usedTypeIntegrationNames.includes(msg.name);
-    const isUsedInFlow = usageAnalysis.usedTypes.has(msg.name);
-    const hasEmptyFlowSlices = narratives.length === 0 || narratives.every((flow) => flow.slices.length === 0);
 
+    // Don't generate local definitions for types imported from integrations
     if (isImportedFromIntegration) {
       return false;
     }
 
+    // For authored modules, trust the declares list - all declared messages should be generated
+    // (messages is already filtered to only include declared messages at line 60-61)
+    if (!module.isDerived) {
+      return true;
+    }
+
+    // For derived modules, only include types that are actually used in flow code
+    // or when there's no flow code (hasEmptyFlowSlices)
+    const isUsedInFlow = usageAnalysis.usedTypes.has(msg.name);
+    const hasEmptyFlowSlices = narratives.length === 0 || narratives.every((flow) => flow.slices.length === 0);
     return isUsedInFlow || hasEmptyFlowSlices;
   });
 
