@@ -1,5 +1,19 @@
 # @auto-engineer/message-store
 
+## 1.4.0
+
+### Minor Changes
+
+- [`c2503a1`](https://github.com/BeOnAuto/auto-engineer/commit/c2503a1cfb342ab1399a382d175def1a8239e2b9) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added query detection for When clauses in query slices, enabling better handling of query-based conditions in narrative definitions
+
+### Patch Changes
+
+- [`a0cf1a8`](https://github.com/BeOnAuto/auto-engineer/commit/a0cf1a8a41faa1a8f4687b0b80be745d1f7a0091) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: generate all declared types for authored modules
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`c2503a1`](https://github.com/BeOnAuto/auto-engineer/commit/c2503a1cfb342ab1399a382d175def1a8239e2b9), [`a0cf1a8`](https://github.com/BeOnAuto/auto-engineer/commit/a0cf1a8a41faa1a8f4687b0b80be745d1f7a0091)]:
+  - @auto-engineer/message-bus@1.4.0
+
 ## 1.3.4
 
 ### Patch Changes
