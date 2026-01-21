@@ -2,6 +2,16 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
 ## 1.3.3
 
 ### Patch Changes
@@ -522,6 +532,21 @@
 
 # @auto-engineer/cli
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/file-store@1.3.4
+  - @auto-engineer/narrative@1.3.4
+  - @auto-engineer/pipeline@1.3.4
+
 ## 1.3.3
 
 ### Patch Changes
@@ -941,6 +966,20 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/ai-gateway@1.3.4
+  - @auto-engineer/message-bus@1.3.4
 
 ## 1.3.3
 
@@ -1929,6 +1968,19 @@
 
 # create-auto-app
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/id@1.3.4
+
 ## 1.3.3
 
 ### Patch Changes
@@ -2654,6 +2706,19 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/message-bus@1.3.4
 
 ## 1.3.3
 
@@ -3645,6 +3710,20 @@
 
 # @auto-engineer/dev-server
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/cli@1.3.4
+  - @auto-engineer/message-bus@1.3.4
+
 ## 1.3.3
 
 ### Patch Changes
@@ -4149,6 +4228,16 @@
 
 # @auto-engineer/file-store
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
 ## 1.3.3
 
 ### Patch Changes
@@ -4626,6 +4715,19 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/message-bus@1.3.4
 
 ## 1.3.3
 
@@ -5575,6 +5677,20 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/ai-gateway@1.3.4
+  - @auto-engineer/message-bus@1.3.4
 
 ## 1.3.3
 
@@ -6664,6 +6780,20 @@
 
 # @auto-engineer/frontend-implementer
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/ai-gateway@1.3.4
+  - @auto-engineer/message-bus@1.3.4
+
 ## 1.3.3
 
 ### Patch Changes
@@ -7749,6 +7879,16 @@
 
 # @auto-engineer/id
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
 ## 1.3.3
 
 ### Patch Changes
@@ -8164,6 +8304,21 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/ai-gateway@1.3.4
+  - @auto-engineer/message-bus@1.3.4
+  - @auto-engineer/narrative@1.3.4
 
 ## 1.3.3
 
@@ -9311,6 +9466,16 @@
 
 # @auto-engineer/message-bus
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
 ## 1.3.3
 
 ### Patch Changes
@@ -9835,6 +10000,19 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/message-bus@1.3.4
 
 ## 1.3.3
 
@@ -10611,6 +10789,21 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/file-store@1.3.4
+  - @auto-engineer/id@1.3.4
+  - @auto-engineer/message-bus@1.3.4
 
 ## 1.3.3
 
@@ -11887,6 +12080,20 @@
 
 # @auto-engineer/pipeline
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/file-store@1.3.4
+  - @auto-engineer/message-bus@1.3.4
+
 ## 1.3.3
 
 ### Patch Changes
@@ -12274,6 +12481,16 @@
 
 # @auto-engineer/release-automation
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
 ## 1.3.3
 
 ### Patch Changes
@@ -12457,6 +12674,20 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/cli@1.3.4
+  - @auto-engineer/message-bus@1.3.4
 
 ## 1.3.3
 
@@ -13398,6 +13629,20 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/message-bus@1.3.4
+  - @auto-engineer/narrative@1.3.4
 
 ## 1.3.3
 
@@ -14489,6 +14734,19 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/narrative@1.3.4
+
 ## 1.3.3
 
 ### Patch Changes
@@ -14830,6 +15088,20 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
+- Updated dependencies [[`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1), [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3)]:
+  - @auto-engineer/ai-gateway@1.3.4
+  - @auto-engineer/message-bus@1.3.4
 
 ## 1.3.3
 

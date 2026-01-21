@@ -1,5 +1,15 @@
 # @auto-engineer/id
 
+## 1.3.4
+
+### Patch Changes
+
+- [`f2ee305`](https://github.com/BeOnAuto/auto-engineer/commit/f2ee305eb055873d93cfe30f2a0f49ee297393c1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: handle negative numbers in jsonToExpr
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`22916b0`](https://github.com/BeOnAuto/auto-engineer/commit/22916b01abc8cee787e79be7aea01de579e30ec3) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed type generation to include all declared types for authored modules
+
 ## 1.3.3
 
 ### Patch Changes
