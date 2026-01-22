@@ -8,7 +8,7 @@ export function toMessageKey(kind: MessageKind, name: string): string {
 }
 
 function isMessageKind(value: string): value is MessageKind {
-  return value === 'command' || value === 'event' || value === 'state';
+  return value === 'command' || value === 'event' || value === 'state' || value === 'query';
 }
 
 export function parseMessageKey(key: string): MessageRef {
