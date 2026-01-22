@@ -1,5 +1,17 @@
 # @auto-engineer/message-bus
 
+## 1.5.0
+
+### Minor Changes
+
+- [`0cc358d`](https://github.com/BeOnAuto/auto-engineer/commit/0cc358da85ce6b62a786d66d9ecd7da63299e169) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add query detection for When clauses in query slices
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- [`ad7cd86`](https://github.com/BeOnAuto/auto-engineer/commit/ad7cd868b47194512938a26fc34b15d6e6de7dd4) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added query support to the isMessageKind type guard in the narrative package
+
 ## 1.4.0
 
 ### Minor Changes
