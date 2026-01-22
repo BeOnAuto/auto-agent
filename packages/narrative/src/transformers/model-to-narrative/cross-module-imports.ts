@@ -1,5 +1,5 @@
-import path from 'node:path';
 import type { Model, Module } from '../../index';
+import { basename, dirname, extname, join, relative } from '../../loader/fs-path';
 import { parseMessageKey, sortImportsBySource, toMessageKey } from './ordering';
 import { collectMessageKeysFromNarratives } from './spec-traversal';
 import type { CrossModuleImport } from './types';
@@ -44,19 +44,19 @@ export function computeCrossModuleImports(module: Module, allModules: Module[], 
 }
 
 export function resolveRelativeImport(fromPath: string, toPath: string): string {
-  const fromDir = path.dirname(fromPath);
-  const toDir = path.dirname(toPath);
-  const toFile = path.basename(toPath, path.extname(toPath));
+  const fromDir = dirname(fromPath);
+  const toDir = dirname(toPath);
+  const toFile = basename(toPath, extname(toPath));
 
-  const relativePath = path.relative(fromDir, toDir);
+  const relativePath = relative(fromDir, toDir);
   if (relativePath === '') {
     return `./${toFile}`;
   }
   if (!relativePath.startsWith('.')) {
-    return `./${relativePath}/${toFile}`.replace(/\\/g, '/');
+    return `./${relativePath}/${toFile}`;
   }
 
-  return path.join(relativePath, toFile).replace(/\\/g, '/');
+  return join(relativePath, toFile);
 }
 
 function collectUsedMessageKeysForModule(module: Module, model: Model): Set<string> {
