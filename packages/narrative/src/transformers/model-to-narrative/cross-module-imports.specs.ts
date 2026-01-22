@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { Model } from '../../index';
-import { computeCrossModuleImports, resolveRelativeImport } from './cross-module-imports';
+import {
+  computeAllCrossModuleDependencies,
+  computeCrossModuleImports,
+  resolveRelativeImport,
+} from './cross-module-imports';
 
 describe('resolveRelativeImport', () => {
   it('resolves same directory imports', () => {
@@ -49,7 +53,6 @@ describe('computeCrossModuleImports', () => {
       integrations: [],
       modules: [
         {
-          id: 'derived.ts',
           sourceFile: 'derived.ts',
           isDerived: true,
           contains: { narrativeIds: [] },
@@ -103,7 +106,6 @@ describe('computeCrossModuleImports', () => {
       integrations: [],
       modules: [
         {
-          id: 'self-contained',
           sourceFile: 'self-contained.ts',
           isDerived: false,
           contains: { narrativeIds: ['test-1'] },
@@ -157,7 +159,6 @@ describe('computeCrossModuleImports', () => {
       integrations: [],
       modules: [
         {
-          id: 'consumer',
           sourceFile: 'consumer.ts',
           isDerived: false,
           contains: { narrativeIds: ['test-1'] },
@@ -212,14 +213,12 @@ describe('computeCrossModuleImports', () => {
       integrations: [],
       modules: [
         {
-          id: 'shared',
           sourceFile: 'shared/types.ts',
           isDerived: false,
           contains: { narrativeIds: ['shared-1'] },
           declares: { messages: [{ kind: 'event', name: 'SharedEvent' }] },
         },
         {
-          id: 'consumer',
           sourceFile: 'features/consumer.ts',
           isDerived: false,
           contains: { narrativeIds: ['consumer-1'] },
@@ -281,7 +280,6 @@ describe('computeCrossModuleImports', () => {
       integrations: [],
       modules: [
         {
-          id: 'shared',
           sourceFile: 'shared.ts',
           isDerived: false,
           contains: { narrativeIds: ['shared-1'] },
@@ -293,7 +291,6 @@ describe('computeCrossModuleImports', () => {
           },
         },
         {
-          id: 'consumer',
           sourceFile: 'consumer.ts',
           isDerived: false,
           contains: { narrativeIds: ['consumer-1'] },
@@ -349,14 +346,12 @@ describe('computeCrossModuleImports', () => {
       integrations: [],
       modules: [
         {
-          id: 'derived.ts',
           sourceFile: 'derived.ts',
           isDerived: true,
           contains: { narrativeIds: [] },
           declares: { messages: [{ kind: 'event', name: 'DerivedEvent' }] },
         },
         {
-          id: 'consumer',
           sourceFile: 'consumer.ts',
           isDerived: false,
           contains: { narrativeIds: ['consumer-1'] },
@@ -419,21 +414,18 @@ describe('computeCrossModuleImports', () => {
       integrations: [],
       modules: [
         {
-          id: 'z-types',
           sourceFile: 'z-types.ts',
           isDerived: false,
           contains: { narrativeIds: ['types-1'] },
           declares: { messages: [{ kind: 'event', name: 'ZEvent' }] },
         },
         {
-          id: 'a-types',
           sourceFile: 'a-types.ts',
           isDerived: false,
           contains: { narrativeIds: ['types-2'] },
           declares: { messages: [{ kind: 'event', name: 'AEvent' }] },
         },
         {
-          id: 'consumer',
           sourceFile: 'consumer.ts',
           isDerived: false,
           contains: { narrativeIds: ['consumer-1'] },
@@ -446,5 +438,191 @@ describe('computeCrossModuleImports', () => {
     const imports = computeCrossModuleImports(consumerModule, model.modules, model);
 
     expect(imports.map((i) => i.fromPath)).toEqual(['./a-types', './z-types']);
+  });
+});
+
+describe('computeAllCrossModuleDependencies', () => {
+  it('returns empty maps when no cross-module imports exist', () => {
+    const model: Model = {
+      variant: 'specs',
+      narratives: [{ name: 'Test', id: 'test-1', slices: [] }],
+      messages: [{ type: 'event', source: 'internal', name: 'LocalEvent', fields: [] }],
+      integrations: [],
+      modules: [
+        {
+          sourceFile: 'self-contained.ts',
+          isDerived: false,
+          contains: { narrativeIds: ['test-1'] },
+          declares: { messages: [{ kind: 'event', name: 'LocalEvent' }] },
+        },
+      ],
+    };
+
+    const { importsPerModule, exportsPerModule } = computeAllCrossModuleDependencies(model.modules, model);
+
+    expect(importsPerModule.get('self-contained.ts')).toEqual([]);
+    expect(exportsPerModule.size).toBe(0);
+  });
+
+  it('computes imports and exports in a single pass', () => {
+    const model: Model = {
+      variant: 'specs',
+      narratives: [
+        { name: 'Shared', id: 'shared-1', slices: [] },
+        {
+          name: 'Consumer',
+          id: 'consumer-1',
+          slices: [
+            {
+              name: 'test',
+              type: 'command',
+              client: { specs: [] },
+              server: {
+                description: 'Test',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Test',
+                    rules: [
+                      {
+                        name: 'rule',
+                        examples: [
+                          {
+                            name: 'example',
+                            steps: [{ keyword: 'Then', text: 'SharedEvent' }],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [{ type: 'event', source: 'internal', name: 'SharedEvent', fields: [] }],
+      integrations: [],
+      modules: [
+        {
+          sourceFile: 'shared/types.ts',
+          isDerived: false,
+          contains: { narrativeIds: ['shared-1'] },
+          declares: { messages: [{ kind: 'event', name: 'SharedEvent' }] },
+        },
+        {
+          sourceFile: 'features/consumer.ts',
+          isDerived: false,
+          contains: { narrativeIds: ['consumer-1'] },
+          declares: { messages: [] },
+        },
+      ],
+    };
+
+    const { importsPerModule, exportsPerModule } = computeAllCrossModuleDependencies(model.modules, model);
+
+    // Consumer should import SharedEvent
+    expect(importsPerModule.get('features/consumer.ts')).toEqual([
+      { fromPath: '../shared/types', typeNames: ['SharedEvent'] },
+    ]);
+
+    // Shared module should export SharedEvent
+    expect(exportsPerModule.get('shared/types.ts')).toEqual(new Set(['SharedEvent']));
+    expect(exportsPerModule.has('features/consumer.ts')).toBe(false);
+  });
+
+  it('aggregates exports from multiple importing modules', () => {
+    const model: Model = {
+      variant: 'specs',
+      narratives: [
+        { name: 'Shared', id: 'shared-1', slices: [] },
+        {
+          name: 'Consumer1',
+          id: 'consumer-1',
+          slices: [
+            {
+              name: 'test',
+              type: 'command',
+              client: { specs: [] },
+              server: {
+                description: 'Test',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Test',
+                    rules: [
+                      {
+                        name: 'rule',
+                        examples: [{ name: 'ex', steps: [{ keyword: 'Then', text: 'EventA' }] }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          name: 'Consumer2',
+          id: 'consumer-2',
+          slices: [
+            {
+              name: 'test',
+              type: 'command',
+              client: { specs: [] },
+              server: {
+                description: 'Test',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Test',
+                    rules: [
+                      {
+                        name: 'rule',
+                        examples: [{ name: 'ex', steps: [{ keyword: 'Then', text: 'EventB' }] }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [
+        { type: 'event', source: 'internal', name: 'EventA', fields: [] },
+        { type: 'event', source: 'internal', name: 'EventB', fields: [] },
+      ],
+      integrations: [],
+      modules: [
+        {
+          sourceFile: 'shared.ts',
+          isDerived: false,
+          contains: { narrativeIds: ['shared-1'] },
+          declares: {
+            messages: [
+              { kind: 'event', name: 'EventA' },
+              { kind: 'event', name: 'EventB' },
+            ],
+          },
+        },
+        {
+          sourceFile: 'consumer1.ts',
+          isDerived: false,
+          contains: { narrativeIds: ['consumer-1'] },
+          declares: { messages: [] },
+        },
+        {
+          sourceFile: 'consumer2.ts',
+          isDerived: false,
+          contains: { narrativeIds: ['consumer-2'] },
+          declares: { messages: [] },
+        },
+      ],
+    };
+
+    const { exportsPerModule } = computeAllCrossModuleDependencies(model.modules, model);
+
+    expect(exportsPerModule.get('shared.ts')).toEqual(new Set(['EventA', 'EventB']));
   });
 });

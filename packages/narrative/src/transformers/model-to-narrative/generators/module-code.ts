@@ -2,7 +2,7 @@ import ts from 'typescript';
 import type { Model, Module } from '../../../index';
 import { deriveModules } from '../../narrative-to-model/derive-modules';
 import { analyzeCodeUsage } from '../analysis/usage';
-import { computeCrossModuleImports } from '../cross-module-imports';
+import { computeAllCrossModuleDependencies } from '../cross-module-imports';
 import { sortFilesByPath } from '../ordering';
 import type { CrossModuleImport, GeneratedFile } from '../types';
 import { extractTypeIntegrationNames } from '../utils/integration-extractor';
@@ -22,11 +22,15 @@ export function generateAllModulesCode(model: Model, opts: GenerateModuleCodeOpt
   const modules =
     model.modules && model.modules.length > 0 ? model.modules : deriveModules(model.narratives, model.messages);
 
+  // Compute all cross-module dependencies in a single pass
+  const { importsPerModule, exportsPerModule } = computeAllCrossModuleDependencies(modules, model);
+
   const files: GeneratedFile[] = [];
 
   for (const module of modules) {
-    const crossModuleImports = computeCrossModuleImports(module, modules, model);
-    const code = generateModuleCode(module, model, opts, crossModuleImports);
+    const crossModuleImports = importsPerModule.get(module.sourceFile) ?? [];
+    const exportedTypes = exportsPerModule.get(module.sourceFile);
+    const code = generateModuleCode(module, model, opts, crossModuleImports, exportedTypes);
     files.push({
       path: module.sourceFile,
       code,
@@ -53,6 +57,7 @@ function generateModuleCode(
   model: Model,
   opts: GenerateModuleCodeOptions,
   crossModuleImports: CrossModuleImport[],
+  exportedTypes?: Set<string>,
 ): string {
   const f = ts.factory;
 
@@ -130,6 +135,7 @@ function generateModuleCode(
     usedFlowFunctionNames,
     narratives,
     crossModuleImports,
+    exportedTypes,
   );
 
   const file = f.createSourceFile(statements, f.createToken(ts.SyntaxKind.EndOfFileToken), ts.NodeFlags.None);
@@ -146,6 +152,7 @@ function buildStatements(
   usedFlowFunctionNames: string[],
   flows: Model['narratives'],
   crossModuleImports: CrossModuleImport[],
+  exportedTypes?: Set<string>,
 ): ts.Statement[] {
   const f = tsModule.factory;
   const statements: ts.Statement[] = [];
@@ -185,7 +192,7 @@ function buildStatements(
       required: field.required,
     })),
   }));
-  statements.push(...buildTypeAliases(tsModule, adaptedMessages));
+  statements.push(...buildTypeAliases(tsModule, adaptedMessages, exportedTypes));
 
   for (const flow of flows) {
     statements.push(...buildFlowStatements(tsModule, flow, messages));

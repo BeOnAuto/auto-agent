@@ -8,14 +8,6 @@ export interface FieldTypeInfo {
 }
 
 /**
- * Check if a string is a valid ISO date string
- */
-function isISODateString(str: string): boolean {
-  const isoDateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?(?:Z|[+-]\d{2}:\d{2})?$/;
-  return isoDateRegex.test(str);
-}
-
-/**
  * Emit a TS expression from a plain JSON-like value with optional type information for Date handling.
  */
 export function jsonToExpr(
@@ -50,7 +42,7 @@ export function jsonToExpr(
           const fieldType = typeInfo?.[k];
           let valueExpr: tsNS.Expression;
 
-          if (fieldType === 'Date' && typeof x === 'string' && isISODateString(x)) {
+          if (fieldType === 'Date' && typeof x === 'string') {
             // Generate new Date('...') for Date fields
             valueExpr = f.createNewExpression(f.createIdentifier('Date'), undefined, [f.createStringLiteral(x)]);
           } else if (fieldType === 'Date' && x instanceof Date) {

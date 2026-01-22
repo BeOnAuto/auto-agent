@@ -6,41 +6,55 @@ import type { CrossModuleImport } from './types';
 
 export type { CrossModuleImport };
 
+/**
+ * Computes cross-module imports for a single module.
+ * Returns the list of imports needed (with relative paths).
+ */
 export function computeCrossModuleImports(module: Module, allModules: Module[], model: Model): CrossModuleImport[] {
-  if (module.isDerived) {
+  const dependencyMap = computeModuleDependencies(module, allModules, model);
+  if (!dependencyMap) {
     return [];
   }
+  return convertToImports(module.sourceFile, dependencyMap);
+}
 
-  const declaredKeys = new Set(module.declares.messages.map((m) => toMessageKey(m.kind, m.name)));
-  const usedKeys = collectUsedMessageKeysForModule(module, model);
-  const neededKeys = new Set([...usedKeys].filter((k) => !declaredKeys.has(k)));
+/**
+ * Computes cross-module imports for all modules and derives which types need to be exported.
+ * Returns both the imports per module and the exports per module in a single pass.
+ */
+export function computeAllCrossModuleDependencies(
+  modules: Module[],
+  model: Model,
+): {
+  importsPerModule: Map<string, CrossModuleImport[]>;
+  exportsPerModule: Map<string, Set<string>>;
+} {
+  const importsPerModule = new Map<string, CrossModuleImport[]>();
+  const exportsPerModule = new Map<string, Set<string>>();
 
-  if (neededKeys.size === 0) {
-    return [];
-  }
+  for (const module of modules) {
+    const dependencyMap = computeModuleDependencies(module, modules, model);
 
-  const importsByModule = new Map<string, string[]>();
+    if (!dependencyMap) {
+      importsPerModule.set(module.sourceFile, []);
+      continue;
+    }
 
-  for (const msgKey of neededKeys) {
-    const { name } = parseMessageKey(msgKey);
-    const declaringModule = findDeclaringModule(msgKey, allModules, module);
+    // Convert to imports with relative paths
+    importsPerModule.set(module.sourceFile, convertToImports(module.sourceFile, dependencyMap));
 
-    if (declaringModule) {
-      const modulePath = declaringModule.sourceFile;
-      if (!importsByModule.has(modulePath)) {
-        importsByModule.set(modulePath, []);
+    // Track which types need to be exported from each declaring module
+    for (const [declaringSourceFile, typeNames] of dependencyMap) {
+      if (!exportsPerModule.has(declaringSourceFile)) {
+        exportsPerModule.set(declaringSourceFile, new Set());
       }
-      importsByModule.get(modulePath)!.push(name);
+      for (const typeName of typeNames) {
+        exportsPerModule.get(declaringSourceFile)!.add(typeName);
+      }
     }
   }
 
-  const imports: CrossModuleImport[] = [];
-  for (const [modulePath, typeNames] of importsByModule) {
-    const relativePath = resolveRelativeImport(module.sourceFile, modulePath);
-    imports.push({ fromPath: relativePath, typeNames });
-  }
-
-  return sortImportsBySource(imports);
+  return { importsPerModule, exportsPerModule };
 }
 
 export function resolveRelativeImport(fromPath: string, toPath: string): string {
@@ -57,6 +71,55 @@ export function resolveRelativeImport(fromPath: string, toPath: string): string 
   }
 
   return join(relativePath, toFile);
+}
+
+/**
+ * Core logic: computes which types a module needs from other modules.
+ * Returns a map of declaringModuleSourceFile -> typeNames[], or null if no dependencies.
+ */
+function computeModuleDependencies(module: Module, allModules: Module[], model: Model): Map<string, string[]> | null {
+  if (module.isDerived) {
+    return null;
+  }
+
+  const declaredKeys = new Set(module.declares.messages.map((m) => toMessageKey(m.kind, m.name)));
+  const usedKeys = collectUsedMessageKeysForModule(module, model);
+  const neededKeys = new Set([...usedKeys].filter((k) => !declaredKeys.has(k)));
+
+  if (neededKeys.size === 0) {
+    return null;
+  }
+
+  const dependencyMap = new Map<string, string[]>();
+
+  for (const msgKey of neededKeys) {
+    const { name } = parseMessageKey(msgKey);
+    const declaringModule = findDeclaringModule(msgKey, allModules, module);
+
+    if (declaringModule) {
+      const modulePath = declaringModule.sourceFile;
+      if (!dependencyMap.has(modulePath)) {
+        dependencyMap.set(modulePath, []);
+      }
+      dependencyMap.get(modulePath)!.push(name);
+    }
+  }
+
+  return dependencyMap.size > 0 ? dependencyMap : null;
+}
+
+/**
+ * Converts a dependency map (absolute paths) to CrossModuleImport[] (relative paths).
+ */
+function convertToImports(fromSourceFile: string, dependencyMap: Map<string, string[]>): CrossModuleImport[] {
+  const imports: CrossModuleImport[] = [];
+
+  for (const [modulePath, typeNames] of dependencyMap) {
+    const relativePath = resolveRelativeImport(fromSourceFile, modulePath);
+    imports.push({ fromPath: relativePath, typeNames });
+  }
+
+  return sortImportsBySource(imports);
 }
 
 function collectUsedMessageKeysForModule(module: Module, model: Model): Set<string> {

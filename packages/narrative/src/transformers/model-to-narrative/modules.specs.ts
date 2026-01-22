@@ -152,12 +152,13 @@ describe('module functionality', () => {
 
       expect(result.files).toHaveLength(2);
 
-      // Find the orders file
       const ordersFile = result.files.find((f) => f.path.includes('orders'));
       expect(ordersFile).toBeDefined();
 
-      // Orders file should import OrderCreated from shared
       expect(ordersFile!.code).toContain("import type { OrderCreated } from '../shared/types.narrative';");
+      const sharedFile = result.files.find((f) => f.path.includes('types'));
+      expect(sharedFile).toBeDefined();
+      expect(sharedFile!.code).toContain('export type OrderCreated = Event<');
     });
   });
 

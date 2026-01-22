@@ -7,7 +7,7 @@ type Message = {
   fields: { name: string; type: string; required: boolean }[];
 };
 
-export function buildTypeAliases(ts: typeof tsNS, messages: Message[]): tsNS.Statement[] {
+export function buildTypeAliases(ts: typeof tsNS, messages: Message[], exportedTypes?: Set<string>): tsNS.Statement[] {
   const f = ts.factory;
 
   const mkK = (s: string) => f.createLiteralTypeNode(f.createStringLiteral(s, true));
@@ -37,11 +37,9 @@ export function buildTypeAliases(ts: typeof tsNS, messages: Message[]): tsNS.Sta
       m.type === 'event' ? 'Event' : m.type === 'command' ? 'Command' : m.type === 'query' ? 'Query' : 'State';
     const rhs = f.createTypeReferenceNode(baseTypeName, typeArgs);
 
-    return f.createTypeAliasDeclaration(
-      undefined, // No export keyword
-      name,
-      [],
-      rhs,
-    );
+    // Add export modifier if this type is imported by other modules
+    const modifiers = exportedTypes?.has(m.name) ? [f.createModifier(ts.SyntaxKind.ExportKeyword)] : undefined;
+
+    return f.createTypeAliasDeclaration(modifiers, name, [], rhs);
   });
 }
