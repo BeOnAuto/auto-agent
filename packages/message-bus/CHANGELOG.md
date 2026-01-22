@@ -1,5 +1,16 @@
 # @auto-engineer/message-bus
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+
 ## 1.5.1
 
 ### Patch Changes

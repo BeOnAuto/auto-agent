@@ -2,6 +2,17 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+
 ## 1.5.1
 
 ### Patch Changes
@@ -566,6 +577,21 @@
 
 # @auto-engineer/cli
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/file-store@1.5.2
+  - @auto-engineer/narrative@1.5.2
+  - @auto-engineer/pipeline@1.5.2
+
 ## 1.5.1
 
 ### Patch Changes
@@ -1048,6 +1074,20 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/ai-gateway@1.5.2
+  - @auto-engineer/message-bus@1.5.2
 
 ## 1.5.1
 
@@ -2095,6 +2135,19 @@
 
 # create-auto-app
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/id@1.5.2
+
 ## 1.5.1
 
 ### Patch Changes
@@ -2875,6 +2928,19 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/message-bus@1.5.2
 
 ## 1.5.1
 
@@ -3921,6 +3987,20 @@
 
 # @auto-engineer/dev-server
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/cli@1.5.2
+  - @auto-engineer/message-bus@1.5.2
+
 ## 1.5.1
 
 ### Patch Changes
@@ -4484,6 +4564,17 @@
 
 # @auto-engineer/file-store
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+
 ## 1.5.1
 
 ### Patch Changes
@@ -5005,6 +5096,19 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/message-bus@1.5.2
 
 ## 1.5.1
 
@@ -6009,6 +6113,20 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/ai-gateway@1.5.2
+  - @auto-engineer/message-bus@1.5.2
 
 ## 1.5.1
 
@@ -7157,6 +7275,20 @@
 
 # @auto-engineer/frontend-implementer
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/ai-gateway@1.5.2
+  - @auto-engineer/message-bus@1.5.2
+
 ## 1.5.1
 
 ### Patch Changes
@@ -8301,6 +8433,17 @@
 
 # @auto-engineer/id
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+
 ## 1.5.1
 
 ### Patch Changes
@@ -8760,6 +8903,21 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/ai-gateway@1.5.2
+  - @auto-engineer/message-bus@1.5.2
+  - @auto-engineer/narrative@1.5.2
 
 ## 1.5.1
 
@@ -9970,6 +10128,17 @@
 
 # @auto-engineer/message-bus
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+
 ## 1.5.1
 
 ### Patch Changes
@@ -10538,6 +10707,19 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/message-bus@1.5.2
 
 ## 1.5.1
 
@@ -11369,6 +11551,21 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/file-store@1.5.2
+  - @auto-engineer/id@1.5.2
+  - @auto-engineer/message-bus@1.5.2
 
 ## 1.5.1
 
@@ -12708,6 +12905,20 @@
 
 # @auto-engineer/pipeline
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/file-store@1.5.2
+  - @auto-engineer/message-bus@1.5.2
+
 ## 1.5.1
 
 ### Patch Changes
@@ -13154,6 +13365,17 @@
 
 # @auto-engineer/release-automation
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+
 ## 1.5.1
 
 ### Patch Changes
@@ -13381,6 +13603,20 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/cli@1.5.2
+  - @auto-engineer/message-bus@1.5.2
 
 ## 1.5.1
 
@@ -14381,6 +14617,20 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/message-bus@1.5.2
+  - @auto-engineer/narrative@1.5.2
 
 ## 1.5.1
 
@@ -15531,6 +15781,19 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/narrative@1.5.2
+
 ## 1.5.1
 
 ### Patch Changes
@@ -15927,6 +16190,20 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.5.2
+
+### Patch Changes
+
+- [`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: use browser-compatible path utilities in cross-module-imports
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Exported cross-module types for better integration between modules
+  - Improved Date field handling in the narrative package
+- Updated dependencies [[`02f70b8`](https://github.com/BeOnAuto/auto-engineer/commit/02f70b8e3be0655ab340c53e2ac2082a3ddc10ef), [`e5883d0`](https://github.com/BeOnAuto/auto-engineer/commit/e5883d0db038d1f95645a46ce528cbd153bde277)]:
+  - @auto-engineer/ai-gateway@1.5.2
+  - @auto-engineer/message-bus@1.5.2
 
 ## 1.5.1
 
