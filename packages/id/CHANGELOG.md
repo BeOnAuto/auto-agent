@@ -1,5 +1,15 @@
 # @auto-engineer/id
 
+## 1.5.1
+
+### Patch Changes
+
+- [`6afefa3`](https://github.com/BeOnAuto/auto-engineer/commit/6afefa3cd483930b2cea1933f6b0d3e84a546a9b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add query support to isMessageKind type guard
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`6edb039`](https://github.com/BeOnAuto/auto-engineer/commit/6edb0394444edcab597b6d149b3928debe9824c8) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed browser compatibility issues with path utilities in cross-module imports
+
 ## 1.5.0
 
 ### Minor Changes
