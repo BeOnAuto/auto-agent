@@ -1,6 +1,6 @@
 {
   "name": "@auto-engineer/release-automation",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "type": "module",
   "description": "Automated release management with changesets and conventional commits",
   "main": "./dist/src/index.js",

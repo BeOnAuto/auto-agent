@@ -2,6 +2,16 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
 ## 1.5.3
 
 ### Patch Changes
@@ -587,6 +597,21 @@
 
 # @auto-engineer/cli
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/file-store@1.5.4
+  - @auto-engineer/narrative@1.5.4
+  - @auto-engineer/pipeline@1.5.4
+
 ## 1.5.3
 
 ### Patch Changes
@@ -1098,6 +1123,20 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/ai-gateway@1.5.4
+  - @auto-engineer/message-bus@1.5.4
 
 ## 1.5.3
 
@@ -2172,6 +2211,19 @@
 
 # create-auto-app
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/id@1.5.4
+
 ## 1.5.3
 
 ### Patch Changes
@@ -2977,6 +3029,19 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/message-bus@1.5.4
 
 ## 1.5.3
 
@@ -4048,6 +4113,20 @@
 
 # @auto-engineer/dev-server
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/cli@1.5.4
+  - @auto-engineer/message-bus@1.5.4
+
 ## 1.5.3
 
 ### Patch Changes
@@ -4638,6 +4717,16 @@
 
 # @auto-engineer/file-store
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
 ## 1.5.3
 
 ### Patch Changes
@@ -5180,6 +5269,19 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/message-bus@1.5.4
 
 ## 1.5.3
 
@@ -6209,6 +6311,20 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/ai-gateway@1.5.4
+  - @auto-engineer/message-bus@1.5.4
 
 ## 1.5.3
 
@@ -7384,6 +7500,20 @@
 
 # @auto-engineer/frontend-implementer
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/ai-gateway@1.5.4
+  - @auto-engineer/message-bus@1.5.4
+
 ## 1.5.3
 
 ### Patch Changes
@@ -8555,6 +8685,16 @@
 
 # @auto-engineer/id
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
 ## 1.5.3
 
 ### Patch Changes
@@ -9035,6 +9175,21 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/ai-gateway@1.5.4
+  - @auto-engineer/message-bus@1.5.4
+  - @auto-engineer/narrative@1.5.4
 
 ## 1.5.3
 
@@ -10274,6 +10429,16 @@
 
 # @auto-engineer/message-bus
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
 ## 1.5.3
 
 ### Patch Changes
@@ -10863,6 +11028,19 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/message-bus@1.5.4
 
 ## 1.5.3
 
@@ -11719,6 +11897,21 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/file-store@1.5.4
+  - @auto-engineer/id@1.5.4
+  - @auto-engineer/message-bus@1.5.4
 
 ## 1.5.3
 
@@ -13087,6 +13280,20 @@
 
 # @auto-engineer/pipeline
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/file-store@1.5.4
+  - @auto-engineer/message-bus@1.5.4
+
 ## 1.5.3
 
 ### Patch Changes
@@ -13560,6 +13767,16 @@
 
 # @auto-engineer/release-automation
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
 ## 1.5.3
 
 ### Patch Changes
@@ -13808,6 +14025,20 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/cli@1.5.4
+  - @auto-engineer/message-bus@1.5.4
 
 ## 1.5.3
 
@@ -14835,6 +15066,20 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/message-bus@1.5.4
+  - @auto-engineer/narrative@1.5.4
 
 ## 1.5.3
 
@@ -16012,6 +16257,19 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/narrative@1.5.4
+
 ## 1.5.3
 
 ### Patch Changes
@@ -16433,6 +16691,20 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
+- Updated dependencies [[`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b), [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774)]:
+  - @auto-engineer/ai-gateway@1.5.4
+  - @auto-engineer/message-bus@1.5.4
 
 ## 1.5.3
 

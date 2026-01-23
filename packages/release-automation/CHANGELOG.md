@@ -1,5 +1,15 @@
 # @auto-engineer/release-automation
 
+## 1.5.4
+
+### Patch Changes
+
+- [`4eeece7`](https://github.com/BeOnAuto/auto-engineer/commit/4eeece7f0894d49e62b374dd0461d9a41bbe169b) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: wrap Date fields in nested objects and arrays with new Date()
+  - **global**: version packages
+  - **global**: add changeset
+
+- [`867ff17`](https://github.com/BeOnAuto/auto-engineer/commit/867ff17b14e0167f362a88a7d14b6b6e75702774) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed registration of foreach-phased handlers to properly work with the PhasedExecutor
+
 ## 1.5.3
 
 ### Patch Changes
