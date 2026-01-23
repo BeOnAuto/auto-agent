@@ -7,6 +7,106 @@ export interface FieldTypeInfo {
   [fieldName: string]: string; // field name -> type (e.g., 'Date', 'string', etc.)
 }
 
+const ARRAY_TYPE_REGEX = /^Array<(.+)>$/;
+
+const VALID_IDENTIFIER_REGEX = /^[A-Za-z_]\w*$/;
+
+function createDateNewExpr(f: tsNS.NodeFactory, dateStr: string): tsNS.NewExpression {
+  return f.createNewExpression(f.createIdentifier('Date'), undefined, [f.createStringLiteral(dateStr)]);
+}
+
+function parseObjectTypeFields(typeStr: string): Array<{ name: string; type: string }> | undefined {
+  const trimmed = typeStr.trim();
+  if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
+    return undefined;
+  }
+
+  const inner = trimmed.slice(1, -1).trim();
+  if (inner.length === 0) {
+    return [];
+  }
+
+  const result: Array<{ name: string; type: string }> = [];
+  const parts = splitTopLevel(inner, ',');
+
+  for (const p of parts) {
+    const colonIdx = p.indexOf(':');
+    if (colonIdx === -1) continue;
+
+    const name = p.slice(0, colonIdx).trim();
+    const type = p.slice(colonIdx + 1).trim();
+    if (name.length === 0 || type.length === 0) continue;
+
+    result.push({ name, type });
+  }
+
+  return result;
+}
+
+function parseObjectTypeInfo(typeStr: string): FieldTypeInfo | undefined {
+  const fields = parseObjectTypeFields(typeStr);
+  if (!fields) return undefined;
+
+  const result: FieldTypeInfo = {};
+  for (const { name, type } of fields) {
+    result[name] = type;
+  }
+  return result;
+}
+
+function parseArrayElementType(typeStr: string): string | undefined {
+  const match = ARRAY_TYPE_REGEX.exec(typeStr.trim());
+  return match ? match[1] : undefined;
+}
+
+function convertDateValue(f: tsNS.NodeFactory, x: unknown): tsNS.Expression | undefined {
+  if (typeof x === 'string') return createDateNewExpr(f, x);
+  if (x instanceof Date) return createDateNewExpr(f, x.toISOString());
+  return undefined;
+}
+
+function convertArrayField(
+  ts: typeof import('typescript'),
+  f: tsNS.NodeFactory,
+  arr: unknown[],
+  fieldType: string,
+): tsNS.Expression {
+  const elementType = parseArrayElementType(fieldType);
+  if (elementType === 'Date') {
+    return f.createArrayLiteralExpression(arr.map((elem) => convertDateValue(f, elem) ?? jsonToExpr(ts, f, elem)));
+  }
+  const elementTypeInfo = elementType ? parseObjectTypeInfo(elementType) : undefined;
+  return f.createArrayLiteralExpression(arr.map((elem) => jsonToExpr(ts, f, elem, elementTypeInfo)));
+}
+
+function convertObjectField(
+  ts: typeof import('typescript'),
+  f: tsNS.NodeFactory,
+  obj: Record<string, unknown>,
+  fieldType: string,
+): tsNS.Expression {
+  const nestedTypeInfo = parseObjectTypeInfo(fieldType);
+  return jsonToExpr(ts, f, obj, nestedTypeInfo);
+}
+
+function computeFieldExpr(
+  ts: typeof import('typescript'),
+  f: tsNS.NodeFactory,
+  x: unknown,
+  fieldType: string | undefined,
+  typeInfo: FieldTypeInfo | undefined,
+): tsNS.Expression {
+  if (fieldType === 'Date') {
+    const dateExpr = convertDateValue(f, x);
+    if (dateExpr) return dateExpr;
+  }
+  if (fieldType && typeof x === 'object' && x !== null) {
+    if (Array.isArray(x)) return convertArrayField(ts, f, x, fieldType);
+    return convertObjectField(ts, f, x as Record<string, unknown>, fieldType);
+  }
+  return jsonToExpr(ts, f, x, typeInfo);
+}
+
 /**
  * Emit a TS expression from a plain JSON-like value with optional type information for Date handling.
  */
@@ -29,37 +129,19 @@ export function jsonToExpr(
       return v ? f.createTrue() : f.createFalse();
     case 'object': {
       if (v instanceof Date) {
-        // Generate new Date('...') for Date objects
-        return f.createNewExpression(f.createIdentifier('Date'), undefined, [f.createStringLiteral(v.toISOString())]);
+        return createDateNewExpr(f, v.toISOString());
       }
       if (Array.isArray(v)) {
         return f.createArrayLiteralExpression(v.map((x) => jsonToExpr(ts, f, x, typeInfo)));
       }
       const entries = Object.entries(v as Record<string, unknown>);
       return f.createObjectLiteralExpression(
-        entries.map(([k, x]) => {
-          // Check if this field should be a Date
-          const fieldType = typeInfo?.[k];
-          let valueExpr: tsNS.Expression;
-
-          if (fieldType === 'Date' && typeof x === 'string') {
-            // Generate new Date('...') for Date fields
-            valueExpr = f.createNewExpression(f.createIdentifier('Date'), undefined, [f.createStringLiteral(x)]);
-          } else if (fieldType === 'Date' && x instanceof Date) {
-            // Generate new Date('...') for Date objects
-            valueExpr = f.createNewExpression(f.createIdentifier('Date'), undefined, [
-              f.createStringLiteral(x.toISOString()),
-            ]);
-          } else {
-            valueExpr = jsonToExpr(ts, f, x, typeInfo);
-          }
-
-          return f.createPropertyAssignment(
-            // use identifier if safe, else quoted string
-            /^[A-Za-z_]\w*$/.test(k) ? f.createIdentifier(k) : f.createStringLiteral(k),
-            valueExpr,
-          );
-        }),
+        entries.map(([k, x]) =>
+          f.createPropertyAssignment(
+            VALID_IDENTIFIER_REGEX.test(k) ? f.createIdentifier(k) : f.createStringLiteral(k),
+            computeFieldExpr(ts, f, x, typeInfo?.[k], typeInfo),
+          ),
+        ),
         false,
       );
     }
@@ -100,7 +182,7 @@ function createArrayTypeNode(
   f: tsNS.NodeFactory,
   trimmed: string,
 ): tsNS.TypeNode | null {
-  const arrayMatch = /^Array<(.+)>$/.exec(trimmed);
+  const arrayMatch = ARRAY_TYPE_REGEX.exec(trimmed);
   if (arrayMatch) {
     const inner = typeFromString(ts, f, arrayMatch[1]);
     return f.createArrayTypeNode(inner);
@@ -116,32 +198,17 @@ function createObjectLiteralTypeNode(
   f: tsNS.NodeFactory,
   trimmed: string,
 ): tsNS.TypeNode | null {
-  if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
-    return null;
-  }
+  const fields = parseObjectTypeFields(trimmed);
+  if (!fields) return null;
 
-  const inner = trimmed.slice(1, -1).trim();
-  const members: tsNS.TypeElement[] = [];
-
-  if (inner.length > 0) {
-    const parts = splitTopLevel(inner, ',');
-    for (const p of parts) {
-      const [rawName, ...rest] = p.split(':');
-      const name = rawName.trim();
-      const rhs = rest.join(':').trim();
-      if (name.length === 0 || rhs.length === 0) continue;
-
-      const typeNode = typeFromString(ts, f, rhs);
-      members.push(
-        f.createPropertySignature(
-          undefined,
-          /^[A-Za-z_]\w*$/.test(name) ? f.createIdentifier(name) : f.createStringLiteral(name),
-          undefined,
-          typeNode,
-        ),
-      );
-    }
-  }
+  const members = fields.map(({ name, type }) =>
+    f.createPropertySignature(
+      undefined,
+      VALID_IDENTIFIER_REGEX.test(name) ? f.createIdentifier(name) : f.createStringLiteral(name),
+      undefined,
+      typeFromString(ts, f, type),
+    ),
+  );
 
   return f.createTypeLiteralNode(members);
 }
