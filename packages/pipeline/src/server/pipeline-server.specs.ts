@@ -2007,6 +2007,61 @@ describe('PipelineServer', () => {
       await new Promise((r) => setTimeout(r, 300));
       await server.stop();
     });
+
+    it('should complete phased execution and emit AllComponentsImplemented', async () => {
+      type Component = { path: string; priority: 'high' | 'medium' | 'low' };
+      type ComponentEvent = { data: { components: Component[] } };
+      type ItemOrResult = { data: { componentPath?: string; path?: string } };
+
+      const generateHandler = {
+        name: 'GenerateComponents',
+        events: ['ComponentsGenerated'],
+        handle: async () => ({
+          type: 'ComponentsGenerated',
+          data: { components: [{ path: '/comp/a.tsx', priority: 'high' }] },
+        }),
+      };
+
+      const implementHandler = {
+        name: 'ImplementComponent',
+        events: ['ComponentImplemented'],
+        handle: async (cmd: { data: { componentPath: string } }) => ({
+          type: 'ComponentImplemented',
+          data: { componentPath: cmd.data.componentPath },
+        }),
+      };
+
+      const pipeline = define('test')
+        .on('ComponentsGenerated')
+        .forEach((e: ComponentEvent) => e.data.components)
+        .groupInto(['high', 'medium', 'low'], (c: Component) => c.priority)
+        .process('ImplementComponent', (c: Component) => ({ componentPath: c.path }))
+        .onComplete({
+          success: 'AllComponentsImplemented',
+          failure: 'ComponentImplementationFailed',
+          itemKey: (e: ItemOrResult) => e.data.componentPath ?? e.data.path ?? '',
+        })
+        .build();
+
+      const server = new PipelineServer({ port: 0 });
+      server.registerCommandHandlers([generateHandler, implementHandler]);
+      server.registerPipeline(pipeline);
+      await server.start();
+
+      await fetch(`http://localhost:${server.port}/command`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'GenerateComponents', data: {} }),
+      });
+
+      await new Promise((r) => setTimeout(r, 500));
+
+      const msgs = await fetchAs<StoredMessage[]>(`http://localhost:${server.port}/messages`);
+
+      expect(msgs.some((m) => m.message.type === 'AllComponentsImplemented')).toBe(true);
+
+      await server.stop();
+    });
   });
 
   describe('POST /execute', () => {

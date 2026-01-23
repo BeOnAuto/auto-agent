@@ -139,6 +139,8 @@ export class PipelineServer {
           commandTypes: handler.commandTypes,
           handler: handler.handler,
         });
+      } else if (handler.type === 'foreach-phased') {
+        this.phasedExecutor.registerHandler(handler);
       }
     }
   }
