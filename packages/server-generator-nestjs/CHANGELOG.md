@@ -1,5 +1,17 @@
 # @auto-engineer/server-generator-nestjs
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/narrative@1.5.3
+
 ## 1.5.2
 
 ### Patch Changes

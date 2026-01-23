@@ -2,6 +2,16 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.5.2
 
 ### Patch Changes
@@ -577,6 +587,20 @@
 
 # @auto-engineer/cli
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/file-store@1.5.3
+  - @auto-engineer/narrative@1.5.3
+  - @auto-engineer/pipeline@1.5.3
+
 ## 1.5.2
 
 ### Patch Changes
@@ -1074,6 +1098,19 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/ai-gateway@1.5.3
+  - @auto-engineer/message-bus@1.5.3
 
 ## 1.5.2
 
@@ -2135,6 +2172,18 @@
 
 # create-auto-app
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/id@1.5.3
+
 ## 1.5.2
 
 ### Patch Changes
@@ -2928,6 +2977,18 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/message-bus@1.5.3
 
 ## 1.5.2
 
@@ -3987,6 +4048,19 @@
 
 # @auto-engineer/dev-server
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/cli@1.5.3
+  - @auto-engineer/message-bus@1.5.3
+
 ## 1.5.2
 
 ### Patch Changes
@@ -4564,6 +4638,16 @@
 
 # @auto-engineer/file-store
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.5.2
 
 ### Patch Changes
@@ -5096,6 +5180,18 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/message-bus@1.5.3
 
 ## 1.5.2
 
@@ -6113,6 +6209,19 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/ai-gateway@1.5.3
+  - @auto-engineer/message-bus@1.5.3
 
 ## 1.5.2
 
@@ -7275,6 +7384,19 @@
 
 # @auto-engineer/frontend-implementer
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/ai-gateway@1.5.3
+  - @auto-engineer/message-bus@1.5.3
+
 ## 1.5.2
 
 ### Patch Changes
@@ -8433,6 +8555,16 @@
 
 # @auto-engineer/id
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.5.2
 
 ### Patch Changes
@@ -8903,6 +9035,20 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/ai-gateway@1.5.3
+  - @auto-engineer/message-bus@1.5.3
+  - @auto-engineer/narrative@1.5.3
 
 ## 1.5.2
 
@@ -10128,6 +10274,16 @@
 
 # @auto-engineer/message-bus
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.5.2
 
 ### Patch Changes
@@ -10707,6 +10863,18 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/message-bus@1.5.3
 
 ## 1.5.2
 
@@ -11551,6 +11719,20 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/file-store@1.5.3
+  - @auto-engineer/id@1.5.3
+  - @auto-engineer/message-bus@1.5.3
 
 ## 1.5.2
 
@@ -12905,6 +13087,19 @@
 
 # @auto-engineer/pipeline
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/file-store@1.5.3
+  - @auto-engineer/message-bus@1.5.3
+
 ## 1.5.2
 
 ### Patch Changes
@@ -13365,6 +13560,16 @@
 
 # @auto-engineer/release-automation
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.5.2
 
 ### Patch Changes
@@ -13603,6 +13808,19 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/cli@1.5.3
+  - @auto-engineer/message-bus@1.5.3
 
 ## 1.5.2
 
@@ -14617,6 +14835,19 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/message-bus@1.5.3
+  - @auto-engineer/narrative@1.5.3
 
 ## 1.5.2
 
@@ -15781,6 +16012,18 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/narrative@1.5.3
+
 ## 1.5.2
 
 ### Patch Changes
@@ -16190,6 +16433,19 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.5.3
+
+### Patch Changes
+
+- [`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Fixed Date fields not being properly converted when nested inside objects and arrays
+
+- [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: export cross-module types and improve Date field handling
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`6a7fa7f`](https://github.com/BeOnAuto/auto-engineer/commit/6a7fa7f848f45bad2b2e97e39404155d8987623d), [`d7f22bb`](https://github.com/BeOnAuto/auto-engineer/commit/d7f22bbe745dc14ebd273d4ffa24ffe62adb95c0)]:
+  - @auto-engineer/ai-gateway@1.5.3
+  - @auto-engineer/message-bus@1.5.3
 
 ## 1.5.2
 
