@@ -57,5 +57,5 @@
     "@types/node": "^22.0.0",
     "socket.io-client": "^4.8.3"
   },
-  "version": "1.5.4"
+  "version": "1.5.5"
 }

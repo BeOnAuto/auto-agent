@@ -1,5 +1,16 @@
 # @auto-engineer/server-implementer
 
+## 1.5.5
+
+### Patch Changes
+
+- [`237ff60`](https://github.com/BeOnAuto/auto-engineer/commit/237ff604674b188645017b7f80cf5d248aadc5b1) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **pipeline**: register foreach-phased handlers with PhasedExecutor
+  - **global**: version packages
+  - **global**: add changeset
+- Updated dependencies [[`237ff60`](https://github.com/BeOnAuto/auto-engineer/commit/237ff604674b188645017b7f80cf5d248aadc5b1)]:
+  - @auto-engineer/ai-gateway@1.5.5
+  - @auto-engineer/message-bus@1.5.5
+
 ## 1.5.4
 
 ### Patch Changes
