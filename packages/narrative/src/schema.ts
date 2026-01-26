@@ -270,6 +270,7 @@ const CommandSliceSchema = BaseSliceSchema.extend({
     specs: ClientSpecSchema,
   }),
   request: z.string().describe('Command request (GraphQL, REST endpoint, or other query format)').optional(),
+  mappings: z.string().describe('Field mappings between Command/Event/State messages').optional(),
   server: z.object({
     description: z.string(),
     data: DataSchema.optional().describe('Data configuration for command slices'),
@@ -283,6 +284,7 @@ const QuerySliceSchema = BaseSliceSchema.extend({
     specs: ClientSpecSchema,
   }),
   request: z.string().describe('Query request (GraphQL, REST endpoint, or other query format)').optional(),
+  mappings: z.string().describe('Field mappings between Command/Event/State messages').optional(),
   server: z.object({
     description: z.string(),
     data: DataSchema.optional().describe('Data configuration for query slices'),
