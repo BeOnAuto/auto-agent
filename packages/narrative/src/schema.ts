@@ -188,6 +188,13 @@ export const MappingFieldRefSchema = z
   })
   .describe('Reference to a specific field within a message type');
 
+export const MappingEntrySchema = z
+  .object({
+    source: MappingFieldRefSchema.describe('Source field reference'),
+    target: MappingFieldRefSchema.describe('Target field reference'),
+  })
+  .describe('Mapping entry linking a source field to a target field');
+
 const BaseSliceSchema = z
   .object({
     name: z.string(),
@@ -278,7 +285,7 @@ const CommandSliceSchema = BaseSliceSchema.extend({
     specs: ClientSpecSchema,
   }),
   request: z.string().describe('Command request (GraphQL, REST endpoint, or other query format)').optional(),
-  mappings: z.string().describe('Field mappings between Command/Event/State messages').optional(),
+  mappings: z.array(MappingEntrySchema).optional().describe('Field mappings between Command/Event/State messages'),
   server: z.object({
     description: z.string(),
     data: DataSchema.optional().describe('Data configuration for command slices'),
@@ -292,7 +299,7 @@ const QuerySliceSchema = BaseSliceSchema.extend({
     specs: ClientSpecSchema,
   }),
   request: z.string().describe('Query request (GraphQL, REST endpoint, or other query format)').optional(),
-  mappings: z.string().describe('Field mappings between Command/Event/State messages').optional(),
+  mappings: z.array(MappingEntrySchema).optional().describe('Field mappings between Command/Event/State messages'),
   server: z.object({
     description: z.string(),
     data: DataSchema.optional().describe('Data configuration for query slices'),

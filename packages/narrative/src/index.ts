@@ -74,6 +74,7 @@ export {
   ExampleSchema,
   ExperienceSliceSchema,
   IntegrationSchema,
+  MappingEntrySchema,
   MappingFieldRefSchema,
   MessageFieldSchema,
   MessageRefSchema,
@@ -106,6 +107,7 @@ import type {
   CommandSliceSchema,
   ExampleSchema,
   ExperienceSliceSchema,
+  MappingEntrySchema,
   MappingFieldRefSchema,
   MessageFieldSchema,
   MessageRefSchema,
@@ -136,6 +138,7 @@ export type Step = z.infer<typeof StepSchema>;
 export type Module = z.infer<typeof ModuleSchema>;
 export type MessageRef = z.infer<typeof MessageRefSchema>;
 export type MappingFieldRef = z.infer<typeof MappingFieldRefSchema>;
+export type MappingEntry = z.infer<typeof MappingEntrySchema>;
 
 // ID assignment utilities
 export { addAutoIds, hasAllIds } from './id';
