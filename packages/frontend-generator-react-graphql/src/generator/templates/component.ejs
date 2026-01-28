@@ -1,5 +1,5 @@
 <% if (atoms && atoms.length > 0) { -%>
-// 🎨 REQUIRED ATOM COMPONENTS:
+// REQUIRED ATOM COMPONENTS:
 // <%= atoms.join(', ') %>
 //
 // Atom source code is provided in the "Available Dependencies" section below.
@@ -78,7 +78,9 @@ import { <%= typeGuidance.imports.join(', ') %> } from '@/gql/graphql';
 <% } -%>
 <% if (molecules && molecules.length > 0) { -%>
 //
+// ------------------------------------------------------------------------------
 // IMPLEMENTATION GUIDE (Priority: Read this immediately before coding)
+// ------------------------------------------------------------------------------
 //
 <% if (specs && specs.length > 0) { -%>
 // Spec Coverage:
@@ -110,7 +112,7 @@ const hasComprehensive = comprehensiveMolecules.length > 0;
 //
 // Code structure:
 //   return (
-//     <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+//     <div> {/* Add vertical spacing and padding */}
 <%   molecules.forEach(mol => { -%>
 //       <<%= mol %> />
 <%   }); -%>
@@ -127,11 +129,78 @@ const hasComprehensive = comprehensiveMolecules.length > 0;
 <% }); -%>
 //
 // Layout guidance:
-//   Vertical: space-y-4 sm:space-y-6
-//   Padding: p-4 sm:p-6
-//   Grids for data: grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
-//   Responsive: Start mobile-first, add sm:/lg: breakpoints
+//   Vertical: Consistent vertical spacing between elements
+//   Padding: Generous padding that scales with viewport
+//   Grids for data: Responsive grid (1 col mobile, 2-3 cols larger screens)
+//   Responsive: Mobile-first approach, adapt layout at breakpoints
 <% } -%>
+//
+// ------------------------------------------------------------------------------
+// VISUAL DESIGN PRINCIPLES
+// ------------------------------------------------------------------------------
+//
+// TYPOGRAPHY HIERARCHY (create clear visual importance):
+//   Headlines: Large size, bold weight, tight letter-spacing
+//   Subheadings: Medium-large size, semi-bold weight
+//   Body: Comfortable reading size, relaxed line-height, muted color
+//   Labels: Smaller size, medium weight
+//
+// SPACING RHYTHM (consistent breathing room):
+//   Section gaps: Large vertical spacing between major sections
+//   Content groups: Medium spacing within related content
+//   Element pairs: Small spacing for tightly coupled elements
+//   Card padding: Generous internal padding that scales with viewport
+//
+// INTERACTIVE STATES (MANDATORY for all clickable elements):
+//   Hover: Visible feedback (shadow elevation, background shift, subtle scale)
+//   Focus: Clear focus ring for accessibility
+//   Active: Tactile feedback (slight scale down)
+//   Transitions: Smooth 200ms transitions for state changes
+//
+// CARD STYLING (for contained content):
+//   Base: Rounded corners, subtle border, card background, soft shadow
+//   Interactive: Shadow elevation on hover, pointer cursor
+//   Header/Footer: Border separation, consistent padding
+//
+// LOADING & EMPTY STATES:
+//   Loading: Skeleton placeholders with subtle animation
+//   Empty: Centered layout with icon, descriptive message, and action button
+//   Error: Error-themed background with clear message and recovery action
+//
+// COLOR USAGE:
+//   Primary actions: Use primary color for main CTAs
+//   Secondary surfaces: Muted/subtle backgrounds for secondary content
+//   Semantic colors: Green (success), Amber (warning), Red (error), Blue (info)
+//   Avoid: Large solid color blocks - prefer subtle backgrounds
+//
+// ------------------------------------------------------------------------------
+// DESIGN CHECKLIST (Apply to your implementation)
+// ------------------------------------------------------------------------------
+//
+// REQUIRED FOR ALL COMPONENTS:
+// - Consistent spacing using your design system's scale
+// - Rounded corners on containers and cards
+// - Smooth transitions on interactive elements
+// - Hover states for all clickable items
+//
+// FOR LISTS/GRIDS:
+// - Responsive grid: 1 column on mobile, 2-3 on larger screens
+// - Consistent gap spacing between items
+// - Hover states on list/grid items
+//
+// FOR CARDS:
+// - Rounded corners, border, subtle shadow
+// - Shadow elevation on hover for interactive cards
+// - Generous padding inside
+//
+// FOR EMPTY STATES:
+// - Vertically and horizontally centered
+// - Icon with muted background
+// - Clear call-to-action button
+//
+// FOR LOADING:
+// - Use Skeleton components matching content layout
+// - Prevent layout shift when content loads
 //
 <% } -%>
 

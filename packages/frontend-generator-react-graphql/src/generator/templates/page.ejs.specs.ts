@@ -10,22 +10,27 @@ const __dirname = path.dirname(__filename);
 const pageTemplate = fs.readFileSync(path.resolve(__dirname, 'page.ejs'), 'utf-8');
 
 describe('page.ejs', () => {
-  it('should generate a basic page with organisms and no type guidance', () => {
+  it('should generate a basic page with template and organisms', () => {
     const content = ejs.render(pageTemplate, {
       name: 'Dashboard',
       description: 'Main dashboard page',
       organisms: ['StatsOverview', 'ActivityFeed'],
-      template: undefined,
+      template: 'DashboardTemplate',
+      templateDescription: 'Dashboard layout with stats and activity',
+      templateSpecs: [],
+      route: '/dashboard',
+      navigation: [],
       specs: [],
+      dataRequirements: [],
       typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
       organismSpecs: {},
     });
 
-    expect(content).toContain('import { StatsOverview } from "@/components/organisms/StatsOverview";');
-    expect(content).toContain('import { ActivityFeed } from "@/components/organisms/ActivityFeed";');
+    expect(content).toContain('import { DashboardTemplate } from "@/components/templates/DashboardTemplate";');
     expect(content).toContain('// Main dashboard page');
     expect(content).toContain('PAGE COMPOSITION');
     expect(content).toContain('export function Dashboard()');
+    expect(content).toContain('return <DashboardTemplate />');
   });
 
   it('should generate a page with organisms and specs', () => {
@@ -33,13 +38,18 @@ describe('page.ejs', () => {
       name: 'AdminPanel',
       description: 'Admin control panel',
       organisms: ['UserManagement', 'SystemSettings'],
-      template: undefined,
+      template: 'AdminTemplate',
+      templateDescription: 'Admin layout template',
+      templateSpecs: [],
+      route: '/admin',
+      navigation: [],
       specs: ['manage users', 'configure system'],
+      dataRequirements: [],
       typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
       organismSpecs: {},
     });
 
-    expect(content).toContain('// Specs:');
+    expect(content).toContain('// Page Specs:');
     expect(content).toContain('// - manage users');
     expect(content).toContain('// - configure system');
     expect(content).toContain('PAGE COMPOSITION');
@@ -50,8 +60,13 @@ describe('page.ejs', () => {
       name: 'UserProfile',
       description: 'User profile page',
       organisms: ['ProfileHeader', 'ProfileDetails'],
-      template: undefined,
+      template: 'ProfileTemplate',
+      templateDescription: 'Profile page layout',
+      templateSpecs: [],
+      route: '/profile',
+      navigation: [],
       specs: ['display user info', 'show activity history'],
+      dataRequirements: [],
       typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
       organismSpecs: {
         ProfileHeader: ['display user info'],
@@ -61,23 +76,29 @@ describe('page.ejs', () => {
 
     expect(content).toContain('YOUR SPECS (what this page must accomplish):');
     expect(content).toContain('[✓] display user info');
-    expect(content).toContain('└─ Implemented by ProfileHeader');
+    expect(content).toContain('└─ Implemented by ProfileHeader (via template)');
     expect(content).toContain('[✓] show activity history');
-    expect(content).toContain('└─ Implemented by ProfileDetails');
+    expect(content).toContain('└─ Implemented by ProfileDetails (via template)');
   });
 
-  it('should generate a page with template import', () => {
+  it('should generate a page with template import using PascalCase conversion', () => {
     const content = ejs.render(pageTemplate, {
       name: 'Settings',
       description: 'Settings page',
       organisms: ['GeneralSettings'],
       template: 'single-column-layout',
+      templateDescription: 'Single column layout template',
+      templateSpecs: [],
+      route: '/settings',
+      navigation: [],
       specs: [],
+      dataRequirements: [],
       typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
       organismSpecs: {},
     });
 
     expect(content).toContain('import { SingleColumnLayout } from "@/components/templates/single-column-layout";');
+    expect(content).toContain('return <SingleColumnLayout />');
   });
 
   it('should generate a page with type guidance', () => {
@@ -85,8 +106,13 @@ describe('page.ejs', () => {
       name: 'TodoList',
       description: 'Todo list page',
       organisms: ['TodoGrid'],
-      template: undefined,
+      template: 'TodoTemplate',
+      templateDescription: 'Todo page layout',
+      templateSpecs: [],
+      route: '/todos',
+      navigation: [],
       specs: ['display todos', 'filter by status'],
+      dataRequirements: [],
       typeGuidance: {
         imports: ['Todo', 'TodoStatus'],
         queryGuidance: [
@@ -110,8 +136,13 @@ describe('page.ejs', () => {
       name: 'TaskBoard',
       description: 'Task management board',
       organisms: ['TaskList', 'TaskFilters'],
-      template: undefined,
+      template: 'BoardTemplate',
+      templateDescription: 'Board layout template',
+      templateSpecs: [],
+      route: '/tasks',
+      navigation: [],
       specs: ['display tasks', 'filter by status', 'sort by date', 'search tasks'],
+      dataRequirements: [],
       typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
       organismSpecs: {
         TaskList: ['display tasks', 'sort by date'],
@@ -120,13 +151,12 @@ describe('page.ejs', () => {
     });
 
     expect(content).toContain('[✓] display tasks');
-    expect(content).toContain('└─ Implemented by TaskList');
+    expect(content).toContain('└─ Implemented by TaskList (via template)');
     expect(content).toContain('[✓] filter by status');
-    expect(content).toContain('└─ Implemented by TaskFilters');
+    expect(content).toContain('└─ Implemented by TaskFilters (via template)');
     expect(content).toContain('[✓] sort by date');
-    expect(content).toContain('└─ Implemented by TaskList');
+    expect(content).toContain('└─ Implemented by TaskList (via template)');
     expect(content).toContain('[ ] search tasks');
-    expect(content).not.toContain('search tasks\n//       └─');
   });
 
   it('should generate a page with NO spec coverage', () => {
@@ -134,8 +164,13 @@ describe('page.ejs', () => {
       name: 'Analytics',
       description: 'Analytics dashboard',
       organisms: ['ChartPanel', 'MetricsPanel'],
-      template: undefined,
+      template: 'AnalyticsTemplate',
+      templateDescription: 'Analytics layout template',
+      templateSpecs: [],
+      route: '/analytics',
+      navigation: [],
       specs: ['show revenue chart', 'display user metrics', 'export data'],
+      dataRequirements: [],
       typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
       organismSpecs: {
         ChartPanel: ['render line chart', 'render bar chart'],
@@ -147,7 +182,6 @@ describe('page.ejs', () => {
     expect(content).toContain('[ ] display user metrics');
     expect(content).toContain('[ ] export data');
     expect(content).not.toContain('[✓]');
-    expect(content).not.toContain('└─ Implemented by');
   });
 
   it('should generate a page with mutation guidance', () => {
@@ -155,8 +189,13 @@ describe('page.ejs', () => {
       name: 'CreateItem',
       description: 'Create item page',
       organisms: ['ItemForm'],
-      template: undefined,
+      template: 'FormTemplate',
+      templateDescription: 'Form page layout',
+      templateSpecs: [],
+      route: '/items/new',
+      navigation: [],
       specs: ['collect item data', 'submit item'],
+      dataRequirements: [],
       typeGuidance: {
         imports: ['CreateItemInput'],
         queryGuidance: [],
@@ -170,7 +209,7 @@ describe('page.ejs', () => {
 
     expect(content).toContain('CRITICAL - TYPE GUIDANCE');
     expect(content).toContain('Mutation - CreateItem:');
-    expect(content).toContain('Child organism data requirements');
+    expect(content).toContain('Data requirements for this page');
   });
 
   it('should generate a page with only mutation guidance (no queries)', () => {
@@ -178,8 +217,13 @@ describe('page.ejs', () => {
       name: 'DeleteConfirmation',
       description: 'Delete confirmation page',
       organisms: ['ConfirmDialog'],
-      template: undefined,
+      template: 'DialogTemplate',
+      templateDescription: 'Dialog layout template',
+      templateSpecs: [],
+      route: '/delete/:id',
+      navigation: [],
       specs: ['confirm deletion'],
+      dataRequirements: [],
       typeGuidance: {
         imports: [],
         queryGuidance: [],
@@ -202,7 +246,12 @@ describe('page.ejs', () => {
       description: 'Product catalog page',
       organisms: ['ProductGrid', 'ProductFilters'],
       template: 'two-column-layout',
+      templateDescription: 'Two column layout with sidebar',
+      templateSpecs: ['responsive sidebar', 'main content area'],
+      route: '/products',
+      navigation: [],
       specs: ['display products', 'filter products'],
+      dataRequirements: [],
       typeGuidance: {
         imports: ['Product'],
         queryGuidance: [
@@ -221,24 +270,50 @@ describe('page.ejs', () => {
     expect(content).toContain('CRITICAL - TYPE GUIDANCE');
     expect(content).toContain('[✓] display products');
     expect(content).toContain('[✓] filter products');
+    expect(content).toContain('return <TwoColumnLayout />');
   });
 
-  it('should include responsive design guidance', () => {
+  it('should include template specs when available', () => {
     const content = ejs.render(pageTemplate, {
-      name: 'SimpleList',
-      description: 'Simple list page',
-      organisms: ['ItemList'],
-      template: undefined,
-      specs: ['show items'],
+      name: 'DashboardPage',
+      description: 'Main dashboard',
+      organisms: ['Header', 'Content'],
+      template: 'DashboardLayout',
+      templateDescription: 'Dashboard layout with header and content areas',
+      templateSpecs: ['fixed header', 'scrollable content area', 'responsive sidebar'],
+      route: '/',
+      navigation: [],
+      specs: [],
+      dataRequirements: [],
       typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
       organismSpecs: {},
     });
 
-    expect(content).toContain('CRITICAL - CONTAINER-AWARE RESPONSIVE DESIGN:');
-    expect(content).toContain('GRIDS: Always start mobile-first');
-    expect(content).toContain('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3');
-    expect(content).toContain('TEXT SIZING: Use responsive classes');
-    expect(content).toContain('MENTAL TEST: Would this work in a 320px wide container?');
+    expect(content).toContain('TEMPLATE LAYOUT SPECS (handled by template):');
+    expect(content).toContain('• fixed header');
+    expect(content).toContain('• scrollable content area');
+    expect(content).toContain('• responsive sidebar');
+  });
+
+  it('should include page-level considerations', () => {
+    const content = ejs.render(pageTemplate, {
+      name: 'SimpleList',
+      description: 'Simple list page',
+      organisms: ['ItemList'],
+      template: 'ListTemplate',
+      templateDescription: 'List page layout',
+      templateSpecs: [],
+      route: '/items',
+      navigation: [],
+      specs: ['show items'],
+      dataRequirements: [],
+      typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
+      organismSpecs: {},
+    });
+
+    expect(content).toContain('PAGE-LEVEL CONSIDERATIONS & VISUAL REQUIREMENTS');
+    expect(content).toContain('Is the entry point for route "/items"');
+    expect(content).toContain('IMPLEMENTATION PATTERN');
   });
 
   it('should handle organisms without organismSpecs data', () => {
@@ -246,8 +321,13 @@ describe('page.ejs', () => {
       name: 'MixedPage',
       description: 'Page with documented and undocumented organisms',
       organisms: ['DocumentedOrg', 'UndocumentedOrg'],
-      template: undefined,
+      template: 'MixedTemplate',
+      templateDescription: 'Mixed content template',
+      templateSpecs: [],
+      route: '/mixed',
+      navigation: [],
       specs: ['feature A', 'feature B'],
+      dataRequirements: [],
       typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
       organismSpecs: {
         DocumentedOrg: ['feature A'],
@@ -257,7 +337,31 @@ describe('page.ejs', () => {
     expect(content).toContain('**DocumentedOrg** capabilities:');
     expect(content).toContain('• feature A');
     expect(content).toContain('**UndocumentedOrg**');
-    expect(content).toContain('(Organism with specific purpose - compose as needed)');
+    expect(content).toContain('(Organism with specific purpose)');
+  });
+
+  it('should include navigation information', () => {
+    const content = ejs.render(pageTemplate, {
+      name: 'ProductPage',
+      description: 'Product detail page',
+      organisms: ['ProductDetails'],
+      template: 'DetailTemplate',
+      templateDescription: 'Detail page layout',
+      templateSpecs: [],
+      route: '/product/:id',
+      navigation: [
+        { on: 'Click Back', to: 'ProductListPage' },
+        { on: 'Click Buy', to: 'CheckoutPage' },
+      ],
+      specs: [],
+      dataRequirements: [],
+      typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
+      organismSpecs: {},
+    });
+
+    expect(content).toContain('NAVIGATION:');
+    expect(content).toContain('On "Click Back" → Navigate to ProductListPage');
+    expect(content).toContain('On "Click Buy" → Navigate to CheckoutPage');
   });
 
   describe('Edge Cases', () => {
@@ -266,15 +370,21 @@ describe('page.ejs', () => {
         name: 'EmptyPage',
         description: 'Page without organisms',
         organisms: [],
-        template: undefined,
+        template: 'EmptyTemplate',
+        templateDescription: 'Empty page layout',
+        templateSpecs: [],
+        route: '/empty',
+        navigation: [],
         specs: [],
+        dataRequirements: [],
         typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
         organismSpecs: {},
       });
 
       expect(content).not.toContain('PAGE COMPOSITION');
-      expect(content).not.toContain('Composition Rules');
+      expect(content).not.toContain('Page Responsibilities');
       expect(content).toContain('export function EmptyPage()');
+      expect(content).toContain('return <EmptyTemplate />');
     });
 
     it('should handle undefined specs gracefully', () => {
@@ -282,13 +392,18 @@ describe('page.ejs', () => {
         name: 'NoSpecs',
         description: 'Page without specs',
         organisms: ['SomeOrganism'],
-        template: undefined,
+        template: 'BasicTemplate',
+        templateDescription: 'Basic layout',
+        templateSpecs: [],
+        route: '/no-specs',
+        navigation: [],
         specs: undefined,
+        dataRequirements: [],
         typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
         organismSpecs: {},
       });
 
-      expect(content).not.toContain('// Specs:');
+      expect(content).not.toContain('// Page Specs:');
       expect(content).not.toContain('YOUR SPECS');
       expect(content).toContain('PAGE COMPOSITION');
     });
@@ -298,8 +413,13 @@ describe('page.ejs', () => {
         name: 'EmptySpecs',
         description: 'Organisms with no documented specs',
         organisms: ['Org1', 'Org2'],
-        template: undefined,
+        template: 'BasicTemplate',
+        templateDescription: 'Basic layout',
+        templateSpecs: [],
+        route: '/empty-specs',
+        navigation: [],
         specs: ['feature X', 'feature Y'],
+        dataRequirements: [],
         typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
         organismSpecs: {
           Org1: [],
@@ -310,6 +430,26 @@ describe('page.ejs', () => {
       expect(content).toContain('[ ] feature X');
       expect(content).toContain('[ ] feature Y');
       expect(content).not.toContain('[✓]');
+    });
+
+    it('should handle page without template (fallback to div)', () => {
+      const content = ejs.render(pageTemplate, {
+        name: 'NoTemplatePage',
+        description: 'Page without template',
+        organisms: [],
+        template: undefined,
+        templateDescription: '',
+        templateSpecs: [],
+        route: '/no-template',
+        navigation: [],
+        specs: [],
+        dataRequirements: [],
+        typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
+        organismSpecs: {},
+      });
+
+      expect(content).not.toContain('import {');
+      expect(content).toContain('return <div />');
     });
   });
 });

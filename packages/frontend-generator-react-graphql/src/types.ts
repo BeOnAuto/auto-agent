@@ -3,6 +3,7 @@ export interface IAScheme {
   atoms: ComponentGroup<AtomSpec>;
   molecules: ComponentGroup<MoleculeSpec>;
   organisms: ComponentGroup<OrganismSpec>;
+  templates: ComponentGroup<TemplateSpec>;
   pages: PageGroup;
 }
 
@@ -33,6 +34,14 @@ export interface OrganismSpec {
   data_requirements?: DataRequirement[];
 }
 
+export interface TemplateSpec {
+  description: string;
+  layout: {
+    organisms: string[];
+  };
+  specs?: string[];
+}
+
 export interface DataRequirement {
   type: 'query' | 'mutation';
   description: string;
@@ -52,10 +61,7 @@ export interface PageGroup {
 export interface PageSpec {
   route: string;
   description: string;
-  layout: {
-    organisms: string[];
-  };
-  template?: string;
+  template: string;
   navigation?: {
     on: string;
     to: string;
@@ -64,7 +70,7 @@ export interface PageSpec {
   data_requirements?: DataRequirement[];
 }
 
-export type ComponentType = 'molecule' | 'organism' | 'page' | 'app';
+export type ComponentType = 'molecule' | 'organism' | 'template' | 'page' | 'app';
 
 export interface GeneratedFile {
   path: string;
