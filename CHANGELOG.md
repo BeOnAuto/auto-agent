@@ -2,6 +2,13 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
 ## 1.5.5
 
 ### Patch Changes
@@ -605,6 +612,20 @@
 
 # @auto-engineer/cli
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603), [`f6aa673`](https://github.com/BeOnAuto/auto-engineer/commit/f6aa673198b9e46b12004a046560df90f31677cf), [`a1a2a71`](https://github.com/BeOnAuto/auto-engineer/commit/a1a2a715dca04209b82bf548b52c8a6ce1e0b611)]:
+  - @auto-engineer/file-store@1.6.0
+  - @auto-engineer/narrative@1.6.0
+  - @auto-engineer/pipeline@1.6.0
+
 ## 1.5.5
 
 ### Patch Changes
@@ -1143,6 +1164,19 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/ai-gateway@1.6.0
+  - @auto-engineer/message-bus@1.6.0
 
 ## 1.5.5
 
@@ -2242,6 +2276,18 @@
 
 # create-auto-app
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/id@1.6.0
+
 ## 1.5.5
 
 ### Patch Changes
@@ -3070,6 +3116,18 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/message-bus@1.6.0
 
 ## 1.5.5
 
@@ -4164,6 +4222,19 @@
 
 # @auto-engineer/dev-server
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/cli@1.6.0
+  - @auto-engineer/message-bus@1.6.0
+
 ## 1.5.5
 
 ### Patch Changes
@@ -4779,6 +4850,13 @@
 
 # @auto-engineer/file-store
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
 ## 1.5.5
 
 ### Patch Changes
@@ -5339,6 +5417,18 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/message-bus@1.6.0
 
 ## 1.5.5
 
@@ -6391,6 +6481,19 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/ai-gateway@1.6.0
+  - @auto-engineer/message-bus@1.6.0
 
 ## 1.5.5
 
@@ -7591,6 +7694,19 @@
 
 # @auto-engineer/frontend-implementer
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/ai-gateway@1.6.0
+  - @auto-engineer/message-bus@1.6.0
+
 ## 1.5.5
 
 ### Patch Changes
@@ -8787,6 +8903,13 @@
 
 # @auto-engineer/id
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
 ## 1.5.5
 
 ### Patch Changes
@@ -9285,6 +9408,20 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603), [`f6aa673`](https://github.com/BeOnAuto/auto-engineer/commit/f6aa673198b9e46b12004a046560df90f31677cf), [`a1a2a71`](https://github.com/BeOnAuto/auto-engineer/commit/a1a2a715dca04209b82bf548b52c8a6ce1e0b611)]:
+  - @auto-engineer/ai-gateway@1.6.0
+  - @auto-engineer/message-bus@1.6.0
+  - @auto-engineer/narrative@1.6.0
 
 ## 1.5.5
 
@@ -10551,6 +10688,13 @@
 
 # @auto-engineer/message-bus
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
 ## 1.5.5
 
 ### Patch Changes
@@ -11158,6 +11302,18 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/message-bus@1.6.0
 
 ## 1.5.5
 
@@ -12037,6 +12193,24 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+- [`f6aa673`](https://github.com/BeOnAuto/auto-engineer/commit/f6aa673198b9e46b12004a046560df90f31677cf) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Add MappingEntrySchema and update slice schemas to use structured mappings
+
+- [`a1a2a71`](https://github.com/BeOnAuto/auto-engineer/commit/a1a2a715dca04209b82bf548b52c8a6ce1e0b611) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Add MappingFieldRefSchema for structured mapping references
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/file-store@1.6.0
+  - @auto-engineer/id@1.6.0
+  - @auto-engineer/message-bus@1.6.0
 
 ## 1.5.5
 
@@ -13432,6 +13606,19 @@
 
 # @auto-engineer/pipeline
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/file-store@1.6.0
+  - @auto-engineer/message-bus@1.6.0
+
 ## 1.5.5
 
 ### Patch Changes
@@ -13930,6 +14117,13 @@
 
 # @auto-engineer/release-automation
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
 ## 1.5.5
 
 ### Patch Changes
@@ -14196,6 +14390,19 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/cli@1.6.0
+  - @auto-engineer/message-bus@1.6.0
 
 ## 1.5.5
 
@@ -15248,6 +15455,19 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603), [`f6aa673`](https://github.com/BeOnAuto/auto-engineer/commit/f6aa673198b9e46b12004a046560df90f31677cf), [`a1a2a71`](https://github.com/BeOnAuto/auto-engineer/commit/a1a2a715dca04209b82bf548b52c8a6ce1e0b611)]:
+  - @auto-engineer/message-bus@1.6.0
+  - @auto-engineer/narrative@1.6.0
 
 ## 1.5.5
 
@@ -16450,6 +16670,18 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603), [`f6aa673`](https://github.com/BeOnAuto/auto-engineer/commit/f6aa673198b9e46b12004a046560df90f31677cf), [`a1a2a71`](https://github.com/BeOnAuto/auto-engineer/commit/a1a2a715dca04209b82bf548b52c8a6ce1e0b611)]:
+  - @auto-engineer/narrative@1.6.0
+
 ## 1.5.5
 
 ### Patch Changes
@@ -16894,6 +17126,19 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/ai-gateway@1.6.0
+  - @auto-engineer/message-bus@1.6.0
 
 ## 1.5.5
 

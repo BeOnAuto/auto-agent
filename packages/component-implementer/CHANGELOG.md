@@ -1,5 +1,18 @@
 # @auto-engineer/frontend-implementer
 
+## 1.6.0
+
+### Minor Changes
+
+- [`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add optional mappings field to CommandSliceSchema and QuerySliceSchema
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`c47d7b7`](https://github.com/BeOnAuto/auto-engineer/commit/c47d7b7b5de04a4da7d5f2ce62211cbe64e23603)]:
+  - @auto-engineer/ai-gateway@1.6.0
+  - @auto-engineer/message-bus@1.6.0
+
 ## 1.5.5
 
 ### Patch Changes
