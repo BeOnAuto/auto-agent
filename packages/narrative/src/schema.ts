@@ -180,6 +180,14 @@ const QuerySchema = BaseMessageSchema.extend({
 
 const MessageSchema = z.discriminatedUnion('type', [CommandSchema, EventSchema, StateSchema, QuerySchema]);
 
+export const MappingFieldRefSchema = z
+  .object({
+    type: z.enum(['Command', 'Event', 'State', 'Query']).describe('Message kind'),
+    name: z.string().describe('Message name'),
+    field: z.string().describe('Field name within the message'),
+  })
+  .describe('Reference to a specific field within a message type');
+
 const BaseSliceSchema = z
   .object({
     name: z.string(),
