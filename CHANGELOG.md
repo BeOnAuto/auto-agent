@@ -2,6 +2,31 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
 ## 1.6.0
 
 ### Minor Changes
@@ -612,6 +637,36 @@
 
 # @auto-engineer/cli
 
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/file-store@1.7.0
+  - @auto-engineer/narrative@1.7.0
+  - @auto-engineer/pipeline@1.7.0
+
 ## 1.6.0
 
 ### Minor Changes
@@ -1164,6 +1219,35 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/ai-gateway@1.7.0
+  - @auto-engineer/message-bus@1.7.0
 
 ## 1.6.0
 
@@ -2276,6 +2360,34 @@
 
 # create-auto-app
 
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/id@1.7.0
+
 ## 1.6.0
 
 ### Minor Changes
@@ -3116,6 +3228,34 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/message-bus@1.7.0
 
 ## 1.6.0
 
@@ -4222,6 +4362,35 @@
 
 # @auto-engineer/dev-server
 
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/cli@1.7.0
+  - @auto-engineer/message-bus@1.7.0
+
 ## 1.6.0
 
 ### Minor Changes
@@ -4850,6 +5019,31 @@
 
 # @auto-engineer/file-store
 
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
 ## 1.6.0
 
 ### Minor Changes
@@ -5417,6 +5611,34 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/message-bus@1.7.0
 
 ## 1.6.0
 
@@ -6481,6 +6703,35 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/ai-gateway@1.7.0
+  - @auto-engineer/message-bus@1.7.0
 
 ## 1.6.0
 
@@ -7694,6 +7945,35 @@
 
 # @auto-engineer/frontend-implementer
 
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/ai-gateway@1.7.0
+  - @auto-engineer/message-bus@1.7.0
+
 ## 1.6.0
 
 ### Minor Changes
@@ -8903,6 +9183,31 @@
 
 # @auto-engineer/id
 
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
 ## 1.6.0
 
 ### Minor Changes
@@ -9408,6 +9713,36 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/ai-gateway@1.7.0
+  - @auto-engineer/message-bus@1.7.0
+  - @auto-engineer/narrative@1.7.0
 
 ## 1.6.0
 
@@ -10688,6 +11023,31 @@
 
 # @auto-engineer/message-bus
 
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
 ## 1.6.0
 
 ### Minor Changes
@@ -11302,6 +11662,34 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/message-bus@1.7.0
 
 ## 1.6.0
 
@@ -12193,6 +12581,36 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/file-store@1.7.0
+  - @auto-engineer/id@1.7.0
+  - @auto-engineer/message-bus@1.7.0
 
 ## 1.6.0
 
@@ -13606,6 +14024,35 @@
 
 # @auto-engineer/pipeline
 
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/file-store@1.7.0
+  - @auto-engineer/message-bus@1.7.0
+
 ## 1.6.0
 
 ### Minor Changes
@@ -14117,6 +14564,31 @@
 
 # @auto-engineer/release-automation
 
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
 ## 1.6.0
 
 ### Minor Changes
@@ -14390,6 +14862,35 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/cli@1.7.0
+  - @auto-engineer/message-bus@1.7.0
 
 ## 1.6.0
 
@@ -15455,6 +15956,35 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/message-bus@1.7.0
+  - @auto-engineer/narrative@1.7.0
 
 ## 1.6.0
 
@@ -16670,6 +17200,34 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/narrative@1.7.0
+
 ## 1.6.0
 
 ### Minor Changes
@@ -17126,6 +17684,35 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.7.0
+
+### Minor Changes
+
+- [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **narrative**: add MappingEntrySchema, update slice schemas to use structured mappings
+  - **narrative**: add MappingFieldRefSchema for structured mapping references
+  - **global**: version packages
+
+- [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Changed file sync default directory to "narratives" for better organization of synchronized content
+
+### Patch Changes
+
+- [`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could cause failures in strict shell environments by properly handling non-zero exit codes
+
+- [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added Ketchup configuration for the project
+
+- [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Excluded .ketchup directory from code formatting and linting checks
+
+- [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - Here's the changelog based on the actual changes:
+  - Added structured mapping schemas to narrative slices, enabling field-level mapping references between commands and queries
+  - Fixed changeset generator failures in strict shell environments by properly handling non-zero exit codes
+  - Added Ketchup configuration for project automation, validation rules, and development workflow hooks
+
+- [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the changeset generator could fail in strict shell environments due to non-zero exit codes
+
+- Updated dependencies [[`86e9bc9`](https://github.com/BeOnAuto/auto-engineer/commit/86e9bc95d163bb6ea8861cb4db2fa39905e9afc2), [`b0ca671`](https://github.com/BeOnAuto/auto-engineer/commit/b0ca6714c090f5ce3b0831353efc2a94f4ad0321), [`1783963`](https://github.com/BeOnAuto/auto-engineer/commit/17839632724eaae84bfbbe8f0b90cc6b777c0eff), [`876f240`](https://github.com/BeOnAuto/auto-engineer/commit/876f24011aa2b97fcfdd226de4c33756ce10dc13), [`6eb8e24`](https://github.com/BeOnAuto/auto-engineer/commit/6eb8e242410b7c396472aa720c137400f694ec9b), [`22da0bb`](https://github.com/BeOnAuto/auto-engineer/commit/22da0bba412bdc78ef7aded96a4d6acafdd6aafc), [`1ebdd34`](https://github.com/BeOnAuto/auto-engineer/commit/1ebdd3475f00e20a6e47e5306d0e2abd743b6067)]:
+  - @auto-engineer/ai-gateway@1.7.0
+  - @auto-engineer/message-bus@1.7.0
 
 ## 1.6.0
 
