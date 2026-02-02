@@ -32,10 +32,8 @@ fi
 
 # Auto-generate changesets before push
 echo "🔄 Auto-generating changesets..."
-pnpm tsx packages/release-automation/bin/release-automation.ts generate
-
-# Check exit code
-EXIT_CODE=$?
+EXIT_CODE=0
+pnpm tsx packages/release-automation/bin/release-automation.ts generate || EXIT_CODE=$?
 
 # Exit code 11 means no commits to process (success state)
 # Exit code 12 means no conventional commits (warning but continue)
