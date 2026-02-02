@@ -1,0 +1,28 @@
+{
+  "autoContinue": {
+    "mode": "smart",
+    "maxIterations": 0,
+    "iteration": 0,
+    "skipModes": [
+      "plan"
+    ]
+  },
+  "validateCommit": {
+    "mode": "strict",
+    "batchCount": 3
+  },
+  "denyList": {
+    "enabled": true,
+    "extraPatterns": []
+  },
+  "promptReminder": {
+    "enabled": true
+  },
+  "subagentHooks": {
+    "validateCommitOnExplore": false,
+    "validateCommitOnWork": true,
+    "validateCommitOnUnknown": true
+  },
+  "updatedAt": "2026-02-02T06:57:41.931Z",
+  "updatedBy": "init"
+}
