@@ -1,5 +1,7 @@
 import createJiti from 'jiti';
 
+const DEFAULT_FILE_SYNC_DIR = 'narratives';
+
 export interface AutoConfig {
   fileId?: string;
   plugins?: string[];
@@ -12,11 +14,19 @@ export interface AutoConfig {
   token?: string;
 }
 
+export interface ResolvedAutoConfig extends Omit<AutoConfig, 'fileSync'> {
+  fileSync: {
+    enabled?: boolean;
+    dir: string;
+    extensions?: string[];
+  };
+}
+
 let configLoading = false;
 
-export async function loadAutoConfig(configPath: string): Promise<AutoConfig> {
+export async function loadAutoConfig(configPath: string): Promise<ResolvedAutoConfig> {
   if (configLoading) {
-    return { fileId: '', plugins: [] };
+    return { fileId: '', plugins: [], fileSync: { dir: DEFAULT_FILE_SYNC_DIR } };
   }
 
   try {
@@ -28,7 +38,14 @@ export async function loadAutoConfig(configPath: string): Promise<AutoConfig> {
     });
 
     const configModule = await jiti.import<{ default?: AutoConfig } & AutoConfig>(configPath);
-    return configModule.default ?? configModule;
+    const config = configModule.default ?? configModule;
+    return {
+      ...config,
+      fileSync: {
+        ...config.fileSync,
+        dir: config.fileSync?.dir ?? DEFAULT_FILE_SYNC_DIR,
+      },
+    };
   } catch (error) {
     console.error('Failed to load config:', error);
     throw error;

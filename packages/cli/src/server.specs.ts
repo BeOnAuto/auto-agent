@@ -31,16 +31,17 @@ describe('startServer', () => {
     });
 
     const receivedEvents: string[] = [];
-    clientSocket = ioClient(`http://localhost:${handle.actualPort}`, {
+    const socket = ioClient(`http://localhost:${handle.actualPort}`, {
       path: '/file-sync',
       autoConnect: true,
     });
+    clientSocket = socket;
 
     await new Promise<void>((resolve) => {
-      clientSocket.on('connect', resolve);
+      socket.on('connect', resolve);
     });
 
-    clientSocket.on('worker:shutdown', () => {
+    socket.on('worker:shutdown', () => {
       receivedEvents.push('worker:shutdown');
     });
 
@@ -113,5 +114,47 @@ describe('startServer', () => {
     });
 
     expect(response.status).toBe(200);
+  });
+
+  it('defaults watchDir to narratives subdirectory', async () => {
+    const configPath = path.join(fixturesDir, 'auto.config.ts');
+
+    handle = await startServer({
+      port: 0,
+      configPath,
+    });
+
+    const socket = ioClient(`http://localhost:${handle.actualPort}`, {
+      path: '/file-sync',
+      autoConnect: true,
+    });
+    clientSocket = socket;
+
+    const initialSync = await new Promise<{ directory: string }>((resolve) => {
+      socket.on('initial-sync', resolve);
+    });
+
+    expect(initialSync.directory).toBe(path.join(fixturesDir, 'narratives'));
+  });
+
+  it('uses fileSync.dir from config when specified', async () => {
+    const configPath = path.join(fixturesDir, 'auto-with-custom-sync-dir.config.ts');
+
+    handle = await startServer({
+      port: 0,
+      configPath,
+    });
+
+    const socket = ioClient(`http://localhost:${handle.actualPort}`, {
+      path: '/file-sync',
+      autoConnect: true,
+    });
+    clientSocket = socket;
+
+    const initialSync = await new Promise<{ directory: string }>((resolve) => {
+      socket.on('initial-sync', resolve);
+    });
+
+    expect(initialSync.directory).toBe(path.join(fixturesDir, 'custom-sync-dir'));
   });
 });

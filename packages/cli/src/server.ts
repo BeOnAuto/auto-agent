@@ -8,6 +8,7 @@ import type { RequestHandler } from 'express';
 import getPort, { portNumbers } from 'get-port';
 import createJiti from 'jiti';
 import { Server as SocketIOServer } from 'socket.io';
+import { loadAutoConfig } from './config-loader.js';
 import { FileSyncer, type SocketMiddleware } from './file-syncer/index.js';
 
 export type { SocketMiddleware };
@@ -218,7 +219,9 @@ export async function startServer(opts: StartServerOptions): Promise<ServerHandl
   pipelineServer.registerCommandHandlers(commandHandlers);
   pipelineServer.registerPipeline(config.pipeline);
 
-  const watchDir = path.dirname(configPath);
+  const autoConfig = await loadAutoConfig(configPath);
+  const configDir = path.dirname(configPath);
+  const watchDir = path.resolve(configDir, autoConfig.fileSync.dir);
 
   const httpServer = pipelineServer.getHttpServer();
   const io = new SocketIOServer(httpServer, {

@@ -16,6 +16,22 @@ describe('loadAutoConfig', () => {
       plugins: expect.any(Array),
     });
   });
+
+  it('defaults fileSync.dir to narratives when not specified', async () => {
+    const configPath = path.join(fixturesDir, 'auto.config.ts');
+
+    const config = await loadAutoConfig(configPath);
+
+    expect(config.fileSync.dir).toBe('narratives');
+  });
+
+  it('uses fileSync.dir from config when specified', async () => {
+    const configPath = path.join(fixturesDir, 'auto-with-custom-sync-dir.config.ts');
+
+    const config = await loadAutoConfig(configPath);
+
+    expect(config.fileSync.dir).toBe('./custom-sync-dir');
+  });
 });
 
 describe('AutoConfig interface', () => {
