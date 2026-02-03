@@ -1,5 +1,26 @@
 # @auto-engineer/cli
 
+## 1.8.0
+
+### Minor Changes
+
+- [`c383ec4`](https://github.com/BeOnAuto/auto-engineer/commit/c383ec4bae483e32d6b747575f2311a67e488a41) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Implemented delegation pattern for FileSyncer reset, allowing the server to swap file syncer instances without re-registering socket handlers
+  - Made FileSyncer stop operation async and idempotent with proper startup/shutdown guards
+  - Updated ketchup development workflow settings
+
+- [`9479f7a`](https://github.com/BeOnAuto/auto-engineer/commit/9479f7a5ebb999907028873cdfcc43b692bfe28a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **cli**: default file sync directory to narratives
+  - **husky**: handle non-zero exit codes from changeset generator under sh -e
+  - **global**: version packages
+  - **global**: add changeset
+  - **global**: exclude .ketchup from biome checks
+
+### Patch Changes
+
+- Updated dependencies [[`c383ec4`](https://github.com/BeOnAuto/auto-engineer/commit/c383ec4bae483e32d6b747575f2311a67e488a41), [`9479f7a`](https://github.com/BeOnAuto/auto-engineer/commit/9479f7a5ebb999907028873cdfcc43b692bfe28a)]:
+  - @auto-engineer/file-store@1.8.0
+  - @auto-engineer/narrative@1.8.0
+  - @auto-engineer/pipeline@1.8.0
+
 ## 1.7.0
 
 ### Minor Changes
