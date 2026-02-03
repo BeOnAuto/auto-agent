@@ -157,4 +157,39 @@ describe('startServer', () => {
 
     expect(initialSync.directory).toBe(path.join(fixturesDir, 'custom-sync-dir'));
   });
+
+  it('resetFileSyncer creates a fresh FileSyncer instance without handler accumulation', async () => {
+    const configPath = path.join(fixturesDir, 'auto.config.ts');
+
+    handle = await startServer({
+      port: 0,
+      configPath,
+    });
+
+    const originalFileSyncer = handle.fileSyncer;
+
+    const newFileSyncer = await handle.resetFileSyncer();
+
+    expect(newFileSyncer).not.toBe(originalFileSyncer);
+    expect(handle.fileSyncer).toBe(newFileSyncer);
+
+    const socket = ioClient(`http://localhost:${handle.actualPort}`, {
+      path: '/file-sync',
+      autoConnect: true,
+      reconnection: false,
+      timeout: 2000,
+    });
+    clientSocket = socket;
+
+    socket.on('connect_error', (err) => {
+      console.error('Connect error:', err.message);
+    });
+
+    const initialSync = await new Promise<{ directory: string }>((resolve, reject) => {
+      socket.on('connect_error', reject);
+      socket.on('initial-sync', resolve);
+    });
+
+    expect(initialSync.directory).toBe(path.join(fixturesDir, 'narratives'));
+  });
 });

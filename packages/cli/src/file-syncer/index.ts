@@ -17,10 +17,6 @@ type FileMeta = { hash: string; size: number };
 
 export type SocketMiddleware = (socket: Socket, next: (err?: Error) => void) => void;
 
-export interface FileSyncerConfig {
-  socketMiddleware?: SocketMiddleware;
-}
-
 export class FileSyncer {
   private io: SocketIOServer;
   private watchDir: string;
@@ -35,20 +31,20 @@ export class FileSyncer {
   private autoConfigHash: string | null = null;
   private autoConfigContent: unknown = null;
   private providerEnvHash: string | null = null;
-  private socketMiddleware?: SocketMiddleware;
+  private connectionHandler?: (socket: Socket) => Promise<void>;
+  private started = false;
+  private stopped = false;
 
-  constructor(io: SocketIOServer, watchDir = '.', _extensions?: string[], config?: FileSyncerConfig) {
+  constructor(io: SocketIOServer, watchDir = '.') {
     this.io = io;
     this.watchDir = path.resolve(watchDir);
     this.vfs = new NodeFileStore();
     this.active = new Map<string, FileMeta>();
-    this.socketMiddleware = config?.socketMiddleware;
   }
 
   start(): void {
-    if (this.socketMiddleware) {
-      this.io.use(this.socketMiddleware);
-    }
+    if (this.started) return;
+    this.started = true;
 
     const serializeConfig = async (cfg: unknown, fileId: string): Promise<string> => {
       let configWithCreds: unknown = cfg;
@@ -331,7 +327,7 @@ export class FileSyncer {
     // Initial auto.config.ts sync
     scheduleAutoConfigSync();
 
-    this.io.on('connection', async (socket) => {
+    this.connectionHandler = async (socket) => {
       debug('New WebSocket client connected, preparing initial sync');
 
       try {
@@ -396,6 +392,19 @@ export class FileSyncer {
           scheduleRebuild();
         }
       });
+    };
+  }
+
+  handleConnection(socket: Socket): void {
+    if (!this.connectionHandler || !this.started || this.stopped) {
+      debug('[FileSyncer] handleConnection called while not ready; disconnecting');
+      socket.disconnect(true);
+      return;
+    }
+
+    void this.connectionHandler(socket).catch((err) => {
+      console.error('[FileSyncer] connection handler error:', err);
+      socket.disconnect(true);
     });
   }
 
@@ -416,16 +425,23 @@ export class FileSyncer {
     return null;
   }
 
-  stop(): void {
-    if (this.watcher) {
-      void this.watcher.close();
-    }
+  async stop(): Promise<void> {
+    if (this.stopped) return;
+    this.stopped = true;
+
+    const tasks: Promise<unknown>[] = [];
+
+    if (this.watcher) tasks.push(this.watcher.close());
     if (this.debounce) {
       clearTimeout(this.debounce);
+      this.debounce = null;
     }
     if (this.autoConfigDebounce) {
       clearTimeout(this.autoConfigDebounce);
+      this.autoConfigDebounce = null;
     }
+
+    await Promise.allSettled(tasks);
   }
 
   broadcastShutdown(): void {

@@ -32,12 +32,13 @@ export interface StartServerOptions {
 }
 
 export interface ServerHandle {
-  fileSyncer: FileSyncer;
+  readonly fileSyncer: FileSyncer;
   httpServer: HttpServer;
   actualPort: number;
   messageBus: MessageBus;
   stop: () => Promise<void>;
   onPreShutdown: () => void;
+  resetFileSyncer: () => Promise<FileSyncer>;
 }
 
 function findConfigFile(): string | null {
@@ -229,13 +230,38 @@ export async function startServer(opts: StartServerOptions): Promise<ServerHandl
     path: '/file-sync',
   });
 
-  const fileSyncer = new FileSyncer(io, watchDir, undefined, { socketMiddleware: opts.socketMiddleware });
+  let fileSyncer = new FileSyncer(io, watchDir);
+
+  if (opts.socketMiddleware) {
+    io.use(opts.socketMiddleware);
+  }
+
+  io.on('connection', (socket) => {
+    fileSyncer.handleConnection(socket);
+  });
+
   fileSyncer.start();
 
   await pipelineServer.start();
 
+  let resetting = false;
+
+  async function resetFileSyncer(): Promise<FileSyncer> {
+    if (resetting) return fileSyncer;
+    resetting = true;
+    try {
+      await fileSyncer.stop();
+      io.disconnectSockets(true);
+      fileSyncer = new FileSyncer(io, watchDir);
+      fileSyncer.start();
+      return fileSyncer;
+    } finally {
+      resetting = false;
+    }
+  }
+
   const stop = async (): Promise<void> => {
-    fileSyncer.stop();
+    await fileSyncer.stop();
     await pipelineServer.stop();
   };
 
@@ -244,11 +270,14 @@ export async function startServer(opts: StartServerOptions): Promise<ServerHandl
   };
 
   return {
-    fileSyncer,
+    get fileSyncer() {
+      return fileSyncer;
+    },
     httpServer,
     actualPort,
     messageBus: pipelineServer.getMessageBus(),
     stop,
     onPreShutdown,
+    resetFileSyncer,
   };
 }
