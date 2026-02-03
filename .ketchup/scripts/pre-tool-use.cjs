@@ -11124,8 +11124,14 @@ function findEntryByName(arr, name) {
   return void 0;
 }
 function parseBatchedOutput(stdout, validatorNames) {
-  const outer = JSON.parse(stdout);
-  const innerRaw = typeof outer.result === "string" ? outer.result : outer;
+  let outer;
+  try {
+    outer = JSON.parse(stdout);
+  } catch {
+    throw new Error(`Failed to parse validator output as JSON. Preview: ${stdout?.substring(0, 300) || "empty"}`);
+  }
+  const outerParsed = outer;
+  const innerRaw = typeof outerParsed.result === "string" ? outerParsed.result : outerParsed;
   const parsed = typeof innerRaw === "string" ? extractJsonArray(innerRaw) : Array.isArray(innerRaw) ? innerRaw : null;
   if (!parsed) {
     const nack = "NACK";
@@ -11155,6 +11161,60 @@ function parseBatchedOutput(stdout, validatorNames) {
 }
 var NON_APPEALABLE_VALIDATORS = ["no-dangerous-git"];
 var BATCH_COUNT = 3;
+async function executeBatch(chunk, chunkIndex, context, executor, onLog) {
+  const names = chunk.map((v) => v.name);
+  onLog?.("spawn", `batch-${chunkIndex}`, `validators: ${names.join(", ")}`);
+  try {
+    const prompt = buildBatchedPrompt(chunk, context);
+    const args = ["-p", prompt, "--output-format", "json"];
+    const opts = { encoding: "utf8" };
+    const spawnResult = await executor("claude", args, opts);
+    if (!spawnResult.stdout || spawnResult.stdout.length === 0) {
+      throw new Error(
+        `Claude CLI returned empty output. Exit code: ${spawnResult.status}. Stderr: ${spawnResult.stderr?.substring(0, 200) || "none"}`
+      );
+    }
+    let outer;
+    try {
+      outer = JSON.parse(spawnResult.stdout);
+    } catch {
+      throw new Error(
+        `Failed to parse Claude CLI JSON output. Stdout preview: ${spawnResult.stdout?.substring(0, 300) || "empty"}`
+      );
+    }
+    const batchResults = parseBatchedOutput(spawnResult.stdout, names);
+    const outerParsed = outer;
+    let inputTokens;
+    let outputTokens;
+    if (outerParsed.usage) {
+      const usage = outerParsed.usage;
+      inputTokens = (usage.input_tokens ?? 0) + (usage.cache_read_input_tokens ?? 0) + (usage.cache_creation_input_tokens ?? 0);
+      outputTokens = usage.output_tokens;
+    }
+    const tokens = inputTokens != null ? ` (in:${inputTokens} out:${outputTokens})` : "";
+    const commitResults = batchResults.map((br) => {
+      onLog?.("complete", br.validator, `${br.decision}${br.reason ? `: ${br.reason}` : ""}${tokens}`);
+      const result = {
+        validator: br.validator,
+        decision: br.decision,
+        appealable: !NON_APPEALABLE_VALIDATORS.includes(br.validator)
+      };
+      if (br.reason) {
+        result.reason = br.reason;
+      }
+      return result;
+    });
+    return commitResults;
+  } catch (err) {
+    onLog?.("error", `batch-${chunkIndex}`, String(err));
+    return chunk.map((v) => ({
+      validator: v.name,
+      decision: "NACK",
+      reason: `validator crashed: ${String(err)}`,
+      appealable: false
+    }));
+  }
+}
 function stripValidatorBoilerplate(content) {
   return content.replace(/^You are a commit validator\.[^\n]*\n*/m, "").replace(/\n*Valid responses:\n\{"decision":"ACK"\}\n\{"decision":"NACK","reason":"[^"]*"\}\n*/m, "").replace(/\n*RESPOND WITH JSON ONLY[^\n]*/m, "").trim();
 }
@@ -11193,43 +11253,7 @@ function chunkArray(arr, count) {
 }
 async function validateCommit(validators, context, executor = spawnAsync, onLog, batchCount = BATCH_COUNT) {
   const chunks = chunkArray(validators, batchCount);
-  const pending = chunks.map(async (chunk, chunkIndex) => {
-    const names = chunk.map((v) => v.name);
-    onLog?.("spawn", `batch-${chunkIndex}`, `validators: ${names.join(", ")}`);
-    try {
-      const prompt = buildBatchedPrompt(chunk, context);
-      const args = ["-p", "--no-session-persistence", prompt, "--output-format", "json"];
-      const opts = { encoding: "utf8" };
-      const spawnResult = await executor("claude", args, opts);
-      const batchResults2 = parseBatchedOutput(spawnResult.stdout, names);
-      const outer = JSON.parse(spawnResult.stdout);
-      let inputTokens;
-      let outputTokens;
-      if (outer.usage) {
-        inputTokens = (outer.usage.input_tokens ?? 0) + (outer.usage.cache_read_input_tokens ?? 0) + (outer.usage.cache_creation_input_tokens ?? 0);
-        outputTokens = outer.usage.output_tokens;
-      }
-      const tokens = inputTokens != null ? ` (in:${inputTokens} out:${outputTokens})` : "";
-      const commitResults = batchResults2.map((br) => {
-        onLog?.("complete", br.validator, `${br.decision}${br.reason ? `: ${br.reason}` : ""}${tokens}`);
-        return {
-          validator: br.validator,
-          decision: br.decision,
-          reason: br.reason,
-          appealable: !NON_APPEALABLE_VALIDATORS.includes(br.validator)
-        };
-      });
-      return commitResults;
-    } catch (err) {
-      onLog?.("error", `batch-${chunkIndex}`, String(err));
-      return chunk.map((v) => ({
-        validator: v.name,
-        decision: "NACK",
-        reason: `validator crashed: ${String(err)}`,
-        appealable: false
-      }));
-    }
-  });
+  const pending = chunks.map((chunk, chunkIndex) => executeBatch(chunk, chunkIndex, context, executor, onLog));
   const batchResults = await Promise.all(pending);
   return batchResults.flat();
 }

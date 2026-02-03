@@ -3,9 +3,7 @@
     "mode": "smart",
     "maxIterations": 0,
     "iteration": 0,
-    "skipModes": [
-      "plan"
-    ]
+    "skipModes": ["plan"]
   },
   "validateCommit": {
     "mode": "strict",
