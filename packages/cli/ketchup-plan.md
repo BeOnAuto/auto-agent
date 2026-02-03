@@ -2,8 +2,6 @@
 
 ## TODO
 
-- [ ] Burst 1: Add buildIo helper function
-- [ ] Burst 2: Add resetFileSyncer function with getter pattern
-- [ ] Burst 3: Update ServerHandle interface with resetFileSyncer
-
 ## DONE
+
+- [x] Burst 1: Implement delegation pattern for FileSyncer reset (00e32bc2)
