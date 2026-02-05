@@ -1,5 +1,23 @@
 # @auto-engineer/pipeline
 
+## 1.10.0
+
+### Minor Changes
+
+- [`f3e6b55`](https://github.com/BeOnAuto/auto-engineer/commit/f3e6b5566b2ab37e4b945bd04168b994f394b33b) Thanks [@osamanar](https://github.com/osamanar)! - - Updated the implementation prompt for the frontend implementer to improve code generation quality
+
+- [`3480c66`](https://github.com/BeOnAuto/auto-engineer/commit/3480c6658781048289c14ee58636825126334d1c) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/information-architect**: adds template generation to FE app generation
+  - **global**: version packages
+  - **global**: add changeset
+  - **global**: fix pnpm lock file
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`f3e6b55`](https://github.com/BeOnAuto/auto-engineer/commit/f3e6b5566b2ab37e4b945bd04168b994f394b33b), [`3480c66`](https://github.com/BeOnAuto/auto-engineer/commit/3480c6658781048289c14ee58636825126334d1c)]:
+  - @auto-engineer/file-store@1.10.0
+  - @auto-engineer/message-bus@1.10.0
+
 ## 1.9.0
 
 ### Minor Changes
