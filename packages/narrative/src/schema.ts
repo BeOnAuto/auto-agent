@@ -456,3 +456,21 @@ export {
   StepWithDocStringSchema,
   StepWithErrorSchema,
 };
+
+export type Model = z.infer<typeof modelSchema>;
+export type Narrative = z.infer<typeof NarrativeSchema>;
+export type Slice = z.infer<typeof SliceSchema>;
+export type QuerySlice = z.infer<typeof QuerySliceSchema>;
+export type ReactSlice = z.infer<typeof ReactSliceSchema>;
+export type CommandSlice = z.infer<typeof CommandSliceSchema>;
+export type ExperienceSlice = z.infer<typeof ExperienceSliceSchema>;
+export type Message = z.infer<typeof MessageSchema>;
+export type Example = z.infer<typeof ExampleSchema>;
+export type MessageField = z.infer<typeof MessageFieldSchema>;
+export type Rule = z.infer<typeof RuleSchema>;
+export type Spec = z.infer<typeof SpecSchema>;
+export type Step = z.infer<typeof StepSchema>;
+export type Module = z.infer<typeof ModuleSchema>;
+export type MessageRef = z.infer<typeof MessageRefSchema>;
+export type MappingFieldRef = z.infer<typeof MappingFieldRefSchema>;
+export type MappingEntry = z.infer<typeof MappingEntrySchema>;

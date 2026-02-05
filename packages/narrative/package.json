@@ -7,6 +7,10 @@
       "types": "./dist/src/index.d.ts",
       "import": "./dist/src/index.js"
     },
+    "./schema": {
+      "types": "./dist/src/schema.d.ts",
+      "import": "./dist/src/schema.js"
+    },
     "./node": {
       "types": "./dist/src/node.d.ts",
       "import": "./dist/src/node.js"
