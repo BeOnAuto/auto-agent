@@ -2,6 +2,16 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.10.0
 
 ### Minor Changes
@@ -679,6 +689,23 @@
 
 # @auto-engineer/cli
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/file-store@1.11.0
+  - @auto-engineer/narrative@1.11.0
+  - @auto-engineer/pipeline@1.11.0
+
 ## 1.10.0
 
 ### Minor Changes
@@ -1322,6 +1349,22 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/ai-gateway@1.11.0
+  - @auto-engineer/message-bus@1.11.0
 
 ## 1.10.0
 
@@ -2521,6 +2564,21 @@
 
 # create-auto-app
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/id@1.11.0
+
 ## 1.10.0
 
 ### Minor Changes
@@ -3444,6 +3502,21 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/message-bus@1.11.0
 
 ## 1.10.0
 
@@ -4633,6 +4706,22 @@
 
 # @auto-engineer/dev-server
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/cli@1.11.0
+  - @auto-engineer/message-bus@1.11.0
+
 ## 1.10.0
 
 ### Minor Changes
@@ -5348,6 +5437,16 @@
 
 # @auto-engineer/file-store
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.10.0
 
 ### Minor Changes
@@ -5982,6 +6081,21 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/message-bus@1.11.0
 
 ## 1.10.0
 
@@ -7129,6 +7243,22 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/ai-gateway@1.11.0
+  - @auto-engineer/message-bus@1.11.0
 
 ## 1.10.0
 
@@ -8429,6 +8559,22 @@
 
 # @auto-engineer/frontend-implementer
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/ai-gateway@1.11.0
+  - @auto-engineer/message-bus@1.11.0
+
 ## 1.10.0
 
 ### Minor Changes
@@ -9725,6 +9871,16 @@
 
 # @auto-engineer/id
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.10.0
 
 ### Minor Changes
@@ -10297,6 +10453,23 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/ai-gateway@1.11.0
+  - @auto-engineer/message-bus@1.11.0
+  - @auto-engineer/narrative@1.11.0
 
 ## 1.10.0
 
@@ -11668,6 +11841,16 @@
 
 # @auto-engineer/message-bus
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.10.0
 
 ### Minor Changes
@@ -12349,6 +12532,21 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/message-bus@1.11.0
 
 ## 1.10.0
 
@@ -13323,6 +13521,23 @@
 - @auto-engineer/message-bus@0.8.6
 
 # @auto-engineer/flow
+
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/file-store@1.11.0
+  - @auto-engineer/id@1.11.0
+  - @auto-engineer/message-bus@1.11.0
 
 ## 1.10.0
 
@@ -14827,6 +15042,22 @@
 
 # @auto-engineer/pipeline
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/file-store@1.11.0
+  - @auto-engineer/message-bus@1.11.0
+
 ## 1.10.0
 
 ### Minor Changes
@@ -15425,6 +15656,16 @@
 
 # @auto-engineer/release-automation
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.10.0
 
 ### Minor Changes
@@ -15765,6 +16006,22 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/cli@1.11.0
+  - @auto-engineer/message-bus@1.11.0
 
 ## 1.10.0
 
@@ -16917,6 +17174,22 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/message-bus@1.11.0
+  - @auto-engineer/narrative@1.11.0
 
 ## 1.10.0
 
@@ -18219,6 +18492,21 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/narrative@1.11.0
+
 ## 1.10.0
 
 ### Minor Changes
@@ -18758,6 +19046,22 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/ai-gateway@1.11.0
+  - @auto-engineer/message-bus@1.11.0
 
 ## 1.10.0
 

@@ -1,5 +1,22 @@
 # @auto-engineer/information-architect
 
+## 1.11.0
+
+### Minor Changes
+
+- [`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2) Thanks [@rami-hatoum](https://github.com/rami-hatoum)! - - Added a lightweight schema subpath export for the narrative package, allowing consumers to import Zod schemas and TypeScript types without pulling in heavy dependencies like typescript, prettier, or graphql
+
+- [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/frontend-implementer**: updates implementation prompt
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`94f3151`](https://github.com/BeOnAuto/auto-engineer/commit/94f315181e69e190f84ba06871b27591e27771c2), [`afd1cd2`](https://github.com/BeOnAuto/auto-engineer/commit/afd1cd28412d12ba7c29ba133fdf57616cf42370)]:
+  - @auto-engineer/ai-gateway@1.11.0
+  - @auto-engineer/message-bus@1.11.0
+  - @auto-engineer/narrative@1.11.0
+
 ## 1.10.0
 
 ### Minor Changes
