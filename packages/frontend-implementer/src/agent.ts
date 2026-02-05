@@ -460,6 +460,7 @@ Transform the IA schema into a complete, production-ready application. Every cha
 - Keep components concise (~50 lines when feasible) and fully typed (<Name>Props).
 - Accessibility is mandatory: ARIA roles, focus management, keyboard navigation.
 - Named exports only; avoid prop drilling via context or colocated state.
+- When updating an existing component, treat any comments already in the code as specifications describing the intended behavior and structure. Follow those specs faithfully in your implementation. Then strip ALL comments and implementation details from the output code. No inline comments (// ...), no block comments (/* ... */), no JSDoc blocks, no TODO/FIXME/HACK annotations, no auto-generated notes. Code must be entirely self-documenting through clear naming, structure, and typing.
 
 ## Template Architecture
 - Templates are page-level layout structures that compose organisms into complete layouts.
