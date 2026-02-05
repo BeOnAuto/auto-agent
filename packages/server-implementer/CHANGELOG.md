@@ -1,5 +1,25 @@
 # @auto-engineer/server-implementer
 
+## 1.9.0
+
+### Minor Changes
+
+- [`9cca67b`](https://github.com/BeOnAuto/auto-engineer/commit/9cca67b7c85953d297a632a268829cc18a168e3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **cli**: implement delegation pattern for FileSyncer reset
+  - **global**: version packages
+  - **global**: add changeset
+  - **global**: update ketchup settings
+  - **cli**: update ketchup plan with completed burst
+
+- [#43](https://github.com/BeOnAuto/auto-engineer/pull/43) [`af76242`](https://github.com/BeOnAuto/auto-engineer/commit/af762423f8adfad0796f2f3a6483fb931c7b0bf1) Thanks [@osamanar](https://github.com/osamanar)! - - Added template generation capability to frontend app generation in the information architect package
+
+### Patch Changes
+
+- [#43](https://github.com/BeOnAuto/auto-engineer/pull/43) [`31aab4f`](https://github.com/BeOnAuto/auto-engineer/commit/31aab4f3114d6fd8f60fa2239fff9d567a78e321) Thanks [@osamanar](https://github.com/osamanar)! - - Fixed package manager lock file to ensure consistent dependency installation
+
+- Updated dependencies [[`31aab4f`](https://github.com/BeOnAuto/auto-engineer/commit/31aab4f3114d6fd8f60fa2239fff9d567a78e321), [`9cca67b`](https://github.com/BeOnAuto/auto-engineer/commit/9cca67b7c85953d297a632a268829cc18a168e3a), [`af76242`](https://github.com/BeOnAuto/auto-engineer/commit/af762423f8adfad0796f2f3a6483fb931c7b0bf1)]:
+  - @auto-engineer/ai-gateway@1.9.0
+  - @auto-engineer/message-bus@1.9.0
+
 ## 1.8.0
 
 ### Minor Changes
