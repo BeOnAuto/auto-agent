@@ -6,6 +6,22 @@ import * as ts from 'typescript';
 
 const debug = createDebug('auto:frontend-implementer:agent');
 const debugPlan = createDebug('auto:frontend-implementer:agent:plan');
+
+const HTML_ELEMENTS_PATH = path.join(import.meta.dirname, 'HTML_ELEMENTS.md');
+let htmlElementsContent: string | null = null;
+
+async function getHtmlElementsReference(): Promise<string> {
+  if (htmlElementsContent === null) {
+    try {
+      htmlElementsContent = await fs.readFile(HTML_ELEMENTS_PATH, 'utf-8');
+      debug('Loaded HTML_ELEMENTS.md, size: %d bytes', htmlElementsContent.length);
+    } catch (error) {
+      debug('Failed to load HTML_ELEMENTS.md: %O', error);
+      htmlElementsContent = '';
+    }
+  }
+  return htmlElementsContent;
+}
 // const debugErrors = createDebug('auto:frontend-implementer:agent:errors');
 // const debugScreenshots = createDebug('auto:frontend-implementer:agent:screenshots');
 // const debugFixes = createDebug('auto:frontend-implementer:agent:fixes');
@@ -125,7 +141,7 @@ async function callAI(prompt: string, options?: { temperature?: number; maxToken
 }
 
 // Copy the Scheme type from index.ts for local use
-interface Scheme {
+export interface Scheme {
   generatedComponents?: { type: string; items?: Record<string, unknown> }[];
   atoms?: {
     description?: string;
@@ -266,6 +282,93 @@ function getFileTreeSummary(
   ].filter(Boolean);
 }
 
+export interface ChildComponent {
+  name: string;
+  type: 'atoms' | 'molecules' | 'organisms' | 'templates';
+}
+
+const childTypeDirs: Record<string, string> = {
+  atoms: 'src/components/atoms/',
+  molecules: 'src/components/molecules/',
+  organisms: 'src/components/organisms/',
+  templates: 'src/components/templates/',
+};
+
+export function getChildrenFromScheme(filePath: string, scheme: Scheme | undefined): ChildComponent[] {
+  if (!scheme) return [];
+
+  const fileName = path.basename(filePath, '.tsx');
+
+  if (filePath.includes('src/components/molecules/')) {
+    const item = scheme.molecules?.items?.[fileName] as
+      | { composition?: { atoms?: string[] } }
+      | undefined;
+    if (item?.composition?.atoms) {
+      return item.composition.atoms.map((name) => ({ name, type: 'atoms' as const }));
+    }
+  }
+
+  if (filePath.includes('src/components/organisms/')) {
+    const item = scheme.organisms?.items?.[fileName] as
+      | { composition?: { molecules?: string[] } }
+      | undefined;
+    if (item?.composition?.molecules) {
+      return item.composition.molecules.map((name) => ({ name, type: 'molecules' as const }));
+    }
+  }
+
+  if (filePath.includes('src/components/templates/')) {
+    const item = scheme.templates?.items?.[fileName];
+    if (item?.layout?.organisms) {
+      return item.layout.organisms.map((name) => ({ name, type: 'organisms' as const }));
+    }
+  }
+
+  if (filePath.includes('src/pages/')) {
+    const item = scheme.pages?.items?.[fileName];
+    if (item?.template) {
+      return [{ name: item.template, type: 'templates' as const }];
+    }
+  }
+
+  return [];
+}
+
+export async function readChildrenSources(children: ChildComponent[], projectDir: string): Promise<string> {
+  const sources: string[] = [];
+
+  for (const child of children) {
+    const dir = childTypeDirs[child.type];
+    if (!dir) continue;
+
+    const filePath = path.join(projectDir, dir, `${child.name}.tsx`);
+    try {
+      const content = await fs.readFile(filePath, 'utf-8');
+      sources.push(`--- ${dir}${child.name}.tsx ---\n${content}`);
+      debugComponents('Read child component source: %s%s.tsx', dir, child.name);
+    } catch {
+      try {
+        const dirPath = path.join(projectDir, dir);
+        const dirFiles = await fs.readdir(dirPath);
+        const match = dirFiles.find(
+          (f) => f.endsWith('.tsx') && f.replace(/\.tsx$/, '').toLowerCase() === child.name.toLowerCase(),
+        );
+        if (match) {
+          const content = await fs.readFile(path.join(dirPath, match), 'utf-8');
+          sources.push(`--- ${dir}${match} ---\n${content}`);
+          debugComponents('Read child component source (case-insensitive match): %s%s', dir, match);
+        } else {
+          debugComponents('Child component file not found: %s%s.tsx', dir, child.name);
+        }
+      } catch {
+        debugComponents('Could not read directory for child component: %s', dir);
+      }
+    }
+  }
+
+  return sources.join('\n\n');
+}
+
 async function getTheme(designSystem: string): Promise<string> {
   debugContext('Extracting theme from design system, content length: %d', designSystem.length);
   try {
@@ -353,7 +456,7 @@ async function listFiles(dir: string, base = dir): Promise<string[]> {
   return flatFiles;
 }
 
-function makeBasePrompt(ctx: ProjectContext): string {
+async function makeBasePrompt(ctx: ProjectContext): Promise<string> {
   const keyFileContents = Object.entries(ctx.keyFileContents)
     .map(([f, c]) => `--- ${f} ---\n${c}\n`)
     .join('\n');
@@ -362,247 +465,85 @@ function makeBasePrompt(ctx: ProjectContext): string {
     .map(([f, c]) => `--- ${f} ---\n${c}\n`)
     .join('\n');
 
+  const htmlElementsReference = await getHtmlElementsReference();
+
   return `
 <ROLE>
-You are Auto, a masterful Frontend & Design Engineer who builds interactive works of art—scalable, modern React applications that feel as beautiful as they are functional.
+You are Auto, a senior Frontend Engineer and Design Systems specialist. You build production-grade React applications that exhibit visual excellence, semantic correctness, and engineering rigor.
 </ROLE>
 
 <TASK>
-Transform the IA schema into a complete, production-ready application. Every change you propose must result in a visually striking, polished, and delightful product that is also internally consistent and buildable.
+Transform the Information Architecture (IA) schema into a complete, production-ready React application. Your implementation must be visually polished, semantically correct, and internally consistent.
 </TASK>
 
 <GOALS>
-- Deliver world-class UX (Notion/Linear/Stripe caliber) with seamless flows, harmonious layouts, and joyful interactions.
-- Guarantee implementation completeness and consistency: no placeholders, no stubs, no undefined references, no dead routes.
-- Respect all constraints (GraphQL ops files, theme tokens, user preferences).
+- Visual Excellence: Create interfaces that are aesthetically refined, with clear hierarchy, purposeful spacing, and meaningful motion.
+- Semantic Correctness: Use HTML elements for their intended purpose. Structure conveys meaning.
+- Engineering Rigor: No placeholders, no stubs, no undefined references, no dead code paths.
 </GOALS>
 
-<INSTRUCTIONS>
-## Visual Excellence Mandate (UI MASTERY GUIDELINES)
+<ATOMIC_DESIGN_METHODOLOGY>
+You are implementing components following Atomic Design principles. Each level has a single responsibility:
 
-### Typography Hierarchy Mastery
-- Headlines: Extra-large size, bold weight, tight letter-spacing (commanding presence)
-- Subheadings: Large size, semi-bold weight (clear section breaks)
-- Body: Medium size, regular weight, relaxed line-height (comfortable reading)
-- Captions/Labels: Small size, regular weight, muted color (subtle context)
-- Color Psychology: Primary text (darkest), secondary (medium), tertiary (lightest)
-- NEVER create pages with uniform text sizes - hierarchy is mandatory
+**Atoms** are the foundational building blocks—basic UI elements that cannot be reduced further without losing function. They are context-agnostic and highly reusable. Examples: buttons, inputs, labels, icons.
 
-### Spacing Rhythm (8px base scale)
-- Section gaps: Large spacing for major visual breaks (scale with viewport)
-- Content blocks: Medium spacing for related content groups
-- Element spacing: Small spacing for tight relationships
-- Padding: Generous padding that scales with viewport size
-- Use consistent multipliers: 8, 16, 24, 32, 48, 64, 96px
+**Molecules** are simple groups of atoms bonded together as a functional unit. Each molecule does one thing and does it well (Single Responsibility Principle). Examples: a search field (label + input + button), a form field (label + input + error message).
 
-### Interactive States (MANDATORY for all controls)
-- Hover: Shadow elevation, background shift, or subtle scale - visible feedback
-- Focus: Clear focus ring with offset - accessibility essential
-- Active: Slight scale down - tactile feedback on press
-- Disabled: Reduced opacity, not-allowed cursor - clear unusability signal
-- Transitions: Smooth 200ms transitions with ease-in-out - smooth state changes
+**Organisms** are relatively complex components composed of molecules and/or atoms, forming distinct interface sections. They have awareness of their data requirements and may fetch data. Examples: a header (logo + nav + search), a card grid, a data table with pagination.
 
-### Button Hierarchy (Primary, Secondary, Ghost)
-- Primary: Primary background, contrasting text, slight shadow
-- Secondary: Secondary background, appropriate text color
-- Outline: Border with primary color, transparent background, fill on hover
-- Ghost: Transparent background, visible only on hover
-- Destructive: Error/danger color background with contrasting text
+**Templates** are page-level layout structures that define the skeletal framework—where organisms are placed spatially (header region, sidebar region, main content region, footer region). Templates have no real data; they establish structure and responsive behavior.
 
-### Card & Surface Design
-- Cards: Card background, rounded corners, subtle border, soft shadow
-- Elevated surfaces: Stronger shadow for modals/dropdowns
-- Subtle surfaces: Muted background for secondary sections
-- Interactive cards: Pointer cursor, border highlight or shadow on hover
+**Pages** are specific instances of templates populated with real content. Pages handle routing, data fetching, and state management. They pass data down to templates and organisms.
 
-### Loading State Excellence
-- Skeleton screens with subtle pulse animation for content placeholders
-- Subtle spinners (not blocking) for background operations
-- Progress bars for long operations with estimated time
-- NEVER show blank screens or raw "Loading..." text
-- Loading states should feel intentional and designed
+**Composition Rules:**
+- Components at each level compose only from the levels below them
+- Atoms are provided; reuse them before creating new ones
+- Each component should have a clear, single purpose
+- Props flow down; callbacks flow up
+- When implementing a component, you will receive the source code of its children—use their actual exports and prop interfaces
+</ATOMIC_DESIGN_METHODOLOGY>
 
-### Error Handling Grace
-- Friendly, helpful error messages (not technical jargon)
-- Clear recovery actions ("Try again", "Go back", "Contact support")
-- Destructive states use error background with appropriate text color
-- Error boundaries wrap risky components
-- Toast notifications for transient errors
+<PROJECT_CONSTRAINTS>
+**Icons:** Use lucide-react exclusively.
+**Animation:** Use framer-motion. Respect prefers-reduced-motion.
+**Data:** Use Apollo Client hooks with only the GraphQL documents in src/graphql/queries.ts and src/graphql/mutations.ts. Do not add, modify, or remove GraphQL documents—adapt the UI to the available data shape.
+**Typing:** All components must be fully typed with explicit Props interfaces (<ComponentName>Props).
+**Exports:** Named exports only. No default exports.
+**Comments:** When updating an existing component, treat any comments in the code as specifications—follow them faithfully. Then strip ALL comments from your output. No inline comments, block comments, JSDoc, or TODO annotations. Code must be self-documenting through clear naming and structure.
+</PROJECT_CONSTRAINTS>
 
-### Micro-interactions using Motion (framer-motion)
-- Entrance: Fade in and slide up from below
-- Exit: Fade out with slight scale down
-- Stagger children: Sequential animation with slight delay
-- Spring physics: Natural spring-based animations
-- Respect prefers-reduced-motion
+<VISUAL_PRINCIPLES>
+**Hierarchy:** Establish clear visual hierarchy through typography scale, weight contrast, and color intensity. Every screen needs a focal point.
+**Spacing:** Use consistent spacing rhythm. Proximity groups related elements; whitespace separates distinct sections.
+**Feedback:** Every interactive element must provide visual feedback—hover, focus, active, disabled states.
+**Motion:** Animation should be purposeful, guiding attention and providing continuity. Entrances, exits, and state changes should feel natural.
+**Accessibility:** Keyboard navigable, focus visible, ARIA labels where needed, sufficient color contrast.
+</VISUAL_PRINCIPLES>
 
-### Iconography Consistency
-- Use lucide-react exclusively for icons
-- Sizes: 16px (inline), 20px (default), 24px (prominent), 32px (hero)
-- Icons should align with adjacent text using flex and gap
-- Icons should enhance meaning, not just decorate - every icon has purpose
+<INTEGRITY_CONTRACT>
+- **No Partial Files:** Every file must be complete and functional—no TODOs, placeholders, or stubs.
+- **No Undefined References:** Do not reference any component, hook, utility, or route that doesn't exist or isn't created in the same plan.
+- **Route Reachability:** Every route must be navigable from at least one UI element. Remove unreachable routes.
+- **Dependency Order:** Create files in dependency order: atoms → molecules → organisms → templates → pages → routing.
+</INTEGRITY_CONTRACT>
 
-## Layout Rules
-- **Single Page Applications (SPAs)**: Avoid page-level scrollbars; scrolling must happen only within defined content regions. Preserve a fluid, app-like feel across breakpoints.
-- **Websites**: For marketing or static sites, full-page scrolling and vertical storytelling are acceptable. Employ elegant sections and natural scroll progression.
-- For single-purpose flows (checkout, booking, signup), craft minimal, elegant, stepwise journeys.
-- Avoid generic headings; communicate structure via layout, tokens, and spacing.
+${htmlElementsReference}
 
-### Responsive Breakpoints (Mobile-First)
-- Small (~640px): Tablet portrait - increase padding, 2-column grids
-- Medium (~768px): Tablet landscape - reveal sidebars, 3-column grids
-- Large (~1024px): Desktop - full layouts, larger typography
-- Extra-large (~1280px): Large desktop - max-width containers, generous spacing
-- Ultra-wide (~1536px): Consider multi-panel layouts
-
-## Component & Code Standards
-- Atomic design: atoms → molecules → organisms → templates → pages; reuse atoms before creating anything new.
-- Keep components concise (~50 lines when feasible) and fully typed (<Name>Props).
-- Accessibility is mandatory: ARIA roles, focus management, keyboard navigation.
-- Named exports only; avoid prop drilling via context or colocated state.
-- When updating an existing component, treat any comments already in the code as specifications describing the intended behavior and structure. Follow those specs faithfully in your implementation. Then strip ALL comments and implementation details from the output code. No inline comments (// ...), no block comments (/* ... */), no JSDoc blocks, no TODO/FIXME/HACK annotations, no auto-generated notes. Code must be entirely self-documenting through clear naming, structure, and typing.
-
-## Template Architecture
-- Templates are page-level layout structures that compose organisms into complete layouts.
-- Templates define the skeletal framework (header, sidebar, main content, footer regions) without real data.
-- Templates must be reusable across multiple pages - they provide structure, pages provide content.
-- Each template should have a children prop or defined slots for page-specific content.
-- Templates reference organisms via their layout.organisms array in the IA schema.
-- Pages reference exactly one template via the template field - pages are instances of templates with real data.
-- Template responsibilities: layout structure, responsive behavior, spacing rhythm, region definitions.
-- Page responsibilities: data fetching, route handling, passing data to template/organisms, navigation logic.
-
-## GraphQL Integration Rules
-- Use Apollo Client hooks and only the documents in:
-  - src/graphql/queries.ts
-  - src/graphql/mutations.ts
-- Do not add/modify/remove GraphQL documents; adapt the UI to the available shape.
-
-## Integrity & Completeness Contract
-- No Partial Files: every created/updated file must be fully implementable—no TODOs, placeholders, or stubs.
-- No Undefined References: do not reference any component, hook, util, icon, or route unless the same plan also creates or updates the exact file that provides it.
-- Route Reachability: every page/route must be reachable from at least one navigational entry (sidebar/topbar/menu/CTA). If a route is not part of the core journey or becomes unreachable, remove it.
-- Navigation Continuity: define a coherent journey (Landing → Auth → Onboarding → Dashboard → Feature → Settings). After any critical action, update related views and caches to reflect the new state.
-- Router Source of Truth: update routing so there is a default index route for the main experience, all declared routes are reachable, and unused ones are pruned.
-- File Dependency Order: list changes so that dependencies are created before dependents (atoms → molecules → organisms → templates → pages → routing/providers).
-- Key File Rule: key files contain all needed imports/specs; do not alter their imports/specs—implement only within the allowed surface.
-
-## Color Usage Contract
-- A single accent color must never dominate the interface. Primary actions may use the strongest accent, but it should account for no more than ~25% of visible UI.
-- Distribute semantic colors across the interface for balance and clarity:
-  - Growth or success metrics → positive/success color (greens)
-  - Completion or engagement metrics → secondary accent (blues)
-  - Targets, goals, or warnings → attention/warning color (ambers/yellows)
-  - Errors or urgent states → critical/destructive color (reds)
-- Cards and surfaces should primarily use neutral backgrounds. Accents should appear through borders, icons, or highlights rather than large fills.
-- Each dashboard view must showcase at least 3 distinct semantic colors to avoid monotony and reinforce hierarchy.
-- Accents must always support meaning (not decoration alone) and follow consistent usage across the app.
-
-## Component Design Patterns
-
-### Form Elements
-- Inputs: Consistent height, horizontal padding, rounded corners, border, focus ring
-- Labels: Small text, medium weight, visually linked to input
-- Error states: Error-colored border, error-colored focus ring
-- Help text: Small muted text below input
-
-### Data Display
-- Tables: Row dividers, subtle row hover effect
-- Lists: Vertical spacing, clear separators or alternating backgrounds
-- Stats/Metrics: Large bold numbers with trend indicators
-- Empty states: Centered, illustrative icon, clear call-to-action
-
-### Navigation Patterns
-- Sidebar: Fixed left, 240-280px wide, collapsible to icons on mobile
-- Top nav: Sticky at top, consistent height, bottom border, backdrop blur on scroll
-- Breadcrumbs: Small text, muted color, hover to foreground color
-- Tabs: Inline horizontal layout, bottom border, active indicator
-
-### Modal & Dialog Design
-- Backdrop: Dark semi-transparent overlay with backdrop blur
-- Container: Card background, rounded corners, shadow, centered with max-width
-- Header: Horizontal padding, bottom border, close button positioned top-right
-- Footer: Horizontal padding, top border, actions aligned right with gap
-
-## VISUAL POLISH CHECKLIST (Apply to ALL components)
-
-Every component you create MUST have:
-1. Proper spacing: Consistent padding and gaps using your design scale
-2. Border radius: Rounded corners for cards and containers
-3. Subtle shadows: Soft shadow for cards, elevated shadow on hover
-4. Transitions: Smooth ~200ms transitions on interactive elements
-5. Hover states: Background shift or shadow elevation on hover
-6. Focus states: Visible focus ring for accessibility
-
-## STYLING PATTERNS BY ELEMENT TYPE
-
-### Containers/Wrappers:
-- Page wrapper: Full viewport height, page background color
-- Content container: Max-width centered with responsive horizontal padding
-- Section: Generous vertical padding that scales with viewport
-- Card: Rounded corners, border, card background, subtle shadow
-
-### Typography:
-- Page title: Large size, bold weight, tight letter-spacing
-- Section heading: Medium-large size, semi-bold weight
-- Card title: Medium size, medium weight
-- Body text: Base size, muted color
-- Small/caption: Small size, muted color
-
-### Interactive Elements:
-- Clickable card: Shadow on hover, subtle border highlight, pointer cursor
-- List item: Background change on hover, smooth color transition
-- Icon button: Background on hover, rounded shape, padding
-
-### Grids and Lists:
-- Card grid: Responsive columns (1→2→3), consistent gap spacing
-- List: Consistent vertical spacing between items
-- Inline items: Flex row, center aligned, consistent gap
-
-### Loading States:
-- Skeleton: Use Skeleton components matching content dimensions
-- Container: Same layout structure as loaded state to prevent shift
-
-### Empty States:
-- Centered: Flex column, center aligned both axes, generous vertical padding
-- Icon: Rounded background, muted styling, bottom margin
-- Message: Muted text, constrained width
-
-## ANTI-PATTERNS (NEVER DO THESE)
-
-WRONG: No styling on containers
-  <div>{children}</div>
-RIGHT: Always add appropriate styling
-  <div> with spacing and padding applied
-
-WRONG: Missing interactive feedback
-  <div onClick={...}>{item}</div>
-RIGHT: Visual feedback for interactions
-  <div onClick={...}> with cursor, hover state, transition, and padding
-
-WRONG: Flat cards with no depth
-  <div> with only border and padding
-RIGHT: Cards with proper styling
-  <Card> component with hover shadow and transition
-
-WRONG: No visual hierarchy
-  <p>{title}</p><p>{description}</p>
-RIGHT: Clear hierarchy with size/weight/color
-  <h3> for title with bold weight, <p> for description with muted style
-
-## Output Format (STRICT)
-Respond ONLY with a JSON array. No prose. No markdown. Each item:
+<OUTPUT_FORMAT>
+Respond ONLY with a JSON array. No prose. No markdown fences. Each item:
 - "action": "create" | "update"
 - "file": relative path from project root
-- "description": concise, specific rationale for the change
+- "description": concise rationale for the change
+</OUTPUT_FORMAT>
 
-Project Snapshot:
+<PROJECT_CONTEXT>
+Project Structure:
 ${JSON.stringify(ctx.fileTreeSummary, null, 2)}
 
-Available Atoms:
+Available Atoms (with their props):
 ${JSON.stringify(ctx.atoms, null, 2)}
 
-Available Templates (from IA Schema):
+Templates (from IA Schema):
 ${JSON.stringify(ctx.scheme?.templates?.items ?? {}, null, 2)}
 
 Key Files:
@@ -613,6 +554,7 @@ ${JSON.stringify(ctx.scheme, null, 2)}
 
 GraphQL Operations:
 ${graphqlDescriptions}
+</PROJECT_CONTEXT>
 `;
 }
 
@@ -624,7 +566,7 @@ interface Change {
 
 async function planProject(ctx: ProjectContext): Promise<Change[]> {
   debugPlan('Starting project planning');
-  const prompt = makeBasePrompt(ctx);
+  const prompt = await makeBasePrompt(ctx);
   debugPlan('Generated prompt with length: %d', prompt.length);
 
   const planText = await callAI(prompt);
@@ -646,6 +588,7 @@ async function planProject(ctx: ProjectContext): Promise<Change[]> {
 
 async function applyPlan(plan: Change[], ctx: ProjectContext, projectDir: string) {
   debugPlan('Applying plan with %d changes', plan.length);
+  const basePrompt = await makeBasePrompt(ctx);
 
   for (const [index, change] of plan.entries()) {
     debugPlan('Applying change %d/%d: %s %s', index + 1, plan.length, change.action, change.file);
@@ -659,9 +602,17 @@ async function applyPlan(plan: Change[], ctx: ProjectContext, projectDir: string
         debugPlan('File %s does not exist, will create', change.file);
       }
     }
-    const codePrompt = `${makeBasePrompt(ctx)}\nHere is the planned change:\n${JSON.stringify(change, null, 2)}\n${
+
+    const children = getChildrenFromScheme(change.file, ctx.scheme);
+    let childrenSourcesText = '';
+    if (children.length > 0) {
+      debugPlan('Found %d children for %s: %s', children.length, change.file, children.map((c) => c.name).join(', '));
+      childrenSourcesText = await readChildrenSources(children, projectDir);
+    }
+
+    const codePrompt = `${basePrompt}\nHere is the planned change:\n${JSON.stringify(change, null, 2)}\n${
       change.action === 'update' ? `Here is the current content of ${change.file}:\n${fileContent}\n` : ''
-    }Please output ONLY the full new code for the file (no markdown, no triple backticks, just code, ready to write to disk).`;
+    }${childrenSourcesText ? `Here are the source files of the children components this component composes. Use their actual props, structure, and exports to correctly integrate them:\n${childrenSourcesText}\n\n` : ''}Please output ONLY the full new code for the file (no markdown, no triple backticks, just code, ready to write to disk).`;
     const code = await callAI(codePrompt);
     debugPlan('Generated code for %s, size: %d bytes', change.file, code.length);
 

@@ -7,3 +7,11 @@ export type {
   ImplementClientCommand,
   ImplementClientEvents,
 } from './commands/implement-client.js';
+
+// Test exports
+export {
+  getChildrenFromScheme,
+  readChildrenSources,
+  type ChildComponent,
+  type Scheme,
+} from './agent.js';
