@@ -26,6 +26,15 @@ function extractOrganismSpecs(spec: IAScheme, organismNames: string[]): Record<s
   return organismSpecs;
 }
 
+function getOrganismsFromTemplate(spec: IAScheme, templateName: string): string[] {
+  const templateDef = spec.templates?.items?.[templateName];
+  if (templateDef === undefined) {
+    debug('Template %s not found in IA schema', templateName);
+    return [];
+  }
+  return templateDef.layout?.organisms ?? [];
+}
+
 function generateMolecules(
   spec: IAScheme,
   componentTemplate: string,
@@ -118,6 +127,55 @@ function generateOrganisms(
   }
 }
 
+function generateTemplates(
+  spec: IAScheme,
+  templateEjsTemplate: string,
+  typeMappings: TypeMapping | undefined,
+  files: GeneratedFile[],
+): void {
+  if (!spec.templates?.items) {
+    debug('No templates found in IA schema');
+    return;
+  }
+
+  debug('Generating %d template components', Object.keys(spec.templates.items).length);
+  for (const [name, def] of Object.entries(spec.templates.items)) {
+    debugOutput('Generating template: %s', name);
+
+    const organisms = def.layout?.organisms ?? [];
+    const organismSpecs = extractOrganismSpecs(spec, organisms);
+
+    // Aggregate type guidance from all organisms in the template
+    const typeGuidance = typeMappings
+      ? aggregateOrganismGuidance(name, organisms, spec, typeMappings)
+      : { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [], typeFieldGuidance: [] };
+
+    debugTypes(
+      '%s (template): %d imports, %d query guidance, %d mutation guidance, %d enum guidance',
+      name,
+      typeGuidance.imports.length,
+      typeGuidance.queryGuidance.length,
+      typeGuidance.mutationGuidance.length,
+      typeGuidance.enumGuidance.length,
+    );
+
+    const content = ejs.render(templateEjsTemplate, {
+      name,
+      description: def.description,
+      organisms,
+      specs: def.specs ?? [],
+      typeGuidance,
+      organismSpecs,
+    });
+
+    files.push({
+      path: `output/components/templates/${name}.tsx`,
+      content,
+      type: 'template',
+    });
+  }
+}
+
 function generatePages(
   spec: IAScheme,
   pageTemplate: string,
@@ -126,14 +184,18 @@ function generatePages(
 ): void {
   debug('Generating %d page components', Object.keys(spec.pages.items).length);
   for (const [name, def] of Object.entries(spec.pages.items)) {
-    debugOutput('Generating page: %s with route: %s', name, def.route);
+    debugOutput('Generating page: %s with route: %s, template: %s', name, def.route, def.template);
+
+    // Get organisms from the referenced template
+    const organisms = getOrganismsFromTemplate(spec, def.template);
+    const templateDef = spec.templates?.items?.[def.template];
 
     const pageTypeGuidance = typeMappings
       ? buildTypeGuidance(name, def, typeMappings)
       : { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] };
 
     const organismTypeGuidance = typeMappings
-      ? aggregateOrganismGuidance(name, def, spec, typeMappings)
+      ? aggregateOrganismGuidance(name, organisms, spec, typeMappings)
       : { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] };
 
     const mergedImports = Array.from(new Set([...pageTypeGuidance.imports, ...organismTypeGuidance.imports]));
@@ -164,17 +226,19 @@ function generatePages(
       typeGuidance.enumGuidance.length,
     );
 
-    const organismSpecs = extractOrganismSpecs(spec, def.layout.organisms);
+    const organismSpecs = extractOrganismSpecs(spec, organisms);
 
     const content = ejs.render(pageTemplate, {
       name,
       description: def.description,
-      organisms: def.layout.organisms,
+      organisms,
       route: def.route,
       navigation: def.navigation ?? [],
       specs: def.specs ?? [],
       dataRequirements: def.data_requirements ?? [],
       template: def.template,
+      templateDescription: templateDef?.description ?? '',
+      templateSpecs: templateDef?.specs ?? [],
       typeGuidance,
       organismSpecs,
     });
@@ -206,12 +270,14 @@ function generate(spec: IAScheme, gqlSchemaContent?: string): GeneratedFile[] {
 
   debugTemplates('Loading templates from: %s/templates', __dirname);
   const componentTemplate = fs.readFileSync(path.resolve(__dirname, 'templates/component.ejs'), 'utf-8');
+  const templateEjsTemplate = fs.readFileSync(path.resolve(__dirname, 'templates/template.ejs'), 'utf-8');
   const pageTemplate = fs.readFileSync(path.resolve(__dirname, 'templates/page.ejs'), 'utf-8');
   const appTemplate = fs.readFileSync(path.resolve(__dirname, 'templates/app.ejs'), 'utf-8');
   debugTemplates('Templates loaded successfully');
 
   generateMolecules(spec, componentTemplate, typeMappings, files);
   generateOrganisms(spec, componentTemplate, typeMappings, files);
+  generateTemplates(spec, templateEjsTemplate, typeMappings, files);
   generatePages(spec, pageTemplate, typeMappings, files);
 
   debug('Generating App.tsx with %d pages', Object.keys(spec.pages.items).length);

@@ -21,7 +21,7 @@ describe('component.ejs', () => {
         typeGuidance: { imports: [], queryGuidance: [], mutationGuidance: [], enumGuidance: [] },
       });
 
-      expect(content).toContain('// 🎨 REQUIRED ATOM COMPONENTS:');
+      expect(content).toContain('// REQUIRED ATOM COMPONENTS:');
       expect(content).toContain('// Button, Badge');
       expect(content).toContain('// Card displaying task information');
       expect(content).toContain('export function TaskCard()');
@@ -60,7 +60,7 @@ describe('component.ejs', () => {
 
       expect(content).toContain('// Molecule with no atoms');
       expect(content).toContain('export function EmptyMolecule()');
-      expect(content).not.toContain('🎨 REQUIRED ATOM COMPONENTS');
+      expect(content).not.toContain('REQUIRED ATOM COMPONENTS');
     });
   });
 
@@ -322,7 +322,7 @@ describe('component.ejs', () => {
         },
       });
 
-      expect(content).toContain('// 🎨 REQUIRED ATOM COMPONENTS:');
+      expect(content).toContain('// REQUIRED ATOM COMPONENTS:');
       expect(content).toContain('// Input, Button');
       expect(content).toContain('import { FilterPanel } from "@/components/molecules/FilterPanel";');
       expect(content).toContain('IMPLEMENTATION GUIDE');

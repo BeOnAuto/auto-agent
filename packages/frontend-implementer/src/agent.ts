@@ -139,6 +139,20 @@ interface Scheme {
     description?: string;
     items?: Record<string, unknown>;
   };
+  templates?: {
+    description?: string;
+    items?: Record<
+      string,
+      {
+        description: string;
+        layout?: {
+          organisms: string[];
+        };
+        specs?: string[];
+        [key: string]: unknown;
+      }
+    >;
+  };
   pages?: {
     description?: string;
     items?: Record<
@@ -146,8 +160,10 @@ interface Scheme {
       {
         route: string;
         description: string;
-        layout?: unknown;
+        template: string;
         navigation?: unknown;
+        specs?: string[];
+        data_requirements?: unknown[];
         [key: string]: unknown;
       }
     >;
@@ -175,8 +191,9 @@ async function loadScheme(iaSchemeDir: string): Promise<Scheme | undefined> {
     const scheme = JSON.parse(content) as Scheme;
     debugContext('IA scheme loaded successfully');
     debugContext(
-      'Scheme has %d pages, %d organisms, %d molecules, %d atoms',
+      'Scheme has %d pages, %d templates, %d organisms, %d molecules, %d atoms',
       Object.keys(scheme.pages?.items ?? {}).length,
+      Object.keys(scheme.templates?.items ?? {}).length,
       Object.keys(scheme.organisms?.items ?? {}).length,
       Object.keys(scheme.molecules?.items ?? {}).length,
       Object.keys(scheme.atoms?.items ?? {}).length,
@@ -232,7 +249,9 @@ async function getKeyFileContents(projectDir: string, files: string[]): Promise<
 function getFileTreeSummary(
   files: string[],
   atoms: { name: string; props: { name: string; type: string }[] }[],
+  scheme: Scheme | undefined,
 ): string[] {
+  const templateNames = Object.keys(scheme?.templates?.items ?? {});
   return [
     ...files.filter(
       (f) =>
@@ -243,7 +262,8 @@ function getFileTreeSummary(
         ['src/App.tsx', 'src/routes.tsx', 'src/main.tsx'].includes(f),
     ),
     `src/components/atoms/ (atoms: ${atoms.map((a) => a.name).join(', ')})`,
-  ];
+    templateNames.length > 0 ? `src/components/templates/ (templates: ${templateNames.join(', ')})` : '',
+  ].filter(Boolean);
 }
 
 async function getTheme(designSystem: string): Promise<string> {
@@ -288,7 +308,7 @@ async function getProjectContext(
     getTheme(designSystem),
   ]);
 
-  const fileTreeSummary = getFileTreeSummary(files, atoms);
+  const fileTreeSummary = getFileTreeSummary(files, atoms, scheme);
   debugContext('File tree summary created with %d entries', fileTreeSummary.length);
 
   debugContext('Project context built successfully');
@@ -358,13 +378,69 @@ Transform the IA schema into a complete, production-ready application. Every cha
 </GOALS>
 
 <INSTRUCTIONS>
-## Visual Excellence Mandate
-- Typography hierarchy that reads with confidence; body copy airy and legible; labels precise.
-- Spacing rhythm on Tailwind’s 4px scale; balanced proportions and breathing room across breakpoints.
-- Interactive states for all controls: hover, focus, active, disabled.
-- Micro-interactions using **Motion**: smooth fades, gentle slides, fluid expansions.
-- Consistent iconography via lucide-react; aligned sizes and spacing.
-- Responsive mastery: mobile, tablet, desktop must each feel intentionally designed.
+## Visual Excellence Mandate (UI MASTERY GUIDELINES)
+
+### Typography Hierarchy Mastery
+- Headlines: Extra-large size, bold weight, tight letter-spacing (commanding presence)
+- Subheadings: Large size, semi-bold weight (clear section breaks)
+- Body: Medium size, regular weight, relaxed line-height (comfortable reading)
+- Captions/Labels: Small size, regular weight, muted color (subtle context)
+- Color Psychology: Primary text (darkest), secondary (medium), tertiary (lightest)
+- NEVER create pages with uniform text sizes - hierarchy is mandatory
+
+### Spacing Rhythm (8px base scale)
+- Section gaps: Large spacing for major visual breaks (scale with viewport)
+- Content blocks: Medium spacing for related content groups
+- Element spacing: Small spacing for tight relationships
+- Padding: Generous padding that scales with viewport size
+- Use consistent multipliers: 8, 16, 24, 32, 48, 64, 96px
+
+### Interactive States (MANDATORY for all controls)
+- Hover: Shadow elevation, background shift, or subtle scale - visible feedback
+- Focus: Clear focus ring with offset - accessibility essential
+- Active: Slight scale down - tactile feedback on press
+- Disabled: Reduced opacity, not-allowed cursor - clear unusability signal
+- Transitions: Smooth 200ms transitions with ease-in-out - smooth state changes
+
+### Button Hierarchy (Primary, Secondary, Ghost)
+- Primary: Primary background, contrasting text, slight shadow
+- Secondary: Secondary background, appropriate text color
+- Outline: Border with primary color, transparent background, fill on hover
+- Ghost: Transparent background, visible only on hover
+- Destructive: Error/danger color background with contrasting text
+
+### Card & Surface Design
+- Cards: Card background, rounded corners, subtle border, soft shadow
+- Elevated surfaces: Stronger shadow for modals/dropdowns
+- Subtle surfaces: Muted background for secondary sections
+- Interactive cards: Pointer cursor, border highlight or shadow on hover
+
+### Loading State Excellence
+- Skeleton screens with subtle pulse animation for content placeholders
+- Subtle spinners (not blocking) for background operations
+- Progress bars for long operations with estimated time
+- NEVER show blank screens or raw "Loading..." text
+- Loading states should feel intentional and designed
+
+### Error Handling Grace
+- Friendly, helpful error messages (not technical jargon)
+- Clear recovery actions ("Try again", "Go back", "Contact support")
+- Destructive states use error background with appropriate text color
+- Error boundaries wrap risky components
+- Toast notifications for transient errors
+
+### Micro-interactions using Motion (framer-motion)
+- Entrance: Fade in and slide up from below
+- Exit: Fade out with slight scale down
+- Stagger children: Sequential animation with slight delay
+- Spring physics: Natural spring-based animations
+- Respect prefers-reduced-motion
+
+### Iconography Consistency
+- Use lucide-react exclusively for icons
+- Sizes: 16px (inline), 20px (default), 24px (prominent), 32px (hero)
+- Icons should align with adjacent text using flex and gap
+- Icons should enhance meaning, not just decorate - every icon has purpose
 
 ## Layout Rules
 - **Single Page Applications (SPAs)**: Avoid page-level scrollbars; scrolling must happen only within defined content regions. Preserve a fluid, app-like feel across breakpoints.
@@ -372,11 +448,28 @@ Transform the IA schema into a complete, production-ready application. Every cha
 - For single-purpose flows (checkout, booking, signup), craft minimal, elegant, stepwise journeys.
 - Avoid generic headings; communicate structure via layout, tokens, and spacing.
 
+### Responsive Breakpoints (Mobile-First)
+- Small (~640px): Tablet portrait - increase padding, 2-column grids
+- Medium (~768px): Tablet landscape - reveal sidebars, 3-column grids
+- Large (~1024px): Desktop - full layouts, larger typography
+- Extra-large (~1280px): Large desktop - max-width containers, generous spacing
+- Ultra-wide (~1536px): Consider multi-panel layouts
+
 ## Component & Code Standards
 - Atomic design: atoms → molecules → organisms → templates → pages; reuse atoms before creating anything new.
 - Keep components concise (~50 lines when feasible) and fully typed (<Name>Props).
 - Accessibility is mandatory: ARIA roles, focus management, keyboard navigation.
 - Named exports only; avoid prop drilling via context or colocated state.
+
+## Template Architecture
+- Templates are page-level layout structures that compose organisms into complete layouts.
+- Templates define the skeletal framework (header, sidebar, main content, footer regions) without real data.
+- Templates must be reusable across multiple pages - they provide structure, pages provide content.
+- Each template should have a children prop or defined slots for page-specific content.
+- Templates reference organisms via their layout.organisms array in the IA schema.
+- Pages reference exactly one template via the template field - pages are instances of templates with real data.
+- Template responsibilities: layout structure, responsive behavior, spacing rhythm, region definitions.
+- Page responsibilities: data fetching, route handling, passing data to template/organisms, navigation logic.
 
 ## GraphQL Integration Rules
 - Use Apollo Client hooks and only the documents in:
@@ -390,19 +483,111 @@ Transform the IA schema into a complete, production-ready application. Every cha
 - Route Reachability: every page/route must be reachable from at least one navigational entry (sidebar/topbar/menu/CTA). If a route is not part of the core journey or becomes unreachable, remove it.
 - Navigation Continuity: define a coherent journey (Landing → Auth → Onboarding → Dashboard → Feature → Settings). After any critical action, update related views and caches to reflect the new state.
 - Router Source of Truth: update routing so there is a default index route for the main experience, all declared routes are reachable, and unused ones are pruned.
-- File Dependency Order: list changes so that dependencies are created before dependents (atoms/molecules/templates first, then pages, then routing and providers).
+- File Dependency Order: list changes so that dependencies are created before dependents (atoms → molecules → organisms → templates → pages → routing/providers).
 - Key File Rule: key files contain all needed imports/specs; do not alter their imports/specs—implement only within the allowed surface.
 
 ## Color Usage Contract
 - A single accent color must never dominate the interface. Primary actions may use the strongest accent, but it should account for no more than ~25% of visible UI.
 - Distribute semantic colors across the interface for balance and clarity:
-  - Growth or success metrics → positive color
-  - Completion or engagement metrics → secondary accent
-  - Targets, goals, or warnings → attention color
-  - Errors or urgent states → critical color
-- Cards and surfaces should primarily use neutral backgrounds (white or light gray). Accents should appear through borders, icons, or highlights rather than large fills.
+  - Growth or success metrics → positive/success color (greens)
+  - Completion or engagement metrics → secondary accent (blues)
+  - Targets, goals, or warnings → attention/warning color (ambers/yellows)
+  - Errors or urgent states → critical/destructive color (reds)
+- Cards and surfaces should primarily use neutral backgrounds. Accents should appear through borders, icons, or highlights rather than large fills.
 - Each dashboard view must showcase at least 3 distinct semantic colors to avoid monotony and reinforce hierarchy.
 - Accents must always support meaning (not decoration alone) and follow consistent usage across the app.
+
+## Component Design Patterns
+
+### Form Elements
+- Inputs: Consistent height, horizontal padding, rounded corners, border, focus ring
+- Labels: Small text, medium weight, visually linked to input
+- Error states: Error-colored border, error-colored focus ring
+- Help text: Small muted text below input
+
+### Data Display
+- Tables: Row dividers, subtle row hover effect
+- Lists: Vertical spacing, clear separators or alternating backgrounds
+- Stats/Metrics: Large bold numbers with trend indicators
+- Empty states: Centered, illustrative icon, clear call-to-action
+
+### Navigation Patterns
+- Sidebar: Fixed left, 240-280px wide, collapsible to icons on mobile
+- Top nav: Sticky at top, consistent height, bottom border, backdrop blur on scroll
+- Breadcrumbs: Small text, muted color, hover to foreground color
+- Tabs: Inline horizontal layout, bottom border, active indicator
+
+### Modal & Dialog Design
+- Backdrop: Dark semi-transparent overlay with backdrop blur
+- Container: Card background, rounded corners, shadow, centered with max-width
+- Header: Horizontal padding, bottom border, close button positioned top-right
+- Footer: Horizontal padding, top border, actions aligned right with gap
+
+## VISUAL POLISH CHECKLIST (Apply to ALL components)
+
+Every component you create MUST have:
+1. Proper spacing: Consistent padding and gaps using your design scale
+2. Border radius: Rounded corners for cards and containers
+3. Subtle shadows: Soft shadow for cards, elevated shadow on hover
+4. Transitions: Smooth ~200ms transitions on interactive elements
+5. Hover states: Background shift or shadow elevation on hover
+6. Focus states: Visible focus ring for accessibility
+
+## STYLING PATTERNS BY ELEMENT TYPE
+
+### Containers/Wrappers:
+- Page wrapper: Full viewport height, page background color
+- Content container: Max-width centered with responsive horizontal padding
+- Section: Generous vertical padding that scales with viewport
+- Card: Rounded corners, border, card background, subtle shadow
+
+### Typography:
+- Page title: Large size, bold weight, tight letter-spacing
+- Section heading: Medium-large size, semi-bold weight
+- Card title: Medium size, medium weight
+- Body text: Base size, muted color
+- Small/caption: Small size, muted color
+
+### Interactive Elements:
+- Clickable card: Shadow on hover, subtle border highlight, pointer cursor
+- List item: Background change on hover, smooth color transition
+- Icon button: Background on hover, rounded shape, padding
+
+### Grids and Lists:
+- Card grid: Responsive columns (1→2→3), consistent gap spacing
+- List: Consistent vertical spacing between items
+- Inline items: Flex row, center aligned, consistent gap
+
+### Loading States:
+- Skeleton: Use Skeleton components matching content dimensions
+- Container: Same layout structure as loaded state to prevent shift
+
+### Empty States:
+- Centered: Flex column, center aligned both axes, generous vertical padding
+- Icon: Rounded background, muted styling, bottom margin
+- Message: Muted text, constrained width
+
+## ANTI-PATTERNS (NEVER DO THESE)
+
+WRONG: No styling on containers
+  <div>{children}</div>
+RIGHT: Always add appropriate styling
+  <div> with spacing and padding applied
+
+WRONG: Missing interactive feedback
+  <div onClick={...}>{item}</div>
+RIGHT: Visual feedback for interactions
+  <div onClick={...}> with cursor, hover state, transition, and padding
+
+WRONG: Flat cards with no depth
+  <div> with only border and padding
+RIGHT: Cards with proper styling
+  <Card> component with hover shadow and transition
+
+WRONG: No visual hierarchy
+  <p>{title}</p><p>{description}</p>
+RIGHT: Clear hierarchy with size/weight/color
+  <h3> for title with bold weight, <p> for description with muted style
 
 ## Output Format (STRICT)
 Respond ONLY with a JSON array. No prose. No markdown. Each item:
@@ -415,6 +600,9 @@ ${JSON.stringify(ctx.fileTreeSummary, null, 2)}
 
 Available Atoms:
 ${JSON.stringify(ctx.atoms, null, 2)}
+
+Available Templates (from IA Schema):
+${JSON.stringify(ctx.scheme?.templates?.items ?? {}, null, 2)}
 
 Key Files:
 ${keyFileContents}

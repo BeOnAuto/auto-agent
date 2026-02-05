@@ -287,12 +287,12 @@ function aggregateTypeFieldGuidance(
 }
 
 export function aggregateOrganismGuidance(
-  pageName: string,
-  pageSpec: PageSpec,
+  componentName: string,
+  organisms: string[],
   iaScheme: IAScheme,
   typeMappings: TypeMapping,
 ): TypeGuidance {
-  debug('Aggregating organism guidance for page: %s', pageName);
+  debug('Aggregating organism guidance for component: %s', componentName);
 
   const allImports = new Set<string>();
   const allQueryGuidance: string[] = [];
@@ -302,8 +302,8 @@ export function aggregateOrganismGuidance(
   const seenOperations = new Set<string>();
   const seenTypes = new Set<string>();
 
-  if (pageSpec.layout === undefined || pageSpec.layout.organisms === undefined) {
-    debug('%s has no organisms in layout', pageName);
+  if (organisms === undefined || organisms.length === 0) {
+    debug('%s has no organisms', componentName);
     return {
       imports: [],
       queryGuidance: [],
@@ -313,7 +313,7 @@ export function aggregateOrganismGuidance(
     };
   }
 
-  for (const organismName of pageSpec.layout.organisms) {
+  for (const organismName of organisms) {
     processOrganismGuidance(
       organismName,
       iaScheme,
@@ -329,7 +329,7 @@ export function aggregateOrganismGuidance(
 
   debug(
     '%s: aggregated %d imports, %d queries, %d mutations, %d enums, %d type field guidance from child organisms',
-    pageName,
+    componentName,
     allImports.size,
     allQueryGuidance.length,
     allMutationGuidance.length,

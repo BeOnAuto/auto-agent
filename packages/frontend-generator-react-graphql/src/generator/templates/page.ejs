@@ -1,16 +1,30 @@
-<% organisms.forEach(org => { -%>
-import { <%= org %> } from "@/components/organisms/<%= org %>";
-<% }) -%>
+<%
+  // Convert template name to PascalCase for import (define at top for use throughout)
+  const templateComponentName = template ? template.split(/[-_\s]+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('') : 'div';
+-%>
 <% if (template) { -%>
-import { <%= template.split(/[-_\s]+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('') %> } from "@/components/templates/<%= template %>";
+import { <%= templateComponentName %> } from "@/components/templates/<%= template %>";
 <% } -%>
 <% if (typeGuidance && typeGuidance.imports && typeGuidance.imports.length > 0) { -%>
 import { <%= typeGuidance.imports.join(', ') %> } from '@/gql/graphql';
 <% } -%>
 
+// PAGE: <%= name %>
+// Route: <%= route %>
 // <%= description %>
+//
+// Pages are specific instances of templates with real representative content.
+// They populate the template's layout structure with actual data and behavior.
+//
+<% if (template) { -%>
+// Template: <%= template %>
+<% if (templateDescription) { -%>
+// Template Purpose: <%= templateDescription %>
+<% } -%>
+<% } -%>
 <% if (specs && specs.length) { -%>
-// Specs:
+//
+// Page Specs:
 <% specs.forEach(spec => { -%>
 // - <%- spec %>
 <% }) -%>
@@ -21,6 +35,11 @@ import { <%= typeGuidance.imports.join(', ') %> } from '@/gql/graphql';
 // PAGE COMPOSITION - Spec Coverage Analysis
 // ──────────────────────────────────────────────────────────────────────────────
 //
+// This page uses the "<%= template %>" template which contains:
+<% organisms.forEach(org => { -%>
+// - <%= org %>
+<% }) -%>
+//
 <% if (specs && specs.length > 0) { -%>
 // YOUR SPECS (what this page must accomplish):
 //
@@ -28,39 +47,59 @@ import { <%= typeGuidance.imports.join(', ') %> } from '@/gql/graphql';
 <%   const coveredBy = organisms.find(org => organismSpecs[org]?.includes(spec)); -%>
 //   [<%= coveredBy ? '✓' : ' ' %>] <%= spec %>
 <%   if (coveredBy) { -%>
-//       └─ Implemented by <%= coveredBy %>
+//       └─ Implemented by <%= coveredBy %> (via template)
 <%   } -%>
 <% }); -%>
 //
 <% } -%>
-// Available Organisms:
+<% if (templateSpecs && templateSpecs.length > 0) { -%>
+// TEMPLATE LAYOUT SPECS (handled by template):
+//
+<% templateSpecs.forEach(spec => { -%>
+//   • <%= spec %>
+<% }); -%>
+//
+<% } -%>
+// Available Organisms (via template):
 //
 <% organisms.forEach(org => { -%>
 <%   const orgSpecs = organismSpecs[org]; -%>
 <%   if (orgSpecs && orgSpecs.length > 0) { -%>
 // **<%= org %>** capabilities:
-<%     orgSpecs.forEach(spec => { -%>
+<%     orgSpecs.slice(0, 5).forEach(spec => { -%>
 //   • <%= spec %>
 <%     }); -%>
+<%     if (orgSpecs.length > 5) { -%>
+//   • ... and <%= orgSpecs.length - 5 %> more specs
+<%     } -%>
 //
 <%   } else { -%>
 // **<%= org %>**
-//   (Organism with specific purpose - compose as needed)
+//   (Organism with specific purpose)
 //
 <%   } -%>
 <% }); -%>
-// Composition Rules:
+// Page Responsibilities:
 //
-// 1. ✓ Checked specs = already implemented by organism
-// 2. [ ] Unchecked specs = your responsibility
-// 3. Your job: compose organisms into page layout
+// 1. ✓ Checked specs = implemented by organism in template
+// 2. [ ] Unchecked specs = your responsibility to implement
+// 3. Pages provide real data to populate template structure
+// 4. Handle page-level navigation and routing
+// 5. Manage page-specific state if needed
 //
+<% } -%>
+<% if (navigation && navigation.length > 0) { -%>
+//
+// NAVIGATION:
+<% navigation.forEach(nav => { -%>
+// - On "<%= nav.on %>" → Navigate to <%= nav.to %>
+<% }) -%>
 <% } -%>
 <% if (typeGuidance && (typeGuidance.queryGuidance.length > 0 || typeGuidance.mutationGuidance.length > 0 || typeGuidance.enumGuidance.length > 0)) { -%>
 //
-// CRITICAL - TYPE GUIDANCE - Child organism data requirements
+// CRITICAL - TYPE GUIDANCE - Data requirements for this page
 //
-// The following operations are used by child organisms.
+// The following operations are used by organisms in this page's template.
 // You can either:
 //   A) Fetch here and pass as props (recommended for shared data/mutations)
 //   B) Let each organism fetch its own data (simpler, but may duplicate queries)
@@ -81,35 +120,60 @@ import { <%= typeGuidance.imports.join(', ') %> } from '@/gql/graphql';
 <% }) -%>
 <% } -%>
 //
-// CRITICAL - CONTAINER-AWARE RESPONSIVE DESIGN:
+// ------------------------------------------------------------------------------
+// PAGE-LEVEL CONSIDERATIONS & VISUAL REQUIREMENTS
+// ------------------------------------------------------------------------------
 //
-// THIS COMPONENT WILL BE USED IN UNPREDICTABLE CONTAINER SIZES:
-// - Narrow sidebars: 300-400px
-// - Medium containers: 500-800px
-// - Wide layouts: 800px+
-// - Mobile viewports: 320-640px
-// - Flex layouts where space is shared with siblings (flex-1)
+// As a PAGE (not a template or component), this component:
+// - Is the entry point for route "<%= route %>"
+// - Should handle route parameters if needed
+// - May coordinate data fetching for child organisms
+// - Should handle page-level loading and error states
 //
-// 🎯 MANDATORY RESPONSIVE PATTERNS:
+// VISUAL REQUIREMENTS FOR PAGES:
 //
-// 1. GRIDS: Always start mobile-first, progressively enhance
-//    WRONG: grid grid-cols-3
-//    RIGHT: grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
+// LOADING STATES (use beautiful skeletons, not spinners):
+//   - Use Skeleton components that match the layout of actual content
+//   - Include skeletons for title, grid items, and other key elements
+//   - Maintain the same spacing and structure as loaded state
+//   - Example pattern:
+//     if (loading) return (
+//       <<%= template ? templateComponentName : 'div' %>>
+//         {/* Skeleton layout matching content structure */}
+//       </<%= template ? templateComponentName : 'div' %>>
+//     );
 //
-// 2. TEXT SIZING: Use responsive classes, never fixed large sizes
-//    WRONG: text-5xl (too big for narrow containers)
-//    RIGHT: text-2xl sm:text-3xl lg:text-4xl
+// ERROR STATES (user-friendly, not technical):
+//   - Center the error message vertically and horizontally
+//   - Include an error icon with appropriate styling
+//   - Use clear, non-technical language
+//   - Provide a recovery action (refresh, go back, etc.)
+//   - Example pattern:
+//     if (error) return (
+//       <<%= template ? templateComponentName : 'div' %>>
+//         {/* Centered error with icon, message, and action button */}
+//       </<%= template ? templateComponentName : 'div' %>>
+//     );
 //
-// 3. FLEX LAYOUTS: Prefer flex-col with responsive row breakpoints
-//    RIGHT: flex flex-col lg:flex-row gap-4
+// IMPLEMENTATION PATTERN:
 //
-// 4. PREVENT OVERFLOW: Use min-w-0 and truncation
-//    RIGHT: min-w-0 truncate OR overflow-hidden
+// 1. SIMPLE PAGE (template handles everything):
+//    return <<%= template ? templateComponentName : 'div' %> />;
 //
-// 5. MENTAL TEST: Would this work in a 320px wide container?
-//    If no → make it responsive!
+// 2. PAGE WITH PROPS/CHILDREN (pass additional content):
+//    return (
+//      <<%= template ? templateComponentName : 'div' %>>
+//        {/* Additional page-specific content */}
+//      </<%= template ? templateComponentName : 'div' %>>
+//    );
+//
+// 3. PAGE WITH DATA FETCHING (with beautiful loading/error states):
+//    const { data, loading, error } = useQuery(SomeQuery);
+//    if (loading) return <PageSkeleton />;  // Custom skeleton component
+//    if (error) return <PageError error={error} />;  // Custom error component
+//    return <<%= template ? templateComponentName : 'div' %> data={data} />;
 //
 
 export function <%= name %>() {
-    return <div />;
+    return <<%= templateComponentName %> />;
 }

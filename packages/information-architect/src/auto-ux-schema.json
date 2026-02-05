@@ -164,8 +164,51 @@
       },
       "required": ["description", "items"]
     },
+    "templates": {
+      "description": "Page-level layout structures that place organisms into a layout. Templates define the skeletal framework and content structure without real data.",
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "items": {
+          "type": "object",
+          "patternProperties": {
+            "^[A-Z][a-zA-Z0-9]*$": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "layout": {
+                  "type": "object",
+                  "properties": {
+                    "organisms": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": ["organisms"]
+                },
+                "specs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Optional. Array of behavioral test specifications. Uses ' → ' to show nested context."
+                }
+              },
+              "required": ["description", "layout"]
+            }
+          }
+        }
+      },
+      "required": ["description", "items"]
+    },
     "pages": {
-      "description": "Top-level views composed of organisms, molecules, and atoms. Tied to routes.",
+      "description": "Specific instances of templates with real representative content. Tied to routes and populated with actual data.",
       "type": "object",
       "properties": {
         "description": {
@@ -183,17 +226,9 @@
                 "description": {
                   "type": "string"
                 },
-                "layout": {
-                  "type": "object",
-                  "properties": {
-                    "organisms": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "required": ["organisms"]
+                "template": {
+                  "type": "string",
+                  "description": "Reference to a template that defines the page's layout structure."
                 },
                 "navigation": {
                   "type": "array",
@@ -257,7 +292,7 @@
                   "description": "Optional. Array of behavioral test specifications. Uses ' → ' to show nested context."
                 }
               },
-              "required": ["route", "description", "layout"]
+              "required": ["route", "description", "template"]
             }
           }
         }
@@ -265,5 +300,5 @@
       "required": ["description", "items"]
     }
   },
-  "required": ["schema_description", "atoms", "molecules", "organisms", "pages"]
+  "required": ["schema_description", "atoms", "molecules", "organisms", "templates", "pages"]
 }
