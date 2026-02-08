@@ -1,8 +1,9 @@
 import type { Event, MessageBus } from '@auto-engineer/message-bus';
 import type { FailurePolicy, GraphState } from './evolve';
-import { evolve, getReadyJobs, initialState } from './evolve';
+import { evolve, getReadyJobs, initialState, isGraphComplete } from './evolve';
 import type { Job } from './graph-validator';
 import { validateGraph } from './graph-validator';
+import { classifyJobEvent } from './handle-job-event';
 
 interface ProcessGraphCommand {
   type: 'ProcessGraph';
@@ -57,7 +58,24 @@ export function createGraphProcessor(messageBus: MessageBus) {
 
     graphs.set(graphId, { state, jobById });
 
+    messageBus.onCorrelationPrefix(`graph:${graphId}:`, (event) => {
+      onJobEvent(graphId, event);
+    });
+
     return { type: 'graph.dispatching', data: { graphId, dispatchedJobs: dispatched } };
+  }
+
+  function onJobEvent(graphId: string, event: Event): void {
+    const entry = graphs.get(graphId)!;
+    const classified = classifyJobEvent(event)!;
+    const state = evolve(entry.state, classified);
+
+    graphs.set(graphId, { ...entry, state });
+
+    if (isGraphComplete(state)) {
+      graphs.delete(graphId);
+      messageBus.publishEvent({ type: 'graph.completed', data: { graphId } });
+    }
   }
 
   return { submit };
