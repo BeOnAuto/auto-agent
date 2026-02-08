@@ -89,10 +89,12 @@ export function createGraphProcessor(messageBus: MessageBus) {
 
     for (const jobId of getReadyJobs(state)) {
       const correlationId = `graph:${graphId}:${jobId}`;
+      const { target, payload } = entry.jobById[jobId];
       state = evolve(state, {
         type: 'JobDispatched',
-        data: { jobId, target: entry.jobById[jobId].target, correlationId },
+        data: { jobId, target, correlationId },
       });
+      messageBus.sendCommand({ type: target, data: payload as Record<string, unknown>, correlationId }).catch(() => {});
     }
 
     graphs.set(graphId, { ...entry, state });

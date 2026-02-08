@@ -221,6 +221,45 @@ describe('createGraphProcessor', () => {
     expect(received).toEqual([{ type: 'build', data: { src: './app' }, correlationId: 'graph:g1:a' }]);
   });
 
+  it('sends target commands for newly ready dependent jobs', async () => {
+    const bus = createMessageBus();
+    const processor = createGraphProcessor(bus);
+    const received: Array<{ type: string; data: unknown; correlationId?: string }> = [];
+    bus.registerCommandHandler({
+      name: 'build',
+      handle: async (command) => {
+        received.push({ type: command.type, data: command.data, correlationId: command.correlationId });
+        return { type: 'BuildCompleted', data: {} };
+      },
+    });
+    bus.registerCommandHandler({
+      name: 'test',
+      handle: async (command) => {
+        received.push({ type: command.type, data: command.data, correlationId: command.correlationId });
+        return { type: 'TestPassed', data: {} };
+      },
+    });
+
+    processor.submit({
+      type: 'ProcessGraph',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: { src: './app' } },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: { suite: 'unit' } },
+        ],
+        failurePolicy: 'halt',
+      },
+    });
+
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(received).toEqual([
+      { type: 'build', data: { src: './app' }, correlationId: 'graph:g1:a' },
+      { type: 'test', data: { suite: 'unit' }, correlationId: 'graph:g1:b' },
+    ]);
+  });
+
   it('applies halt policy when job fails via correlation', async () => {
     const bus = createMessageBus();
     const processor = createGraphProcessor(bus);

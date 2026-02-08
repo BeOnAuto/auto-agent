@@ -5,7 +5,7 @@
 ### Bottle: Dispatch target commands via messageBus
 
 - [x] Burst 1: submit sends target commands for initial ready jobs [depends: none]
-- [ ] Burst 2: onJobEvent sends target commands for newly ready dependent jobs [depends: 1]
+- [x] Burst 2: onJobEvent sends target commands for newly ready dependent jobs [depends: 1]
 
 ## DONE
 
