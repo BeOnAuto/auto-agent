@@ -38,4 +38,29 @@ describe('createGraphProcessor', () => {
       data: { graphId: 'g1', reason: 'Graph must contain at least one job' },
     });
   });
+
+  it('dispatches ready jobs and returns dispatching event', () => {
+    const bus = createMessageBus();
+    const processor = createGraphProcessor(bus);
+
+    const result = processor.submit({
+      type: 'ProcessGraph',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: { src: './app' } },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+        ],
+        failurePolicy: 'halt',
+      },
+    });
+
+    expect(result).toEqual({
+      type: 'graph.dispatching',
+      data: {
+        graphId: 'g1',
+        dispatchedJobs: [{ jobId: 'a', target: 'build', payload: { src: './app' }, correlationId: 'graph:g1:a' }],
+      },
+    });
+  });
 });

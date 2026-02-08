@@ -1,5 +1,6 @@
 import type { Event, MessageBus } from '@auto-engineer/message-bus';
-import type { FailurePolicy } from './evolve';
+import type { FailurePolicy, GraphState } from './evolve';
+import { evolve, getReadyJobs, initialState } from './evolve';
 import type { Job } from './graph-validator';
 import { validateGraph } from './graph-validator';
 
@@ -12,11 +13,18 @@ interface ProcessGraphCommand {
   };
 }
 
+interface DispatchedJob {
+  jobId: string;
+  target: string;
+  payload: unknown;
+  correlationId: string;
+}
+
 export function createGraphProcessor(messageBus: MessageBus) {
-  const graphs = new Map<string, { graphId: string }>();
+  const graphs = new Map<string, { state: GraphState; jobById: Record<string, Job> }>();
 
   function submit(command: ProcessGraphCommand): Event {
-    const { graphId, jobs } = command.data;
+    const { graphId, jobs, failurePolicy } = command.data;
 
     if (graphs.has(graphId)) {
       return { type: 'graph.failed', data: { graphId, reason: `Graph ${graphId} already submitted` } };
@@ -27,9 +35,29 @@ export function createGraphProcessor(messageBus: MessageBus) {
       return { type: 'graph.failed', data: { graphId, reason: validation.error } };
     }
 
-    graphs.set(graphId, { graphId });
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: { graphId, jobs, failurePolicy },
+    });
 
-    return { type: 'graph.accepted', data: { graphId } };
+    const ready = getReadyJobs(state);
+    const jobById: Record<string, Job> = {};
+    for (const job of jobs) {
+      jobById[job.id] = job;
+    }
+
+    const dispatched: DispatchedJob[] = ready.map((jobId) => {
+      const correlationId = `graph:${graphId}:${jobId}`;
+      state = evolve(state, {
+        type: 'JobDispatched',
+        data: { jobId, target: jobById[jobId].target, correlationId },
+      });
+      return { jobId, target: jobById[jobId].target, payload: jobById[jobId].payload, correlationId };
+    });
+
+    graphs.set(graphId, { state, jobById });
+
+    return { type: 'graph.dispatching', data: { graphId, dispatchedJobs: dispatched } };
   }
 
   return { submit };
