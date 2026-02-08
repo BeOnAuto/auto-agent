@@ -195,6 +195,32 @@ describe('createGraphProcessor', () => {
     expect(completed).toEqual([]);
   });
 
+  it('sends target commands for initial ready jobs', async () => {
+    const bus = createMessageBus();
+    const processor = createGraphProcessor(bus);
+    const received: Array<{ type: string; data: unknown; correlationId?: string }> = [];
+    bus.registerCommandHandler({
+      name: 'build',
+      handle: async (command) => {
+        received.push({ type: command.type, data: command.data, correlationId: command.correlationId });
+        return { type: 'BuildCompleted', data: {} };
+      },
+    });
+
+    processor.submit({
+      type: 'ProcessGraph',
+      data: {
+        graphId: 'g1',
+        jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: { src: './app' } }],
+        failurePolicy: 'halt',
+      },
+    });
+
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(received).toEqual([{ type: 'build', data: { src: './app' }, correlationId: 'graph:g1:a' }]);
+  });
+
   it('applies halt policy when job fails via correlation', async () => {
     const bus = createMessageBus();
     const processor = createGraphProcessor(bus);

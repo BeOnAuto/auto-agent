@@ -63,6 +63,12 @@ export function createGraphProcessor(messageBus: MessageBus) {
       onJobEvent(graphId, event);
     });
 
+    for (const d of dispatched) {
+      messageBus
+        .sendCommand({ type: d.target, data: d.payload as Record<string, unknown>, correlationId: d.correlationId })
+        .catch(() => {});
+    }
+
     return { type: 'graph.dispatching', data: { graphId, dispatchedJobs: dispatched } };
   }
 
