@@ -48,9 +48,9 @@ export function validateGraph(jobs: readonly Job[]): ValidationResult {
 }
 
 function detectCycles(jobs: readonly Job[]): string | null {
-  const adjacency = new Map<string, readonly string[]>();
+  const adjacency: Record<string, readonly string[]> = {};
   for (const job of jobs) {
-    adjacency.set(job.id, job.dependsOn);
+    adjacency[job.id] = job.dependsOn;
   }
 
   const visited = new Set<string>();
@@ -70,15 +70,14 @@ function detectCycles(jobs: readonly Job[]): string | null {
 
 function dfs(
   nodeId: string,
-  adjacency: Map<string, readonly string[]>,
+  adjacency: Record<string, readonly string[]>,
   visited: Set<string>,
   inStack: Set<string>,
 ): string | null {
   visited.add(nodeId);
   inStack.add(nodeId);
 
-  const deps = adjacency.get(nodeId) ?? [];
-  for (const dep of deps) {
+  for (const dep of adjacency[nodeId]) {
     if (inStack.has(dep)) {
       return dep;
     }
