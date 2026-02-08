@@ -107,6 +107,24 @@ describe('isGraphComplete', () => {
     expect(isGraphComplete(state)).toBe(true);
   });
 
+  it('returns true when a job has timed out', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: {} }],
+        failurePolicy: 'halt',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+    state = evolve(state, { type: 'JobTimedOut', data: { jobId: 'a', timeoutMs: 5000 } });
+
+    expect(isGraphComplete(state)).toBe(true);
+  });
+
   it('returns true when a job has failed', () => {
     let state = evolve(initialState(), {
       type: 'GraphSubmitted',
