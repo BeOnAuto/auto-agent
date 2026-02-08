@@ -66,6 +66,14 @@ function updateJobStatus(state: GraphState, jobId: string, status: JobStatus): G
   return { ...state, jobs };
 }
 
+export function isGraphComplete(state: GraphState): boolean {
+  if (state.status !== 'processing') return false;
+  for (const job of state.jobs.values()) {
+    if (job.status !== 'succeeded') return false;
+  }
+  return true;
+}
+
 export function getReadyJobs(state: GraphState): string[] {
   if (state.status !== 'processing') return [];
   const ready: string[] = [];
