@@ -69,7 +69,8 @@ export function createGraphProcessor(messageBus: MessageBus) {
     const entry = graphs.get(graphId);
     if (entry === undefined) return;
 
-    const classified = classifyJobEvent(event)!;
+    const classified = classifyJobEvent(event);
+    if (classified === null) return;
     let state = evolve(entry.state, classified);
 
     for (const jobId of getReadyJobs(state)) {

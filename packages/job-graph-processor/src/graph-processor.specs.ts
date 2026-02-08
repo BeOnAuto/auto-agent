@@ -165,4 +165,33 @@ describe('createGraphProcessor', () => {
 
     expect(completed).toEqual([{ type: 'graph.completed', data: { graphId: 'g1' } }]);
   });
+
+  it('ignores events with unrecognized correlationId format', async () => {
+    const bus = createMessageBus();
+    const processor = createGraphProcessor(bus);
+    const completed: Array<{ type: string; data: Record<string, unknown> }> = [];
+    bus.subscribeToEvent('graph.completed', {
+      name: 'completionTracker',
+      handle: (event) => {
+        completed.push(event);
+      },
+    });
+
+    processor.submit({
+      type: 'ProcessGraph',
+      data: {
+        graphId: 'g1',
+        jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: {} }],
+        failurePolicy: 'halt',
+      },
+    });
+
+    await bus.publishEvent({
+      type: 'WeirdEvent',
+      data: {},
+      correlationId: 'graph:g1:',
+    });
+
+    expect(completed).toEqual([]);
+  });
 });
