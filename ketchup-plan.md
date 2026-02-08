@@ -793,34 +793,10 @@ it("dispatches job when graph is ready", () =>
 
 ## TODO
 
-### Bottle: ProcessGraphHandler
+### Bottle: ProcessGraphHandler (Emmett Integration)
 
-- [ ] Burst 21: Handler validates graph and emits GraphFailed on invalid [depends: none]
-- [ ] Burst 22: Handler checks idempotency via stream existence [depends: 21]
-- [ ] Burst 23: Handler emits GraphSubmitted, subscribes correlations, dispatches ready jobs [depends: 22]
-
-### Bottle: Timeouts
-
-- [ ] Burst 31: Timeout manager tracks timers per job [depends: none]
-- [ ] Burst 32: ProcessGraphHandler starts timeout timer when dispatching [depends: 23, 31]
-- [ ] Burst 33: handleJobEvent clears timeout timer on completion [depends: 30, 32]
-- [ ] Burst 34: Timeout handler emits JobTimedOut when timer fires [depends: 33]
-
-### Bottle: Retry Logic
-
-- [ ] Burst 34a: Retry manager tracks retry attempts per job [depends: none]
-- [ ] Burst 34b: On dispatch failure, schedule retry with backoff [depends: 34a]
-- [ ] Burst 34c: Emit JobRetried event on retry attempt [depends: 34b]
-- [ ] Burst 34d: After max retries, emit JobFailed [depends: 34c]
-
-### Bottle: Integration
-
-- [ ] Burst 35: Main index.ts with type maps [depends: none]
-- [ ] Burst 36: Integration test - diamond dependency graph [depends: 23, 34d]
-- [ ] Burst 37: Integration test - failure policies [depends: 36]
-- [ ] Burst 38: Integration test - job timeout [depends: 37]
-- [ ] Burst 39: Integration test - retry with backoff [depends: 38]
-- [ ] Burst 40: Integration test - recovery from SQLite on restart [depends: 39]
+- [ ] Burst 22: Handler checks idempotency via stream existence [depends: none]
+- [ ] Burst 23b: Handler wires correlation subscriptions with messageBus [depends: 22]
 
 ## DONE
 
@@ -870,6 +846,32 @@ it("dispatches job when graph is ready", () =>
 - [x] applyPolicy skip-dependents skips transitive deps (ededa69a)
 - [x] applyPolicy continue returns no skip events (9bc2035e)
 - [x] handleJobEvent composes classify, evolve, policy, completion (c82c9489)
+
+### Bottle: ProcessGraphHandler
+
+- [x] handleProcessGraph returns graph.failed on invalid graph (24571e92)
+- [x] handleProcessGraph dispatches ready jobs for valid graph (a6f6d1c3)
+
+### Bottle: Failure Policy (continue)
+
+- [x] getReadyJobs treats failed deps as resolved under continue policy (fe4a4791)
+
+### Bottle: Timeouts
+
+- [x] Timeout manager tracks and fires per-job timers (fb8e1aab)
+
+### Bottle: Retry Logic
+
+- [x] Retry manager with exponential backoff and max cap (b49b742b)
+
+### Bottle: Integration
+
+- [x] Public API exports in index.ts (bcd28976)
+- [x] Diamond dependency graph integration test (be927228)
+- [x] Halt and skip-dependents failure policy integration tests (028481d2)
+- [x] Continue policy unlocks dependents integration test (1124c5f6)
+- [x] Timeout fires and evolve treats timed-out as terminal (e2622e75)
+- [x] Retry with backoff and max retries integration test (6358d3b6)
 
 ---
 
