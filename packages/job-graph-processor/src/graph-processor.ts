@@ -68,7 +68,15 @@ export function createGraphProcessor(messageBus: MessageBus) {
   function onJobEvent(graphId: string, event: Event): void {
     const entry = graphs.get(graphId)!;
     const classified = classifyJobEvent(event)!;
-    const state = evolve(entry.state, classified);
+    let state = evolve(entry.state, classified);
+
+    for (const jobId of getReadyJobs(state)) {
+      const correlationId = `graph:${graphId}:${jobId}`;
+      state = evolve(state, {
+        type: 'JobDispatched',
+        data: { jobId, target: entry.jobById[jobId].target, correlationId },
+      });
+    }
 
     graphs.set(graphId, { ...entry, state });
 

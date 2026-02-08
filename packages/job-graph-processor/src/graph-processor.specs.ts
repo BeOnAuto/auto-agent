@@ -92,4 +92,42 @@ describe('createGraphProcessor', () => {
 
     expect(completed).toEqual([{ type: 'graph.completed', data: { graphId: 'g1' } }]);
   });
+
+  it('dispatches dependent jobs when deps complete via correlation', async () => {
+    const bus = createMessageBus();
+    const processor = createGraphProcessor(bus);
+    const completed: Array<{ type: string; data: Record<string, unknown> }> = [];
+    bus.subscribeToEvent('graph.completed', {
+      name: 'completionTracker',
+      handle: (event) => {
+        completed.push(event);
+      },
+    });
+
+    processor.submit({
+      type: 'ProcessGraph',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: {} },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+        ],
+        failurePolicy: 'halt',
+      },
+    });
+
+    await bus.publishEvent({
+      type: 'BuildCompleted',
+      data: {},
+      correlationId: 'graph:g1:a',
+    });
+
+    await bus.publishEvent({
+      type: 'TestPassed',
+      data: {},
+      correlationId: 'graph:g1:b',
+    });
+
+    expect(completed).toEqual([{ type: 'graph.completed', data: { graphId: 'g1' } }]);
+  });
 });
