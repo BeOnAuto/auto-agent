@@ -66,7 +66,9 @@ export function createGraphProcessor(messageBus: MessageBus) {
   }
 
   function onJobEvent(graphId: string, event: Event): void {
-    const entry = graphs.get(graphId)!;
+    const entry = graphs.get(graphId);
+    if (entry === undefined) return;
+
     const classified = classifyJobEvent(event)!;
     let state = evolve(entry.state, classified);
 
