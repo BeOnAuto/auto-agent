@@ -14,7 +14,13 @@ type GraphSubmitted = {
   data: { graphId: string; jobs: readonly Job[]; failurePolicy: FailurePolicy };
 };
 
-export type JobGraphEvent = GraphSubmitted;
+type JobDispatched = {
+  type: 'JobDispatched';
+  data: { jobId: string; target: string; correlationId: string };
+};
+type JobSucceeded = { type: 'JobSucceeded'; data: { jobId: string; result?: unknown } };
+
+export type JobGraphEvent = GraphSubmitted | JobDispatched | JobSucceeded;
 
 type PendingGraphState = { status: 'pending' };
 type ProcessingGraphState = {
@@ -44,7 +50,20 @@ export function evolve(state: GraphState, event: JobGraphEvent): GraphState {
           ]),
         ),
       };
+    case 'JobDispatched':
+      return updateJobStatus(state, event.data.jobId, 'dispatched');
+    case 'JobSucceeded':
+      return updateJobStatus(state, event.data.jobId, 'succeeded');
   }
+}
+
+function updateJobStatus(state: GraphState, jobId: string, status: JobStatus): GraphState {
+  if (state.status !== 'processing') return state;
+  const jobs = new Map(state.jobs);
+  const existing = jobs.get(jobId);
+  if (existing === undefined) return state;
+  jobs.set(jobId, { ...existing, status });
+  return { ...state, jobs };
 }
 
 export function getReadyJobs(state: GraphState): string[] {

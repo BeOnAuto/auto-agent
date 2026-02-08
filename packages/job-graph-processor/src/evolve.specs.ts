@@ -17,4 +17,25 @@ describe('getReadyJobs', () => {
 
     expect(getReadyJobs(state)).toEqual(['a']);
   });
+
+  it('unlocks dependent jobs after dependency succeeds', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: {} },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+        ],
+        failurePolicy: 'halt',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+    state = evolve(state, { type: 'JobSucceeded', data: { jobId: 'a' } });
+
+    expect(getReadyJobs(state)).toEqual(['b']);
+  });
 });
