@@ -1,3 +1,7 @@
+import { commandHandler as processJobGraphHandler } from './commands/process-job-graph';
+
+export const COMMANDS = [processJobGraphHandler];
+
 export { applyPolicy } from './apply-policy';
 export type { FailurePolicy, GraphState, JobGraphEvent, JobStatus } from './evolve';
 
