@@ -165,6 +165,7 @@ const exhausted = retries.recordFailure('build', config);
 
 ```typescript
 import {
+  COMMANDS,
   createGraphProcessor,
   evolve,
   initialState,
@@ -293,15 +294,17 @@ type JobGraphEvent =
 
 ```
 src/
-├── index.ts               Barrel exports
-├── evolve.ts              Pure event-sourced state machine
-├── graph-validator.ts     DAG validation (cycles, duplicates, refs)
-├── handle-job-event.ts    Domain event classification and orchestration
-├── apply-policy.ts        Failure policy engine (halt/skip-dependents/continue)
-├── graph-processor.ts     Stateful MessageBus coordinator
-├── process-graph.ts       Standalone command handler
-├── timeout-manager.ts     Per-job setTimeout wrapper
-└── retry-manager.ts       Exponential backoff retry
+├── index.ts                          Barrel exports + COMMANDS array
+├── commands/
+│   └── process-job-graph.ts          Pipeline command handler (ProcessJobGraph)
+├── evolve.ts                         Pure event-sourced state machine
+├── graph-validator.ts                DAG validation (cycles, duplicates, refs)
+├── handle-job-event.ts               Domain event classification and orchestration
+├── apply-policy.ts                   Failure policy engine (halt/skip-dependents/continue)
+├── graph-processor.ts                Stateful MessageBus coordinator
+├── process-graph.ts                  Standalone command handler
+├── timeout-manager.ts                Per-job setTimeout wrapper
+└── retry-manager.ts                  Exponential backoff retry
 ```
 
 ```mermaid
@@ -321,6 +324,62 @@ flowchart LR
   Complete -->|yes| Done[graph.completed]
   Complete -->|no| Dispatch
 ```
+
+---
+
+## Pipeline Integration
+
+The package exports a `COMMANDS` array so it can be loaded as a plugin by `PipelineServer` via `PluginLoader`.
+
+### Register as Plugin
+
+```typescript
+// auto.config.ts
+export const plugins = [
+  '@auto-engineer/job-graph-processor',
+  // ... other plugins
+];
+```
+
+### Command: ProcessJobGraph
+
+| Field           | Type             | Description                                      |
+| --------------- | ---------------- | ------------------------------------------------ |
+| `graphId`       | `string`         | Unique identifier for the graph                  |
+| `jobs`          | `Job[]`          | Array of jobs with dependencies                  |
+| `failurePolicy` | `FailurePolicy`  | How to handle failures: halt, skip-dependents, continue |
+
+**Alias:** `process:job-graph`
+
+### Events Produced
+
+| Event              | When                                    |
+| ------------------ | --------------------------------------- |
+| `graph.dispatching`| Graph validated, ready jobs dispatched  |
+| `graph.failed`     | Validation error or missing messageBus  |
+| `graph.completed`  | All jobs reached terminal status        |
+
+### Dispatch via HTTP
+
+```bash
+curl -X POST http://localhost:3000/command \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "type": "ProcessJobGraph",
+    "data": {
+      "graphId": "deploy-1",
+      "jobs": [
+        { "id": "build", "dependsOn": [], "target": "RunBuild", "payload": {} },
+        { "id": "test", "dependsOn": ["build"], "target": "RunTests", "payload": {} }
+      ],
+      "failurePolicy": "halt"
+    }
+  }'
+```
+
+The handler creates a fresh `createGraphProcessor(messageBus)` per invocation. The processor subscribes to correlated events on the shared messageBus, so the graph lifecycle continues asynchronously after the handler returns.
+
+---
 
 ### Dependencies
 
