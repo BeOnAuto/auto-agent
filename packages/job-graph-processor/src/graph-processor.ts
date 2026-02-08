@@ -1,4 +1,5 @@
 import type { Event, MessageBus } from '@auto-engineer/message-bus';
+import { applyPolicy } from './apply-policy';
 import type { FailurePolicy, GraphState } from './evolve';
 import { evolve, getReadyJobs, initialState, isGraphComplete } from './evolve';
 import type { Job } from './graph-validator';
@@ -72,6 +73,13 @@ export function createGraphProcessor(messageBus: MessageBus) {
     const classified = classifyJobEvent(event);
     if (classified === null) return;
     let state = evolve(entry.state, classified);
+
+    if (classified.type === 'JobFailed') {
+      const policyEvents = applyPolicy(state, classified.data.jobId);
+      for (const pe of policyEvents) {
+        state = evolve(state, pe);
+      }
+    }
 
     for (const jobId of getReadyJobs(state)) {
       const correlationId = `graph:${graphId}:${jobId}`;

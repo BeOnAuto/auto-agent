@@ -194,4 +194,36 @@ describe('createGraphProcessor', () => {
 
     expect(completed).toEqual([]);
   });
+
+  it('applies halt policy when job fails via correlation', async () => {
+    const bus = createMessageBus();
+    const processor = createGraphProcessor(bus);
+    const completed: Array<{ type: string; data: Record<string, unknown> }> = [];
+    bus.subscribeToEvent('graph.completed', {
+      name: 'completionTracker',
+      handle: (event) => {
+        completed.push(event);
+      },
+    });
+
+    processor.submit({
+      type: 'ProcessGraph',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: {} },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+        ],
+        failurePolicy: 'halt',
+      },
+    });
+
+    await bus.publishEvent({
+      type: 'BuildFailed',
+      data: { error: 'compile error' },
+      correlationId: 'graph:g1:a',
+    });
+
+    expect(completed).toEqual([{ type: 'graph.completed', data: { graphId: 'g1' } }]);
+  });
 });
