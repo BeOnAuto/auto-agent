@@ -93,6 +93,20 @@ describe('isGraphComplete', () => {
     expect(isGraphComplete(state)).toBe(false);
   });
 
+  it('returns true when a job has been skipped', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: {} }],
+        failurePolicy: 'halt',
+      },
+    });
+    state = evolve(state, { type: 'JobSkipped', data: { jobId: 'a', reason: 'dependency failed' } });
+
+    expect(isGraphComplete(state)).toBe(true);
+  });
+
   it('returns true when a job has failed', () => {
     let state = evolve(initialState(), {
       type: 'GraphSubmitted',
