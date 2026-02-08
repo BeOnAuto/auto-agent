@@ -791,130 +791,85 @@ it("dispatches job when graph is ready", () =>
 
 ---
 
-## Implementation Bursts
+## TODO
 
-### Bottle -1: Infrastructure Context Enhancement (pipeline)
+### Bottle: ProcessGraphHandler
 
-Extend `PipelineContext` to share Emmett with plugins:
+- [ ] Burst 21: Handler validates graph and emits GraphFailed on invalid [depends: none]
+- [ ] Burst 22: Handler checks idempotency via stream existence [depends: 21]
+- [ ] Burst 23: Handler emits GraphSubmitted, subscribes correlations, dispatches ready jobs [depends: 22]
 
-- [ ] Burst -1a: Add `eventStore` to PipelineContext interface [depends: none]
-- [ ] Burst -1b: Add `messageBus` to PipelineContext interface [depends: -1a]
-- [ ] Burst -1c: Update handler-adapter to pass context to handler [depends: -1b]
-- [ ] Burst -1d: Update defineCommandHandler signature to accept optional context [depends: -1c]
-- [ ] Burst -1e: Update PipelineServer.createContext() to include eventStore [depends: -1d]
+### Bottle: Event Listener
 
----
+- [ ] Burst 24: handleJobEvent parses correlationId to identify graph+job [depends: none]
+- [ ] Burst 25: handleJobEvent determines success vs failure from payload.error [depends: 24]
+- [ ] Burst 26: handleJobEvent emits JobSucceeded and dispatches ready jobs [depends: 25]
+- [ ] Burst 27: handleJobEvent applies halt policy (skip pending, emit GraphFailed) [depends: 26]
+- [ ] Burst 28: handleJobEvent applies skip-dependents policy [depends: 27]
+- [ ] Burst 29: handleJobEvent applies continue policy [depends: 28]
+- [ ] Burst 30: handleJobEvent checks graph completion and emits GraphCompleted [depends: 29]
 
-### Bottle 0: EventBus Enhancement (message-bus)
+### Bottle: Timeouts
 
-Add correlation-based subscription to `@on.auto/message-bus`:
+- [ ] Burst 31: Timeout manager tracks timers per job [depends: none]
+- [ ] Burst 32: ProcessGraphHandler starts timeout timer when dispatching [depends: 23, 31]
+- [ ] Burst 33: handleJobEvent clears timeout timer on completion [depends: 30, 32]
+- [ ] Burst 34: Timeout handler emits JobTimedOut when timer fires [depends: 33]
 
-```typescript
-// New method on EventBus
-onCorrelation(
-  correlationId: string,
-  listener: (event: Event) => void
-): Unsubscribe
+### Bottle: Retry Logic
 
-// Usage:
-const unsub = eventBus.onCorrelation('graph:g1:job-123', (event) => {
-  // Called for ANY event with this correlationId
-});
-```
-
-**Implementation approach:**
-
-- Maintain a `Map<string, Set<listener>>` for correlation subscriptions
-- In `notifyListeners()`, also check correlation subscribers
-- Return unsubscribe function that removes from the map
-
-- [ ] Burst 0a: EventBus.onCorrelation() - subscribe by exact correlationId [depends: none]
-- [ ] Burst 0b: EventBus.onCorrelationPrefix() - subscribe by correlationId prefix (e.g., 'graph:') [depends: 0a]
-
----
-
-### Bottle 1: Package Setup & Core Types
-
-- [ ] Burst 1: Create package.json, tsconfig.json, vitest.config.ts [depends: 0b]
-- [ ] Burst 2: Define core types (JobStatus, GraphStatus, FailurePolicy, Job, JobState, GraphState) [depends: 1]
-
-### Bottle 2: Validation
-
-- [ ] Burst 3: GraphValidator.validate() - unique IDs check [depends: 2]
-- [ ] Burst 4: GraphValidator - dependency existence check [depends: 3]
-- [ ] Burst 5: GraphValidator - self-reference check [depends: 4]
-- [ ] Burst 6: GraphValidator - cycle detection (DFS) [depends: 5]
-- [ ] Burst 7: GraphValidator - empty target check [depends: 6]
-
-### Bottle 3: Commands
-
-- [ ] Burst 8: ProcessGraph command factory [depends: 2]
-- [ ] Burst 9: Commands index.ts [depends: 8]
-
-### Bottle 4: Events
-
-- [ ] Burst 10: JobDispatched event factory [depends: 2]
-- [ ] Burst 11: JobSkipped event factory [depends: 2]
-- [ ] Burst 12: JobTimedOut event factory [depends: 2]
-- [ ] Burst 13: GraphProcessed event factory [depends: 2]
-- [ ] Burst 14: GraphFailed event factory [depends: 2]
-- [ ] Burst 15: Events index.ts [depends: 10-14]
-
-### Bottle 5: Event Store Events (Emmett)
-
-- [ ] Burst 16: Define GraphSubmitted event type [depends: 2]
-- [ ] Burst 17: Define JobDispatched, JobSucceeded, JobFailed events [depends: 16]
-- [ ] Burst 18: Define JobSkipped, JobTimedOut, JobRetried events [depends: 17]
-- [ ] Burst 19: Define GraphCompleted, GraphFailed events [depends: 18]
-- [ ] Burst 20: Event store setup with SQLite backend [depends: 19]
-
-### Bottle 5b: Projection
-
-- [ ] Burst 20a: GraphState projection - initialize from GraphSubmitted [depends: 20]
-- [ ] Burst 20b: Projection - handle JobDispatched, update job status [depends: 20a]
-- [ ] Burst 20c: Projection - handle JobSucceeded/Failed/Skipped/TimedOut [depends: 20b]
-- [ ] Burst 20d: Projection - derive getReadyJobs from state [depends: 20c]
-- [ ] Burst 20e: Projection - derive getTransitiveDependents [depends: 20d]
-- [ ] Burst 20f: Projection - derive isGraphComplete [depends: 20e]
-
-### Bottle 6: ProcessGraphHandler (Emmett command handler)
-
-- [ ] Burst 21: Handler - validation and emit GraphFailed on invalid [depends: 7, 9, 15, 20f]
-- [ ] Burst 22: Handler - idempotency via stream existence check [depends: 21]
-- [ ] Burst 23: Handler - emit GraphSubmitted, subscribe correlations, dispatch ready jobs [depends: 22]
-
-### Bottle 7: Event Listener (handleJobEvent)
-
-- [ ] Burst 24: handleJobEvent - parse correlationId, identify graph+job [depends: 20f, 0b]
-- [ ] Burst 25: handleJobEvent - determine success vs failure (check payload.error) [depends: 24]
-- [ ] Burst 26: handleJobEvent - emit JobSucceeded, dispatch ready jobs [depends: 25]
-- [ ] Burst 27: handleJobEvent - halt policy (emit JobSkipped for pending, emit GraphFailed) [depends: 26]
-- [ ] Burst 28: handleJobEvent - skip-dependents policy [depends: 27]
-- [ ] Burst 29: handleJobEvent - continue policy [depends: 28]
-- [ ] Burst 30: handleJobEvent - check graph completion, emit GraphCompleted [depends: 29]
-
-### Bottle 8: Timeouts
-
-- [ ] Burst 31: Timeout manager - track timers per job (separate from event store) [depends: 20f]
-- [ ] Burst 32: ProcessGraphHandler - start timeout timer when dispatching job [depends: 23, 31]
-- [ ] Burst 33: handleJobEvent - clear timeout timer on completion [depends: 30, 32]
-- [ ] Burst 34: Timeout handler - emit JobTimedOut when timer fires [depends: 33]
-
-### Bottle 8b: Retry Logic
-
-- [ ] Burst 34a: Retry manager - track retry attempts per job [depends: 20f]
+- [ ] Burst 34a: Retry manager tracks retry attempts per job [depends: none]
 - [ ] Burst 34b: On dispatch failure, schedule retry with backoff [depends: 34a]
 - [ ] Burst 34c: Emit JobRetried event on retry attempt [depends: 34b]
 - [ ] Burst 34d: After max retries, emit JobFailed [depends: 34c]
 
-### Bottle 9: Integration
+### Bottle: Integration
 
-- [ ] Burst 35: Main index.ts with type maps [depends: 9, 15]
+- [ ] Burst 35: Main index.ts with type maps [depends: none]
 - [ ] Burst 36: Integration test - diamond dependency graph [depends: 23, 34d]
 - [ ] Burst 37: Integration test - failure policies [depends: 36]
 - [ ] Burst 38: Integration test - job timeout [depends: 37]
 - [ ] Burst 39: Integration test - retry with backoff [depends: 38]
 - [ ] Burst 40: Integration test - recovery from SQLite on restart [depends: 39]
+
+## DONE
+
+### Bottle: Infrastructure Context Enhancement (pipeline)
+
+- [x] Burst -1a: Add eventStore to PipelineContext interface (61122ec4)
+- [x] Burst -1b: Add messageBus to PipelineContext interface (61122ec4)
+- [x] Burst -1c: Update handler-adapter to pass context to handler (61122ec4)
+- [x] Burst -1d: Update defineCommandHandler signature to accept optional context (61122ec4)
+- [x] Burst -1e: Update PipelineServer.createContext() to include eventStore (61122ec4)
+
+### Bottle: EventBus Correlation Subscriptions (message-bus)
+
+- [x] Burst 0a: EventBus.onCorrelation() - subscribe by exact correlationId (8e178818)
+- [x] Burst 0b: EventBus.onCorrelationPrefix() - subscribe by correlationId prefix (24a7197e)
+
+### Bottle: Package Setup and Core Types
+
+- [x] Burst 1: Create package.json, tsconfig.json, vitest.config.ts (52ec7e7e)
+- [x] Burst 2: Core types defined inline in evolve.ts and graph-validator.ts (emergent design)
+
+### Bottle: Graph Validation
+
+- [x] Burst 3-7: GraphValidator with all checks (b82e4ac0)
+
+### Bottle: Evolve Module (Events, State, Queries)
+
+- [x] getReadyJobs returns root jobs after graph submission (0e78904f)
+- [x] getReadyJobs unlocks dependents after job succeeds (ff6823c6)
+- [x] isGraphComplete returns true when all jobs succeeded (106139ad)
+- [x] isGraphComplete returns false when jobs still pending (5d365b74)
+- [x] getReadyJobs returns empty before graph submission (24c8a5dd)
+- [x] isGraphComplete returns false before graph submission (c5a150e3)
+- [x] evolve ignores events for unknown job IDs (95bb1295)
+- [x] evolve ignores job events before graph submission (d97abc28)
+- [x] isGraphComplete treats failed jobs as terminal (1c5660ee)
+- [x] isGraphComplete treats skipped jobs as terminal (20657f4c)
+- [x] isGraphComplete treats timed-out jobs as terminal (d3843559)
+- [x] getTransitiveDependents query function (d12ad238)
 
 ---
 
