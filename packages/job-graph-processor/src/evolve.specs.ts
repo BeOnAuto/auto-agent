@@ -45,6 +45,10 @@ describe('getReadyJobs', () => {
 });
 
 describe('isGraphComplete', () => {
+  it('returns false before graph submission', () => {
+    expect(isGraphComplete(initialState())).toBe(false);
+  });
+
   it('returns false when some jobs are still pending', () => {
     let state = evolve(initialState(), {
       type: 'GraphSubmitted',
