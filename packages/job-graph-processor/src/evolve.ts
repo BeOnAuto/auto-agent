@@ -44,9 +44,9 @@ export function evolve(state: GraphState, event: JobGraphEvent): GraphState {
         graphId: event.data.graphId,
         failurePolicy: event.data.failurePolicy,
         jobs: new Map(
-          event.data.jobs.map((job) => [
+          event.data.jobs.map((job): [string, JobState] => [
             job.id,
-            { jobId: job.id, status: 'pending' as JobStatus, dependsOn: job.dependsOn },
+            { jobId: job.id, status: 'pending', dependsOn: job.dependsOn },
           ]),
         ),
       };
