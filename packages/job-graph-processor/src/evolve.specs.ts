@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { evolve, getReadyJobs, initialState, isGraphComplete } from './evolve';
 
 describe('evolve', () => {
+  it('ignores job events before graph submission', () => {
+    const state = evolve(initialState(), { type: 'JobSucceeded', data: { jobId: 'a' } });
+
+    expect(getReadyJobs(state)).toEqual([]);
+    expect(isGraphComplete(state)).toBe(false);
+  });
+
   it('ignores job events for unknown job IDs', () => {
     const state = evolve(initialState(), {
       type: 'GraphSubmitted',
