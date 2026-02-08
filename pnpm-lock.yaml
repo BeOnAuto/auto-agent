@@ -193,6 +193,9 @@ importers:
       '@auto-engineer/information-architect':
         specifier: workspace:*
         version: link:../../packages/information-architect
+      '@auto-engineer/job-graph-processor':
+        specifier: workspace:*
+        version: link:../../packages/job-graph-processor
       '@auto-engineer/message-bus':
         specifier: workspace:*
         version: link:../../packages/message-bus

@@ -118,6 +118,7 @@ export const plugins = [
   '@auto-engineer/frontend-generator-react-graphql',
   '@auto-engineer/server-implementer',
   '@auto-engineer/dev-server',
+  '@auto-engineer/job-graph-processor',
 ];
 
 export const pipeline = define('kanban-todo')

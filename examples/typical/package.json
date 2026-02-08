@@ -18,6 +18,7 @@
     "@auto-engineer/frontend-generator-react-graphql": "workspace:*",
     "@auto-engineer/frontend-implementer": "workspace:*",
     "@auto-engineer/information-architect": "workspace:*",
+    "@auto-engineer/job-graph-processor": "workspace:*",
     "@auto-engineer/message-bus": "workspace:*",
     "@auto-engineer/pipeline": "workspace:*",
     "@auto-engineer/server-checks": "workspace:*",
