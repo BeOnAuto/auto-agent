@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { classifyJobEvent, isJobFailure, parseCorrelationId } from './handle-job-event';
+import { evolve, initialState } from './evolve';
+import { classifyJobEvent, handleJobEvent, isJobFailure, parseCorrelationId } from './handle-job-event';
 
 describe('parseCorrelationId', () => {
   it('extracts graphId and jobId from graph correlation format', () => {
@@ -41,6 +42,113 @@ describe('classifyJobEvent', () => {
     expect(result).toEqual({
       type: 'JobSucceeded',
       data: { jobId: 'job-a', result: { output: 'success' } },
+    });
+  });
+});
+
+describe('handleJobEvent', () => {
+  it('returns null for events without graph correlation', () => {
+    const state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: {} }],
+        failurePolicy: 'halt',
+      },
+    });
+
+    const result = handleJobEvent(state, { type: 'Unrelated', data: {} });
+
+    expect(result).toBe(null);
+  });
+
+  it('emits JobSucceeded and dispatches ready dependents', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: {} },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+        ],
+        failurePolicy: 'halt',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+
+    const result = handleJobEvent(state, {
+      type: 'BuildCompleted',
+      data: { output: 'ok' },
+      correlationId: 'graph:g1:a',
+    });
+
+    expect(result).toEqual({
+      events: [{ type: 'JobSucceeded', data: { jobId: 'a', result: { output: 'ok' } } }],
+      readyJobs: ['b'],
+      graphComplete: false,
+    });
+  });
+
+  it('marks graph complete when last job succeeds', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: {} }],
+        failurePolicy: 'halt',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+
+    const result = handleJobEvent(state, {
+      type: 'BuildCompleted',
+      data: { output: 'ok' },
+      correlationId: 'graph:g1:a',
+    });
+
+    expect(result).toEqual({
+      events: [{ type: 'JobSucceeded', data: { jobId: 'a', result: { output: 'ok' } } }],
+      readyJobs: [],
+      graphComplete: true,
+    });
+  });
+
+  it('applies halt policy and marks graph complete on failure', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: {} },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+        ],
+        failurePolicy: 'halt',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+
+    const result = handleJobEvent(state, {
+      type: 'BuildFailed',
+      data: { error: 'compile error' },
+      correlationId: 'graph:g1:a',
+    });
+
+    expect(result).toEqual({
+      events: [
+        { type: 'JobFailed', data: { jobId: 'a', error: 'compile error' } },
+        { type: 'JobSkipped', data: { jobId: 'b', reason: 'halt policy' } },
+      ],
+      readyJobs: [],
+      graphComplete: true,
     });
   });
 });
