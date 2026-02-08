@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { evolve, getReadyJobs, initialState, isGraphComplete } from './evolve';
+import { evolve, getReadyJobs, getTransitiveDependents, initialState, isGraphComplete } from './evolve';
 
 describe('evolve', () => {
   it('ignores job events before graph submission', () => {
@@ -64,6 +64,29 @@ describe('getReadyJobs', () => {
     state = evolve(state, { type: 'JobSucceeded', data: { jobId: 'a' } });
 
     expect(getReadyJobs(state)).toEqual(['b']);
+  });
+});
+
+describe('getTransitiveDependents', () => {
+  it('returns empty array before graph submission', () => {
+    expect(getTransitiveDependents(initialState(), 'a')).toEqual([]);
+  });
+
+  it('returns direct and transitive dependents of a job', () => {
+    const state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: {} },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+          { id: 'c', dependsOn: ['b'], target: 'deploy', payload: {} },
+        ],
+        failurePolicy: 'halt',
+      },
+    });
+
+    expect(getTransitiveDependents(state, 'a').sort()).toEqual(['b', 'c']);
   });
 });
 

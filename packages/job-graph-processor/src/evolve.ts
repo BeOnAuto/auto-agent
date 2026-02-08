@@ -85,6 +85,22 @@ export function isGraphComplete(state: GraphState): boolean {
   return true;
 }
 
+export function getTransitiveDependents(state: GraphState, jobId: string): string[] {
+  if (state.status !== 'processing') return [];
+  const dependents: Set<string> = new Set();
+  const queue = [jobId];
+  while (queue.length > 0) {
+    const current = queue.pop()!;
+    for (const [id, job] of state.jobs) {
+      if (!dependents.has(id) && job.dependsOn.includes(current)) {
+        dependents.add(id);
+        queue.push(id);
+      }
+    }
+  }
+  return [...dependents];
+}
+
 export function getReadyJobs(state: GraphState): string[] {
   if (state.status !== 'processing') return [];
   const ready: string[] = [];
