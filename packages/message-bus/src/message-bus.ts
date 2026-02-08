@@ -20,6 +20,7 @@ type MessageBusState = {
   eventHandlers: Record<string, EventHandler[]>;
   allEventHandlers: EventHandler[];
   correlationListeners: Map<string, Set<CorrelationListener>>;
+  correlationPrefixListeners: Map<string, Set<CorrelationListener>>;
 };
 
 // DSL functions moved to CLI package
@@ -31,6 +32,7 @@ export function createMessageBus() {
     eventHandlers: {},
     allEventHandlers: [],
     correlationListeners: new Map(),
+    correlationPrefixListeners: new Map(),
   };
   debug('Message bus state initialized');
 
@@ -236,6 +238,14 @@ export function createMessageBus() {
         listener(event);
       }
     }
+
+    for (const [prefix, listeners] of state.correlationPrefixListeners) {
+      if (correlationId.startsWith(prefix)) {
+        for (const listener of listeners) {
+          listener(event);
+        }
+      }
+    }
   }
 
   function onCorrelation(correlationId: string, listener: CorrelationListener): EventSubscription {
@@ -257,6 +267,25 @@ export function createMessageBus() {
     };
   }
 
+  function onCorrelationPrefix(prefix: string, listener: CorrelationListener): EventSubscription {
+    if (!state.correlationPrefixListeners.has(prefix)) {
+      state.correlationPrefixListeners.set(prefix, new Set());
+    }
+    state.correlationPrefixListeners.get(prefix)!.add(listener);
+
+    return {
+      unsubscribe: () => {
+        const listeners = state.correlationPrefixListeners.get(prefix);
+        if (listeners !== undefined) {
+          listeners.delete(listener);
+          if (listeners.size === 0) {
+            state.correlationPrefixListeners.delete(prefix);
+          }
+        }
+      },
+    };
+  }
+
   function getCommandHandlers(): Record<string, CommandHandler> {
     return { ...state.commandHandlers };
   }
@@ -270,6 +299,7 @@ export function createMessageBus() {
     subscribeAll,
     getCommandHandlers,
     onCorrelation,
+    onCorrelationPrefix,
   };
 }
 
