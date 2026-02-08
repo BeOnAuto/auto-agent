@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .ketchup/scripts/session-start.cjs"
+            "command": "node .claude-auto/scripts/session-start.cjs"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .ketchup/scripts/pre-tool-use.cjs"
+            "command": "node .claude-auto/scripts/pre-tool-use.cjs"
           }
         ]
       }
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .ketchup/scripts/user-prompt-submit.cjs"
+            "command": "node .claude-auto/scripts/user-prompt-submit.cjs"
           }
         ]
       }
@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .ketchup/scripts/auto-continue.cjs"
+            "command": "node .claude-auto/scripts/auto-continue.cjs"
           }
         ]
       }

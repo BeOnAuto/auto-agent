@@ -4,7 +4,7 @@ when:
 priority: 100
 ---
 
-# Ketchup Core Reminder
+# Claude Auto Core Reminder
 
 > Controlled Bursts | TDD | TCR | 100% Coverage
 

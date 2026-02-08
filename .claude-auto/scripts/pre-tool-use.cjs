@@ -11124,14 +11124,8 @@ function findEntryByName(arr, name) {
   return void 0;
 }
 function parseBatchedOutput(stdout, validatorNames) {
-  let outer;
-  try {
-    outer = JSON.parse(stdout);
-  } catch {
-    throw new Error(`Failed to parse validator output as JSON. Preview: ${stdout?.substring(0, 300) || "empty"}`);
-  }
-  const outerParsed = outer;
-  const innerRaw = typeof outerParsed.result === "string" ? outerParsed.result : outerParsed;
+  const outer = JSON.parse(stdout);
+  const innerRaw = typeof outer.result === "string" ? outer.result : outer;
   const parsed = typeof innerRaw === "string" ? extractJsonArray(innerRaw) : Array.isArray(innerRaw) ? innerRaw : null;
   if (!parsed) {
     const nack = "NACK";
@@ -11161,60 +11155,6 @@ function parseBatchedOutput(stdout, validatorNames) {
 }
 var NON_APPEALABLE_VALIDATORS = ["no-dangerous-git"];
 var BATCH_COUNT = 3;
-async function executeBatch(chunk, chunkIndex, context, executor, onLog) {
-  const names = chunk.map((v) => v.name);
-  onLog?.("spawn", `batch-${chunkIndex}`, `validators: ${names.join(", ")}`);
-  try {
-    const prompt = buildBatchedPrompt(chunk, context);
-    const args = ["-p", prompt, "--output-format", "json"];
-    const opts = { encoding: "utf8" };
-    const spawnResult = await executor("claude", args, opts);
-    if (!spawnResult.stdout || spawnResult.stdout.length === 0) {
-      throw new Error(
-        `Claude CLI returned empty output. Exit code: ${spawnResult.status}. Stderr: ${spawnResult.stderr?.substring(0, 200) || "none"}`
-      );
-    }
-    let outer;
-    try {
-      outer = JSON.parse(spawnResult.stdout);
-    } catch {
-      throw new Error(
-        `Failed to parse Claude CLI JSON output. Stdout preview: ${spawnResult.stdout?.substring(0, 300) || "empty"}`
-      );
-    }
-    const batchResults = parseBatchedOutput(spawnResult.stdout, names);
-    const outerParsed = outer;
-    let inputTokens;
-    let outputTokens;
-    if (outerParsed.usage) {
-      const usage = outerParsed.usage;
-      inputTokens = (usage.input_tokens ?? 0) + (usage.cache_read_input_tokens ?? 0) + (usage.cache_creation_input_tokens ?? 0);
-      outputTokens = usage.output_tokens;
-    }
-    const tokens = inputTokens != null ? ` (in:${inputTokens} out:${outputTokens})` : "";
-    const commitResults = batchResults.map((br) => {
-      onLog?.("complete", br.validator, `${br.decision}${br.reason ? `: ${br.reason}` : ""}${tokens}`);
-      const result = {
-        validator: br.validator,
-        decision: br.decision,
-        appealable: !NON_APPEALABLE_VALIDATORS.includes(br.validator)
-      };
-      if (br.reason) {
-        result.reason = br.reason;
-      }
-      return result;
-    });
-    return commitResults;
-  } catch (err) {
-    onLog?.("error", `batch-${chunkIndex}`, String(err));
-    return chunk.map((v) => ({
-      validator: v.name,
-      decision: "NACK",
-      reason: `validator crashed: ${String(err)}`,
-      appealable: false
-    }));
-  }
-}
 function stripValidatorBoilerplate(content) {
   return content.replace(/^You are a commit validator\.[^\n]*\n*/m, "").replace(/\n*Valid responses:\n\{"decision":"ACK"\}\n\{"decision":"NACK","reason":"[^"]*"\}\n*/m, "").replace(/\n*RESPOND WITH JSON ONLY[^\n]*/m, "").trim();
 }
@@ -11253,7 +11193,43 @@ function chunkArray(arr, count) {
 }
 async function validateCommit(validators, context, executor = spawnAsync, onLog, batchCount = BATCH_COUNT) {
   const chunks = chunkArray(validators, batchCount);
-  const pending = chunks.map((chunk, chunkIndex) => executeBatch(chunk, chunkIndex, context, executor, onLog));
+  const pending = chunks.map(async (chunk, chunkIndex) => {
+    const names = chunk.map((v) => v.name);
+    onLog?.("spawn", `batch-${chunkIndex}`, `validators: ${names.join(", ")}`);
+    try {
+      const prompt = buildBatchedPrompt(chunk, context);
+      const args = ["-p", "--no-session-persistence", prompt, "--output-format", "json"];
+      const opts = { encoding: "utf8" };
+      const spawnResult = await executor("claude", args, opts);
+      const batchResults2 = parseBatchedOutput(spawnResult.stdout, names);
+      const outer = JSON.parse(spawnResult.stdout);
+      let inputTokens;
+      let outputTokens;
+      if (outer.usage) {
+        inputTokens = (outer.usage.input_tokens ?? 0) + (outer.usage.cache_read_input_tokens ?? 0) + (outer.usage.cache_creation_input_tokens ?? 0);
+        outputTokens = outer.usage.output_tokens;
+      }
+      const tokens = inputTokens != null ? ` (in:${inputTokens} out:${outputTokens})` : "";
+      const commitResults = batchResults2.map((br) => {
+        onLog?.("complete", br.validator, `${br.decision}${br.reason ? `: ${br.reason}` : ""}${tokens}`);
+        return {
+          validator: br.validator,
+          decision: br.decision,
+          reason: br.reason,
+          appealable: !NON_APPEALABLE_VALIDATORS.includes(br.validator)
+        };
+      });
+      return commitResults;
+    } catch (err) {
+      onLog?.("error", `batch-${chunkIndex}`, String(err));
+      return chunk.map((v) => ({
+        validator: v.name,
+        decision: "NACK",
+        reason: `validator crashed: ${String(err)}`,
+        appealable: false
+      }));
+    }
+  });
   const batchResults = await Promise.all(pending);
   return batchResults.flat();
 }
@@ -11269,8 +11245,8 @@ var path = __toESM(require("node:path"));
 function sanitizeForFilename(hookName) {
   return hookName.replace(/[^a-zA-Z0-9-]/g, "-").toLowerCase();
 }
-function writeHookLog(ketchupDir, entry) {
-  const logsDir = path.join(ketchupDir, "logs", "hooks");
+function writeHookLog(autoDir, entry) {
+  const logsDir = path.join(autoDir, "logs", "hooks");
   if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
   }
@@ -11340,11 +11316,11 @@ function matchesFilter(hookName, message) {
   }
   return includes.some((pattern) => searchText.includes(pattern));
 }
-function activityLog(ketchupDir, sessionId, hookName, message) {
+function activityLog(autoDir, sessionId, hookName, message) {
   if (!matchesFilter(hookName, message)) {
     return;
   }
-  const logsDir = import_node_path.default.join(ketchupDir, "logs");
+  const logsDir = import_node_path.default.join(autoDir, "logs");
   if (!import_node_fs.default.existsSync(logsDir)) {
     import_node_fs.default.mkdirSync(logsDir, { recursive: true });
   }
@@ -11365,12 +11341,12 @@ function activityLog(ketchupDir, sessionId, hookName, message) {
 // src/debug-logger.ts
 var import_node_fs2 = __toESM(require("node:fs"));
 var import_node_path2 = __toESM(require("node:path"));
-function debugLog(ketchupDir, hookName, message) {
+function debugLog(autoDir, hookName, message) {
   const debug = process.env.DEBUG;
-  if (!debug || !debug.includes("ketchup")) {
+  if (!debug || !debug.includes("claude-auto")) {
     return;
   }
-  const logsDir = import_node_path2.default.join(ketchupDir, "logs", "ketchup");
+  const logsDir = import_node_path2.default.join(autoDir, "logs", "claude-auto");
   if (!import_node_fs2.default.existsSync(logsDir)) {
     import_node_fs2.default.mkdirSync(logsDir, { recursive: true });
   }
@@ -11430,11 +11406,11 @@ var DEFAULT_HOOK_STATE = {
   updatedAt: (/* @__PURE__ */ new Date()).toISOString(),
   updatedBy: "default"
 };
-function createHookState(ketchupDir) {
-  if (!fs5.existsSync(ketchupDir)) {
-    fs5.mkdirSync(ketchupDir, { recursive: true });
+function createHookState(autoDir) {
+  if (!fs5.existsSync(autoDir)) {
+    fs5.mkdirSync(autoDir, { recursive: true });
   }
-  const stateFile = path5.join(ketchupDir, ".claude.hooks.json");
+  const stateFile = path5.join(autoDir, ".claude.hooks.json");
   function read() {
     if (!fs5.existsSync(stateFile)) {
       const state = { ...DEFAULT_HOOK_STATE, updatedAt: (/* @__PURE__ */ new Date()).toISOString(), updatedBy: "init" };
@@ -11500,9 +11476,9 @@ var path6 = __toESM(require("node:path"));
 
 // src/config-loader.ts
 var import_cosmiconfig = __toESM(require_dist());
-var DEFAULT_KETCHUP_DIR = ".ketchup";
+var DEFAULT_AUTO_DIR = ".claude-auto";
 async function loadConfig(searchFrom) {
-  const explorer = (0, import_cosmiconfig.cosmiconfig)("ketchup");
+  const explorer = (0, import_cosmiconfig.cosmiconfig)("claude-auto");
   const result = await explorer.search(searchFrom);
   return result?.config ?? {};
 }
@@ -11511,14 +11487,14 @@ async function loadConfig(searchFrom) {
 async function resolvePaths(claudeDir2) {
   const projectRoot = path6.dirname(claudeDir2);
   const config = await loadConfig(projectRoot);
-  const ketchupDirName = config.ketchupDir ?? DEFAULT_KETCHUP_DIR;
-  const ketchupDir = path6.join(projectRoot, ketchupDirName);
+  const autoDirName = config.autoDir ?? DEFAULT_AUTO_DIR;
+  const autoDir = path6.join(projectRoot, autoDirName);
   return {
     projectRoot,
     claudeDir: claudeDir2,
-    ketchupDir,
-    remindersDir: path6.join(ketchupDir, "reminders"),
-    validatorsDir: path6.join(ketchupDir, "validators")
+    autoDir,
+    remindersDir: path6.join(autoDir, "reminders"),
+    validatorsDir: path6.join(autoDir, "validators")
   };
 }
 
@@ -11602,16 +11578,16 @@ async function handlePreToolUse(claudeDir2, sessionId, toolInput, options2 = {})
   const paths = await resolvePaths(claudeDir2);
   const command = toolInput.command;
   if (command && isCommitCommand(command)) {
-    return handleCommitValidation(claudeDir2, sessionId, command, options2, paths.ketchupDir);
+    return handleCommitValidation(claudeDir2, sessionId, command, options2, paths.autoDir);
   }
   const patterns = loadDenyPatterns(claudeDir2);
   const filePath = toolInput.file_path;
   if (filePath && isDenied(filePath, patterns)) {
-    activityLog(paths.ketchupDir, sessionId, "pre-tool-use", `blocked: ${filePath}`);
-    debugLog(paths.ketchupDir, "pre-tool-use", `${filePath} blocked by deny-list`);
+    activityLog(paths.autoDir, sessionId, "pre-tool-use", `blocked: ${filePath}`);
+    debugLog(paths.autoDir, "pre-tool-use", `${filePath} blocked by deny-list`);
     return {
       decision: "block",
-      reason: `Path ${filePath} is denied by ketchup deny-list`
+      reason: `Path ${filePath} is denied by claude-auto deny-list`
     };
   }
   const reminders = loadReminders(paths.remindersDir, {
@@ -11624,32 +11600,32 @@ async function handlePreToolUse(claudeDir2, sessionId, toolInput, options2 = {})
   }
   return { decision: "allow" };
 }
-async function handleCommitValidation(claudeDir2, sessionId, command, options2, ketchupDir) {
+async function handleCommitValidation(claudeDir2, sessionId, command, options2, autoDir) {
   const paths = await resolvePaths(claudeDir2);
   const allValidators = loadValidators([paths.validatorsDir]);
   const validators = allValidators.filter((v) => v.name !== "appeal-system");
   if (validators.length === 0) {
-    activityLog(ketchupDir, sessionId, "pre-tool-use", "commit allowed (no validators)");
+    activityLog(autoDir, sessionId, "pre-tool-use", "commit allowed (no validators)");
     return { decision: "allow" };
   }
   const context = getCommitContext(process.cwd(), command);
-  const state = createHookState(ketchupDir).read();
+  const state = createHookState(autoDir).read();
   const onLog = (event, name, detail) => {
-    activityLog(ketchupDir, sessionId, "pre-tool-use", `validator ${event}: ${name}${detail ? ` \u2192 ${detail}` : ""}`);
+    activityLog(autoDir, sessionId, "pre-tool-use", `validator ${event}: ${name} \u2192 ${detail}`);
   };
   const results = await validateCommit(validators, context, options2.executor, onLog, state.validateCommit.batchCount);
   const nacks = results.filter((r) => r.decision === "NACK");
   if (nacks.length > 0) {
     const reasons = nacks.map((n) => `${n.validator}: ${n.reason}`).join("\n");
-    activityLog(ketchupDir, sessionId, "pre-tool-use", `commit blocked: ${reasons}`);
-    debugLog(ketchupDir, "pre-tool-use", `commit blocked: ${reasons}`);
+    activityLog(autoDir, sessionId, "pre-tool-use", `commit blocked: ${reasons}`);
+    debugLog(autoDir, "pre-tool-use", `commit blocked: ${reasons}`);
     return {
       decision: "block",
       reason: reasons
     };
   }
-  activityLog(ketchupDir, sessionId, "pre-tool-use", "commit allowed");
-  debugLog(ketchupDir, "pre-tool-use", "commit allowed");
+  activityLog(autoDir, sessionId, "pre-tool-use", "commit allowed");
+  debugLog(autoDir, "pre-tool-use", "commit allowed");
   return { decision: "allow" };
 }
 
@@ -11658,13 +11634,13 @@ var input = parseHookInput(fs8.readFileSync(0, "utf-8"));
 var claudeDir = path9.resolve(process.cwd(), ".claude");
 var startTime = Date.now();
 (async () => {
-  const { ketchupDir } = await resolvePaths(claudeDir);
+  const { autoDir } = await resolvePaths(claudeDir);
   try {
     const toolInput = input.tool_input || {};
     const command = toolInput.command;
     const result = await handlePreToolUse(claudeDir, input.session_id, toolInput);
     if (command && isCommitCommand(command)) {
-      writeHookLog(ketchupDir, {
+      writeHookLog(autoDir, {
         hookName: "pre-tool-use",
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
         input,
@@ -11675,7 +11651,7 @@ var startTime = Date.now();
     console.log(JSON.stringify(result));
     process.exit(0);
   } catch (err) {
-    writeHookLog(ketchupDir, {
+    writeHookLog(autoDir, {
       hookName: "pre-tool-use",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
       input,

@@ -8304,8 +8304,8 @@ var path = __toESM(require("node:path"));
 function sanitizeForFilename(hookName) {
   return hookName.replace(/[^a-zA-Z0-9-]/g, "-").toLowerCase();
 }
-function writeHookLog(ketchupDir, entry) {
-  const logsDir = path.join(ketchupDir, "logs", "hooks");
+function writeHookLog(autoDir, entry) {
+  const logsDir = path.join(autoDir, "logs", "hooks");
   if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
   }
@@ -8375,11 +8375,11 @@ function matchesFilter(hookName, message) {
   }
   return includes.some((pattern) => searchText.includes(pattern));
 }
-function activityLog(ketchupDir, sessionId, hookName, message) {
+function activityLog(autoDir, sessionId, hookName, message) {
   if (!matchesFilter(hookName, message)) {
     return;
   }
-  const logsDir = import_node_path.default.join(ketchupDir, "logs");
+  const logsDir = import_node_path.default.join(autoDir, "logs");
   if (!import_node_fs.default.existsSync(logsDir)) {
     import_node_fs.default.mkdirSync(logsDir, { recursive: true });
   }
@@ -8400,12 +8400,12 @@ function activityLog(ketchupDir, sessionId, hookName, message) {
 // src/debug-logger.ts
 var import_node_fs2 = __toESM(require("node:fs"));
 var import_node_path2 = __toESM(require("node:path"));
-function debugLog(ketchupDir, hookName, message) {
+function debugLog(autoDir, hookName, message) {
   const debug = process.env.DEBUG;
-  if (!debug || !debug.includes("ketchup")) {
+  if (!debug || !debug.includes("claude-auto")) {
     return;
   }
-  const logsDir = import_node_path2.default.join(ketchupDir, "logs", "ketchup");
+  const logsDir = import_node_path2.default.join(autoDir, "logs", "claude-auto");
   if (!import_node_fs2.default.existsSync(logsDir)) {
     import_node_fs2.default.mkdirSync(logsDir, { recursive: true });
   }
@@ -8421,9 +8421,9 @@ var path4 = __toESM(require("node:path"));
 
 // src/config-loader.ts
 var import_cosmiconfig = __toESM(require_dist());
-var DEFAULT_KETCHUP_DIR = ".ketchup";
+var DEFAULT_AUTO_DIR = ".claude-auto";
 async function loadConfig(searchFrom) {
-  const explorer = (0, import_cosmiconfig.cosmiconfig)("ketchup");
+  const explorer = (0, import_cosmiconfig.cosmiconfig)("claude-auto");
   const result = await explorer.search(searchFrom);
   return result?.config ?? {};
 }
@@ -8432,14 +8432,14 @@ async function loadConfig(searchFrom) {
 async function resolvePaths(claudeDir2) {
   const projectRoot = path4.dirname(claudeDir2);
   const config = await loadConfig(projectRoot);
-  const ketchupDirName = config.ketchupDir ?? DEFAULT_KETCHUP_DIR;
-  const ketchupDir = path4.join(projectRoot, ketchupDirName);
+  const autoDirName = config.autoDir ?? DEFAULT_AUTO_DIR;
+  const autoDir = path4.join(projectRoot, autoDirName);
   return {
     projectRoot,
     claudeDir: claudeDir2,
-    ketchupDir,
-    remindersDir: path4.join(ketchupDir, "reminders"),
-    validatorsDir: path4.join(ketchupDir, "validators")
+    autoDir,
+    remindersDir: path4.join(autoDir, "reminders"),
+    validatorsDir: path4.join(autoDir, "validators")
   };
 }
 
@@ -8492,13 +8492,13 @@ async function handleUserPromptSubmit(claudeDir2, sessionId, userPrompt) {
   const reminders = loadReminders(paths.remindersDir, { hook: "UserPromptSubmit" });
   const reminderContent = reminders.map((r) => r.content).join("\n\n");
   activityLog(
-    paths.ketchupDir,
+    paths.autoDir,
     sessionId,
     "user-prompt-submit",
     `injected ${reminders.length} reminder${reminders.length === 1 ? "" : "s"}`
   );
   debugLog(
-    paths.ketchupDir,
+    paths.autoDir,
     "user-prompt-submit",
     `injected ${reminders.length} reminder${reminders.length === 1 ? "" : "s"}`
   );
@@ -8525,10 +8525,10 @@ var input = parseHookInput(fs5.readFileSync(0, "utf-8"));
 var claudeDir = path6.resolve(process.cwd(), ".claude");
 var startTime = Date.now();
 (async () => {
-  const { ketchupDir } = await resolvePaths(claudeDir);
+  const { autoDir } = await resolvePaths(claudeDir);
   try {
     const { diagnostics, ...result } = await handleUserPromptSubmit(claudeDir, input.session_id, input.prompt || "");
-    writeHookLog(ketchupDir, {
+    writeHookLog(autoDir, {
       hookName: "user-prompt-submit",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
       input: { ...input, prompt: input.prompt ? `[${input.prompt.length} chars]` : void 0 },
@@ -8541,7 +8541,7 @@ var startTime = Date.now();
     console.log(JSON.stringify(result));
     process.exit(0);
   } catch (err) {
-    writeHookLog(ketchupDir, {
+    writeHookLog(autoDir, {
       hookName: "user-prompt-submit",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
       input: { ...input, prompt: input.prompt ? `[${input.prompt.length} chars]` : void 0 },
