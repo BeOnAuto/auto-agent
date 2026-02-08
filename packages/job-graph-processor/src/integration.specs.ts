@@ -86,3 +86,74 @@ describe('diamond dependency graph', () => {
     });
   });
 });
+
+describe('failure policies integration', () => {
+  it('halt policy skips all pending and completes graph on failure', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: {} },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+          { id: 'c', dependsOn: [], target: 'lint', payload: {} },
+        ],
+        failurePolicy: 'halt',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+
+    const result = handleJobEvent(state, {
+      type: 'BuildFailed',
+      data: { error: 'compile error' },
+      correlationId: 'graph:g1:a',
+    });
+
+    expect(result).toEqual({
+      events: [
+        { type: 'JobFailed', data: { jobId: 'a', error: 'compile error' } },
+        { type: 'JobSkipped', data: { jobId: 'b', reason: 'halt policy' } },
+        { type: 'JobSkipped', data: { jobId: 'c', reason: 'halt policy' } },
+      ],
+      readyJobs: [],
+      graphComplete: true,
+    });
+  });
+
+  it('skip-dependents policy skips only dependents and allows others to continue', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: {} },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+          { id: 'c', dependsOn: [], target: 'lint', payload: {} },
+        ],
+        failurePolicy: 'skip-dependents',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+
+    const result = handleJobEvent(state, {
+      type: 'BuildFailed',
+      data: { error: 'compile error' },
+      correlationId: 'graph:g1:a',
+    });
+
+    expect(result).toEqual({
+      events: [
+        { type: 'JobFailed', data: { jobId: 'a', error: 'compile error' } },
+        { type: 'JobSkipped', data: { jobId: 'b', reason: 'dependency failed' } },
+      ],
+      readyJobs: ['c'],
+      graphComplete: false,
+    });
+  });
+});
