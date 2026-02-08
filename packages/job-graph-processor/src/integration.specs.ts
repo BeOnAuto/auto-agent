@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { evolve, getReadyJobs, initialState } from './evolve';
 import { handleJobEvent } from './handle-job-event';
+import { createRetryManager } from './retry-manager';
 import { createTimeoutManager } from './timeout-manager';
 
 describe('diamond dependency graph', () => {
@@ -215,6 +216,33 @@ describe('timeout integration', () => {
 
     state = evolve(state, { type: 'JobTimedOut', data: { jobId: 'a', timeoutMs: 5000 } });
     expect(getReadyJobs(state)).toEqual([]);
+
+    vi.useRealTimers();
+  });
+});
+
+describe('retry integration', () => {
+  it('retries with backoff then exhausts max retries', () => {
+    vi.useFakeTimers();
+    const retries: Array<{ jobId: string; attempt: number }> = [];
+    const manager = createRetryManager((jobId, attempt) => retries.push({ jobId, attempt }));
+    const config = { maxRetries: 2, backoffMs: 100, maxBackoffMs: 5000 };
+
+    const exhausted1 = manager.recordFailure('a', config);
+    expect(exhausted1).toBe(false);
+    vi.advanceTimersByTime(100);
+    expect(retries).toEqual([{ jobId: 'a', attempt: 1 }]);
+
+    const exhausted2 = manager.recordFailure('a', config);
+    expect(exhausted2).toBe(false);
+    vi.advanceTimersByTime(200);
+    expect(retries).toEqual([
+      { jobId: 'a', attempt: 1 },
+      { jobId: 'a', attempt: 2 },
+    ]);
+
+    const exhausted3 = manager.recordFailure('a', config);
+    expect(exhausted3).toBe(true);
 
     vi.useRealTimers();
   });
