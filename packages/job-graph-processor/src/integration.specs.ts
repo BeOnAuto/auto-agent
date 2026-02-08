@@ -156,4 +156,34 @@ describe('failure policies integration', () => {
       graphComplete: false,
     });
   });
+
+  it('continue policy unlocks dependents after failure', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: {} },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+        ],
+        failurePolicy: 'continue',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+
+    const result = handleJobEvent(state, {
+      type: 'BuildFailed',
+      data: { error: 'compile error' },
+      correlationId: 'graph:g1:a',
+    });
+
+    expect(result).toEqual({
+      events: [{ type: 'JobFailed', data: { jobId: 'a', error: 'compile error' } }],
+      readyJobs: ['b'],
+      graphComplete: false,
+    });
+  });
 });
