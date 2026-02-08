@@ -13,10 +13,13 @@ debugCommand.color = '4'; // blue
 debugEvent.color = '2'; // green
 debugHandler.color = '6'; // cyan
 
+type CorrelationListener = (event: Event) => void;
+
 type MessageBusState = {
   commandHandlers: Record<string, CommandHandler>;
   eventHandlers: Record<string, EventHandler[]>;
-  allEventHandlers: EventHandler[]; // Handlers that receive ALL events
+  allEventHandlers: EventHandler[];
+  correlationListeners: Map<string, Set<CorrelationListener>>;
 };
 
 // DSL functions moved to CLI package
@@ -27,6 +30,7 @@ export function createMessageBus() {
     commandHandlers: {},
     eventHandlers: {},
     allEventHandlers: [],
+    correlationListeners: new Map(),
   };
   debug('Message bus state initialized');
 
@@ -149,7 +153,8 @@ export function createMessageBus() {
       debugEvent('  Event data (error event): %O', event.data);
     }
 
-    // Get both specific handlers and all-event handlers
+    notifyCorrelationListeners(event);
+
     const specificHandlers = state.eventHandlers[event.type] ?? [];
     const allHandlers = state.allEventHandlers;
     const handlers = [...specificHandlers, ...allHandlers];
@@ -221,6 +226,37 @@ export function createMessageBus() {
     '  Available methods: registerCommandHandler, sendCommand, publishEvent, subscribeToEvent, subscribeAll, registerEventHandler',
   );
 
+  function notifyCorrelationListeners<TEvent extends Event>(event: TEvent): void {
+    const correlationId = event.correlationId;
+    if (correlationId === undefined) return;
+
+    const exactListeners = state.correlationListeners.get(correlationId);
+    if (exactListeners !== undefined) {
+      for (const listener of exactListeners) {
+        listener(event);
+      }
+    }
+  }
+
+  function onCorrelation(correlationId: string, listener: CorrelationListener): EventSubscription {
+    if (!state.correlationListeners.has(correlationId)) {
+      state.correlationListeners.set(correlationId, new Set());
+    }
+    state.correlationListeners.get(correlationId)!.add(listener);
+
+    return {
+      unsubscribe: () => {
+        const listeners = state.correlationListeners.get(correlationId);
+        if (listeners !== undefined) {
+          listeners.delete(listener);
+          if (listeners.size === 0) {
+            state.correlationListeners.delete(correlationId);
+          }
+        }
+      },
+    };
+  }
+
   function getCommandHandlers(): Record<string, CommandHandler> {
     return { ...state.commandHandlers };
   }
@@ -233,6 +269,7 @@ export function createMessageBus() {
     subscribeToEvent,
     subscribeAll,
     getCommandHandlers,
+    onCorrelation,
   };
 }
 
