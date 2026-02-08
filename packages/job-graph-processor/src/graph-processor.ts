@@ -6,8 +6,8 @@ import type { Job } from './graph-validator';
 import { validateGraph } from './graph-validator';
 import { classifyJobEvent } from './handle-job-event';
 
-interface ProcessGraphCommand {
-  type: 'ProcessGraph';
+export interface ProcessGraphCommand {
+  type: string;
   data: {
     graphId: string;
     jobs: readonly Job[];
