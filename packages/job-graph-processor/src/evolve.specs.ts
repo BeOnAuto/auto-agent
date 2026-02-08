@@ -93,6 +93,24 @@ describe('isGraphComplete', () => {
     expect(isGraphComplete(state)).toBe(false);
   });
 
+  it('returns true when a job has failed', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: {} }],
+        failurePolicy: 'halt',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+    state = evolve(state, { type: 'JobFailed', data: { jobId: 'a', error: 'build error' } });
+
+    expect(isGraphComplete(state)).toBe(true);
+  });
+
   it('returns true when all jobs have succeeded', () => {
     let state = evolve(initialState(), {
       type: 'GraphSubmitted',

@@ -1,6 +1,6 @@
 import type { Job } from './graph-validator';
 
-export type JobStatus = 'pending' | 'dispatched' | 'succeeded';
+export type JobStatus = 'pending' | 'dispatched' | 'succeeded' | 'failed';
 export type FailurePolicy = 'halt' | 'skip-dependents' | 'continue';
 
 interface JobState {
@@ -19,8 +19,9 @@ type JobDispatched = {
   data: { jobId: string; target: string; correlationId: string };
 };
 type JobSucceeded = { type: 'JobSucceeded'; data: { jobId: string; result?: unknown } };
+type JobFailed = { type: 'JobFailed'; data: { jobId: string; error: string } };
 
-export type JobGraphEvent = GraphSubmitted | JobDispatched | JobSucceeded;
+export type JobGraphEvent = GraphSubmitted | JobDispatched | JobSucceeded | JobFailed;
 
 type PendingGraphState = { status: 'pending' };
 type ProcessingGraphState = {
@@ -54,6 +55,8 @@ export function evolve(state: GraphState, event: JobGraphEvent): GraphState {
       return updateJobStatus(state, event.data.jobId, 'dispatched');
     case 'JobSucceeded':
       return updateJobStatus(state, event.data.jobId, 'succeeded');
+    case 'JobFailed':
+      return updateJobStatus(state, event.data.jobId, 'failed');
   }
 }
 
@@ -66,10 +69,12 @@ function updateJobStatus(state: GraphState, jobId: string, status: JobStatus): G
   return { ...state, jobs };
 }
 
+const TERMINAL_STATUSES: ReadonlySet<JobStatus> = new Set(['succeeded', 'failed']);
+
 export function isGraphComplete(state: GraphState): boolean {
   if (state.status !== 'processing') return false;
   for (const job of state.jobs.values()) {
-    if (job.status !== 'succeeded') return false;
+    if (!TERMINAL_STATUSES.has(job.status)) return false;
   }
   return true;
 }
