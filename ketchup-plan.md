@@ -793,12 +793,22 @@ it("dispatches job when graph is ready", () =>
 
 ## TODO
 
-### Bottle: ProcessGraphHandler (Emmett Integration)
-
-- [ ] Burst 22: Handler checks idempotency via stream existence [depends: none]
-- [ ] Burst 23b: Handler wires correlation subscriptions with messageBus [depends: 22]
+(empty — all bursts complete)
 
 ## DONE
+
+### Bottle: Graph Processor (MessageBus Integration)
+
+- [x] submit rejects duplicate graph submissions (92ee8ae1)
+- [x] submit rejects invalid graph (93b90bee)
+- [x] submit dispatches ready jobs and returns dispatching event (10f0214a)
+- [x] process correlated events and emit graph.completed (e956b347)
+- [x] dispatch dependent jobs when deps complete via correlation (56093d10)
+- [x] ignore correlated events after graph completes (89c8c5a7)
+- [x] ignore events with unrecognized correlationId format (cb294531)
+- [x] apply halt policy when job fails via correlation (59779996)
+- [x] export createGraphProcessor from index (dedcabe5)
+
 
 ### Bottle: Infrastructure Context Enhancement (pipeline)
 
