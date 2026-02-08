@@ -10,12 +10,15 @@ Without `@auto-engineer/job-graph-processor`, you would have to manually track j
 
 This package implements job graph processing as a pure event-sourced state machine. State is computed by folding events through an `evolve` function -- no mutable state, no side effects in the core logic. The `createGraphProcessor` factory wires the pure logic to a `MessageBus` for correlation-based event routing, so any domain event type can complete or fail a job as long as it carries the correct correlation ID.
 
+The package exports a `COMMANDS` array, so `PipelineServer` discovers it via `PluginLoader` and exposes `ProcessJobGraph` as a dispatchable command.
+
 ## Key Concepts
 
 - **Event-sourced state machine**: Graph state is derived by replaying events through a pure `evolve` reducer. No mutable state.
 - **Correlation-based routing**: Jobs are tracked via `graph:<graphId>:<jobId>` correlation IDs. Downstream handlers don't need to know about the job graph.
 - **Failure policies**: Three strategies (`halt`, `skip-dependents`, `continue`) control what happens when a job fails.
 - **Maximum parallelism**: All jobs whose dependencies are satisfied dispatch simultaneously.
+- **Target handlers required**: Each job's `target` field names a command handler that must also be registered as a plugin. The graph processor dispatches jobs by subscribing to correlated events on the messageBus, but the actual job execution depends on those target handlers existing and emitting events with the inherited correlation ID. Without matching handlers, the graph will dispatch but jobs will never complete.
 
 ---
 
@@ -27,35 +30,77 @@ pnpm add @auto-engineer/job-graph-processor
 
 ## Quick Start
 
+### 1. Register the Plugin
+
 ```typescript
-import { createMessageBus } from '@auto-engineer/message-bus';
-import { createGraphProcessor } from '@auto-engineer/job-graph-processor';
-
-const bus = createMessageBus();
-const processor = createGraphProcessor(bus);
-
-const result = processor.submit({
-  type: 'ProcessGraph',
-  data: {
-    graphId: 'deploy-pipeline',
-    jobs: [
-      { id: 'build', dependsOn: [], target: 'RunBuild', payload: { src: './app' } },
-      { id: 'test', dependsOn: ['build'], target: 'RunTests', payload: {} },
-      { id: 'deploy', dependsOn: ['test'], target: 'Deploy', payload: {} },
-    ],
-    failurePolicy: 'halt',
-  },
-});
-
-console.log(result);
-// { type: 'graph.dispatching', data: { graphId: 'deploy-pipeline', dispatchedJobs: [{ jobId: 'build', ... }] } }
+// auto.config.ts
+export const plugins = [
+  '@auto-engineer/job-graph-processor',
+  '@auto-engineer/server-checks', // target handlers for your jobs
+];
 ```
 
-The processor dispatches `build` immediately (no dependencies), then waits for correlated events. When a `BuildCompleted` event arrives with `correlationId: 'graph:deploy-pipeline:build'`, it dispatches `test`, and so on until `graph.completed` is published.
+### 2. Send a Command
+
+```bash
+curl -X POST http://localhost:3000/command \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "type": "ProcessJobGraph",
+    "data": {
+      "graphId": "deploy-1",
+      "jobs": [
+        { "id": "build", "dependsOn": [], "target": "RunBuild", "payload": { "src": "./app" } },
+        { "id": "test", "dependsOn": ["build"], "target": "RunTests", "payload": {} },
+        { "id": "deploy", "dependsOn": ["test"], "target": "Deploy", "payload": {} }
+      ],
+      "failurePolicy": "halt"
+    }
+  }'
+```
+
+The server returns an ack. The handler creates a `createGraphProcessor(messageBus)`, validates the graph, and dispatches `build` immediately (no dependencies). When the `RunBuild` handler emits an event with `correlationId: 'graph:deploy-1:build'`, the processor dispatches `test`, and so on until `graph.completed` is published to the messageBus.
+
+Each job's `target` must match a registered command handler name. If `RunBuild` is not registered as a plugin, the build job dispatches but never receives a completion event, so the graph stalls.
 
 ---
 
 ## How-to Guides
+
+### Run via CLI
+
+```bash
+auto process:job-graph --graphId=g1 --jobs='[{"id":"a","dependsOn":[],"target":"build","payload":{}}]' --failurePolicy=halt
+```
+
+### Run Programmatically
+
+```typescript
+import { COMMANDS } from '@auto-engineer/job-graph-processor';
+
+const handler = COMMANDS[0];
+const result = await handler.handle(
+  {
+    type: 'ProcessJobGraph',
+    data: {
+      graphId: 'g1',
+      jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: {} }],
+      failurePolicy: 'halt',
+    },
+  },
+  { messageBus },
+);
+```
+
+The second argument is the pipeline context. The handler extracts `messageBus` from it. Without a messageBus, the handler returns `graph.failed` with reason `messageBus not available in context`.
+
+### Handle Errors
+
+```typescript
+if (result.type === 'graph.failed') {
+  console.error(result.data.reason);
+}
+```
 
 ### Listen for Graph Completion
 
@@ -79,6 +124,29 @@ await bus.publishEvent({
 ```
 
 Any event without an `error` field in its data is treated as success. Any event with an `error` field is treated as failure.
+
+### Handle Failures with Policies
+
+```typescript
+processor.submit({
+  type: 'ProcessGraph',
+  data: {
+    graphId: 'g1',
+    jobs: [
+      { id: 'a', dependsOn: [], target: 'build', payload: {} },
+      { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+      { id: 'c', dependsOn: [], target: 'lint', payload: {} },
+    ],
+    failurePolicy: 'skip-dependents',
+  },
+});
+```
+
+| Policy            | When `a` Fails                                           |
+| ----------------- | -------------------------------------------------------- |
+| `halt`            | `b` and `c` are skipped. Graph completes immediately.    |
+| `skip-dependents` | `b` is skipped (depends on `a`). `c` continues.          |
+| `continue`        | `b` is dispatched anyway. Failure is treated as resolved. |
 
 ### Use the Pure State Machine Directly
 
@@ -105,29 +173,6 @@ state = evolve(state, { type: 'JobSucceeded', data: { jobId: 'a', result: { outp
 
 getReadyJobs(state);    // ['b']
 ```
-
-### Handle Failures with Policies
-
-```typescript
-processor.submit({
-  type: 'ProcessGraph',
-  data: {
-    graphId: 'g1',
-    jobs: [
-      { id: 'a', dependsOn: [], target: 'build', payload: {} },
-      { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
-      { id: 'c', dependsOn: [], target: 'lint', payload: {} },
-    ],
-    failurePolicy: 'skip-dependents',
-  },
-});
-```
-
-| Policy              | When `a` Fails                                             |
-| ------------------- | ---------------------------------------------------------- |
-| `halt`              | `b` and `c` are skipped. Graph completes immediately.      |
-| `skip-dependents`   | `b` is skipped (depends on `a`). `c` continues.            |
-| `continue`          | `b` is dispatched anyway. Failure is treated as resolved.   |
 
 ### Add Per-Job Timeouts
 
@@ -161,7 +206,7 @@ const exhausted = retries.recordFailure('build', config);
 
 ## API Reference
 
-### Package Exports
+### Exports
 
 ```typescript
 import {
@@ -194,6 +239,28 @@ import type {
   TimeoutManager,
 } from '@auto-engineer/job-graph-processor';
 ```
+
+### Commands
+
+| Command           | CLI Alias          | Description                                                                |
+| ----------------- | ------------------ | -------------------------------------------------------------------------- |
+| `ProcessJobGraph` | `process:job-graph`| Process a DAG of jobs with dependency tracking and failure policies         |
+
+#### Command Fields
+
+| Field           | Type            | Required | Description                                                         |
+| --------------- | --------------- | -------- | ------------------------------------------------------------------- |
+| `graphId`       | `string`        | yes      | Unique identifier for the graph                                     |
+| `jobs`          | `Job[]`         | yes      | Array of jobs with dependencies. Each job's `target` must match a registered command handler |
+| `failurePolicy` | `FailurePolicy` | yes      | How to handle failures: `halt`, `skip-dependents`, or `continue`    |
+
+#### Events Produced
+
+| Event              | When                                    |
+| ------------------ | --------------------------------------- |
+| `graph.dispatching`| Graph validated, ready jobs dispatched  |
+| `graph.failed`     | Validation error or missing messageBus  |
+| `graph.completed`  | All jobs reached terminal status (published to messageBus, not returned from handler) |
 
 ### Functions
 
@@ -325,62 +392,6 @@ flowchart LR
   Complete -->|no| Dispatch
 ```
 
----
-
-## Pipeline Integration
-
-The package exports a `COMMANDS` array so it can be loaded as a plugin by `PipelineServer` via `PluginLoader`.
-
-### Register as Plugin
-
-```typescript
-// auto.config.ts
-export const plugins = [
-  '@auto-engineer/job-graph-processor',
-  // ... other plugins
-];
-```
-
-### Command: ProcessJobGraph
-
-| Field           | Type             | Description                                      |
-| --------------- | ---------------- | ------------------------------------------------ |
-| `graphId`       | `string`         | Unique identifier for the graph                  |
-| `jobs`          | `Job[]`          | Array of jobs with dependencies                  |
-| `failurePolicy` | `FailurePolicy`  | How to handle failures: halt, skip-dependents, continue |
-
-**Alias:** `process:job-graph`
-
-### Events Produced
-
-| Event              | When                                    |
-| ------------------ | --------------------------------------- |
-| `graph.dispatching`| Graph validated, ready jobs dispatched  |
-| `graph.failed`     | Validation error or missing messageBus  |
-| `graph.completed`  | All jobs reached terminal status        |
-
-### Dispatch via HTTP
-
-```bash
-curl -X POST http://localhost:3000/command \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "type": "ProcessJobGraph",
-    "data": {
-      "graphId": "deploy-1",
-      "jobs": [
-        { "id": "build", "dependsOn": [], "target": "RunBuild", "payload": {} },
-        { "id": "test", "dependsOn": ["build"], "target": "RunTests", "payload": {} }
-      ],
-      "failurePolicy": "halt"
-    }
-  }'
-```
-
-The handler creates a fresh `createGraphProcessor(messageBus)` per invocation. The processor subscribes to correlated events on the shared messageBus, so the graph lifecycle continues asynchronously after the handler returns.
-
----
-
 ### Dependencies
 
 **Monorepo:**
@@ -391,7 +402,7 @@ The handler creates a fresh `createGraphProcessor(messageBus)` per invocation. T
 
 **External:**
 
-| Package                    | Usage                        |
-| -------------------------- | ---------------------------- |
-| `@event-driven-io/emmett`  | Event type import only       |
-| `nanoid`                   | Unique ID generation         |
+| Package                   | Usage                  |
+| ------------------------- | ---------------------- |
+| `@event-driven-io/emmett` | Event type import only |
+| `nanoid`                  | Unique ID generation   |
