@@ -1,6 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { evolve, getReadyJobs, initialState, isGraphComplete } from './evolve';
 
+describe('evolve', () => {
+  it('ignores job events for unknown job IDs', () => {
+    const state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: {} }],
+        failurePolicy: 'halt',
+      },
+    });
+    const after = evolve(state, { type: 'JobSucceeded', data: { jobId: 'unknown' } });
+
+    expect(getReadyJobs(after)).toEqual(['a']);
+  });
+});
+
 describe('getReadyJobs', () => {
   it('returns empty array before graph submission', () => {
     expect(getReadyJobs(initialState())).toEqual([]);
