@@ -15,6 +15,9 @@
     "@event-driven-io/emmett": "^0.38.2",
     "nanoid": "^5.0.0"
   },
+  "devDependencies": {
+    "@auto-engineer/pipeline": "workspace:*"
+  },
   "publishConfig": {
     "access": "public"
   },

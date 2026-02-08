@@ -536,6 +536,22 @@ importers:
         specifier: workspace:*
         version: link:../cli
 
+  packages/job-graph-processor:
+    dependencies:
+      '@auto-engineer/message-bus':
+        specifier: workspace:*
+        version: link:../message-bus
+      '@event-driven-io/emmett':
+        specifier: ^0.38.2
+        version: 0.38.5(@types/async-retry@1.4.9)(@types/uuid@10.0.0)(async-retry@1.3.3)(commander@14.0.0)(ts-node@10.9.2(@types/node@20.19.11)(typescript@5.8.3))(uuid@11.1.0)(web-streams-polyfill@4.2.0)
+      nanoid:
+        specifier: ^5.0.0
+        version: 5.1.5
+    devDependencies:
+      '@auto-engineer/pipeline':
+        specifier: workspace:*
+        version: link:../pipeline
+
   packages/message-bus:
     devDependencies:
       '@types/node':
