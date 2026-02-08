@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { evolve, getReadyJobs, initialState, isGraphComplete } from './evolve';
 
 describe('getReadyJobs', () => {
+  it('returns empty array before graph submission', () => {
+    expect(getReadyJobs(initialState())).toEqual([]);
+  });
+
   it('returns root jobs after graph submission', () => {
     const state = evolve(initialState(), {
       type: 'GraphSubmitted',
