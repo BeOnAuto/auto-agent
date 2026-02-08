@@ -74,7 +74,28 @@ describe('handler-adapter', () => {
       const command = { type: 'CheckTests', data: { targetDirectory: './src' } };
       await adapted.handle(command);
 
-      expect(mockHandle).toHaveBeenCalledWith(command);
+      expect(mockHandle).toHaveBeenCalledWith(command, undefined);
+    });
+
+    it('should forward context to source handle function', async () => {
+      const mockHandle = vi.fn().mockResolvedValue({ type: 'TestsCheckPassed', data: {} });
+      const source: CommandHandlerMetadata = {
+        name: 'CheckTests',
+        handle: mockHandle,
+      };
+
+      const adapted = adaptHandler(source);
+      const command = { type: 'CheckTests', data: {} };
+      const context = {
+        correlationId: 'corr-1',
+        emit: vi.fn(),
+        sendCommand: vi.fn(),
+        eventStore: {} as unknown,
+        messageBus: {} as unknown,
+      };
+      await adapted.handle(command, context);
+
+      expect(mockHandle).toHaveBeenCalledWith(command, context);
     });
 
     it('should return single event from handle', async () => {

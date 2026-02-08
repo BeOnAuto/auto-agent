@@ -31,6 +31,7 @@ export interface CommandHandlerWithMetadata extends CommandHandler {
   fields?: Record<string, unknown>;
   examples?: unknown[];
   events?: EventDefinition[];
+  handle: (command: Command, context?: PipelineContext) => Promise<Event | Event[]>;
 }
 
 export interface PipelineServerConfig {
@@ -900,7 +901,8 @@ export class PipelineServer {
     await this.updateNodeStatus(command.correlationId, command.type, 'running');
     await this.settledTracker.onCommandStarted(command);
 
-    const resultEvent = await handler.handle(command);
+    const ctx = this.createContext(command.correlationId);
+    const resultEvent = await handler.handle(command, ctx);
     const events = Array.isArray(resultEvent) ? resultEvent : [resultEvent];
 
     const finalStatus = this.getStatusFromEvents(events);
@@ -1003,6 +1005,8 @@ export class PipelineServer {
       startPhased: async (handler, event) => {
         await this.phasedExecutor.startPhased(handler, event, correlationId);
       },
+      eventStore: this.eventStoreContext.eventStore,
+      messageBus: this.messageBus,
     };
   }
 

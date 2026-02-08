@@ -8,7 +8,7 @@ export interface CommandHandlerMetadata {
   description?: string;
   events?: string[];
   fields?: Record<string, unknown>;
-  handle: (command: unknown) => Promise<unknown>;
+  handle: (command: unknown, context?: unknown) => Promise<unknown>;
 }
 
 interface UnifiedCommandHandler {
