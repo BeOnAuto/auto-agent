@@ -108,7 +108,10 @@ export function getReadyJobs(state: GraphState): string[] {
     if (job.status !== 'pending') continue;
     const allDepsResolved = job.dependsOn.every((dep) => {
       const depJob = state.jobs.get(dep);
-      return depJob !== undefined && depJob.status === 'succeeded';
+      return (
+        depJob !== undefined &&
+        (depJob.status === 'succeeded' || (state.failurePolicy === 'continue' && TERMINAL_STATUSES.has(depJob.status)))
+      );
     });
     if (allDepsResolved) {
       ready.push(id);

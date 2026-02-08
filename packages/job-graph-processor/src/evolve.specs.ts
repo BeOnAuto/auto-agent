@@ -65,6 +65,47 @@ describe('getReadyJobs', () => {
 
     expect(getReadyJobs(state)).toEqual(['b']);
   });
+
+  it('unlocks dependents of failed job under continue policy', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: {} },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+        ],
+        failurePolicy: 'continue',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+    state = evolve(state, { type: 'JobFailed', data: { jobId: 'a', error: 'build error' } });
+
+    expect(getReadyJobs(state)).toEqual(['b']);
+  });
+
+  it('does not unlock dependents of dispatched job under continue policy', () => {
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [
+          { id: 'a', dependsOn: [], target: 'build', payload: {} },
+          { id: 'b', dependsOn: ['a'], target: 'test', payload: {} },
+        ],
+        failurePolicy: 'continue',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+
+    expect(getReadyJobs(state)).toEqual([]);
+  });
 });
 
 describe('getTransitiveDependents', () => {
