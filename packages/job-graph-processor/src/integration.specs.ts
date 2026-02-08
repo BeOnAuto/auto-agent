@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { evolve, getReadyJobs, initialState } from './evolve';
 import { handleJobEvent } from './handle-job-event';
+import { createTimeoutManager } from './timeout-manager';
 
 describe('diamond dependency graph', () => {
   it('processes a→(b,c)→d diamond graph to completion', () => {
@@ -185,5 +186,36 @@ describe('failure policies integration', () => {
       readyJobs: ['b'],
       graphComplete: false,
     });
+  });
+});
+
+describe('timeout integration', () => {
+  it('fires timeout callback after elapsed time and evolve treats it as terminal', () => {
+    vi.useFakeTimers();
+    const timedOut: string[] = [];
+    const manager = createTimeoutManager((jobId) => timedOut.push(jobId));
+
+    let state = evolve(initialState(), {
+      type: 'GraphSubmitted',
+      data: {
+        graphId: 'g1',
+        jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: {} }],
+        failurePolicy: 'halt',
+      },
+    });
+    state = evolve(state, {
+      type: 'JobDispatched',
+      data: { jobId: 'a', target: 'build', correlationId: 'graph:g1:a' },
+    });
+
+    manager.start('a', 5000);
+    vi.advanceTimersByTime(5000);
+
+    expect(timedOut).toEqual(['a']);
+
+    state = evolve(state, { type: 'JobTimedOut', data: { jobId: 'a', timeoutMs: 5000 } });
+    expect(getReadyJobs(state)).toEqual([]);
+
+    vi.useRealTimers();
   });
 });
