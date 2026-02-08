@@ -799,16 +799,6 @@ it("dispatches job when graph is ready", () =>
 - [ ] Burst 22: Handler checks idempotency via stream existence [depends: 21]
 - [ ] Burst 23: Handler emits GraphSubmitted, subscribes correlations, dispatches ready jobs [depends: 22]
 
-### Bottle: Event Listener
-
-- [ ] Burst 24: handleJobEvent parses correlationId to identify graph+job [depends: none]
-- [ ] Burst 25: handleJobEvent determines success vs failure from payload.error [depends: 24]
-- [ ] Burst 26: handleJobEvent emits JobSucceeded and dispatches ready jobs [depends: 25]
-- [ ] Burst 27: handleJobEvent applies halt policy (skip pending, emit GraphFailed) [depends: 26]
-- [ ] Burst 28: handleJobEvent applies skip-dependents policy [depends: 27]
-- [ ] Burst 29: handleJobEvent applies continue policy [depends: 28]
-- [ ] Burst 30: handleJobEvent checks graph completion and emits GraphCompleted [depends: 29]
-
 ### Bottle: Timeouts
 
 - [ ] Burst 31: Timeout manager tracks timers per job [depends: none]
@@ -870,6 +860,16 @@ it("dispatches job when graph is ready", () =>
 - [x] isGraphComplete treats skipped jobs as terminal (20657f4c)
 - [x] isGraphComplete treats timed-out jobs as terminal (d3843559)
 - [x] getTransitiveDependents query function (d12ad238)
+
+### Bottle: Event Listener
+
+- [x] parseCorrelationId extracts graphId and jobId (43b57579)
+- [x] isJobFailure detects failure from payload error (951446de)
+- [x] classifyJobEvent maps domain events to evolve events (a9ed7169)
+- [x] applyPolicy halt skips all pending jobs (ed51ebc3)
+- [x] applyPolicy skip-dependents skips transitive deps (ededa69a)
+- [x] applyPolicy continue returns no skip events (9bc2035e)
+- [x] handleJobEvent composes classify, evolve, policy, completion (c82c9489)
 
 ---
 
