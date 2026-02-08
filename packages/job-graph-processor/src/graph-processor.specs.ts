@@ -23,4 +23,19 @@ describe('createGraphProcessor', () => {
       data: { graphId: 'g1', reason: 'Graph g1 already submitted' },
     });
   });
+
+  it('rejects invalid graph', () => {
+    const bus = createMessageBus();
+    const processor = createGraphProcessor(bus);
+
+    const result = processor.submit({
+      type: 'ProcessGraph',
+      data: { graphId: 'g1', jobs: [], failurePolicy: 'halt' },
+    });
+
+    expect(result).toEqual({
+      type: 'graph.failed',
+      data: { graphId: 'g1', reason: 'Graph must contain at least one job' },
+    });
+  });
 });
