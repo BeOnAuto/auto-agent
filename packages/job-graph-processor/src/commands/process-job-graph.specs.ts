@@ -46,6 +46,30 @@ describe('ProcessJobGraph command handler', () => {
     });
   });
 
+  it('dispatches target commands via ctx.sendCommand when provided', async () => {
+    const messageBus = createMessageBus();
+    const dispatched: Array<{ type: string; data: unknown; correlationId: string }> = [];
+    const sendCommand = async (type: string, data: unknown, correlationId?: string) => {
+      dispatched.push({ type, data, correlationId: correlationId! });
+    };
+
+    await commandHandler.handle(
+      {
+        type: 'ProcessJobGraph',
+        data: {
+          graphId: 'g1',
+          jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: { src: './app' } }],
+          failurePolicy: 'halt',
+        },
+      },
+      { messageBus, sendCommand },
+    );
+
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(dispatched).toEqual([{ type: 'build', data: { src: './app' }, correlationId: 'graph:g1:a' }]);
+  });
+
   it('returns graph.failed for invalid graph', async () => {
     const messageBus = createMessageBus();
 

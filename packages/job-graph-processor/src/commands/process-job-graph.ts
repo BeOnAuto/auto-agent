@@ -1,9 +1,15 @@
 import type { Command, Event, MessageBus } from '@auto-engineer/message-bus';
 import type { FailurePolicy } from '../evolve';
+import type { DispatchFn } from '../graph-processor';
 import { createGraphProcessor, type ProcessGraphCommand } from '../graph-processor';
 import type { Job } from '../graph-validator';
 
-function isContextWithMessageBus(context: unknown): context is { messageBus: MessageBus } {
+interface ContextWithMessageBus {
+  messageBus: MessageBus;
+  sendCommand?: (type: string, data: unknown, correlationId?: string) => Promise<void>;
+}
+
+function isContextWithMessageBus(context: unknown): context is ContextWithMessageBus {
   return (
     context !== null &&
     context !== undefined &&
@@ -13,6 +19,12 @@ function isContextWithMessageBus(context: unknown): context is { messageBus: Mes
     context.messageBus !== undefined &&
     typeof context.messageBus === 'object'
   );
+}
+
+function buildDispatch(context: ContextWithMessageBus): DispatchFn | undefined {
+  if (typeof context.sendCommand !== 'function') return undefined;
+  const ctxSendCommand = context.sendCommand;
+  return (cmd) => ctxSendCommand(cmd.type, cmd.data, cmd.correlationId);
 }
 
 function toProcessGraphCommand(command: Command): ProcessGraphCommand {
@@ -59,7 +71,8 @@ export const commandHandler = {
       };
     }
 
-    const processor = createGraphProcessor(context.messageBus);
+    const dispatch = buildDispatch(context);
+    const processor = createGraphProcessor(context.messageBus, dispatch ? { dispatch } : undefined);
     return processor.submit(toProcessGraphCommand(command));
   },
 };
