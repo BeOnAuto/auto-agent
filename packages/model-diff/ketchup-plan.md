@@ -2,13 +2,6 @@
 
 ## TODO
 
-- [ ] Burst 5: `getReferencedMessageNames` — extract all message type names from a slice [depends: 4]
-- [ ] Burst 6: `findEventSource` — find which command slice's Then steps produce a given event name [depends: 4]
-- [ ] Burst 7: `findCommandSource` — find which command slice's When steps define a given command name [depends: 4]
-- [ ] Burst 8: `getEventSourceMap` — build consumed-events→producer map [depends: 6]
-- [ ] Burst 9: `getCommandSourceMap` — build produced-commands→definer map [depends: 7]
-- [ ] Burst 10: `getReferencedIntegrations` — filter model integrations by slice.via names [depends: 1]
-- [ ] Burst 11: `computeSharedTypesHash` — hash string literal union fields from messages [depends: 2]
 - [ ] Burst 12: `buildSliceSnapshot` — assemble snapshot from slice + model dependencies [depends: 5, 8, 9, 10]
 - [ ] Burst 13: `computeFingerprintFromSnapshot` — SHA-256 of stable-stringified snapshot [depends: 2, 12]
 - [ ] Burst 14: `computeAllSnapshots` + `computeAllFingerprints` — build all from a model [depends: 3, 12, 13]
@@ -25,4 +18,5 @@
 
 - [x] Burst 1: infra — scaffold `packages/model-diff` (4d32a30b)
 - [x] Burst 2: `stableStringify` — deterministic JSON output (f04e4db2)
-- [x] Burst 3+4: `toKebabCase` + `walkStepsByKeyword` — utils and step walking (pending)
+- [x] Burst 3+4: `toKebabCase` + `walkStepsByKeyword` — utils and step walking (25f27b92)
+- [x] Burst 5-11: model dependency functions — message refs, event/command sources, integrations, shared types hash (pending)
