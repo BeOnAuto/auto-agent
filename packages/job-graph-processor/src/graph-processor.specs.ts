@@ -260,6 +260,28 @@ describe('createGraphProcessor', () => {
     ]);
   });
 
+  it('uses dispatch callback instead of messageBus.sendCommand when provided', async () => {
+    const bus = createMessageBus();
+    const dispatched: Array<{ type: string; data: unknown; correlationId: string }> = [];
+    const dispatch = async (command: { type: string; data: unknown; correlationId: string }) => {
+      dispatched.push(command);
+    };
+    const processor = createGraphProcessor(bus, { dispatch });
+
+    processor.submit({
+      type: 'ProcessGraph',
+      data: {
+        graphId: 'g1',
+        jobs: [{ id: 'a', dependsOn: [], target: 'build', payload: { src: './app' } }],
+        failurePolicy: 'halt',
+      },
+    });
+
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(dispatched).toEqual([{ type: 'build', data: { src: './app' }, correlationId: 'graph:g1:a' }]);
+  });
+
   it('applies halt policy when job fails via correlation', async () => {
     const bus = createMessageBus();
     const processor = createGraphProcessor(bus);

@@ -22,7 +22,17 @@ interface DispatchedJob {
   correlationId: string;
 }
 
-export function createGraphProcessor(messageBus: MessageBus) {
+export type DispatchFn = (command: { type: string; data: unknown; correlationId: string }) => Promise<void>;
+
+export function createGraphProcessor(messageBus: MessageBus, options?: { dispatch?: DispatchFn }) {
+  const dispatch: DispatchFn =
+    options?.dispatch ??
+    ((cmd) =>
+      messageBus.sendCommand({
+        type: cmd.type,
+        data: cmd.data as Record<string, unknown>,
+        correlationId: cmd.correlationId,
+      }));
   const graphs = new Map<string, { state: GraphState; jobById: Record<string, Job> }>();
 
   function submit(command: ProcessGraphCommand): Event {
@@ -64,9 +74,7 @@ export function createGraphProcessor(messageBus: MessageBus) {
     });
 
     for (const d of dispatched) {
-      messageBus
-        .sendCommand({ type: d.target, data: d.payload as Record<string, unknown>, correlationId: d.correlationId })
-        .catch(() => {});
+      dispatch({ type: d.target, data: d.payload, correlationId: d.correlationId }).catch(() => {});
     }
 
     return { type: 'graph.dispatching', data: { graphId, dispatchedJobs: dispatched } };
@@ -94,7 +102,7 @@ export function createGraphProcessor(messageBus: MessageBus) {
         type: 'JobDispatched',
         data: { jobId, target, correlationId },
       });
-      messageBus.sendCommand({ type: target, data: payload as Record<string, unknown>, correlationId }).catch(() => {});
+      dispatch({ type: target, data: payload, correlationId }).catch(() => {});
     }
 
     graphs.set(graphId, { ...entry, state });
