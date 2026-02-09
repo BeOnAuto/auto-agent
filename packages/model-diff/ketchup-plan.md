@@ -2,9 +2,6 @@
 
 ## TODO
 
-- [ ] Burst 12: `buildSliceSnapshot` — assemble snapshot from slice + model dependencies [depends: 5, 8, 9, 10]
-- [ ] Burst 13: `computeFingerprintFromSnapshot` — SHA-256 of stable-stringified snapshot [depends: 2, 12]
-- [ ] Burst 14: `computeAllSnapshots` + `computeAllFingerprints` — build all from a model [depends: 3, 12, 13]
 - [ ] Burst 15: `loadGenerationState` + `saveGenerationState` — JSON persistence [depends: 1]
 - [ ] Burst 16: `computeChangeSet` — diff previous state vs current → ChangeSet [depends: 14, 15]
 - [ ] Burst 17: `DetectChanges` command handler [depends: 11, 14, 15, 16]
@@ -20,3 +17,4 @@
 - [x] Burst 2: `stableStringify` — deterministic JSON output (f04e4db2)
 - [x] Burst 3+4: `toKebabCase` + `walkStepsByKeyword` — utils and step walking (25f27b92)
 - [x] Burst 5-11: model dependency functions — message refs, event/command sources, integrations, shared types hash (fe598616)
+- [x] Burst 12-14: fingerprinting — buildSliceSnapshot, computeFingerprintFromSnapshot, computeAllSnapshots/Fingerprints (59f1f61e)
