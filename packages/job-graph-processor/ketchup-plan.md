@@ -7,7 +7,8 @@
 - [x] Burst 1: submit sends target commands for initial ready jobs [depends: none]
 - [x] Burst 2: onJobEvent sends target commands for newly ready dependent jobs [depends: 1]
 - [x] Burst 3: accept dispatch callback instead of using messageBus.sendCommand [depends: 2]
-- [ ] Burst 4: process-job-graph handler wires ctx.sendCommand as dispatch [depends: 3]
+- [x] Burst 4: PipelineContext.sendCommand accepts optional correlationId override [depends: 3]
+- [ ] Burst 5: process-job-graph handler wires ctx.sendCommand as dispatch [depends: 4]
 
 ## DONE
 

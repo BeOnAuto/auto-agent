@@ -4,7 +4,7 @@ import type { ForEachPhasedDescriptor } from '../core/descriptors';
 
 export interface PipelineContext {
   emit: (type: string, data: unknown) => Promise<void>;
-  sendCommand: (type: string, data: unknown) => Promise<void>;
+  sendCommand: (type: string, data: unknown, correlationId?: string) => Promise<void>;
   correlationId: string;
   startPhased?: (handler: ForEachPhasedDescriptor, event: Event) => Promise<void>;
   eventStore?: InMemoryEventStore;

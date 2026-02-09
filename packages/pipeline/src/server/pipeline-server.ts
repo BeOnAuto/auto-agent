@@ -990,15 +990,16 @@ export class PipelineServer {
         this.sseManager.broadcast(event);
         await this.routeEventToPipelines(event);
       },
-      sendCommand: async (type: string, data: unknown) => {
+      sendCommand: async (type: string, data: unknown, overrideCorrelationId?: string) => {
         const requestId = `req-${nanoid()}`;
+        const effectiveCorrelationId = overrideCorrelationId ?? correlationId;
         const command: Command & { correlationId: string; requestId: string } = {
           type,
           data: data as Record<string, unknown>,
-          correlationId,
+          correlationId: effectiveCorrelationId,
           requestId,
         };
-        await this.emitCommandDispatched(correlationId, requestId, type, data as Record<string, unknown>);
+        await this.emitCommandDispatched(effectiveCorrelationId, requestId, type, data as Record<string, unknown>);
         await this.processCommand(command);
       },
       /* v8 ignore next 3 - integration path tested via pipeline-runtime.specs.ts */
