@@ -282,6 +282,21 @@ describe('createGraphProcessor', () => {
     expect(dispatched).toEqual([{ type: 'build', data: { src: './app' }, correlationId: 'graph:g1:a' }]);
   });
 
+  it('rejects command with missing jobs', () => {
+    const bus = createMessageBus();
+    const processor = createGraphProcessor(bus);
+
+    const result = processor.submit({
+      type: 'ProcessGraph',
+      data: { graphId: 'g1', failurePolicy: 'halt' } as any,
+    });
+
+    expect(result).toEqual({
+      type: 'graph.failed',
+      data: { graphId: 'g1', reason: 'jobs is required and must be an array' },
+    });
+  });
+
   it('applies halt policy when job fails via correlation', async () => {
     const bus = createMessageBus();
     const processor = createGraphProcessor(bus);

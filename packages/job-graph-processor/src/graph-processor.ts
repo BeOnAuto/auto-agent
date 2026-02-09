@@ -42,6 +42,10 @@ export function createGraphProcessor(messageBus: MessageBus, options?: { dispatc
       return { type: 'graph.failed', data: { graphId, reason: `Graph ${graphId} already submitted` } };
     }
 
+    if (!Array.isArray(jobs)) {
+      return { type: 'graph.failed', data: { graphId, reason: 'jobs is required and must be an array' } };
+    }
+
     const validation = validateGraph(jobs);
     if (!validation.valid) {
       return { type: 'graph.failed', data: { graphId, reason: validation.error } };
