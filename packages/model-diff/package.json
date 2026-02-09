@@ -1,0 +1,33 @@
+{
+  "name": "@auto-engineer/model-diff",
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc && tsx ../../scripts/fix-esm-imports.ts",
+    "test": "vitest run --reporter=dot --passWithNoTests",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@auto-engineer/narrative": "workspace:*",
+    "@auto-engineer/message-bus": "workspace:*",
+    "debug": "^4.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "1.12.0"
+}

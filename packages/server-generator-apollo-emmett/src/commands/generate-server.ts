@@ -4,7 +4,9 @@ import * as path from 'node:path';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
-import type { Model } from '@auto-engineer/narrative';
+import type { ChangeSet, GenerationState } from '@auto-engineer/model-diff';
+import { saveGenerationState } from '@auto-engineer/model-diff';
+import type { Model, Narrative, Slice } from '@auto-engineer/narrative';
 import createDebug from 'debug';
 import { execa } from 'execa';
 import fs from 'fs-extra';
@@ -24,7 +26,10 @@ export type GenerateServerCommand = Command<
   'GenerateServer',
   {
     modelPath: string;
-    destination: string; // the project root where "server" directory will be created
+    destination: string;
+    changeSet?: ChangeSet;
+    isFirstRun?: boolean;
+    newState?: GenerationState;
   }
 >;
 
@@ -177,13 +182,19 @@ async function cleanStaleCompiledFiles(serverDir: string): Promise<void> {
   debugScaffold('  Cleanup completed');
 }
 
-async function generateAndWriteScaffold(spec: Model, serverDir: string): Promise<void> {
+async function generateAndWriteScaffold(spec: Model, serverDir: string, affectedSliceIds?: Set<string>): Promise<void> {
   const domainFlowsPath = join(serverDir, 'src', 'domain', 'flows');
   debugScaffold('Generating scaffold file plans');
   debugScaffold('  Domain flows path: %s', domainFlowsPath);
   debugScaffold('  Number of flows: %d', spec.narratives?.length || 0);
 
-  const filePlans = await generateScaffoldFilePlans(spec.narratives, spec.messages, spec.integrations, domainFlowsPath);
+  const filePlans = await generateScaffoldFilePlans(
+    spec.narratives,
+    spec.messages,
+    spec.integrations,
+    domainFlowsPath,
+    affectedSliceIds,
+  );
 
   debugScaffold('Generated %d file plans', filePlans.length);
   if (filePlans.length > 0) {
@@ -261,10 +272,66 @@ function createServerFailureEvent(command: GenerateServerCommand, error: unknown
   };
 }
 
+export function createSliceGeneratedEvent(
+  flow: Narrative,
+  slice: Slice,
+  command: GenerateServerCommand,
+): SliceGeneratedEvent {
+  return {
+    type: 'SliceGenerated',
+    data: {
+      flowName: flow.name,
+      sliceName: slice.name,
+      sliceType: slice.type,
+      schemaPath: command.data.modelPath,
+      slicePath: ensureDirPath('./server/src/domain/flows', toKebabCase(flow.name), toKebabCase(slice.name)),
+    },
+    timestamp: new Date(),
+    requestId: command.requestId,
+    correlationId: command.correlationId,
+  };
+}
+
+export function emitSliceGeneratedForAll(
+  spec: Model,
+  command: GenerateServerCommand,
+  events: GenerateServerEvents[],
+): void {
+  if (Array.isArray(spec.narratives) && spec.narratives.length > 0) {
+    for (const flow of spec.narratives) {
+      if (Array.isArray(flow.slices) && flow.slices.length > 0) {
+        for (const slice of flow.slices) {
+          if (slice.type === 'experience') continue;
+          events.push(createSliceGeneratedEvent(flow, slice, command));
+          debug('SliceGenerated: %s.%s', flow.name, slice.name);
+        }
+      }
+    }
+  }
+}
+
+export function emitSliceGeneratedForAffected(
+  spec: Model,
+  affectedIds: Set<string>,
+  command: GenerateServerCommand,
+  events: GenerateServerEvents[],
+): void {
+  for (const flow of spec.narratives) {
+    for (const slice of flow.slices) {
+      if (slice.type === 'experience') continue;
+      const sliceId = `${toKebabCase(flow.name)}/${toKebabCase(slice.name)}`;
+      if (affectedIds.has(sliceId)) {
+        events.push(createSliceGeneratedEvent(flow, slice, command));
+        debug('SliceGenerated (incremental): %s.%s', flow.name, slice.name);
+      }
+    }
+  }
+}
+
 export async function handleGenerateServerCommandInternal(
   command: GenerateServerCommand,
 ): Promise<GenerateServerEvents[]> {
-  const { modelPath, destination } = command.data;
+  const { modelPath, destination, changeSet, isFirstRun, newState } = command.data;
   const events: GenerateServerEvents[] = [];
 
   debug('Starting server generation');
@@ -284,62 +351,51 @@ export async function handleGenerateServerCommandInternal(
 
     const spec = await readAndParseModel(absModel);
 
-    // Setup server directory
     const serverDir = join(absDest, 'server');
     debug('Server directory: %s', serverDir);
-    debug('🔄 Generating server... %s', serverDir);
 
-    debug('Clearing existing server directory if it exists');
-    await fs.remove(serverDir);
-    debug('Server directory cleared');
+    const hasChangeSet = changeSet !== undefined;
+    const isFullGeneration = !hasChangeSet || isFirstRun;
 
-    await ensureDirExists(serverDir);
-    debugFiles('Created server directory: %s', serverDir);
+    if (isFullGeneration) {
+      debug('Full generation mode');
+      await fs.remove(serverDir);
+      await ensureDirExists(serverDir);
+      await copyAllFiles(serverDir);
+      await generateAndWriteScaffold(spec, serverDir);
+      emitSliceGeneratedForAll(spec, command, events);
+      await writeConfigurationFiles(serverDir, absDest);
+      debugDeps('Installing dependencies and generating GraphQL schema...');
+      await installDependenciesAndGenerateSchema(serverDir, absDest);
+    } else if (changeSet.allAffected.length === 0 && changeSet.removed.length === 0) {
+      debug('No changes detected, skipping scaffold generation');
+    } else {
+      debug('Incremental generation mode');
 
-    await copyAllFiles(serverDir);
-
-    await generateAndWriteScaffold(spec, serverDir);
-
-    if (Array.isArray(spec.narratives) && spec.narratives.length > 0) {
-      for (const flow of spec.narratives) {
-        if (Array.isArray(flow.slices) && flow.slices.length > 0) {
-          for (const slice of flow.slices) {
-            if (slice.type === 'experience') continue; // skip experience slices
-            const sliceEvent: SliceGeneratedEvent = {
-              type: 'SliceGenerated',
-              data: {
-                flowName: flow.name,
-                sliceName: slice.name,
-                sliceType: slice.type,
-                schemaPath: command.data.modelPath,
-                slicePath: ensureDirPath('./server/src/domain/flows', toKebabCase(flow.name), toKebabCase(slice.name)),
-              },
-              timestamp: new Date(),
-              requestId: command.requestId,
-              correlationId: command.correlationId,
-            };
-            events.push(sliceEvent);
-            debug('SliceGenerated: %s.%s', flow.name, slice.name);
-          }
-        }
+      for (const sliceId of changeSet.removed) {
+        const [flowDir, sliceDir] = sliceId.split('/');
+        await fs.remove(join(serverDir, 'src/domain/flows', flowDir, sliceDir));
+        debug('Removed slice directory: %s/%s', flowDir, sliceDir);
       }
+
+      await copyAllFiles(serverDir);
+
+      const affectedIds = new Set(changeSet.allAffected);
+      await generateAndWriteScaffold(spec, serverDir, affectedIds);
+      emitSliceGeneratedForAffected(spec, affectedIds, command, events);
+      await writeConfigurationFiles(serverDir, absDest);
+      debugDeps('Installing dependencies and generating GraphQL schema...');
+      await installDependenciesAndGenerateSchema(serverDir, absDest);
     }
 
-    // Write configuration files
-    await writeConfigurationFiles(serverDir, absDest);
-
-    // Install dependencies and generate schema
-    debugDeps('Installing dependencies and generating GraphQL schema...');
-    await installDependenciesAndGenerateSchema(serverDir, absDest);
+    if (newState) {
+      await saveGenerationState(absDest, newState);
+    }
 
     debug('Server generation completed successfully');
-    debug('Server directory: %s', serverDir);
-
-    // Add final success event
     events.push(createServerSuccessEvent(command, serverDir, absDest));
     return events;
   } catch (error) {
-    // Add failure event to events array if any events were already added
     events.push(createServerFailureEvent(command, error));
     return events;
   }

@@ -12,6 +12,14 @@ interface SchemaExportedData {
   outputPath: string;
 }
 
+interface ChangesDetectedData {
+  modelPath: string;
+  destination: string;
+  changeSet: Record<string, unknown>;
+  isFirstRun: boolean;
+  newState: Record<string, unknown>;
+}
+
 interface SliceGeneratedData {
   slicePath: string;
 }
@@ -107,6 +115,7 @@ function resolvePath(relativePath: string): string {
 export const fileId = 'kanbanNew1';
 
 export const plugins = [
+  '@auto-engineer/model-diff',
   '@auto-engineer/server-checks',
   '@auto-engineer/design-system-importer',
   '@auto-engineer/server-generator-apollo-emmett',
@@ -122,13 +131,22 @@ export const plugins = [
 
 export const pipeline = define('kanban-todo')
   .on('SchemaExported')
-  .emit('GenerateServer', (e: { data: SchemaExportedData }) => {
+  .emit('DetectChanges', (e: { data: SchemaExportedData }) => {
     projectRoot = e.data.directory;
     return {
       modelPath: e.data.outputPath,
       destination: e.data.directory,
     };
   })
+
+  .on('ChangesDetected')
+  .emit('GenerateServer', (e: { data: ChangesDetectedData }) => ({
+    modelPath: e.data.modelPath,
+    destination: e.data.destination,
+    changeSet: e.data.changeSet,
+    isFirstRun: e.data.isFirstRun,
+    newState: e.data.newState,
+  }))
 
   .on('SliceGenerated')
   .emit('ImplementSlice', (e: { data: SliceGeneratedData }) => ({

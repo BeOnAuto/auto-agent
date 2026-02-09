@@ -680,6 +680,7 @@ export async function generateScaffoldFilePlans(
   messages: Model['messages'],
   integrations?: Model['integrations'],
   baseDir = 'src/domain/flows',
+  affectedSliceIds?: Set<string>,
 ): Promise<FilePlan[]> {
   debug('Generating scaffold file plans');
   debug('  Number of flows: %d', flows.length);
@@ -701,6 +702,10 @@ export async function generateScaffoldFilePlans(
     debugFlow('  Number of slices: %d', flow.slices.length);
 
     for (const slice of flow.slices) {
+      if (affectedSliceIds) {
+        const sliceId = `${toKebabCase(flow.name)}/${toKebabCase(slice.name)}`;
+        if (!affectedSliceIds.has(sliceId)) continue;
+      }
       debugFlow('  Processing slice: %s (type: %s)', slice.name, slice.type);
       const sliceDir = ensureDirPath(flowDir, toKebabCase(slice.name));
       debugFlow('    Slice directory: %s', sliceDir);

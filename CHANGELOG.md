@@ -2,6 +2,16 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.11.0
 
 ### Minor Changes
@@ -689,6 +699,23 @@
 
 # @auto-engineer/cli
 
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/file-store@1.12.0
+  - @auto-engineer/narrative@1.12.0
+  - @auto-engineer/pipeline@1.12.0
+
 ## 1.11.0
 
 ### Minor Changes
@@ -1349,6 +1376,22 @@
   - @auto-engineer/pipeline@0.14.0
 
 # @auto-engineer/frontend-implementer
+
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/ai-gateway@1.12.0
+  - @auto-engineer/message-bus@1.12.0
 
 ## 1.11.0
 
@@ -2564,6 +2607,21 @@
 
 # create-auto-app
 
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/id@1.12.0
+
 ## 1.11.0
 
 ### Minor Changes
@@ -3502,6 +3560,21 @@
 - Major overhaul of the plugin system
 
 # @auto-engineer/design-system-importer
+
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/message-bus@1.12.0
 
 ## 1.11.0
 
@@ -4706,6 +4779,22 @@
 
 # @auto-engineer/dev-server
 
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/cli@1.12.0
+  - @auto-engineer/message-bus@1.12.0
+
 ## 1.11.0
 
 ### Minor Changes
@@ -5437,6 +5526,16 @@
 
 # @auto-engineer/file-store
 
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.11.0
 
 ### Minor Changes
@@ -6081,6 +6180,21 @@
 - version bump
 
 # @auto-engineer/frontend-checks
+
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/message-bus@1.12.0
 
 ## 1.11.0
 
@@ -7243,6 +7357,22 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/frontend-react-graphql-generator
+
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/ai-gateway@1.12.0
+  - @auto-engineer/message-bus@1.12.0
 
 ## 1.11.0
 
@@ -8559,6 +8689,22 @@
 
 # @auto-engineer/frontend-implementer
 
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/ai-gateway@1.12.0
+  - @auto-engineer/message-bus@1.12.0
+
 ## 1.11.0
 
 ### Minor Changes
@@ -9871,6 +10017,16 @@
 
 # @auto-engineer/id
 
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.11.0
 
 ### Minor Changes
@@ -10453,6 +10609,23 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/ai-gateway@1.12.0
+  - @auto-engineer/message-bus@1.12.0
+  - @auto-engineer/narrative@1.12.0
 
 ## 1.11.0
 
@@ -11841,6 +12014,16 @@
 
 # @auto-engineer/message-bus
 
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.11.0
 
 ### Minor Changes
@@ -12532,6 +12715,21 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/message-bus@1.12.0
 
 ## 1.11.0
 
@@ -13520,7 +13718,42 @@
 
 - @auto-engineer/message-bus@0.8.6
 
+# @auto-engineer/model-diff
+
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/message-bus@1.12.0
+  - @auto-engineer/narrative@1.12.0
+
 # @auto-engineer/flow
+
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/file-store@1.12.0
+  - @auto-engineer/id@1.12.0
+  - @auto-engineer/message-bus@1.12.0
 
 ## 1.11.0
 
@@ -15042,6 +15275,22 @@
 
 # @auto-engineer/pipeline
 
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/file-store@1.12.0
+  - @auto-engineer/message-bus@1.12.0
+
 ## 1.11.0
 
 ### Minor Changes
@@ -15656,6 +15905,16 @@
 
 # @auto-engineer/release-automation
 
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
 ## 1.11.0
 
 ### Minor Changes
@@ -16006,6 +16265,22 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/cli@1.12.0
+  - @auto-engineer/message-bus@1.12.0
 
 ## 1.11.0
 
@@ -17174,6 +17449,23 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/message-bus@1.12.0
+  - @auto-engineer/model-diff@1.12.0
+  - @auto-engineer/narrative@1.12.0
 
 ## 1.11.0
 
@@ -18492,6 +18784,21 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/narrative@1.12.0
+
 ## 1.11.0
 
 ### Minor Changes
@@ -19046,6 +19353,22 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.12.0
+
+### Minor Changes
+
+- [`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **packages/narrative**: add @auto-engineer/narrative/schema subpath export
+  - **packages/model-diff**: new package for model-level change detection (incremental generation)
+  - **packages/server-generator-apollo-emmett**: add incremental generation support via model-diff change sets
+  - **global**: version packages
+  - **global**: add changeset
+
+### Patch Changes
+
+- Updated dependencies [[`a425971`](https://github.com/BeOnAuto/auto-engineer/commit/a4259717bdd3bd1c9f0194c9c33c46bbff510f00)]:
+  - @auto-engineer/ai-gateway@1.12.0
+  - @auto-engineer/message-bus@1.12.0
 
 ## 1.11.0
 

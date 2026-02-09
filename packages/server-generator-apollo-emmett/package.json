@@ -19,6 +19,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
+    "@auto-engineer/model-diff": "workspace:*",
     "@auto-engineer/narrative": "workspace:*",
     "@auto-engineer/message-bus": "workspace:*",
     "@event-driven-io/emmett": "^0.38.2",
@@ -54,5 +55,5 @@
     "vitest": "^3.2.4",
     "tsx": "^4.19.2"
   },
-  "version": "1.11.0"
+  "version": "1.12.0"
 }

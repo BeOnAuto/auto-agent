@@ -12,6 +12,7 @@
 "@auto-engineer/information-architect": minor
 "@auto-engineer/message-bus": minor
 "@auto-engineer/message-store": minor
+"@auto-engineer/model-diff": minor
 "@auto-engineer/narrative": minor
 "@auto-engineer/pipeline": minor
 "@auto-engineer/release-automation": minor
@@ -22,6 +23,8 @@
 "create-auto-app": minor
 ---
 
-- **packages/narrative**: add @auto-engineer/narrative/schema subpath export
-- **global**: version packages
-- **global**: add changeset
+- **server-generator-apollo-emmett**: add 3-mode generation with incremental support
+- **server-generator-apollo-emmett**: add affectedSliceIds filter to generateScaffoldFilePlans
+- **model-diff**: add index.ts exports
+- **model-diff**: add DetectChanges command handler
+- **model-diff**: add change set computation
