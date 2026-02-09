@@ -741,6 +741,9 @@ importers:
       '@auto-engineer/message-bus':
         specifier: workspace:*
         version: link:../message-bus
+      '@auto-engineer/model-diff':
+        specifier: workspace:*
+        version: link:../model-diff
       '@auto-engineer/narrative':
         specifier: workspace:*
         version: link:../narrative
