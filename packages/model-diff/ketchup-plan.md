@@ -19,4 +19,4 @@
 - [x] Burst 1: infra — scaffold `packages/model-diff` (4d32a30b)
 - [x] Burst 2: `stableStringify` — deterministic JSON output (f04e4db2)
 - [x] Burst 3+4: `toKebabCase` + `walkStepsByKeyword` — utils and step walking (25f27b92)
-- [x] Burst 5-11: model dependency functions — message refs, event/command sources, integrations, shared types hash (pending)
+- [x] Burst 5-11: model dependency functions — message refs, event/command sources, integrations, shared types hash (fe598616)
