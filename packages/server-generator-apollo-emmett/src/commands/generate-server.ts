@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
-import type { Model } from '@auto-engineer/narrative';
+import type { Model, Narrative, Slice } from '@auto-engineer/narrative';
 import createDebug from 'debug';
 import { execa } from 'execa';
 import fs from 'fs-extra';
@@ -261,6 +261,26 @@ function createServerFailureEvent(command: GenerateServerCommand, error: unknown
   };
 }
 
+export function createSliceGeneratedEvent(
+  flow: Narrative,
+  slice: Slice,
+  command: GenerateServerCommand,
+): SliceGeneratedEvent {
+  return {
+    type: 'SliceGenerated',
+    data: {
+      flowName: flow.name,
+      sliceName: slice.name,
+      sliceType: slice.type,
+      schemaPath: command.data.modelPath,
+      slicePath: ensureDirPath('./server/src/domain/flows', toKebabCase(flow.name), toKebabCase(slice.name)),
+    },
+    timestamp: new Date(),
+    requestId: command.requestId,
+    correlationId: command.correlationId,
+  };
+}
+
 export async function handleGenerateServerCommandInternal(
   command: GenerateServerCommand,
 ): Promise<GenerateServerEvents[]> {
@@ -304,21 +324,8 @@ export async function handleGenerateServerCommandInternal(
       for (const flow of spec.narratives) {
         if (Array.isArray(flow.slices) && flow.slices.length > 0) {
           for (const slice of flow.slices) {
-            if (slice.type === 'experience') continue; // skip experience slices
-            const sliceEvent: SliceGeneratedEvent = {
-              type: 'SliceGenerated',
-              data: {
-                flowName: flow.name,
-                sliceName: slice.name,
-                sliceType: slice.type,
-                schemaPath: command.data.modelPath,
-                slicePath: ensureDirPath('./server/src/domain/flows', toKebabCase(flow.name), toKebabCase(slice.name)),
-              },
-              timestamp: new Date(),
-              requestId: command.requestId,
-              correlationId: command.correlationId,
-            };
-            events.push(sliceEvent);
+            if (slice.type === 'experience') continue;
+            events.push(createSliceGeneratedEvent(flow, slice, command));
             debug('SliceGenerated: %s.%s', flow.name, slice.name);
           }
         }
