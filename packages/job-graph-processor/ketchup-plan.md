@@ -6,6 +6,10 @@
 
 ## DONE
 
+### Bottle: Defensive input validation
+
+- [x] Burst 1: guard submit against missing jobs array (ecd82695)
+
 ### Bottle: Dispatch target commands via dispatch callback
 
 - [x] Burst 1: submit sends target commands for initial ready jobs (caa7abf9)
