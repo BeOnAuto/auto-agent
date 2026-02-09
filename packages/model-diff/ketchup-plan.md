@@ -2,11 +2,6 @@
 
 ## TODO
 
-- [ ] Burst 18: `index.ts` exports [depends: 17]
-- [ ] Burst 19: Server generator — extract `createSliceGeneratedEvent` helper [depends: none]
-- [ ] Burst 20: Server generator — add `affectedSliceIds` filter [depends: none]
-- [ ] Burst 21: Server generator — modify handler for 3-mode generation [depends: 18, 19, 20]
-- [ ] Burst 22: Pipeline configs — update auto.config.ts files [depends: 18]
 
 ## DONE
 
@@ -18,3 +13,7 @@
 - [x] Burst 15: generation state persistence — load/save with version check (f0a38fbe)
 - [x] Burst 16: change set computation — computeChangeSet (01eb77d9)
 - [x] Burst 17: `DetectChanges` command handler [depends: 11, 14, 15, 16] (4e76515b)
+- [x] Burst 18: `index.ts` exports [depends: 17] (7f79a569)
+- [x] Burst 19: Server generator — extract `createSliceGeneratedEvent` helper [depends: none] (ca402792)
+- [x] Burst 20: Server generator — add `affectedSliceIds` filter [depends: none] (564d95c2)
+- [x] Burst 21: Server generator — modify handler for 3-mode generation [depends: 18, 19, 20] (5b286819)
