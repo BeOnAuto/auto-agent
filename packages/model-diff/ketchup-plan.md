@@ -2,9 +2,6 @@
 
 ## TODO
 
-- [ ] Burst 2: `stableStringify` — deterministic JSON output regardless of key order [depends: 1]
-- [ ] Burst 3: `toKebabCase` — convert PascalCase/camelCase/spaced strings to kebab-case [depends: 1]
-- [ ] Burst 4: `walkStepsByKeyword` — group step texts by effective keyword (And inherits previous) [depends: 1]
 - [ ] Burst 5: `getReferencedMessageNames` — extract all message type names from a slice [depends: 4]
 - [ ] Burst 6: `findEventSource` — find which command slice's Then steps produce a given event name [depends: 4]
 - [ ] Burst 7: `findCommandSource` — find which command slice's When steps define a given command name [depends: 4]
@@ -27,3 +24,5 @@
 ## DONE
 
 - [x] Burst 1: infra — scaffold `packages/model-diff` (4d32a30b)
+- [x] Burst 2: `stableStringify` — deterministic JSON output (f04e4db2)
+- [x] Burst 3+4: `toKebabCase` + `walkStepsByKeyword` — utils and step walking (pending)

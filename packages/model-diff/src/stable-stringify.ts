@@ -4,7 +4,7 @@ export function stableStringify(value: unknown): string {
   }
 
   if (Array.isArray(value)) {
-    return '[' + value.map((item) => stableStringify(item)).join(',') + ']';
+    return `[${value.map((item) => stableStringify(item)).join(',')}]`;
   }
 
   const obj = value as Record<string, unknown>;
@@ -13,7 +13,7 @@ export function stableStringify(value: unknown): string {
   for (const key of sortedKeys) {
     const val = obj[key];
     if (val === undefined) continue;
-    parts.push(JSON.stringify(key) + ':' + stableStringify(val));
+    parts.push(`${JSON.stringify(key)}:${stableStringify(val)}`);
   }
-  return '{' + parts.join(',') + '}';
+  return `{${parts.join(',')}}`;
 }
