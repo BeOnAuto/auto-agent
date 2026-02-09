@@ -20,6 +20,7 @@
     "@auto-engineer/information-architect": "workspace:*",
     "@auto-engineer/job-graph-processor": "workspace:*",
     "@auto-engineer/message-bus": "workspace:*",
+    "@auto-engineer/model-diff": "workspace:*",
     "@auto-engineer/pipeline": "workspace:*",
     "@auto-engineer/server-checks": "workspace:*",
     "@auto-engineer/server-generator-apollo-emmett": "workspace:*",
