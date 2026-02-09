@@ -51,10 +51,14 @@ jobs:
         run: |
           set -e
           for i in 1 2 3; do
-            pnpm install --network-concurrency=8 --reporter=append && break
+            if pnpm install --network-concurrency=8 --reporter=append; then
+              exit 0
+            fi
             echo "pnpm install failed (attempt $i), backing off..."
             sleep $((i*30))
           done
+          echo "All install attempts failed"
+          exit 1
 
       - name: Build all workspaces
         env:
