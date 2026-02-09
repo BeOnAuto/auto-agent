@@ -177,13 +177,19 @@ async function cleanStaleCompiledFiles(serverDir: string): Promise<void> {
   debugScaffold('  Cleanup completed');
 }
 
-async function generateAndWriteScaffold(spec: Model, serverDir: string): Promise<void> {
+async function generateAndWriteScaffold(spec: Model, serverDir: string, affectedSliceIds?: Set<string>): Promise<void> {
   const domainFlowsPath = join(serverDir, 'src', 'domain', 'flows');
   debugScaffold('Generating scaffold file plans');
   debugScaffold('  Domain flows path: %s', domainFlowsPath);
   debugScaffold('  Number of flows: %d', spec.narratives?.length || 0);
 
-  const filePlans = await generateScaffoldFilePlans(spec.narratives, spec.messages, spec.integrations, domainFlowsPath);
+  const filePlans = await generateScaffoldFilePlans(
+    spec.narratives,
+    spec.messages,
+    spec.integrations,
+    domainFlowsPath,
+    affectedSliceIds,
+  );
 
   debugScaffold('Generated %d file plans', filePlans.length);
   if (filePlans.length > 0) {
