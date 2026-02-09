@@ -2,7 +2,6 @@
 
 ## TODO
 
-- [ ] Burst 1: infra — scaffold `packages/model-diff` [depends: none]
 - [ ] Burst 2: `stableStringify` — deterministic JSON output regardless of key order [depends: 1]
 - [ ] Burst 3: `toKebabCase` — convert PascalCase/camelCase/spaced strings to kebab-case [depends: 1]
 - [ ] Burst 4: `walkStepsByKeyword` — group step texts by effective keyword (And inherits previous) [depends: 1]
@@ -26,3 +25,5 @@
 - [ ] Burst 22: Pipeline configs — update auto.config.ts files [depends: 18]
 
 ## DONE
+
+- [x] Burst 1: infra — scaffold `packages/model-diff` (4d32a30b)
