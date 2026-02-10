@@ -376,4 +376,111 @@ describe('handle.ts.ejs (react slice)', () => {
 
     expect(reactFile?.contents).toContain("from '../../order-management/create-order/events'");
   });
+
+  it('should normalize Pattern B-full: swap trigger from given to when', async () => {
+    const spec: SpecsSchema = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'order management',
+          slices: [
+            {
+              type: 'command',
+              name: 'process payment',
+              client: { specs: [] },
+              server: {
+                description: '',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Process payment',
+                    rules: [
+                      {
+                        name: 'Payment processed',
+                        examples: [
+                          {
+                            name: 'Payment succeeds',
+                            steps: [
+                              { keyword: 'When', text: 'ProcessPayment', docString: { paymentId: 'p1' } },
+                              { keyword: 'Then', text: 'PaymentProcessed', docString: { paymentId: 'p1' } },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          name: 'fulfillment',
+          slices: [
+            {
+              type: 'react',
+              name: 'adjust inventory',
+              server: {
+                description: 'Adjusts inventory when payment is processed',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Adjust inventory reaction',
+                    rules: [
+                      {
+                        name: 'Should adjust inventory on payment',
+                        examples: [
+                          {
+                            name: 'Payment triggers adjustment',
+                            steps: [
+                              { keyword: 'Given', text: 'PaymentProcessed', docString: { paymentId: 'p1' } },
+                              {
+                                keyword: 'And',
+                                text: 'InventoryReservation',
+                                docString: { reservationId: 'r1' },
+                              },
+                              {
+                                keyword: 'When',
+                                text: 'ReactToPaymentProcessed',
+                                docString: {},
+                              },
+                              { keyword: 'Then', text: 'AdjustInventory', docString: { sku: 'SKU_A' } },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      modules: [],
+      messages: [
+        { type: 'command', name: 'ProcessPayment', fields: [{ name: 'paymentId', type: 'string', required: true }] },
+        { type: 'command', name: 'AdjustInventory', fields: [{ name: 'sku', type: 'string', required: true }] },
+        {
+          type: 'event',
+          name: 'PaymentProcessed',
+          source: 'internal',
+          fields: [{ name: 'paymentId', type: 'string', required: true }],
+        },
+        {
+          type: 'state',
+          name: 'InventoryReservation',
+          fields: [{ name: 'reservationId', type: 'string', required: true }],
+        },
+      ],
+    };
+
+    const plans = await generateScaffoldFilePlans(spec.narratives, spec.messages, undefined, 'src/domain/flows');
+    const reactFile = plans.find((p) => p.outputPath.endsWith('adjust-inventory/react.ts'));
+
+    expect(reactFile?.contents).toContain('inMemoryReactor<PaymentProcessed>');
+    expect(reactFile?.contents).toContain("canHandle: ['PaymentProcessed']");
+    expect(reactFile?.contents).toContain("from '../../order-management/process-payment/events'");
+    expect(reactFile?.contents).not.toContain('ReactToPaymentProcessed');
+  });
 });

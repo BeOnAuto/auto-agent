@@ -1,4 +1,5 @@
 import type { Slice, Spec } from '@auto-engineer/narrative';
+import type { MessageDefinition } from '../types';
 import {
   type CommandRef,
   type ErrorRef,
@@ -47,7 +48,30 @@ function groupGwtByRule(gwtResults: GwtConditionWithRule[]): Map<string, GwtCond
   return grouped;
 }
 
-function normalizeSpecsForTemplate(specs: Spec[], sliceType: SliceType): NormalizedSpecs | null {
+function normalizeReactPatternB(rules: NormalizedRule[], allMessages: MessageDefinition[]): void {
+  for (const rule of rules) {
+    for (const example of rule.examples) {
+      if (!Array.isArray(example.when)) continue;
+      const whenRef = example.when[0]?.eventRef;
+      if (!whenRef) continue;
+      const isRealEvent = allMessages.some((m) => m.type === 'event' && m.name === whenRef);
+      if (isRealEvent) continue;
+      const triggerIdx = example.given.findIndex((ref) =>
+        allMessages.some((m) => m.type === 'event' && m.name === ref.eventRef),
+      );
+      if (triggerIdx === -1) continue;
+      const triggerRef = example.given[triggerIdx];
+      example.when = [triggerRef];
+      example.given = example.given.filter((_, i) => i !== triggerIdx);
+    }
+  }
+}
+
+function normalizeSpecsForTemplate(
+  specs: Spec[],
+  sliceType: SliceType,
+  allMessages?: MessageDefinition[],
+): NormalizedSpecs | null {
   if (specs.length === 0) return null;
 
   const gwtResults = extractGwtFromSpecs(specs, sliceType);
@@ -60,6 +84,10 @@ function normalizeSpecsForTemplate(specs: Spec[], sliceType: SliceType): Normali
     examples: gwts.map(gwtToNormalizedExample),
   }));
 
+  if (sliceType === 'react' && allMessages) {
+    normalizeReactPatternB(rules, allMessages);
+  }
+
   return {
     name: featureName,
     rules,
@@ -71,13 +99,16 @@ type NormalizedSlice<T extends SliceWithServer> = Omit<T, 'server'> & {
   server?: Omit<T['server'], 'specs'> & { specs?: NormalizedSpecs | null };
 };
 
-export function normalizeSliceForTemplate<T extends SliceWithServer>(slice: T): NormalizedSlice<T> {
+export function normalizeSliceForTemplate<T extends SliceWithServer>(
+  slice: T,
+  allMessages?: MessageDefinition[],
+): NormalizedSlice<T> {
   if (!('server' in slice) || !slice.server?.specs) {
     return slice as NormalizedSlice<T>;
   }
 
   const sliceType = getSliceType(slice);
-  const normalizedSpecs = normalizeSpecsForTemplate(slice.server.specs, sliceType);
+  const normalizedSpecs = normalizeSpecsForTemplate(slice.server.specs, sliceType, allMessages);
 
   return {
     ...slice,

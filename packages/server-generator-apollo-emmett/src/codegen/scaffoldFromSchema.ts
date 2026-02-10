@@ -520,7 +520,7 @@ async function prepareTemplateData(
   return {
     flowName: flow.name,
     sliceName: slice.name,
-    slice: normalizeSliceForTemplate(slice),
+    slice: normalizeSliceForTemplate(slice, allMessages),
     stream: { pattern: streamPattern, id: streamId },
     commands: filteredCommands,
     events,
