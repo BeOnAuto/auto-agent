@@ -1,6 +1,9 @@
-# Ketchup Plan: Support Both React Gherkin Patterns + State in Given
+# Ketchup Plan: Fix Nested Inline Object Type Parsing in Templates
 
 ## TODO
+
+- [ ] Burst 1: Add parseInlineObjectFields to type-helpers + fix createFieldUsesFloat [depends: none]
+- [ ] Burst 2: Wire helper to templates + update 3 EJS files + integration test [depends: 1]
 
 ## DONE
 
