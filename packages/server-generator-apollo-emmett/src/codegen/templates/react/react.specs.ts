@@ -377,6 +377,80 @@ describe('handle.ts.ejs (react slice)', () => {
     expect(reactFile?.contents).toContain("from '../../order-management/create-order/events'");
   });
 
+  it('should not self-reference react slice when trigger event has no known producer', async () => {
+    const spec: SpecsSchema = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'notifications',
+          slices: [
+            {
+              type: 'react',
+              name: 'notify on external event',
+              server: {
+                description: 'Reacts to an external event with no known command producer',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Notify on external event',
+                    rules: [
+                      {
+                        name: 'Should notify when external event arrives',
+                        examples: [
+                          {
+                            name: 'External event triggers notification',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'ExternalPaymentReceived',
+                                docString: { paymentId: 'pay_001', amount: 100 },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'SendReceipt',
+                                docString: { paymentId: 'pay_001' },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      modules: [],
+      messages: [
+        {
+          type: 'event',
+          name: 'ExternalPaymentReceived',
+          source: 'external',
+          fields: [
+            { name: 'paymentId', type: 'string', required: true },
+            { name: 'amount', type: 'number', required: true },
+          ],
+        },
+        {
+          type: 'command',
+          name: 'SendReceipt',
+          fields: [{ name: 'paymentId', type: 'string', required: true }],
+        },
+      ],
+    };
+
+    const plans = await generateScaffoldFilePlans(spec.narratives, spec.messages, undefined, 'src/domain/flows');
+    const reactFile = plans.find((p) => p.outputPath.endsWith('notify-on-external-event/react.ts'));
+    const registerFile = plans.find((p) => p.outputPath.endsWith('notify-on-external-event/register.ts'));
+    const specsFile = plans.find((p) => p.outputPath.endsWith('notify-on-external-event/react.specs.ts'));
+
+    expect(reactFile?.contents).not.toContain('../notify-on-external-event/');
+    expect(registerFile?.contents).not.toContain('../notify-on-external-event/');
+    expect(specsFile?.contents).not.toContain('../notify-on-external-event/');
+  });
+
   it('should normalize Pattern B-full: swap trigger from given to when', async () => {
     const spec: SpecsSchema = {
       variant: 'specs',

@@ -15,7 +15,7 @@ const event = events.find(e => e.type === eventType);
 const isCrossFlow = event?.sourceFlowName && event.sourceFlowName !== flowName;
 const eventImportBase = isCrossFlow
   ? `../../${toKebabCase(event.sourceFlowName)}/${toKebabCase(event.sourceSliceName)}`
-  : `../${toKebabCase(event?.sourceSliceName ?? 'unknown')}`;
+  : event?.sourceSliceName ? `../${toKebabCase(event.sourceSliceName)}` : '.';
 %>
 import { type CommandSender, type EventSubscription, type EventStore } from '@event-driven-io/emmett';
 import type { <%= pascalCase(eventType) %> } from '<%= eventImportBase %>/events';

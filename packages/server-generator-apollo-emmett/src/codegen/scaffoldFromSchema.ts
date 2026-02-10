@@ -554,12 +554,13 @@ function annotateEventSources(
   flows: Narrative[],
   fallbackFlowName: string,
   fallbackSliceName: string,
+  sliceType: string,
 ): void {
   debug('Annotating event sources for %d events', events.length);
   for (const event of events) {
     const match = findEventSource(flows, event.type);
     event.sourceFlowName = match?.flowName ?? fallbackFlowName;
-    event.sourceSliceName = match?.sliceName ?? fallbackSliceName;
+    event.sourceSliceName = match?.sliceName ?? (sliceType === 'react' ? undefined : fallbackSliceName);
     debug('  Event %s: flow=%s, slice=%s', event.type, event.sourceFlowName, event.sourceSliceName);
   }
 }
@@ -596,12 +597,13 @@ function annotateCommandSources(
   flows: Narrative[],
   fallbackFlowName: string,
   fallbackSliceName: string,
+  sliceType: string,
 ): void {
   debug('Annotating command sources for %d commands', commands.length);
   for (const command of commands) {
     const match = findCommandSource(flows, command.type);
     command.sourceFlowName = match?.flowName ?? fallbackFlowName;
-    command.sourceSliceName = match?.sliceName ?? fallbackSliceName;
+    command.sourceSliceName = match?.sliceName ?? (sliceType === 'react' ? undefined : fallbackSliceName);
     debug('  Command %s: flow=%s, slice=%s', command.type, command.sourceFlowName, command.sourceSliceName);
   }
 }
@@ -653,8 +655,8 @@ async function generateFilesForSlice(
     slice.name,
     extracted.events.map((e) => e.type),
   );
-  annotateEventSources(extracted.events, flows, flow.name, slice.name);
-  annotateCommandSources(extracted.commands, flows, flow.name, slice.name);
+  annotateEventSources(extracted.events, flows, flow.name, slice.name, slice.type);
+  annotateCommandSources(extracted.commands, flows, flow.name, slice.name, slice.type);
 
   const templateData = await prepareTemplateData(
     slice,

@@ -181,7 +181,7 @@ describe('react.specs.ts.ejs (react slice)', () => {
       import { type ReactorContext, ReactorSpecification } from '../../../shared';
       import { react } from './react';
       import type { BookingRequested } from '../guest-submits-booking-request/events';
-      import type { NotifyHost } from '../send-notification-to-host/commands';
+      import type { NotifyHost } from './commands';
 
       type ReactorEvent = BookingRequested;
       type ReactorCommand = NotifyHost;
