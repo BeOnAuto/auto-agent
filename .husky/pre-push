@@ -1,61 +1,28 @@
 #!/bin/sh
 
-# Check if auto-changeset is enabled
-if [ "${AUTO_CHANGESET_ENABLED:-true}" = "false" ]; then
-  echo "⏭️  Auto-changeset disabled (AUTO_CHANGESET_ENABLED=false)"
-  exit 0
-fi
-
-# Fetch remote to check if we're behind
-echo "🔍 Checking remote status..."
-git fetch origin main --quiet 2>/dev/null || git fetch origin --quiet 2>/dev/null
-
 # Get the current branch being pushed
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # Only check divergence from origin/main when pushing main itself.
 # Feature branches naturally diverge from main — that's expected.
 if [ "$CURRENT_BRANCH" = "main" ]; then
+  git fetch origin main --quiet 2>/dev/null || git fetch origin --quiet 2>/dev/null
+
   LOCAL=$(git rev-parse HEAD)
   REMOTE=$(git rev-parse origin/main 2>/dev/null || echo "")
   BASE=$(git merge-base HEAD origin/main 2>/dev/null || echo "")
 
   if [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ] && [ "$BASE" = "$LOCAL" ]; then
-    echo "⚠️  Local branch is behind remote. Skipping changeset generation."
+    echo "⚠️  Local branch is behind remote."
     echo "   Run 'git pull --rebase' first, then push again."
     exit 1
   fi
 
   if [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ] && [ "$BASE" != "$LOCAL" ] && [ "$BASE" != "$REMOTE" ]; then
-    echo "⚠️  Local branch has diverged from remote. Skipping changeset generation."
+    echo "⚠️  Local branch has diverged from remote."
     echo "   Run 'git pull --rebase' or 'git reset --hard origin/main' first."
     exit 1
   fi
 fi
 
-# Auto-generate changesets before push
-echo "🔄 Auto-generating changesets..."
-EXIT_CODE=0
-pnpm tsx packages/release-automation/bin/release-automation.ts generate || EXIT_CODE=$?
-
-# Exit code 11 means no commits to process (success state)
-# Exit code 12 means no conventional commits (warning but continue)
-if [ $EXIT_CODE -ne 0 ] && [ $EXIT_CODE -ne 11 ] && [ $EXIT_CODE -ne 12 ]; then
-  echo "❌ Failed to generate changeset (exit code: $EXIT_CODE)"
-  exit $EXIT_CODE
-fi
-
-# Check if any changesets were created - create a new commit (never amend)
-# Using a new commit avoids diverged history if push fails due to CI race
-if [ -n "$(git status --porcelain .changeset/*.md 2>/dev/null)" ]; then
-  echo "📦 Staging new changesets..."
-  git add .changeset/*.md
-
-  echo "📝 Creating changeset commit..."
-  git commit -m "chore(global): add changeset" --no-verify
-
-  echo "✅ Changeset commit created!"
-fi
-
-# Exit successfully
 exit 0

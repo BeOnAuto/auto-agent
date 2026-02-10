@@ -1,0 +1,57 @@
+#!/bin/sh
+
+# Prevent recursion when amending
+if [ "$SKIP_POST_COMMIT" = "1" ]; then
+  exit 0
+fi
+
+# Check if auto-changeset is enabled
+if [ "${AUTO_CHANGESET_ENABLED:-true}" = "false" ]; then
+  exit 0
+fi
+
+# Skip if this is already a changeset commit (prevent infinite loop)
+COMMIT_MSG=$(git log -1 --pretty=%B)
+if echo "$COMMIT_MSG" | grep -q "^chore(global): add changeset"; then
+  exit 0
+fi
+
+# Skip if commit message has [skip changeset] or is a merge commit
+if echo "$COMMIT_MSG" | grep -qi "\[skip changeset\]"; then
+  exit 0
+fi
+if git rev-parse -q --verify HEAD^2 >/dev/null 2>&1; then
+  exit 0
+fi
+
+# Generate changeset for the commit we just made
+echo "🔄 Auto-generating changeset..."
+EXIT_CODE=0
+pnpm tsx packages/release-automation/bin/release-automation.ts generate || EXIT_CODE=$?
+
+# Exit code 11 means no commits to process (success state)
+# Exit code 12 means no conventional commits (warning but continue)
+if [ $EXIT_CODE -ne 0 ] && [ $EXIT_CODE -ne 11 ] && [ $EXIT_CODE -ne 12 ]; then
+  echo "❌ Failed to generate changeset (exit code: $EXIT_CODE)"
+  exit $EXIT_CODE
+fi
+
+# If changeset was created, amend it into the commit
+if [ -n "$(git status --porcelain .changeset/*.md 2>/dev/null)" ]; then
+  echo "📦 Amending changeset into commit..."
+
+  # Workaround for git worktree index corruption caused by lint-staged
+  # If git status fails, reset the index from HEAD
+  if ! git status >/dev/null 2>&1; then
+    echo "⚠️  Repairing corrupted git index..."
+    GITDIR=$(git rev-parse --git-dir)
+    rm -f "$GITDIR/index"
+    git reset HEAD >/dev/null 2>&1
+  fi
+
+  git add .changeset/*.md
+  SKIP_POST_COMMIT=1 git commit --amend --no-edit --no-verify
+  echo "✅ Changeset added to commit!"
+fi
+
+exit 0

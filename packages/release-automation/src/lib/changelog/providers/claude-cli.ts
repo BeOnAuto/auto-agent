@@ -29,9 +29,14 @@ export class ClaudeCliProvider implements ChangelogProvider {
 
       return result.trim();
     } finally {
-      // Always cleanup temp file
+      // Always cleanup temp file and .claude-plugin directory
       try {
         execSync(`rm ${tempFile}`);
+      } catch {
+        // Ignore cleanup errors
+      }
+      try {
+        execSync(`rm -rf ${join(process.cwd(), '.claude-plugin')}`);
       } catch {
         // Ignore cleanup errors
       }

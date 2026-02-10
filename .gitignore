@@ -62,3 +62,4 @@ coverage
 
 /packages/create-auto-app/templates/*
 /.claude/settings.local.json
+.claude-plugin/
