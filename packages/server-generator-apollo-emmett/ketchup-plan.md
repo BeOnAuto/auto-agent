@@ -1,9 +1,9 @@
-# Ketchup Plan: Fix Cross-Flow Imports & Empty State Fallback
+# Ketchup Plan: Support Both React Gherkin Patterns + State in Given
 
 ## TODO
 
-## DONE
+- [ ] Burst 1: Extract given events/states and filter phantom refs for react slices [depends: none]
+- [ ] Burst 2: Normalize Pattern B-full GWT in slice-normalizer + integration test [depends: 1]
+- [ ] Burst 3: Surface state context in react.ts.ejs implementation instructions [depends: 1]
 
-- [x] Burst 1: Fix `groupEventImports` for cross-flow imports [depends: none] (f741ccd0)
-- [x] Burst 2: Fix react template inline imports for cross-flow [depends: 1] (5c55eb84)
-- [x] Burst 3: Fix state.ts.ejs fallback `UnknownState` export [depends: none] (b7e435dd)
+## DONE
