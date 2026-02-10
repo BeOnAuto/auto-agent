@@ -175,6 +175,7 @@ describe('handle.ts.ejs (react slice)', () => {
           ],
         },
       ],
+      modules: [],
       messages: [
         {
           type: 'command',
@@ -349,6 +350,7 @@ describe('handle.ts.ejs (react slice)', () => {
           ],
         },
       ],
+      modules: [],
       messages: [
         {
           type: 'command',

@@ -39,6 +39,7 @@ describe('state.ts.ejs', () => {
           ],
         },
       ],
+      modules: [],
       messages: [
         {
           type: 'state',
@@ -88,6 +89,7 @@ describe('state.ts.ejs', () => {
           ],
         },
       ],
+      modules: [],
       messages: [],
     };
 
