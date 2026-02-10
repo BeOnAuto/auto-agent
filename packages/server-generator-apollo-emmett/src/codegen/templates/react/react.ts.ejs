@@ -40,6 +40,9 @@ eachMessage: async (event, context): Promise<MessageHandlerResult> => {
     * - Replace the placeholder logic and \`throw\` below with real implementation.
     * - Send one or more commands via: commandSender.send({...})
     * - Optionally return a MessageHandlerResult for SKIP or error cases.
+<% if (states.length > 0) { -%>
+    * - Context state available: <%= states.map(s => pascalCase(s.type)).join(', ') %> (readable from database)
+<% } -%>
     */
 
     throw new IllegalStateError('Not yet implemented: react in response to <%= eventType %>');

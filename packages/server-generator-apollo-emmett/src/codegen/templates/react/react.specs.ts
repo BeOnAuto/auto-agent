@@ -482,5 +482,6 @@ describe('handle.ts.ejs (react slice)', () => {
     expect(reactFile?.contents).toContain("canHandle: ['PaymentProcessed']");
     expect(reactFile?.contents).toContain("from '../../order-management/process-payment/events'");
     expect(reactFile?.contents).not.toContain('ReactToPaymentProcessed');
+    expect(reactFile?.contents).toContain('Context state available: InventoryReservation (readable from database)');
   });
 });
