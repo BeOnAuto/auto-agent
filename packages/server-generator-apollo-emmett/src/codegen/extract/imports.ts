@@ -8,6 +8,7 @@ export interface ImportGroup {
 
 export interface CrossSliceImportContext {
   currentSliceName: string;
+  currentFlowName: string;
   events: Message[];
 }
 
@@ -17,7 +18,7 @@ export interface CrossSliceImportContext {
  * while cross-slice events are imported from '../other-slice/events'.
  */
 export function groupEventImports(context: CrossSliceImportContext): ImportGroup[] {
-  const { currentSliceName, events } = context;
+  const { currentSliceName, currentFlowName, events } = context;
   const importGroups = new Map<string, string[]>();
 
   for (const event of events) {
@@ -29,7 +30,12 @@ export function groupEventImports(context: CrossSliceImportContext): ImportGroup
     if (isFromCurrentSlice) {
       importPath = './events';
     } else {
-      importPath = `../${toKebabCase(event.sourceSliceName ?? currentSliceName)}/events`;
+      const sourceFlowName = event.sourceFlowName;
+      const isCrossFlow = sourceFlowName != null && sourceFlowName !== currentFlowName;
+      const sliceSegment = toKebabCase(event.sourceSliceName ?? currentSliceName);
+      importPath = isCrossFlow
+        ? `../../${toKebabCase(sourceFlowName)}/${sliceSegment}/events`
+        : `../${sliceSegment}/events`;
     }
     if (!importGroups.has(importPath)) {
       importGroups.set(importPath, []);

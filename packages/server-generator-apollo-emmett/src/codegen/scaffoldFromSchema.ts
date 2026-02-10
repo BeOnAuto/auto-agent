@@ -512,7 +512,7 @@ async function prepareTemplateData(
   const filteredCommands =
     allowedForSlice.size > 0 ? uniqueCommands.filter((c) => allowedForSlice.has(c.type)) : uniqueCommands;
 
-  const eventImportGroups = groupEventImports({ currentSliceName: slice.name, events });
+  const eventImportGroups = groupEventImports({ currentSliceName: slice.name, currentFlowName: flow.name, events });
   const allEventTypesArray = getAllEventTypes(events);
   const allEventTypes = createEventUnionType(events);
   const localEvents = getLocalEvents(events);
