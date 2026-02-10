@@ -52,7 +52,8 @@ function normalizeReactPatternB(rules: NormalizedRule[], allMessages: MessageDef
   for (const rule of rules) {
     for (const example of rule.examples) {
       if (!Array.isArray(example.when)) continue;
-      const whenRef = example.when[0]?.eventRef;
+      const originalWhen = example.when[0];
+      const whenRef = originalWhen?.eventRef;
       if (!whenRef) continue;
       const isRealEvent = allMessages.some((m) => m.type === 'event' && m.name === whenRef);
       if (isRealEvent) continue;
@@ -63,6 +64,10 @@ function normalizeReactPatternB(rules: NormalizedRule[], allMessages: MessageDef
       const triggerRef = example.given[triggerIdx];
       example.when = [triggerRef];
       example.given = example.given.filter((_, i) => i !== triggerIdx);
+      const isRealCommand = allMessages.some((m) => m.type === 'command' && m.name === whenRef);
+      if (isRealCommand) {
+        example.then = [{ commandRef: whenRef, exampleData: originalWhen.exampleData }];
+      }
     }
   }
 }
