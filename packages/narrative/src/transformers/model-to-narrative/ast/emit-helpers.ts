@@ -7,6 +7,8 @@ export interface FieldTypeInfo {
   [fieldName: string]: string; // field name -> type (e.g., 'Date', 'string', etc.)
 }
 
+export type TypeResolver = (typeName: string) => FieldTypeInfo | undefined;
+
 const ARRAY_TYPE_REGEX = /^Array<(.+)>$/;
 
 const VALID_IDENTIFIER_REGEX = /^[A-Za-z_]\w*$/;
@@ -70,13 +72,14 @@ function convertArrayField(
   f: tsNS.NodeFactory,
   arr: unknown[],
   fieldType: string,
+  typeResolver?: TypeResolver,
 ): tsNS.Expression {
   const elementType = parseArrayElementType(fieldType);
   if (elementType === 'Date') {
     return f.createArrayLiteralExpression(arr.map((elem) => convertDateValue(f, elem) ?? jsonToExpr(ts, f, elem)));
   }
-  const elementTypeInfo = elementType ? parseObjectTypeInfo(elementType) : undefined;
-  return f.createArrayLiteralExpression(arr.map((elem) => jsonToExpr(ts, f, elem, elementTypeInfo)));
+  const elementTypeInfo = elementType ? (parseObjectTypeInfo(elementType) ?? typeResolver?.(elementType)) : undefined;
+  return f.createArrayLiteralExpression(arr.map((elem) => jsonToExpr(ts, f, elem, elementTypeInfo, typeResolver)));
 }
 
 function convertObjectField(
@@ -84,9 +87,10 @@ function convertObjectField(
   f: tsNS.NodeFactory,
   obj: Record<string, unknown>,
   fieldType: string,
+  typeResolver?: TypeResolver,
 ): tsNS.Expression {
-  const nestedTypeInfo = parseObjectTypeInfo(fieldType);
-  return jsonToExpr(ts, f, obj, nestedTypeInfo);
+  const nestedTypeInfo = parseObjectTypeInfo(fieldType) ?? typeResolver?.(fieldType);
+  return jsonToExpr(ts, f, obj, nestedTypeInfo, typeResolver);
 }
 
 function computeFieldExpr(
@@ -95,16 +99,17 @@ function computeFieldExpr(
   x: unknown,
   fieldType: string | undefined,
   typeInfo: FieldTypeInfo | undefined,
+  typeResolver?: TypeResolver,
 ): tsNS.Expression {
   if (fieldType === 'Date') {
     const dateExpr = convertDateValue(f, x);
     if (dateExpr) return dateExpr;
   }
   if (fieldType && typeof x === 'object' && x !== null) {
-    if (Array.isArray(x)) return convertArrayField(ts, f, x, fieldType);
-    return convertObjectField(ts, f, x as Record<string, unknown>, fieldType);
+    if (Array.isArray(x)) return convertArrayField(ts, f, x, fieldType, typeResolver);
+    return convertObjectField(ts, f, x as Record<string, unknown>, fieldType, typeResolver);
   }
-  return jsonToExpr(ts, f, x, typeInfo);
+  return jsonToExpr(ts, f, x, typeInfo, typeResolver);
 }
 
 /**
@@ -115,6 +120,7 @@ export function jsonToExpr(
   f: tsNS.NodeFactory,
   v: unknown,
   typeInfo?: FieldTypeInfo,
+  typeResolver?: TypeResolver,
 ): tsNS.Expression {
   if (v === null) return f.createNull();
   switch (typeof v) {
@@ -132,14 +138,14 @@ export function jsonToExpr(
         return createDateNewExpr(f, v.toISOString());
       }
       if (Array.isArray(v)) {
-        return f.createArrayLiteralExpression(v.map((x) => jsonToExpr(ts, f, x, typeInfo)));
+        return f.createArrayLiteralExpression(v.map((x) => jsonToExpr(ts, f, x, typeInfo, typeResolver)));
       }
       const entries = Object.entries(v as Record<string, unknown>);
       return f.createObjectLiteralExpression(
         entries.map(([k, x]) =>
           f.createPropertyAssignment(
             VALID_IDENTIFIER_REGEX.test(k) ? f.createIdentifier(k) : f.createStringLiteral(k),
-            computeFieldExpr(ts, f, x, typeInfo?.[k], typeInfo),
+            computeFieldExpr(ts, f, x, typeInfo?.[k], typeInfo, typeResolver),
           ),
         ),
         false,

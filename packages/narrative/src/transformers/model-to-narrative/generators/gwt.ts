@@ -1,5 +1,5 @@
 import type tsNS from 'typescript';
-import { type FieldTypeInfo, jsonToExpr } from '../ast/emit-helpers';
+import { type FieldTypeInfo, jsonToExpr, type TypeResolver } from '../ast/emit-helpers';
 
 /**
  * Build a single specs() block for a GWT entry, adapting to slice type:
@@ -46,13 +46,14 @@ function chainGivenCalls(
     return base;
   }
 
+  const resolver = createTypeResolver(messages);
   const firstGiven = g.given[0];
   const firstTypeInfo = messages ? getFieldTypeInfo(messages, firstGiven.eventRef) : undefined;
 
   let result = f.createCallExpression(
     f.createPropertyAccessExpression(base, f.createIdentifier('given')),
     [f.createTypeReferenceNode(firstGiven.eventRef, undefined)],
-    [jsonToExpr(ts, f, firstGiven.exampleData, firstTypeInfo)],
+    [jsonToExpr(ts, f, firstGiven.exampleData, firstTypeInfo, resolver)],
   );
 
   for (let i = 1; i < g.given.length; i++) {
@@ -61,7 +62,7 @@ function chainGivenCalls(
     result = f.createCallExpression(
       f.createPropertyAccessExpression(result, f.createIdentifier('and')),
       [f.createTypeReferenceNode(givenEvent.eventRef, undefined)],
-      [jsonToExpr(ts, f, givenEvent.exampleData, typeInfo)],
+      [jsonToExpr(ts, f, givenEvent.exampleData, typeInfo, resolver)],
     );
   }
 
@@ -109,10 +110,11 @@ function chainWhenCall(
   }
 
   const typeInfo = messages !== undefined ? getFieldTypeInfo(messages, typeRef) : undefined;
+  const resolver = createTypeResolver(messages);
   return f.createCallExpression(
     f.createPropertyAccessExpression(base, f.createIdentifier('when')),
     typeRef !== '' ? [f.createTypeReferenceNode(typeRef, undefined)] : undefined,
-    [jsonToExpr(ts, f, exampleData, typeInfo)],
+    [jsonToExpr(ts, f, exampleData, typeInfo, resolver)],
   );
 }
 
@@ -129,7 +131,8 @@ function chainThenCall(
   const firstThenItem = g.then[0];
   const thenTypeRef = getThenTypeRef(firstThenItem);
   const typeInfo = messages && thenTypeRef ? getFieldTypeInfo(messages, thenTypeRef) : undefined;
-  const thenArg = buildThenItem(ts, f, firstThenItem, typeInfo);
+  const resolver = createTypeResolver(messages);
+  const thenArg = buildThenItem(ts, f, firstThenItem, typeInfo, resolver);
   const thenTypeParams = thenTypeRef ? [f.createTypeReferenceNode(thenTypeRef, undefined)] : undefined;
 
   return f.createCallExpression(f.createPropertyAccessExpression(base, f.createIdentifier('then')), thenTypeParams, [
@@ -142,22 +145,23 @@ function buildThenItem(
   f: tsNS.NodeFactory,
   t: GWTBlock['then'][0],
   typeInfo?: FieldTypeInfo,
+  typeResolver?: TypeResolver,
 ): tsNS.Expression {
   const item = t as Record<string, unknown>;
 
   if ('eventRef' in item) {
     const e = t as { eventRef: string; exampleData: Record<string, unknown> };
-    return jsonToExpr(ts, f, e.exampleData, typeInfo);
+    return jsonToExpr(ts, f, e.exampleData, typeInfo, typeResolver);
   }
 
   if ('commandRef' in item) {
     const c = t as { commandRef: string; exampleData: Record<string, unknown> };
-    return jsonToExpr(ts, f, c.exampleData, typeInfo);
+    return jsonToExpr(ts, f, c.exampleData, typeInfo, typeResolver);
   }
 
   if ('stateRef' in item) {
     const s = t as { stateRef: string; exampleData: Record<string, unknown> };
-    return jsonToExpr(ts, f, s.exampleData, typeInfo);
+    return jsonToExpr(ts, f, s.exampleData, typeInfo, typeResolver);
   }
 
   if ('errorType' in item) {
@@ -307,6 +311,16 @@ function getFieldTypeInfo(
     typeInfo[field.name] = field.type;
   }
   return typeInfo;
+}
+
+function createTypeResolver(
+  messages?: Array<{ type: string; name: string; fields: Array<{ name: string; type: string; required: boolean }> }>,
+): TypeResolver | undefined {
+  if (!messages) return undefined;
+  return (typeName: string) => {
+    const info = getFieldTypeInfo(messages, typeName);
+    return Object.keys(info).length > 0 ? info : undefined;
+  };
 }
 
 export function buildConsolidatedGwtSpecBlock(
