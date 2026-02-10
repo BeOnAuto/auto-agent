@@ -1214,6 +1214,202 @@ describe('projection.specs.ts.ejs', () => {
     `);
   });
 
+  it('should serialize inline objects and arrays with Date sub-fields correctly', async () => {
+    const spec: SpecsSchema = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'fitness-flow',
+          slices: [
+            {
+              type: 'command',
+              name: 'record-session',
+              stream: 'sessions-${memberId}',
+              client: { specs: [] },
+              server: {
+                description: '',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Record session command',
+                    rules: [
+                      {
+                        name: 'Should record sessions',
+                        examples: [
+                          {
+                            name: 'Records session',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'RecordSession',
+                                docString: { memberId: 'mem_001', duration: 30 },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'SessionRecorded',
+                                docString: {
+                                  memberId: 'mem_001',
+                                  duration: 30,
+                                  recordedAt: '2030-01-15T10:00:00.000Z',
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+            {
+              type: 'query',
+              name: 'view-member-stats',
+              stream: 'sessions',
+              client: { specs: [] },
+              server: {
+                description: '',
+                data: {
+                  items: [
+                    {
+                      target: { type: 'State', name: 'MemberStats' },
+                      origin: { type: 'projection', name: 'MemberStatsProjection', idField: 'memberId' },
+                    },
+                  ],
+                },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'View member stats',
+                    rules: [
+                      {
+                        name: 'Should aggregate member stats',
+                        examples: [
+                          {
+                            name: 'Session recorded updates stats',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'SessionRecorded',
+                                docString: {
+                                  memberId: 'mem_001',
+                                  duration: 30,
+                                  recordedAt: '2030-01-15T10:00:00.000Z',
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'MemberStats',
+                                docString: {
+                                  memberId: 'mem_001',
+                                  totalSessions: 1,
+                                  lastSession: { duration: 30, completedAt: '2030-01-15T10:30:00.000Z' },
+                                  recentSessions: [{ savedAt: '2030-01-15T10:00:00.000Z', name: 'Morning workout' }],
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [
+        {
+          type: 'command',
+          name: 'RecordSession',
+          fields: [
+            { name: 'memberId', type: 'string', required: true },
+            { name: 'duration', type: 'number', required: true },
+          ],
+        },
+        {
+          type: 'event',
+          name: 'SessionRecorded',
+          source: 'internal',
+          fields: [
+            { name: 'memberId', type: 'string', required: true },
+            { name: 'duration', type: 'number', required: true },
+            { name: 'recordedAt', type: 'Date', required: true },
+          ],
+        },
+        {
+          type: 'state',
+          name: 'MemberStats',
+          fields: [
+            { name: 'memberId', type: 'string', required: true },
+            { name: 'totalSessions', type: 'number', required: true },
+            { name: 'lastSession', type: '{ duration: number, completedAt: Date }', required: true },
+            {
+              name: 'recentSessions',
+              type: 'Array<{ savedAt: Date, name: string }>',
+              required: true,
+            },
+          ],
+        },
+      ],
+    } as SpecsSchema;
+
+    const plans = await generateScaffoldFilePlans(spec.narratives, spec.messages, undefined, 'src/domain/flows');
+    const specFile = plans.find((p) => p.outputPath.endsWith('view-member-stats/projection.specs.ts'));
+
+    expect(specFile?.contents).toMatchInlineSnapshot(`
+      "import { describe, it, beforeEach, expect } from 'vitest';
+      import { InMemoryProjectionSpec } from '@event-driven-io/emmett';
+      import { projection } from './projection';
+      import type { SessionRecorded } from '../record-session/events';
+      import { MemberStats } from './state';
+
+      type ProjectionEvent = SessionRecorded;
+
+      describe('Should aggregate member stats', () => {
+        let given: InMemoryProjectionSpec<ProjectionEvent>;
+
+        beforeEach(() => {
+          given = InMemoryProjectionSpec.for({ projection });
+        });
+
+        it('Session recorded updates stats', () =>
+          given([])
+            .when([
+              {
+                type: 'SessionRecorded',
+                data: {
+                  memberId: 'mem_001',
+                  duration: 30,
+                  recordedAt: new Date('2030-01-15T10:00:00.000Z'),
+                },
+                metadata: {
+                  streamName: 'sessions',
+                  streamPosition: 1n,
+                  globalPosition: 1n,
+                },
+              },
+            ])
+            .then(async (state) => {
+              const document = await state.database
+                .collection<MemberStats>('MemberStatsProjection')
+                .findOne((doc) => doc.memberId === 'mem_001');
+
+              const expected: MemberStats = {
+                memberId: 'mem_001',
+                totalSessions: 1,
+                lastSession: { duration: 30, completedAt: new Date('2030-01-15T10:30:00.000Z') },
+                recentSessions: [{ savedAt: new Date('2030-01-15T10:00:00.000Z'), name: 'Morning workout' }],
+              };
+
+              expect(document).toMatchObject(expected);
+            }));
+      });
+      "
+    `);
+  });
+
   it('should generate valid projection.ts when When clause is a query action (QueryActionRef)', async () => {
     const spec: SpecsSchema = {
       variant: 'specs',

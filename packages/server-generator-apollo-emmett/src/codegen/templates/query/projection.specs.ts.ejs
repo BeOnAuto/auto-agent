@@ -31,6 +31,37 @@ function isQueryAction(whenText, queryName) {
     return whenText === queryName || whenText.toLowerCase() === queryName.toLowerCase();
 }
 
+function formatSpecValue(value, tsType) {
+    if (value === null || value === undefined) return 'null';
+    if (tsType === 'string' || tsType === 'ID') return `'${value}'`;
+    if (tsType === 'number' || tsType === 'boolean') return String(value);
+    if (tsType === 'Date') return `new Date('${value}')`;
+    if (Array.isArray(value)) {
+        const elementFields = parseInlineObjectFields(tsType);
+        if (elementFields?.length && typeof value[0] === 'object') {
+            return '[' + value.map(elem => {
+                const entries = Object.entries(elem).map(([k, v]) => {
+                    const subField = elementFields.find(f => f.name === k);
+                    return `${k}: ${formatSpecValue(v, subField?.tsType || typeof v)}`;
+                });
+                return `{ ${entries.join(', ')} }`;
+            }).join(', ') + ']';
+        }
+        return JSON.stringify(value);
+    }
+    if (typeof value === 'object' && value !== null) {
+        const fields = parseInlineObjectFields(tsType);
+        if (fields?.length) {
+            const entries = Object.entries(value).map(([k, v]) => {
+                const subField = fields.find(f => f.name === k);
+                return `${k}: ${formatSpecValue(v, subField?.tsType || typeof v)}`;
+            });
+            return `{ ${entries.join(', ')} }`;
+        }
+    }
+    return `'${value}'`;
+}
+
 const queryName = extractQueryName(slice?.request);
 const ruleGroups = new Map();
 
@@ -145,21 +176,7 @@ _%>
      const isLast = i === dataKeys.length - 1;
      const field = eventMessage?.fields?.find(f => f.name === key);
      const tsType = field?.tsType || field?.type || 'string';
-
-     let formattedValue;
-     if (value === null || value === undefined) {
-       formattedValue = 'null';
-     } else if (tsType === 'string' || tsType === 'ID') {
-       formattedValue = `'${value}'`;
-     } else if (tsType === 'number' || tsType === 'boolean') {
-       formattedValue = String(value);
-     } else if (tsType === 'Date') {
-       formattedValue = `new Date('${value}')`;
-     } else if (Array.isArray(value)) {
-       formattedValue = JSON.stringify(value);
-     } else {
-       formattedValue = `'${value}'`;
-     }
+     const formattedValue = formatSpecValue(value, tsType);
 -%>
           <%= key %>: <%= formattedValue %><%= isLast ? '' : ',' %>
 <% } -%>
@@ -186,21 +203,7 @@ _%>
      const isLast = i === dataKeys.length - 1;
      const field = eventMessage?.fields?.find(f => f.name === key);
      const tsType = field?.tsType || field?.type || 'string';
-
-     let formattedValue;
-     if (value === null || value === undefined) {
-       formattedValue = 'null';
-     } else if (tsType === 'string' || tsType === 'ID') {
-       formattedValue = `'${value}'`;
-     } else if (tsType === 'number' || tsType === 'boolean') {
-       formattedValue = String(value);
-     } else if (tsType === 'Date') {
-       formattedValue = `new Date('${value}')`;
-     } else if (Array.isArray(value)) {
-       formattedValue = JSON.stringify(value);
-     } else {
-       formattedValue = `'${value}'`;
-     }
+     const formattedValue = formatSpecValue(value, tsType);
 -%>
             <%= key %>: <%= formattedValue %><%= isLast ? '' : ',' %>
 <% } -%>
@@ -238,28 +241,14 @@ if (idField.includes('-')) {
 
         const expected: <%= TargetType %> = {
 <% const stateKeys = Object.keys(expectedState.exampleData || {});
+   const stateMessage = messages.find(m => m.name === targetName);
    for (let i = 0; i < stateKeys.length; i++) {
      const key = stateKeys[i];
      const value = expectedState.exampleData[key];
      const isLast = i === stateKeys.length - 1;
-     const stateMessage = messages.find(m => m.name === targetName);
      const field = stateMessage?.fields?.find(f => f.name === key);
      const tsType = field?.tsType || field?.type || 'string';
-
-     let formattedValue;
-     if (value === null || value === undefined) {
-       formattedValue = 'null';
-     } else if (tsType === 'string' || tsType === 'ID') {
-       formattedValue = `'${value}'`;
-     } else if (tsType === 'number' || tsType === 'boolean') {
-       formattedValue = String(value);
-     } else if (tsType === 'Date') {
-       formattedValue = `new Date('${value}')`;
-     } else if (Array.isArray(value)) {
-       formattedValue = JSON.stringify(value);
-     } else {
-       formattedValue = `'${value}'`;
-     }
+     const formattedValue = formatSpecValue(value, tsType);
 -%>
           <%= key %>: <%= formattedValue %><%= isLast ? '' : ',' %>
 <% } -%>
