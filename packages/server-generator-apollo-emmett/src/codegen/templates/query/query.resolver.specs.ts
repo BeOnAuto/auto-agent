@@ -702,4 +702,73 @@ describe('query.resolver.ts.ejs', () => {
     expect(resolverFile?.contents).toContain("import { type GraphQLContext } from '../../../shared'");
     expect(resolverFile?.contents).not.toContain(', ReadModel');
   });
+
+  it('should handle nested Array<{...}> in embedded ObjectType without breaking', async () => {
+    const spec: SpecsSchema = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'training-flow',
+          slices: [
+            {
+              type: 'query',
+              name: 'views-workout-session',
+              request: `
+                query GetWorkoutSession($sessionId: ID!) {
+                  workoutSession(sessionId: $sessionId) {
+                    sessionId
+                    performance {
+                      exerciseId
+                      completedSets
+                    }
+                  }
+                }
+              `,
+              client: { specs: [] },
+              server: {
+                description: '',
+                data: {
+                  items: [
+                    {
+                      origin: {
+                        type: 'projection',
+                        idField: 'sessionId',
+                        name: 'WorkoutSessionsProjection',
+                      },
+                      target: {
+                        type: 'State',
+                        name: 'WorkoutSession',
+                      },
+                    },
+                  ],
+                },
+                specs: [],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [
+        {
+          type: 'state',
+          name: 'WorkoutSession',
+          fields: [
+            { name: 'sessionId', type: 'string', required: true },
+            {
+              name: 'performance',
+              type: 'Array<{ exerciseId: string; sets: Array<{ reps: number; weight: number }> }>',
+              required: true,
+            },
+          ],
+        },
+      ],
+    };
+
+    const plans = await generateScaffoldFilePlans(spec.narratives, spec.messages, undefined, 'src/domain/flows');
+    const resolverFile = plans.find((p) => p.outputPath.endsWith('query.resolver.ts'));
+
+    expect(resolverFile?.contents).toContain('export class WorkoutSessionPerformance');
+    expect(resolverFile?.contents).toContain('exerciseId!: string;');
+    expect(resolverFile?.contents).toContain('sets!: { reps: number; weight: number }[];');
+  });
 });

@@ -33,6 +33,7 @@ import {
   groupEventImports,
   isInlineObjectArray as isInlineObjectArrayHelper,
   isInlineObject as isInlineObjectHelper,
+  parseInlineObjectFields,
 } from './extract';
 import { getStreamFromSink } from './extract/data-sink';
 import { parseGraphQlRequest } from './extract/graphql';
@@ -357,6 +358,7 @@ async function renderTemplate(
     message: data.message,
     isInlineObject,
     isInlineObjectArray,
+    parseInlineObjectFields,
     baseTs,
     isEnumType,
     fieldUsesDate,

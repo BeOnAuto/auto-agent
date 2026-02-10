@@ -22,14 +22,8 @@ function formatFieldDocLine(field) {
     const type = field.type;
 
     if (type.startsWith('Array<{') && type.endsWith('}>')) {
-        const inner = type.slice(7, -1);
-        const entries = inner
-                .split(',')
-                .map(s => s.trim())
-                .map(pair => {
-                    const [k, v] = pair.split(':').map(p => p.trim());
-                    return `*     ${k}: ${v};`;
-                });
+        const subFields = parseInlineObjectFields(type);
+        const entries = subFields.map(sf => `*     ${sf.name}: ${sf.tsType};`);
         return [`*   ${name}: Array<{`, ...entries, `*   }>;`];
     }
 

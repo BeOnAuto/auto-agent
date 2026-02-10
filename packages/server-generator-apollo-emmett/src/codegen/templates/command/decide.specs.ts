@@ -582,7 +582,7 @@ describe('decide.ts.ejs', () => {
              * products?.data = {
              *   products: Array<{
              *     id: string;
-             *     name: string };
+             *     name: string;
              *   }>;
              * }
              */

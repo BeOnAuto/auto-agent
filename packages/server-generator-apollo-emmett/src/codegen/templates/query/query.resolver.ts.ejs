@@ -37,19 +37,11 @@ import { Query, Resolver<% if (hasArgs) { %>, Arg<% } %>, Ctx, ObjectType, Field
 
 <%
         for (const { typeName, tsType } of embeddedTypes) {
-    const inner = tsType.trim().startsWith('Array<')
-            ? tsType.trim().replace(/^Array<\{/, '{').replace(/}>$/, '}')
-            : tsType.trim().replace(/\[\]$/, '');
-    const match = inner.match(/^\{([\s\S]*)\}$/);
-    const body = match ? match[1] : '';
-    const rawFields = body.split(/[,;]\s*/).filter(Boolean);
-    const parsedFields = rawFields.map(f => {
-        const parts = f.split(':');
-        const name = parts[0]?.trim();
-        const type = parts.slice(1).join(':').trim();
-        if (!name || !type) return null;
-        return { name, tsType: type, gqlType: graphqlType(type), nullable: isNullable(type) };
-    }).filter(Boolean);
+    const parsedFields = parseInlineObjectFields(tsType).map(f => ({
+        ...f,
+        gqlType: graphqlType(f.tsType),
+        nullable: isNullable(f.tsType),
+    }));
 %>
 @ObjectType()
 export class <%= typeName %> {
