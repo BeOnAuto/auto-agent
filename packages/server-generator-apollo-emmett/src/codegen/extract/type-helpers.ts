@@ -11,6 +11,56 @@ export function baseTs(ts: string): string {
   return (ts ?? 'string').replace(/\s*\|\s*null\b/g, '').trim();
 }
 
+function extractObjectBody(tsType: string): string | null {
+  const t = tsType.trim();
+  let inner: string;
+  if (t.startsWith('Array<{') && t.endsWith('}>')) {
+    inner = t.slice(6, -1);
+  } else if (t.endsWith('[]')) {
+    inner = t.slice(0, -2).trim();
+  } else {
+    inner = t;
+  }
+  const match = inner.match(/^\{([\s\S]*)\}$/);
+  return match ? match[1] : null;
+}
+
+function splitFieldsRespectingNesting(body: string): string[] {
+  const fields: string[] = [];
+  let current = '';
+  let depth = 0;
+  for (const char of body) {
+    if (char === '<' || char === '{') depth++;
+    if (char === '>' || char === '}') depth--;
+    if ((char === ';' || char === ',') && depth === 0) {
+      const trimmed = current.trim();
+      if (trimmed) fields.push(trimmed);
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+  const trimmed = current.trim();
+  if (trimmed) fields.push(trimmed);
+  return fields;
+}
+
+export function parseInlineObjectFields(tsType: string): Array<{ name: string; tsType: string }> {
+  const body = extractObjectBody(tsType);
+  if (body === null) return [];
+  const rawFields = splitFieldsRespectingNesting(body);
+  return rawFields
+    .map((f) => {
+      const colonIdx = f.indexOf(':');
+      if (colonIdx === -1) return null;
+      const name = f.slice(0, colonIdx).trim();
+      const type = f.slice(colonIdx + 1).trim();
+      if (!name || !type) return null;
+      return { name, tsType: type };
+    })
+    .filter((f): f is { name: string; tsType: string } => f !== null);
+}
+
 export function createIsEnumType(toTsFieldType: (ts: string) => string) {
   return (tsType: string): boolean => {
     const converted = toTsFieldType(tsType);
@@ -62,20 +112,8 @@ export function createFieldUsesFloat(graphqlType: (ts: string) => string) {
     const gqlType = graphqlType(b);
     if (gqlType.includes('Float')) return true;
     if (isInlineObject(b) || isInlineObjectArray(b)) {
-      const inner = b.trim().startsWith('Array<')
-        ? b
-            .trim()
-            .replace(/^Array<\{/, '{')
-            .replace(/}>$/, '}')
-        : b.trim().replace(/\[\]$/, '');
-      const match = inner.match(/^\{([\s\S]*)\}$/);
-      const body = match ? match[1] : '';
-      const rawFields = body.split(/[,;]\s*/).filter(Boolean);
-      return rawFields.some((f) => {
-        const parts = f.split(':');
-        const type = parts.slice(1).join(':').trim();
-        return type.length > 0 && graphqlType(type).includes('Float');
-      });
+      const fields = parseInlineObjectFields(b);
+      return fields.some((f) => graphqlType(f.tsType).includes('Float'));
     }
     return false;
   };
