@@ -1037,6 +1037,183 @@ describe('projection.specs.ts.ejs', () => {
     `);
   });
 
+  it('should generate empty when array for query action in projection.specs.ts', async () => {
+    const spec: SpecsSchema = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'workout-flow',
+          slices: [
+            {
+              type: 'command',
+              name: 'log-workout',
+              stream: 'workouts-${memberId}',
+              client: { specs: [] },
+              server: {
+                description: '',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Log workout command',
+                    rules: [
+                      {
+                        name: 'Should record workouts',
+                        examples: [
+                          {
+                            name: 'User logs workout',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'LogWorkout',
+                                docString: { memberId: 'mem_001', caloriesBurned: 250 },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'WorkoutRecorded',
+                                docString: { memberId: 'mem_001', caloriesBurned: 250 },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+            {
+              type: 'query',
+              name: 'view-workout-history',
+              stream: 'workouts',
+              request:
+                'query GetWorkoutHistory($memberId: ID!) { workoutHistory(memberId: $memberId) { totalCalories } }',
+              client: { specs: [] },
+              server: {
+                description: '',
+                data: {
+                  items: [
+                    {
+                      target: { type: 'State', name: 'WorkoutHistory' },
+                      origin: { type: 'projection', name: 'WorkoutHistoryProjection', idField: 'memberId' },
+                    },
+                  ],
+                },
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'View workout history query',
+                    rules: [
+                      {
+                        name: 'Workout history projection',
+                        examples: [
+                          {
+                            name: 'Shows calories after workout recorded',
+                            steps: [
+                              {
+                                keyword: 'Given',
+                                text: 'WorkoutRecorded',
+                                docString: { memberId: 'mem_001', caloriesBurned: 250 },
+                              },
+                              { keyword: 'When', text: 'GetWorkoutHistory', docString: { memberId: 'mem_001' } },
+                              {
+                                keyword: 'Then',
+                                text: 'WorkoutHistory',
+                                docString: { memberId: 'mem_001', totalCalories: 250 },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [
+        {
+          type: 'command',
+          name: 'LogWorkout',
+          fields: [
+            { name: 'memberId', type: 'string', required: true },
+            { name: 'caloriesBurned', type: 'number', required: true },
+          ],
+        },
+        {
+          type: 'event',
+          name: 'WorkoutRecorded',
+          source: 'internal',
+          fields: [
+            { name: 'memberId', type: 'string', required: true },
+            { name: 'caloriesBurned', type: 'number', required: true },
+          ],
+        },
+        { type: 'query', name: 'GetWorkoutHistory', fields: [{ name: 'memberId', type: 'string', required: true }] },
+        {
+          type: 'state',
+          name: 'WorkoutHistory',
+          fields: [
+            { name: 'memberId', type: 'string', required: true },
+            { name: 'totalCalories', type: 'number', required: true },
+          ],
+        },
+      ],
+    } as SpecsSchema;
+
+    const plans = await generateScaffoldFilePlans(spec.narratives, spec.messages, undefined, 'src/domain/flows');
+    const specFile = plans.find((p) => p.outputPath.endsWith('view-workout-history/projection.specs.ts'));
+
+    expect(specFile?.contents).toMatchInlineSnapshot(`
+      "import { describe, it, beforeEach, expect } from 'vitest';
+      import { InMemoryProjectionSpec } from '@event-driven-io/emmett';
+      import { projection } from './projection';
+      import type { WorkoutRecorded } from '../log-workout/events';
+      import { WorkoutHistory } from './state';
+
+      type ProjectionEvent = WorkoutRecorded;
+
+      describe('Workout history projection', () => {
+        let given: InMemoryProjectionSpec<ProjectionEvent>;
+
+        beforeEach(() => {
+          given = InMemoryProjectionSpec.for({ projection });
+        });
+
+        it('Shows calories after workout recorded', () =>
+          given([
+            {
+              type: 'WorkoutRecorded',
+              data: {
+                memberId: 'mem_001',
+                caloriesBurned: 250,
+              },
+              metadata: {
+                streamName: 'workouts',
+                streamPosition: 1n,
+                globalPosition: 1n,
+              },
+            },
+          ])
+            .when([])
+            .then(async (state) => {
+              const document = await state.database
+                .collection<WorkoutHistory>('WorkoutHistoryProjection')
+                .findOne((doc) => doc.memberId === 'mem_001');
+
+              const expected: WorkoutHistory = {
+                memberId: 'mem_001',
+                totalCalories: 250,
+              };
+
+              expect(document).toMatchObject(expected);
+            }));
+      });
+      "
+    `);
+  });
+
   it('should generate valid projection.ts when When clause is a query action (QueryActionRef)', async () => {
     const spec: SpecsSchema = {
       variant: 'specs',

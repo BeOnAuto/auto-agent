@@ -74,8 +74,9 @@ if (Array.isArray(slice?.server?.specs)) {
         }
 
         for (const example of rule.examples || []) {
-            // Check if when is already a QueryActionRef
-            const isQueryActionPattern = example.when && !Array.isArray(example.when) && 'queryAction' in example.when;
+            const isQueryActionPattern = (example.when && !Array.isArray(example.when) && 'queryAction' in example.when)
+                || (queryName && Array.isArray(example.when) && example.when.length > 0
+                    && isQueryAction(example.when[0].eventRef, queryName));
 
             ruleGroups.get(ruleDescription).push({
                 description: example.description || 'should handle events correctly',
