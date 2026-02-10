@@ -11,6 +11,7 @@ export default {
     '@auto-engineer/component-implementer',
     '@auto-engineer/information-architect',
     '@auto-engineer/frontend-generator-react-graphql',
+    '@auto-engineer/generate-react-client',
     '@auto-engineer/server-checks',
     '@auto-engineer/server-implementer',
   ],

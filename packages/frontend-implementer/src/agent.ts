@@ -300,18 +300,14 @@ export function getChildrenFromScheme(filePath: string, scheme: Scheme | undefin
   const fileName = path.basename(filePath, '.tsx');
 
   if (filePath.includes('src/components/molecules/')) {
-    const item = scheme.molecules?.items?.[fileName] as
-      | { composition?: { atoms?: string[] } }
-      | undefined;
+    const item = scheme.molecules?.items?.[fileName] as { composition?: { atoms?: string[] } } | undefined;
     if (item?.composition?.atoms) {
       return item.composition.atoms.map((name) => ({ name, type: 'atoms' as const }));
     }
   }
 
   if (filePath.includes('src/components/organisms/')) {
-    const item = scheme.organisms?.items?.[fileName] as
-      | { composition?: { molecules?: string[] } }
-      | undefined;
+    const item = scheme.organisms?.items?.[fileName] as { composition?: { molecules?: string[] } } | undefined;
     if (item?.composition?.molecules) {
       return item.composition.molecules.map((name) => ({ name, type: 'molecules' as const }));
     }

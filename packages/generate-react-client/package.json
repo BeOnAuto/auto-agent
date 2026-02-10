@@ -1,0 +1,38 @@
+{
+  "name": "@auto-engineer/generate-react-client",
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc && tsx ../../scripts/fix-esm-imports.ts && cp -r starter dist/",
+    "test-cli": "tsx test-cli.ts",
+    "test": "vitest run --reporter=dot",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit",
+    "link:dev": "pnpm build && pnpm link --global",
+    "unlink:dev": "pnpm unlink --global",
+    "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@auto-engineer/message-bus": "workspace:*",
+    "debug": "^4.4.1"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.12"
+  },
+  "version": "0.1.0"
+}

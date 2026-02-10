@@ -27,6 +27,7 @@
       "!**/.ketchup",
       "!**/packages/frontend-generator-react-graphql/shadcn-starter",
       "!**/packages/frontend-generator-react-graphql/mui-starter",
+      "!**/packages/generate-react-client/starter",
       "!**/packages/create-auto-app/templates",
       "!**/examples"
     ]
@@ -115,6 +116,7 @@
       "includes": [
         "packages/frontend-generator-react-graphql/shadcn-starter/**",
         "packages/frontend-generator-react-graphql/mui-starter/**",
+        "packages/generate-react-client/starter/**",
         "packages/create-auto-app/templates/**",
         "examples/**"
       ],

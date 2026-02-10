@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { getChildrenFromScheme, readChildrenSources, type ChildComponent, type Scheme } from './agent.js';
+import { type ChildComponent, getChildrenFromScheme, readChildrenSources, type Scheme } from './agent.js';
 
 describe('children injection', () => {
   describe('getChildrenFromScheme', () => {
