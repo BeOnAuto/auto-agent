@@ -68,4 +68,38 @@ describe('state.ts.ejs', () => {
       "
     `);
   });
+
+  it('should export fallback UnknownState when query slice has no data config', async () => {
+    const spec: SpecsSchema = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'Dashboard',
+          slices: [
+            {
+              type: 'query',
+              name: 'View summary',
+              client: { specs: [] },
+              server: {
+                description: 'Shows summary',
+                specs: [],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [],
+    };
+
+    const plans = await generateScaffoldFilePlans(spec.narratives, spec.messages, undefined, 'src/domain/flows');
+    const stateFile = plans.find((p) => p.outputPath.endsWith('state.ts'));
+
+    expect(stateFile?.contents).toMatchInlineSnapshot(`
+      "export type UnknownState = {
+        id: string;
+        [key: string]: unknown;
+      };
+      "
+    `);
+  });
 });

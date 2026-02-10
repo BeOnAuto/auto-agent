@@ -1,3 +1,9 @@
+<% if (states.length === 0) { -%>
+export type UnknownState = {
+  id: string;
+  [key: string]: unknown;
+};
+<% } -%>
 <% for (const state of states) { -%>
     export type <%= pascalCase(state.type) %> = {
     <% for (const field of state.fields) { -%>
