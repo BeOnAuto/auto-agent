@@ -37,7 +37,10 @@ const commandImportGroups = new Map();
 for (const eventType of allUsedEvents) {
     const event = events.find(e => e.type === eventType);
     if (event) {
-        const importPath = event.sourceSliceName ? `../${toKebabCase(event.sourceSliceName)}/events` : './events';
+        const isCrossFlow = event.sourceFlowName && event.sourceFlowName !== flowName;
+        const importPath = isCrossFlow
+            ? `../../${toKebabCase(event.sourceFlowName)}/${toKebabCase(event.sourceSliceName)}/events`
+            : event.sourceSliceName ? `../${toKebabCase(event.sourceSliceName)}/events` : './events';
         if (!eventImportGroups.has(importPath)) {
             eventImportGroups.set(importPath, []);
         }
@@ -48,7 +51,10 @@ for (const eventType of allUsedEvents) {
 for (const commandType of allUsedCommands) {
     const command = commands.find(c => c.type === commandType);
     if (command) {
-        const importPath = command.sourceSliceName ? `../${toKebabCase(command.sourceSliceName)}/commands` : './commands';
+        const isCrossFlow = command.sourceFlowName && command.sourceFlowName !== flowName;
+        const importPath = isCrossFlow
+            ? `../../${toKebabCase(command.sourceFlowName)}/${toKebabCase(command.sourceSliceName)}/commands`
+            : command.sourceSliceName ? `../${toKebabCase(command.sourceSliceName)}/commands` : './commands';
         if (!commandImportGroups.has(importPath)) {
             commandImportGroups.set(importPath, []);
         }

@@ -278,4 +278,100 @@ describe('handle.ts.ejs (react slice)', () => {
       "
     `);
   });
+
+  it('should generate cross-flow import path in react.ts', async () => {
+    const spec: SpecsSchema = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'order management',
+          slices: [
+            {
+              type: 'command',
+              name: 'create order',
+              client: { specs: [] },
+              server: {
+                description: '',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Create order',
+                    rules: [
+                      {
+                        name: 'Create order rule',
+                        examples: [
+                          {
+                            name: 'Order created',
+                            steps: [
+                              { keyword: 'When', text: 'CreateOrder', docString: { orderId: 'o1' } },
+                              { keyword: 'Then', text: 'OrderCreated', docString: { orderId: 'o1' } },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          name: 'fulfillment',
+          slices: [
+            {
+              type: 'react',
+              name: 'notify warehouse',
+              server: {
+                description: 'Reacts to OrderCreated from order management flow',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Notify warehouse',
+                    rules: [
+                      {
+                        name: 'Notify on order',
+                        examples: [
+                          {
+                            name: 'Order triggers warehouse notification',
+                            steps: [
+                              { keyword: 'When', text: 'OrderCreated', docString: { orderId: 'o1' } },
+                              { keyword: 'Then', text: 'NotifyWarehouse', docString: { orderId: 'o1' } },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [
+        {
+          type: 'command',
+          name: 'CreateOrder',
+          fields: [{ name: 'orderId', type: 'string', required: true }],
+        },
+        {
+          type: 'command',
+          name: 'NotifyWarehouse',
+          fields: [{ name: 'orderId', type: 'string', required: true }],
+        },
+        {
+          type: 'event',
+          name: 'OrderCreated',
+          source: 'internal',
+          fields: [{ name: 'orderId', type: 'string', required: true }],
+        },
+      ],
+    };
+
+    const plans = await generateScaffoldFilePlans(spec.narratives, spec.messages, undefined, 'src/domain/flows');
+    const reactFile = plans.find((p) => p.outputPath.endsWith('notify-warehouse/react.ts'));
+
+    expect(reactFile?.contents).toContain("from '../../order-management/create-order/events'");
+  });
 });

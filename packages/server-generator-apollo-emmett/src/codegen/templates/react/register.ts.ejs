@@ -12,9 +12,13 @@ const then = Array.isArray(gwt?.then) ? gwt.then[0] : gwt?.then;
 const eventType = when?.eventRef;
 const commandType = then?.commandRef;
 const event = events.find(e => e.type === eventType);
+const isCrossFlow = event?.sourceFlowName && event.sourceFlowName !== flowName;
+const eventImportBase = isCrossFlow
+  ? `../../${toKebabCase(event.sourceFlowName)}/${toKebabCase(event.sourceSliceName)}`
+  : `../${toKebabCase(event?.sourceSliceName ?? 'unknown')}`;
 %>
 import { type CommandSender, type EventSubscription, type EventStore } from '@event-driven-io/emmett';
-import type { <%= pascalCase(eventType) %> } from '../<%= toKebabCase(event?.sourceSliceName ?? 'unknown') %>/events';
+import type { <%= pascalCase(eventType) %> } from '<%= eventImportBase %>/events';
 
 export async function register(
 messageBus: CommandSender & EventSubscription,
