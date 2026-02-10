@@ -5,7 +5,7 @@ import { extractCommandsFromGwt, extractCommandsFromThen } from './commands';
 import { extractEventsFromGiven, extractEventsFromThen, extractEventsFromWhen } from './events';
 import { extractFieldsFromMessage } from './fields';
 import { extractProjectionIdField, extractProjectionSingleton } from './projection';
-import { extractStatesFromData, extractStatesFromTarget } from './states';
+import { extractStatesFromData, extractStatesFromGiven, extractStatesFromTarget } from './states';
 import { extractGwtFromSpecs } from './step-converter';
 
 const debug = createDebug('auto:server-generator-apollo-emmett:extract:messages');
@@ -168,24 +168,35 @@ function extractMessagesForReact(slice: Slice, allMessages: MessageDefinition[])
   debugReact('  Found %d GWT specs', gwtSpecs.length);
 
   const reactGwtSpecs: ReactGwtSpec[] = gwtSpecs.map((gwt) => ({
-    when: Array.isArray(gwt.when) ? gwt.when : undefined,
+    when: Array.isArray(gwt.when)
+      ? gwt.when.filter((ref) => allMessages.some((m) => m.type === 'event' && m.name === ref.eventRef))
+      : undefined,
     then: gwt.then.filter((item): item is CommandRef => 'commandRef' in item),
   }));
 
   const events = extractEventsFromWhen(reactGwtSpecs, allMessages);
   debugReact('  Extracted %d events from when', events.length);
 
+  const allGivenRefs = gwtSpecs.flatMap((gwt) => gwt.given);
+  const givenEventRefs = allGivenRefs.filter((ref) =>
+    allMessages.some((m) => m.type === 'event' && m.name === ref.eventRef),
+  );
+  const givenEvents = extractEventsFromGiven(givenEventRefs, allMessages, slice.name);
+  debugReact('  Extracted %d events from given', givenEvents.length);
+  const givenStates = extractStatesFromGiven(allGivenRefs, allMessages);
+  debugReact('  Extracted %d states from given', givenStates.length);
+
   const { commands, commandSchemasByName } = extractCommandsFromThen(gwtSpecs, allMessages);
   debugReact('  Extracted %d commands from then', commands.length);
   debugReact('  Command schemas: %o', Object.keys(commandSchemasByName));
 
-  const states = extractStatesFromData(slice, allMessages);
-  debugReact('  Extracted %d states from data', states.length);
+  const dataStates = extractStatesFromData(slice, allMessages);
+  debugReact('  Extracted %d states from data', dataStates.length);
 
   const result = {
     commands,
-    events: deduplicateMessages(events),
-    states,
+    events: deduplicateMessages([...events, ...givenEvents]),
+    states: deduplicateMessages([...dataStates, ...givenStates]),
     commandSchemasByName,
   };
 

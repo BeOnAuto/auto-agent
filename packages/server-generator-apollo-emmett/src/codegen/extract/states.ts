@@ -1,5 +1,5 @@
 import type { Slice } from '@auto-engineer/narrative';
-import type { Message, MessageDefinition } from '../types';
+import type { EventRef, Message, MessageDefinition } from '../types';
 import { extractFieldsFromMessage } from './fields';
 
 interface DataItem {
@@ -25,6 +25,12 @@ function hasServerData(slice: Slice): slice is Slice & { server: { data: { items
     Array.isArray(slice.server.data.items) &&
     slice.server.data.items.length > 0
   );
+}
+
+export function extractStatesFromGiven(givenRefs: EventRef[], allMessages: MessageDefinition[]): Message[] {
+  return givenRefs
+    .filter((ref) => allMessages.some((m) => m.type === 'state' && m.name === ref.eventRef))
+    .map((ref) => createStateMessage(ref.eventRef, allMessages));
 }
 
 export function extractStatesFromTarget(slice: Slice, allMessages: MessageDefinition[]): Message[] {
