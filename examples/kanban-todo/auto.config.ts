@@ -151,7 +151,7 @@ export const pipeline = define('kanban-todo')
   .on('SliceGenerated')
   .emit('ImplementSlice', (e: { data: SliceGeneratedData }) => ({
     slicePath: resolvePath(e.data.slicePath),
-    context: { previousOutputs: 'errors', attemptNumber: 0 },
+    context: { previousOutputs: '', attemptNumber: 0 },
     aiOptions: { maxTokens: 2000 },
   }))
 
@@ -183,6 +183,11 @@ export const pipeline = define('kanban-todo')
     const slicePath = extractSlicePath(events);
 
     if (!shouldRetry(slicePath)) {
+      const errors = collectErrors(allEvents);
+      console.error(`❌ Slice implementation failed after ${MAX_RETRIES} retries: ${slicePath}`);
+      if (errors) {
+        console.error(`   Last errors:\n${errors}`);
+      }
       sliceRetryState.delete(slicePath);
       return;
     }

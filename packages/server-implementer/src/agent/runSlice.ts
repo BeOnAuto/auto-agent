@@ -48,7 +48,13 @@ export async function runSlice(sliceDir: string, flow: string): Promise<void> {
   }
 }
 
-async function retryFailedFiles(sliceDir: string, flow: string, initialResult: TestAndTypecheckResult) {
+async function retryFailedFiles(
+  sliceDir: string,
+  flow: string,
+  initialResult: TestAndTypecheckResult,
+  depth = 0,
+): Promise<TestAndTypecheckResult> {
+  const MAX_RECURSION_DEPTH = 2;
   let contextFiles = await loadContextFiles(sliceDir);
   let result = initialResult;
   for (let attempt = 1; attempt <= 5; attempt++) {
@@ -71,13 +77,17 @@ async function retryFailedFiles(sliceDir: string, flow: string, initialResult: T
     reportTestAndTypecheckResults(sliceDir, flow, result);
   }
   if (result.failedTypecheckFiles.length > 0) {
+    if (depth >= MAX_RECURSION_DEPTH) {
+      console.error(`❌ Typecheck errors persist after ${MAX_RECURSION_DEPTH} recursive retry rounds. Giving up.`);
+      return result;
+    }
     console.log(`⚠️ Fixing tests caused typecheck errors. Retrying typecheck fixes...`);
     const typecheckOnlyResult = {
       ...result,
       testErrors: '', // Clear test errors since we're only fixing typecheck
       failedTestFiles: [], // Clear failed test files
     };
-    result = await retryFailedFiles(sliceDir, path.basename(sliceDir), typecheckOnlyResult);
+    result = await retryFailedFiles(sliceDir, path.basename(sliceDir), typecheckOnlyResult, depth + 1);
     // After fixing typecheck, re-run everything to get fresh results
     const freshResult = await runTestsAndTypecheck(sliceDir);
     reportTestAndTypecheckResults(sliceDir, flow, freshResult);
