@@ -2,6 +2,36 @@
 
 ## TODO
 
+### Phase 12: Consistent Non-Blocking Dispatch (Bursts 103-105)
+
+**Goal**: Make all command dispatch paths non-blocking for consistent parallel execution.
+
+---
+
+#### Burst 103: Add `await` to `startPhased` call in pipeline-runtime.ts
+
+| Value | Prevent silently swallowed rejections |
+| Approach | Add `await` before `ctx.startPhased(handler, event)` + test rejection propagation |
+| Size | S |
+
+---
+
+#### Burst 104: Make `sendCommand` non-blocking in pipeline-server.ts
+
+| Value | Consistent fire-and-forget dispatch across all paths |
+| Approach | Change `await this.processCommand(command)` to `void this.processCommand(command)` in createContext |
+| Size | S |
+
+---
+
+#### Burst 105: Fix phased executor race condition in countPendingInPhase
+
+| Value | Prevent premature phase advancement when completion races with dispatch |
+| Approach | Remove `item.dispatched &&` from pending check + test completion-before-dispatch race |
+| Size | S |
+
+---
+
 ### Phase 11: 100% Test Coverage (Bursts 93-102)
 
 **Goal**: Achieve 100% test coverage by testing uncovered code or removing dead code.
