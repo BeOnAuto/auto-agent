@@ -396,8 +396,7 @@ export async function handleGenerateServerCommandInternal(
     events.push(createServerSuccessEvent(command, serverDir, absDest));
     return events;
   } catch (error) {
-    events.push(createServerFailureEvent(command, error));
-    return events;
+    return [createServerFailureEvent(command, error)];
   }
 }
 
