@@ -522,4 +522,85 @@ describe('spec.ts.ejs', () => {
       "
     `);
   });
+
+  it('should render null for Date fields with null values', async () => {
+    const spec: SpecsSchema = {
+      variant: 'specs',
+      narratives: [
+        {
+          name: 'User starts a session',
+          slices: [
+            {
+              type: 'command',
+              name: 'Start session',
+              client: { specs: [] },
+              server: {
+                description: '',
+                specs: [
+                  {
+                    type: 'gherkin',
+                    feature: 'Start session spec',
+                    rules: [
+                      {
+                        name: 'Should start a session',
+                        examples: [
+                          {
+                            name: 'Session with no date',
+                            steps: [
+                              {
+                                keyword: 'When',
+                                text: 'StartSession',
+                                docString: {
+                                  sessionId: 'sess_1',
+                                  sessionDate: null,
+                                },
+                              },
+                              {
+                                keyword: 'Then',
+                                text: 'SessionStarted',
+                                docString: {
+                                  sessionId: 'sess_1',
+                                  sessionDate: null,
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      messages: [
+        {
+          type: 'command',
+          name: 'StartSession',
+          fields: [
+            { name: 'sessionId', type: 'string', required: true },
+            { name: 'sessionDate', type: 'Date' },
+          ],
+        },
+        {
+          type: 'event',
+          name: 'SessionStarted',
+          source: 'internal',
+          fields: [
+            { name: 'sessionId', type: 'string', required: true },
+            { name: 'sessionDate', type: 'Date' },
+          ],
+        },
+      ],
+    };
+
+    const plans = await generateScaffoldFilePlans(spec.narratives, spec.messages, undefined, 'src/domain/flows');
+    const specFile = plans.find((p) => p.outputPath.endsWith('specs.ts'));
+    const contents = specFile?.contents ?? '';
+
+    expect(contents).toContain('sessionDate: null');
+    expect(contents).not.toContain('new Date(null)');
+  });
 });

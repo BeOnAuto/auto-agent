@@ -372,6 +372,7 @@ async function renderTemplate(
 }
 
 function formatTsValueSimple(value: unknown, tsType: string): string {
+  if (value === null || value === undefined) return 'null';
   if (tsType === 'Date') {
     return `new Date(${JSON.stringify(value)})`;
   }
