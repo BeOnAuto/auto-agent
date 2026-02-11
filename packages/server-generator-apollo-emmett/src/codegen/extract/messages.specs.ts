@@ -106,4 +106,85 @@ describe('extractMessagesFromSpecs (react slice)', () => {
     expect(result.events.some((e) => e.type === 'InventoryReservation')).toBe(false);
     expect(result.events.some((e) => e.type === 'ReactToPaymentProcessed')).toBe(false);
   });
+
+  it('should extract commands from normalized react when-command pattern', () => {
+    const slice: Slice = {
+      type: 'react',
+      name: 'update workout progress',
+      server: {
+        description: 'Reacts to GymSessionLogged by updating workout progress',
+        specs: [
+          {
+            type: 'gherkin',
+            feature: 'Update workout progress reaction',
+            rules: [
+              {
+                name: 'Progress update',
+                examples: [
+                  {
+                    name: 'session triggers progress update',
+                    steps: [
+                      {
+                        keyword: 'Given',
+                        text: 'GymSessionLogged',
+                        docString: { sessionId: 'gs_1' },
+                      },
+                      {
+                        keyword: 'When',
+                        text: 'UpdateWorkoutProgress',
+                        docString: { userId: 'usr_1' },
+                      },
+                      {
+                        keyword: 'Then',
+                        text: 'WorkoutProgressUpdated',
+                        docString: { userId: 'usr_1' },
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    const allMessages: MessageDefinition[] = [
+      {
+        type: 'event',
+        name: 'GymSessionLogged',
+        fields: [{ name: 'sessionId', type: 'string', required: true }],
+      },
+      {
+        type: 'command',
+        name: 'UpdateWorkoutProgress',
+        fields: [{ name: 'userId', type: 'string', required: true }],
+      },
+      {
+        type: 'event',
+        name: 'WorkoutProgressUpdated',
+        fields: [{ name: 'userId', type: 'string', required: true }],
+      },
+    ];
+
+    const result = extractMessagesFromSpecs(slice, allMessages);
+
+    expect(result.events).toEqual([
+      {
+        type: 'GymSessionLogged',
+        fields: [{ name: 'sessionId', tsType: 'string', required: true }],
+        source: 'given',
+        sourceFlowName: undefined,
+        sourceSliceName: 'update workout progress',
+      },
+    ]);
+
+    expect(result.commands).toEqual([
+      {
+        type: 'UpdateWorkoutProgress',
+        fields: [{ name: 'userId', tsType: 'string', required: true }],
+        source: 'then',
+      },
+    ]);
+  });
 });

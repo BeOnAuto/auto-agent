@@ -48,26 +48,34 @@ function groupGwtByRule(gwtResults: GwtConditionWithRule[]): Map<string, GwtCond
   return grouped;
 }
 
+export function normalizeReactEntry(
+  entry: {
+    given: EventRef[];
+    when: CommandRef | EventRef[] | QueryActionRef;
+    then: Array<EventRef | StateRef | CommandRef | ErrorRef>;
+  },
+  allMessages: MessageDefinition[],
+): void {
+  if (!Array.isArray(entry.when)) return;
+  const originalWhen = entry.when[0];
+  const whenRef = originalWhen?.eventRef;
+  if (!whenRef) return;
+  if (allMessages.some((m) => m.type === 'event' && m.name === whenRef)) return;
+  const triggerIdx = entry.given.findIndex((ref) =>
+    allMessages.some((m) => m.type === 'event' && m.name === ref.eventRef),
+  );
+  if (triggerIdx === -1) return;
+  entry.when = [entry.given[triggerIdx]];
+  entry.given = entry.given.filter((_, i) => i !== triggerIdx);
+  if (allMessages.some((m) => m.type === 'command' && m.name === whenRef)) {
+    entry.then = [{ commandRef: whenRef, exampleData: originalWhen.exampleData }];
+  }
+}
+
 function normalizeReactPatternB(rules: NormalizedRule[], allMessages: MessageDefinition[]): void {
   for (const rule of rules) {
     for (const example of rule.examples) {
-      if (!Array.isArray(example.when)) continue;
-      const originalWhen = example.when[0];
-      const whenRef = originalWhen?.eventRef;
-      if (!whenRef) continue;
-      const isRealEvent = allMessages.some((m) => m.type === 'event' && m.name === whenRef);
-      if (isRealEvent) continue;
-      const triggerIdx = example.given.findIndex((ref) =>
-        allMessages.some((m) => m.type === 'event' && m.name === ref.eventRef),
-      );
-      if (triggerIdx === -1) continue;
-      const triggerRef = example.given[triggerIdx];
-      example.when = [triggerRef];
-      example.given = example.given.filter((_, i) => i !== triggerIdx);
-      const isRealCommand = allMessages.some((m) => m.type === 'command' && m.name === whenRef);
-      if (isRealCommand) {
-        example.then = [{ commandRef: whenRef, exampleData: originalWhen.exampleData }];
-      }
+      normalizeReactEntry(example, allMessages);
     }
   }
 }

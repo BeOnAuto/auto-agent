@@ -52,11 +52,15 @@ export function extractEventsFromGiven(
     .filter((event): event is Message => event !== undefined);
 }
 
-export function extractEventsFromWhen(gwtSpecs: ReactGwtSpec[], allMessages: MessageDefinition[]): Message[] {
+export function extractEventsFromWhen(
+  gwtSpecs: ReactGwtSpec[],
+  allMessages: MessageDefinition[],
+  currentSliceName?: string,
+): Message[] {
   return gwtSpecs.flatMap((gwt) => {
     if (!Array.isArray(gwt.when)) {
       return [];
     }
-    return gwt.when.flatMap((eventExample) => extractEventsFromGiven([eventExample], allMessages));
+    return gwt.when.flatMap((eventExample) => extractEventsFromGiven([eventExample], allMessages, currentSliceName));
   });
 }

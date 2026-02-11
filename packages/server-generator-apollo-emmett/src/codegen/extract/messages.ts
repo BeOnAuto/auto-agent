@@ -5,6 +5,7 @@ import { extractCommandsFromGwt, extractCommandsFromThen } from './commands';
 import { extractEventsFromGiven, extractEventsFromThen, extractEventsFromWhen } from './events';
 import { extractFieldsFromMessage } from './fields';
 import { extractProjectionIdField, extractProjectionSingleton } from './projection';
+import { normalizeReactEntry } from './slice-normalizer';
 import { extractStatesFromData, extractStatesFromGiven, extractStatesFromTarget } from './states';
 import { extractGwtFromSpecs } from './step-converter';
 
@@ -167,6 +168,10 @@ function extractMessagesForReact(slice: Slice, allMessages: MessageDefinition[])
   const gwtSpecs = extractGwtFromSpecs(specs, 'react');
   debugReact('  Found %d GWT specs', gwtSpecs.length);
 
+  for (const gwt of gwtSpecs) {
+    normalizeReactEntry(gwt, allMessages);
+  }
+
   const reactGwtSpecs: ReactGwtSpec[] = gwtSpecs.map((gwt) => ({
     when: Array.isArray(gwt.when)
       ? gwt.when.filter((ref) => allMessages.some((m) => m.type === 'event' && m.name === ref.eventRef))
@@ -174,7 +179,7 @@ function extractMessagesForReact(slice: Slice, allMessages: MessageDefinition[])
     then: gwt.then.filter((item): item is CommandRef => 'commandRef' in item),
   }));
 
-  const events = extractEventsFromWhen(reactGwtSpecs, allMessages);
+  const events = extractEventsFromWhen(reactGwtSpecs, allMessages, slice.name);
   debugReact('  Extracted %d events from when', events.length);
 
   const allGivenRefs = gwtSpecs.flatMap((gwt) => gwt.given);
