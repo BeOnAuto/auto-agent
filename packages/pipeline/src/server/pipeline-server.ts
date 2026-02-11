@@ -1000,7 +1000,7 @@ export class PipelineServer {
           requestId,
         };
         await this.emitCommandDispatched(effectiveCorrelationId, requestId, type, data as Record<string, unknown>);
-        await this.processCommand(command);
+        void this.processCommand(command);
       },
       /* v8 ignore next 3 - integration path tested via pipeline-runtime.specs.ts */
       startPhased: async (handler, event) => {
