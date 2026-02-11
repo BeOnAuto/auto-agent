@@ -2,36 +2,6 @@
 
 ## TODO
 
-### Phase 12: Consistent Non-Blocking Dispatch (Bursts 103-105)
-
-**Goal**: Make all command dispatch paths non-blocking for consistent parallel execution.
-
----
-
-#### Burst 103: Add `await` to `startPhased` call in pipeline-runtime.ts
-
-| Value | Prevent silently swallowed rejections |
-| Approach | Add `await` before `ctx.startPhased(handler, event)` + test rejection propagation |
-| Size | S |
-
----
-
-#### Burst 104: Make `sendCommand` non-blocking in pipeline-server.ts
-
-| Value | Consistent fire-and-forget dispatch across all paths |
-| Approach | Change `await this.processCommand(command)` to `void this.processCommand(command)` in createContext |
-| Size | S |
-
----
-
-#### Burst 105: Fix phased executor race condition in countPendingInPhase
-
-| Value | Prevent premature phase advancement when completion races with dispatch |
-| Approach | Remove `item.dispatched &&` from pending check + test completion-before-dispatch race |
-| Size | S |
-
----
-
 ### Phase 11: 100% Test Coverage (Bursts 93-102)
 
 **Goal**: Achieve 100% test coverage by testing uncovered code or removing dead code.
@@ -943,6 +913,14 @@ it("should extract graph from emit handler", () => {
 ---
 
 ## DONE
+
+### Phase 12: Consistent Non-Blocking Dispatch (Bursts 103-105) ✅
+
+- [x] Burst 103: Add `await` to `startPhased` call in pipeline-runtime.ts (e9b391f4)
+- [x] Burst 104: Make `sendCommand` non-blocking in pipeline-server.ts (2309cf5b)
+- [x] Burst 105: Fix phased executor race condition in countPendingInPhase (03f4f951)
+
+---
 
 ### Phase 8: CLI Integration (Bursts 67-70) ✅
 
