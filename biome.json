@@ -25,6 +25,7 @@
       "!**/.DS_Store",
       "!**/Thumbs.db",
       "!**/.ketchup",
+      "!**/.claude-auto",
       "!**/packages/frontend-generator-react-graphql/shadcn-starter",
       "!**/packages/frontend-generator-react-graphql/mui-starter",
       "!**/packages/generate-react-client/starter",
