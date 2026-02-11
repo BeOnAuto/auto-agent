@@ -189,7 +189,6 @@ export const pipeline = define('kanban-todo')
       if (errors) {
         console.error(`   Last errors:\n${errors}`);
       }
-      sliceRetryState.delete(slicePath);
       return;
     }
 
