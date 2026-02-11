@@ -43,7 +43,7 @@ export class PipelineRuntime {
           break;
         case 'foreach-phased':
           if (ctx.startPhased !== undefined) {
-            ctx.startPhased(handler, event);
+            await ctx.startPhased(handler, event);
           } else {
             await this.executeForEachPhasedHandler(handler, event, ctx);
           }

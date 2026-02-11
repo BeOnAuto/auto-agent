@@ -235,6 +235,29 @@ describe('PipelineRuntime', () => {
     expect(phasedCalled).toBe(true);
   });
 
+  it('should propagate startPhased rejection', async () => {
+    const ctx = {
+      sendCommand: async () => {},
+      emit: async () => {},
+      correlationId: 'test',
+      startPhased: async () => {
+        throw new Error('phased-setup-failed');
+      },
+    };
+    type Item = { id: string; p: 'high' | 'low' };
+    const pipeline = define('test')
+      .on('Items')
+      .forEach((e: { data: { items: Item[] } }) => e.data.items)
+      .groupInto(['high', 'low'], (i: Item) => i.p)
+      .process('Cmd', (i: Item) => ({ id: i.id }))
+      .onComplete({ success: 'Done', failure: 'Fail', itemKey: () => '' })
+      .build();
+    const runtime = new PipelineRuntime(pipeline.descriptor);
+    await expect(runtime.handleEvent({ type: 'Items', data: { items: [{ id: '1', p: 'low' }] } }, ctx)).rejects.toThrow(
+      'phased-setup-failed',
+    );
+  });
+
   it('should dispatch multiple emit commands in parallel, not sequentially', async () => {
     const callOrder: string[] = [];
     let resolveA: () => void;
