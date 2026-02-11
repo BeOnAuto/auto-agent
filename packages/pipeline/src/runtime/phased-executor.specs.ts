@@ -467,6 +467,52 @@ describe('PhasedExecutor', () => {
     });
   });
 
+  describe('dispatch race condition', () => {
+    it('should not advance phase when item completes before next item is dispatched', async () => {
+      const items: TestItem[] = [
+        { id: 'm1', type: 'molecule' },
+        { id: 'm2', type: 'molecule' },
+        { id: 'o1', type: 'organism' },
+      ];
+      const handler = createHandler(items);
+      const raceDispatched: Array<{ commandType: string; data: unknown; correlationId: string }> = [];
+      const raceCompleted: Event[] = [];
+      let firstDispatchSeen = false;
+
+      const raceExecutor = new PhasedExecutor({
+        readModel: ctx.readModel,
+        onDispatch: (commandType, data, correlationId) => {
+          raceDispatched.push({ commandType, data, correlationId });
+        },
+        onComplete: (event) => {
+          raceCompleted.push(event);
+        },
+        onEventEmit: async (event) => {
+          const data = event.data as Record<string, unknown>;
+          const correlationId =
+            (data.correlationId as string) ?? (data.executionId as string)?.split('-')[1] ?? 'default';
+          await ctx.eventStore.appendToStream(`phased-${correlationId}`, [{ type: event.type, data: event.data }]);
+
+          if (event.type === 'PhasedItemDispatched' && data.itemKey === 'm1' && !firstDispatchSeen) {
+            firstDispatchSeen = true;
+            await raceExecutor.onEventReceived(
+              { type: 'ComponentImplemented', correlationId: 'c1', data: { filePath: 'm1' } },
+              'm1',
+            );
+          }
+        },
+      });
+      raceExecutor.registerHandler(handler);
+
+      const event: Event = { type: 'ClientGenerated', correlationId: 'c1', data: { components: items } };
+      await raceExecutor.startPhased(handler, event, 'c1');
+
+      const dispatchedPaths = raceDispatched.map((d) => (d.data as { filePath: string }).filePath);
+      expect(dispatchedPaths).toEqual(['m1', 'm2']);
+      expect(raceCompleted).toHaveLength(0);
+    });
+  });
+
   describe('event edge cases', () => {
     it('should ignore events with undefined correlationId', async () => {
       const items: TestItem[] = [{ id: 'm1', type: 'molecule' }];

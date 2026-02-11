@@ -117,7 +117,7 @@ export class PhasedExecutor {
     let pending = 0;
     const currentPhase = execution.phases[execution.currentPhaseIndex];
     for (const item of execution.items) {
-      if (item.phase === currentPhase && item.dispatched && !item.completed) {
+      if (item.phase === currentPhase && !item.completed) {
         pending++;
       }
     }
