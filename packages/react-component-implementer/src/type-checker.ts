@@ -1,4 +1,5 @@
 import { execSync } from 'node:child_process';
+import path from 'node:path';
 
 export interface TypeCheckResult {
   passed: boolean;
@@ -14,12 +15,12 @@ function getExecOutput(error: unknown): { stdout: string; stderr: string } {
   return { stdout, stderr };
 }
 
-export function checkTypes(filePaths: string[]): TypeCheckResult {
+export function checkTypes(filePaths: string[], cwd: string): TypeCheckResult {
   let stdout = '';
   let stderr = '';
 
   try {
-    stdout = execSync('npx tsc --noEmit --pretty false', { encoding: 'utf-8' });
+    stdout = execSync('pnpm type-check', { encoding: 'utf-8', cwd });
   } catch (error: unknown) {
     const output = getExecOutput(error);
     stdout = output.stdout;
@@ -29,7 +30,15 @@ export function checkTypes(filePaths: string[]): TypeCheckResult {
   const combined = [stdout, stderr].join('\n');
   const lines = combined.split('\n');
 
-  const errors = lines.filter((line) => filePaths.some((filePath) => line.includes(filePath)));
+  // tsc outputs relative paths (e.g. "src/components/ui/logo-text.tsx(3,1): error TS...")
+  // Convert absolute filePaths to relative (from cwd) for matching
+  const relativePaths = filePaths.map((fp) => path.relative(cwd, fp));
+
+  const errors = lines.filter((line) => relativePaths.some((rp) => line.includes(rp)));
+
+  console.log('Relative paths checked for type errors:', relativePaths);
+  console.log('Type check output lines:', lines);
+  console.log('Filtered type errors:', errors);
 
   if (errors.length === 0) {
     return { passed: true, errors: [] };

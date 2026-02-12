@@ -26,6 +26,7 @@ const MAX_ITERATIONS = 3;
 
 interface IterationLoopParams {
   task: ComponentTask;
+  targetDir: string;
   outputDir: string;
   generator: ReturnType<typeof createComponentGenerator>;
   context: GenerationContext;
@@ -45,7 +46,8 @@ interface IterationResult {
 }
 
 async function runValidationLoop(params: IterationLoopParams): Promise<IterationResult> {
-  const { task, outputDir, generator, context, mcpClient, browser, model, designReference, initialCode } = params;
+  const { task, targetDir, outputDir, generator, context, mcpClient, browser, model, designReference, initialCode } =
+    params;
   const name = componentName(task.componentId);
 
   let { code, history } = initialCode;
@@ -56,7 +58,7 @@ async function runValidationLoop(params: IterationLoopParams): Promise<Iteration
   for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     console.log(`  Iteration ${iteration}/${MAX_ITERATIONS} for ${name}`);
 
-    const typeResult = checkTypes([componentPath, storyPath]);
+    const typeResult = checkTypes([componentPath, storyPath], targetDir);
 
     if (!typeResult.passed) {
       console.log('    Type errors found, skipping functional/visual validation');
@@ -334,8 +336,10 @@ export const commandHandler = defineCommandHandler({
       debug('Generating component: %s', name);
       const initialCode = await generator.generate(task, context);
 
+      const resolvedTargetDir = path.resolve(targetDir);
       const result = await runValidationLoop({
         task,
+        targetDir: resolvedTargetDir,
         outputDir,
         generator,
         context,
