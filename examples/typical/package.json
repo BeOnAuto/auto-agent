@@ -25,6 +25,7 @@
     "@auto-engineer/pipeline": "workspace:*",
     "@auto-engineer/server-checks": "workspace:*",
     "@auto-engineer/server-generator-apollo-emmett": "workspace:*",
+    "@auto-engineer/react-component-implementer": "workspace:*",
     "@auto-engineer/server-implementer": "workspace:*"
   },
   "devDependencies": {

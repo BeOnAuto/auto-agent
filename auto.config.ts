@@ -14,6 +14,7 @@ export default {
     '@auto-engineer/generate-react-client',
     '@auto-engineer/server-checks',
     '@auto-engineer/server-implementer',
+    '@auto-engineer/react-component-implementer',
   ],
 
   aliases: {

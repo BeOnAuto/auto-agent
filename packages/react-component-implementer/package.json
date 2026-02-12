@@ -1,0 +1,38 @@
+{
+  "name": "@auto-engineer/react-component-implementer",
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc && tsx ../../scripts/fix-esm-imports.ts",
+    "test-cli": "tsx test-cli.ts",
+    "test": "vitest run --reporter=dot",
+    "type-check": "tsc --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@auto-engineer/message-bus": "workspace:*",
+    "@ai-sdk/anthropic": "^1.2.12",
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "ai": "^4.3.16",
+    "debug": "^4.4.1",
+    "playwright": "^1.52.0"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.12"
+  },
+  "version": "0.1.0"
+}
