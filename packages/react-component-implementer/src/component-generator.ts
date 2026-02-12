@@ -2,6 +2,14 @@ import type { LanguageModel } from 'ai';
 import { generateText } from 'ai';
 import type { ComponentTask } from './types.js';
 
+export function componentName(componentId: string): string {
+  return componentId
+    .replace(/^(atom|molecule|organism|template|page)_/, '')
+    .split('_')
+    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+    .join('');
+}
+
 export interface GeneratedCode {
   componentCode: string;
   storyCode: string;
@@ -137,29 +145,24 @@ function buildSystemPrompt(context: GenerationContext): string {
 }
 
 function buildUserPrompt(task: ComponentTask): string {
+  const name = componentName(task.componentId);
   const lines: string[] = [
-    `Component: ${task.name}`,
+    `Component: ${name}`,
     `Description: ${task.description}`,
-    `Level: ${task.level}`,
+    `Level: ${task.type}`,
     '',
-    'Props:',
-    ...Object.entries(task.props).map(([key, value]) => `  ${key}: ${value}`),
+    `Implementation: ${task.implementation}`,
+    '',
+    'Acceptance Criteria:',
+    ...task.acceptanceCriteria.map((c) => `  - ${c}`),
   ];
-
-  if (task.variants && task.variants.length > 0) {
-    lines.push('', 'Variants:', ...task.variants.map((v) => `  - ${v}`));
-  }
-
-  if (task.state && task.state.length > 0) {
-    lines.push('', 'State:', ...task.state.map((s) => `  - ${s}`));
-  }
-
-  if (task.requests && task.requests.length > 0) {
-    lines.push('', 'GraphQL Requests:', ...task.requests.map((r) => `  ${r}`));
-  }
 
   if (task.prompt) {
     lines.push('', 'Additional Instructions:', task.prompt);
+  }
+
+  if (task.files.create.length > 0) {
+    lines.push('', 'Files to create:', ...task.files.create.map((f) => `  - ${f}`));
   }
 
   return lines.join('\n');

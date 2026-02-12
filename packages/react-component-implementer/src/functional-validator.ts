@@ -24,7 +24,7 @@ export async function validateFunctional(storyUrl: string, browser: Browser): Pr
   });
 
   await page.goto(storyUrl);
-  await page.waitForSelector('#storybook-root', { timeout: 10000 });
+  await page.waitForSelector('#storybook-root', { state: 'attached', timeout: 10000 });
 
   const errorText = await page.evaluate(() => {
     const el = document.querySelector('[data-testid="storybook-error"]');

@@ -1,29 +1,38 @@
 import { commandHandler } from './src/commands/implement-react-component.js';
-import type { ComponentTask } from './src/types.js';
+import type { Job } from './src/types.js';
 
-const task: ComponentTask = {
-  name: 'Button',
-  description: 'A clickable button component with multiple variants',
-  level: 'atom',
-  props: {
-    label: 'string',
-    onClick: '() => void',
-    variant: "'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'",
-    size: "'default' | 'sm' | 'lg' | 'icon'",
-    disabled: 'boolean',
+const job: Job = {
+  id: 'job_atom_button',
+  dependsOn: [],
+  target: 'ImplementReactComponent',
+  payload: {
+    title: 'Implement Button Atom',
+    description: 'A clickable button component with multiple variants',
+    type: 'atom',
+    componentId: 'atom_button',
+    implementation: 'Create a button component with default, destructive, outline, secondary, ghost, and link variants',
+    acceptanceCriteria: [
+      'Supports multiple visual variants',
+      'Handles disabled and loading states',
+      'Uses proper button semantics',
+    ],
+    prompt: 'Create a Button atom component with multiple variants and proper interaction states.',
+    storybookPath: 'atoms/Button',
+    files: {
+      create: ['components/atoms/Button/Button.tsx', 'components/atoms/Button/Button.stories.tsx'],
+      modify: [],
+    },
   },
-  variants: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
-  state: ['disabled', 'loading'],
 };
 
-const clientDir = process.argv[2] || './test-client';
+const targetDir = process.argv[2] || './test-client';
 
 async function main() {
-  console.log(`Running ImplementReactComponent for "${task.name}" in ${clientDir}`);
+  console.log(`Running ImplementReactComponent for "${job.payload.componentId}" in ${targetDir}`);
 
   const result = await commandHandler.handle({
     type: 'ImplementReactComponent',
-    data: { task, clientDir },
+    data: { targetDir, job },
     timestamp: new Date(),
     requestId: 'test-cli',
   });

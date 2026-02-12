@@ -1,10 +1,18 @@
 export interface ComponentTask {
-  name: string;
+  title: string;
   description: string;
-  level: 'atom' | 'molecule' | 'organism';
-  props: Record<string, string>;
-  variants?: string[];
-  state?: string[];
-  requests?: string[];
-  prompt?: string;
+  type: string;
+  componentId: string;
+  implementation: string;
+  acceptanceCriteria: string[];
+  prompt: string;
+  storybookPath: string;
+  files: { create: string[]; modify: string[] };
+}
+
+export interface Job {
+  id: string;
+  dependsOn: string[];
+  target: string;
+  payload: ComponentTask;
 }

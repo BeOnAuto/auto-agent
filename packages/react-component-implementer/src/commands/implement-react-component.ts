@@ -7,16 +7,15 @@ import createDebug from 'debug';
 import type { Browser } from 'playwright';
 import { chromium } from 'playwright';
 import type { GenerationContext, ValidationFeedback } from '../component-generator.js';
-import { createComponentGenerator } from '../component-generator.js';
+import { componentName, createComponentGenerator } from '../component-generator.js';
 import { writeComponent, writeStory } from '../component-writer.js';
-import { captureDesignReferences } from '../design-reference.js';
 import { scanFileTree } from '../file-tree.js';
 import type { FunctionalResult } from '../functional-validator.js';
 import { validateFunctional } from '../functional-validator.js';
 import { connectMcpClient } from '../mcp-client.js';
 import type { TypeCheckResult } from '../type-checker.js';
 import { checkTypes } from '../type-checker.js';
-import type { ComponentTask } from '../types.js';
+import type { ComponentTask, Job } from '../types.js';
 import type { DesignReference, VisualFeedback } from '../visual-evaluator.js';
 import { evaluateVisual } from '../visual-evaluator.js';
 
@@ -47,22 +46,16 @@ interface IterationResult {
 
 async function runValidationLoop(params: IterationLoopParams): Promise<IterationResult> {
   const { task, outputDir, generator, context, mcpClient, browser, model, designReference, initialCode } = params;
+  const name = componentName(task.componentId);
 
   let { code, history } = initialCode;
-  let componentPath = await writeComponent(task.name, code.componentCode, outputDir);
-  let storyPath = await writeStory(task.name, code.storyCode, outputDir);
+  let componentPath = await writeComponent(name, code.componentCode, outputDir);
+  let storyPath = await writeStory(name, code.storyCode, outputDir);
   let lastFeedback: ValidationFeedback | undefined;
 
   for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
-    console.log(`  Iteration ${iteration}/${MAX_ITERATIONS} for ${task.name}`);
+    console.log(`  Iteration ${iteration}/${MAX_ITERATIONS} for ${name}`);
 
-    const storyExports = extractStoryExports(code.storyCode);
-    if (storyExports.length === 0) {
-      console.log(`  Warning: no named exports found in story for ${task.name}, skipping validation`);
-      return { success: true, componentPath, storyPath, iterations: iteration };
-    }
-
-    const storyUrls = await waitForStoryUrls(mcpClient, storyExports, storyPath);
     const typeResult = checkTypes([componentPath, storyPath]);
 
     if (!typeResult.passed) {
@@ -70,32 +63,40 @@ async function runValidationLoop(params: IterationLoopParams): Promise<Iteration
       lastFeedback = collectFeedback(typeResult, [], []);
       console.log(`  Errors: ${summarizeFeedback(lastFeedback)}`);
       if (iteration < MAX_ITERATIONS) {
-        console.log(`  Refining ${task.name}...`);
+        console.log(`  Refining ${name}...`);
         const refined = await generator.refine(lastFeedback, context, history);
         code = refined.code;
         history = refined.history;
-        componentPath = await writeComponent(task.name, code.componentCode, outputDir);
-        storyPath = await writeStory(task.name, code.storyCode, outputDir);
+        componentPath = await writeComponent(name, code.componentCode, outputDir);
+        storyPath = await writeStory(name, code.storyCode, outputDir);
       }
       continue;
     }
 
-    const storyResults = await Promise.all(
-      storyUrls.map(async ({ exportName, url }) => {
-        console.log(`    Validating story ${exportName}...`);
-        const [functionalResult, visualResult] = await Promise.all([
-          validateFunctional(url, browser),
-          evaluateVisual(url, { name: task.name, description: task.description }, browser, model, designReference),
-        ]);
-        return { functionalResult, visualResult };
-      }),
-    );
+    const storyExports = extractStoryExports(code.storyCode);
+    if (storyExports.length === 0) {
+      console.log(`  Warning: no named exports found in story for ${name}, skipping validation`);
+      return { success: true, componentPath, storyPath, iterations: iteration };
+    }
+
+    const storyUrls = await waitForStoryUrls(mcpClient, storyExports, storyPath);
+
+    const storyResults: Array<{ functionalResult: FunctionalResult; visualResult: VisualFeedback }> = [];
+    console.log(storyUrls);
+    for (const { exportName, url } of storyUrls) {
+      console.log(`    Validating story ${exportName}...`);
+      const [functionalResult, visualResult] = await Promise.all([
+        validateFunctional(url, browser),
+        evaluateVisual(url, { name, description: task.description }, browser, model, designReference),
+      ]);
+      storyResults.push({ functionalResult, visualResult });
+    }
 
     const functionalResults = storyResults.map((r) => r.functionalResult);
     const visualResults = storyResults.map((r) => r.visualResult);
 
     if (isPassing(typeResult, functionalResults, visualResults)) {
-      console.log(`  ${task.name} passed all validations on iteration ${iteration}`);
+      console.log(`  ${name} passed all validations on iteration ${iteration}`);
       return { success: true, componentPath, storyPath, iterations: iteration };
     }
 
@@ -103,16 +104,16 @@ async function runValidationLoop(params: IterationLoopParams): Promise<Iteration
     console.log(`  Errors: ${summarizeFeedback(lastFeedback)}`);
 
     if (iteration < MAX_ITERATIONS) {
-      console.log(`  Refining ${task.name}...`);
+      console.log(`  Refining ${name}...`);
       const refined = await generator.refine(lastFeedback, context, history);
       code = refined.code;
       history = refined.history;
-      componentPath = await writeComponent(task.name, code.componentCode, outputDir);
-      storyPath = await writeStory(task.name, code.storyCode, outputDir);
+      componentPath = await writeComponent(name, code.componentCode, outputDir);
+      storyPath = await writeStory(name, code.storyCode, outputDir);
     }
   }
 
-  console.log(`  ${task.name} failed after ${MAX_ITERATIONS} iterations`);
+  console.log(`  ${name} failed after ${MAX_ITERATIONS} iterations`);
   return { success: false, componentPath, storyPath, iterations: MAX_ITERATIONS, lastFeedback };
 }
 
@@ -132,8 +133,8 @@ async function checkStorybookRunning(): Promise<void> {
 export type ImplementReactComponentCommand = Command<
   'ImplementReactComponent',
   {
-    task: ComponentTask;
-    clientDir: string;
+    targetDir: string;
+    job: Job;
   }
 >;
 
@@ -272,26 +273,28 @@ export const commandHandler = defineCommandHandler({
   category: 'implement',
   icon: 'component',
   fields: {
-    task: {
-      description: 'Component task definition (name, description, level, props, variants, state, requests, prompt)',
+    targetDir: {
+      description: 'The client project root directory (components will be written to src/components/ui/)',
       required: true,
     },
-    clientDir: {
-      description: 'The client project root directory (components will be written to src/components/ui/)',
+    job: {
+      description: 'Job object with payload containing component details (componentId, description, type, prompt)',
       required: true,
     },
   },
   examples: [
-    '$ auto implement:react-component --client-dir=./client --task=\'{"name":"Button","description":"A clickable button","level":"atom","props":{"label":"string","onClick":"() => void"}}\'',
+    '$ auto implement:react-component --target-dir=./client --job=\'{"id":"job_1","dependsOn":[],"target":"ImplementReactComponent","payload":{"componentId":"atom_button","description":"A button","type":"atom","prompt":"Create a Button"}}\'',
   ],
   events: [
     { name: 'ReactComponentImplemented', displayName: 'React Component Implemented' },
     { name: 'ReactComponentImplementationFailed', displayName: 'React Component Implementation Failed' },
   ],
   handle: async (command: Command): Promise<ImplementReactComponentEvents> => {
-    const { task, clientDir } = (command as ImplementReactComponentCommand).data;
+    const { targetDir, job } = (command as ImplementReactComponentCommand).data;
+    const task = job.payload;
+    const name = componentName(task.componentId);
 
-    debug('Implementing React component: %s in %s', task.name, clientDir);
+    debug('Implementing React component: %s in %s', name, targetDir);
 
     let browser: Awaited<ReturnType<typeof chromium.launch>> | undefined;
     let mcpClient: Awaited<ReturnType<typeof connectMcpClient>> | undefined;
@@ -304,7 +307,7 @@ export const commandHandler = defineCommandHandler({
       mcpClient = await connectMcpClient({ baseUrl: `http://localhost:${PORT}` });
 
       debug('Fetching generation context...');
-      const outputDir = path.join(clientDir, 'src', 'components', 'ui');
+      const outputDir = path.resolve(targetDir, 'src', 'components', 'ui');
       const [uiBuildingInstructions, existingComponents, fileTree] = await Promise.all([
         mcpClient.getUiBuildingInstructions(),
         mcpClient.listComponents(),
@@ -321,10 +324,14 @@ export const commandHandler = defineCommandHandler({
       browser = await chromium.launch();
 
       debug('Capturing design references...');
-      const designReference = await captureDesignReferences(browser, PORT, existingComponents, uiBuildingInstructions);
+      // const designReference = await captureDesignReferences(browser, PORT, existingComponents, uiBuildingInstructions);
+      const designReference: DesignReference = {
+        screenshots: [],
+        instructions: '',
+      };
 
       const generator = createComponentGenerator(model);
-      debug('Generating component: %s', task.name);
+      debug('Generating component: %s', name);
       const initialCode = await generator.generate(task, context);
 
       const result = await runValidationLoop({
@@ -343,7 +350,7 @@ export const commandHandler = defineCommandHandler({
         return {
           type: 'ReactComponentImplemented',
           data: {
-            name: task.name,
+            name,
             componentPath: result.componentPath,
             storyPath: result.storyPath,
             iterations: result.iterations,
@@ -358,7 +365,7 @@ export const commandHandler = defineCommandHandler({
         type: 'ReactComponentImplementationFailed',
         data: {
           error: `Failed after ${MAX_ITERATIONS} iterations. Last feedback: ${result.lastFeedback ? summarizeFeedback(result.lastFeedback) : 'none'}`,
-          name: task.name,
+          name,
         },
         timestamp: new Date(),
         requestId: command.requestId,
@@ -370,7 +377,7 @@ export const commandHandler = defineCommandHandler({
 
       return {
         type: 'ReactComponentImplementationFailed',
-        data: { error: errorMessage, name: task.name },
+        data: { error: errorMessage, name },
         timestamp: new Date(),
         requestId: command.requestId,
         correlationId: command.correlationId,
