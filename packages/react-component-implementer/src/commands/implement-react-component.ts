@@ -300,7 +300,7 @@ export const commandHandler = defineCommandHandler({
     },
   },
   examples: [
-    '$ auto implement:react-component --target-dir=./client --job=\'{"id":"job_1","dependsOn":[],"target":"ImplementReactComponent","payload":{"componentId":"atom_button","description":"A button","type":"atom","prompt":"Create a Button"}}\'',
+    '$ auto implement:react-component --target-dir=./client --job=\'{"id":"job_1","dependsOn":[],"target":"ImplementReactComponent","payload":{"componentId":"button","description":"A button","type":"component","prompt":"Create a Button"}}\'',
   ],
   events: [
     { name: 'ReactComponentImplemented', displayName: 'React Component Implemented' },

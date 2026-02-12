@@ -4,7 +4,6 @@ import type { ComponentTask } from './types.js';
 
 export function componentName(componentId: string): string {
   return componentId
-    .replace(/^(atom|molecule|organism|template|page)_/, '')
     .split('_')
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
     .join('');
@@ -61,8 +60,8 @@ function buildSystemPrompt(context: GenerationContext): string {
     context.fileTree,
     'Use these exact file paths when constructing import statements. Do not guess or invent file paths.',
     '',
-    'GraphQL & Data Fetching (organisms only):',
-    '- When an organism has GraphQL requests, use @tanstack/react-query with graphql-request',
+    'GraphQL & Data Fetching (for components with data requirements):',
+    '- When a component has GraphQL requests, use @tanstack/react-query with graphql-request',
     '- Import { useQuery, useMutation } from "@tanstack/react-query"',
     '- Import { request, gql } from "graphql-request"',
     '- Define the GraphQL document using gql`...` with the exact operation string provided',
@@ -70,7 +69,7 @@ function buildSystemPrompt(context: GenerationContext): string {
     '- Accept the GraphQL endpoint via props or use a default "/graphql"',
     '- Handle loading (isPending) and error (isError) states in the component',
     '',
-    'Storybook MSW Mocking (for organisms with GraphQL requests):',
+    'Storybook MSW Mocking (for components with GraphQL requests):',
     '- Mock GraphQL operations in stories using MSW (Mock Service Worker) via msw-storybook-addon',
     '- Import { graphql, HttpResponse } from "msw"',
     '- Define handlers using graphql.query("OperationName", ...) or graphql.mutation("OperationName", ...)',
