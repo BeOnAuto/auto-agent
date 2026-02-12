@@ -5,6 +5,7 @@
     "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
+    "types": ["node"],
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },
@@ -20,7 +21,14 @@
     "packages/create-auto-app/templates/shopping-app/example-integrations/cart/cart-integration.ts",
     "packages/create-auto-app/templates/shopping-app/example-integrations/product-catalogue/product-catalogue-integration.ts"
   ],
-  "exclude": ["**/dist/**", "**/node_modules/**"],
+  "exclude": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/starter/**",
+    "**/*-starter/**",
+    "examples/**",
+    "packages/create-auto-app/templates/**/client/**"
+  ],
   "references": [
     {
       "path": "./packages/ai-gateway"

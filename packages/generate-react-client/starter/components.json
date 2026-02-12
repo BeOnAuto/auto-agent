@@ -17,5 +17,13 @@
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
-  "iconLibrary": "lucide"
+  "iconLibrary": "lucide",
+  "registries": {
+    "@shadcraft": {
+      "url": "https://registry-shadcraft.vercel.app/r/{name}",
+      "headers": {
+        "X-License-Key": "${SHADCRAFT_LICENSE_KEY}"
+      }
+    }
+  }
 }
