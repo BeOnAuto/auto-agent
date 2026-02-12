@@ -1,9 +1,8 @@
-import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
-import { StarterBuilder } from '../builder.js';
+import { copyStarter } from '../copy-starter.js';
 
 const debug = createDebug('auto:generate-react-client:command');
 
@@ -63,20 +62,11 @@ export const commandHandler = defineCommandHandler({
     debug('Generating React client to: %s', targetDir);
 
     try {
-      const builder = new StarterBuilder();
       const starterPath = resolveStarterPath();
-
       debug('Starter path: %s', starterPath);
-      await builder.cloneStarter(starterPath);
-      await builder.build(targetDir);
 
-      debug('Running pnpm install in: %s', targetDir);
-      execSync('pnpm install', {
-        cwd: targetDir,
-        stdio: 'inherit',
-      });
-
-      debug('React client generated at: %s', targetDir);
+      const fileCount = await copyStarter(starterPath, targetDir);
+      debug('React client generated at %s (%d files)', targetDir, fileCount);
 
       return {
         type: 'ReactClientGenerated',

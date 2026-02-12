@@ -125,6 +125,7 @@ export const plugins = [
   '@auto-engineer/component-implementer',
   '@auto-engineer/information-architect',
   '@auto-engineer/frontend-generator-react-graphql',
+  '@auto-engineer/generate-react-client',
   '@auto-engineer/server-implementer',
   '@auto-engineer/dev-server',
   '@auto-engineer/job-graph-processor',
@@ -202,6 +203,9 @@ export const pipeline = define('kanban-todo')
   })
 
   .on('ServerGenerated')
+  .emit('GenerateReactClient', () => ({
+    targetDir: resolvePath('./client'),
+  }))
   .emit('GenerateIA', () => {
     iaRetryCount = 0;
     return {
