@@ -128,6 +128,7 @@ export const plugins = [
   '@auto-engineer/generate-react-client',
   '@auto-engineer/react-component-implementer',
   '@auto-engineer/server-implementer',
+  '@auto-engineer/app-implementer',
   '@auto-engineer/dev-server',
   '@auto-engineer/job-graph-processor',
 ];

@@ -15,6 +15,7 @@ export default {
     '@auto-engineer/server-checks',
     '@auto-engineer/server-implementer',
     '@auto-engineer/react-component-implementer',
+    '@auto-engineer/app-implementer',
   ],
 
   aliases: {

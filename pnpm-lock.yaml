@@ -172,6 +172,9 @@ importers:
 
   examples/typical:
     dependencies:
+      '@auto-engineer/app-implementer':
+        specifier: workspace:*
+        version: link:../../packages/app-implementer
       '@auto-engineer/cli':
         specifier: workspace:*
         version: link:../../packages/cli
@@ -276,6 +279,28 @@ importers:
       dotenv:
         specifier: ^16.4.5
         version: 16.6.1
+
+  packages/app-implementer:
+    dependencies:
+      '@ai-sdk/anthropic':
+        specifier: ^1.2.12
+        version: 1.2.12(zod@3.25.76)
+      '@auto-engineer/message-bus':
+        specifier: workspace:*
+        version: link:../message-bus
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.12.1
+        version: 1.17.4
+      ai:
+        specifier: ^4.3.16
+        version: 4.3.19(react@19.2.4)(zod@3.25.76)
+      debug:
+        specifier: ^4.4.1
+        version: 4.4.1
+    devDependencies:
+      '@types/debug':
+        specifier: ^4.1.12
+        version: 4.1.12
 
   packages/cli:
     dependencies:
