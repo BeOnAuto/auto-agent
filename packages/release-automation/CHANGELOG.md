@@ -1,5 +1,16 @@
 # @auto-engineer/release-automation
 
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
 ## 1.13.0
 
 ### Minor Changes

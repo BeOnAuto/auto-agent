@@ -2,6 +2,17 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
 ## 1.13.0
 
 ### Minor Changes
@@ -723,6 +734,22 @@
 
 # @auto-engineer/app-implementer
 
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/message-bus@1.14.0
+
 ## 1.13.0
 
 ### Minor Changes
@@ -756,6 +783,24 @@
   - @auto-engineer/message-bus@1.12.1
 
 # @auto-engineer/cli
+
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/file-store@1.14.0
+  - @auto-engineer/narrative@1.14.0
+  - @auto-engineer/pipeline@1.14.0
 
 ## 1.13.0
 
@@ -1470,6 +1515,22 @@
   - @auto-engineer/pipeline@0.14.0
 
 # create-auto-app
+
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/id@1.14.0
 
 ## 1.13.0
 
@@ -2457,6 +2518,23 @@
 
 # @auto-engineer/dev-server
 
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/cli@1.14.0
+  - @auto-engineer/message-bus@1.14.0
+
 ## 1.13.0
 
 ### Minor Changes
@@ -3238,6 +3316,17 @@
 
 # @auto-engineer/file-store
 
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
 ## 1.13.0
 
 ### Minor Changes
@@ -3917,6 +4006,22 @@
 
 # @auto-engineer/generate-react-client
 
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/message-bus@1.14.0
+
 ## 1.13.0
 
 ### Minor Changes
@@ -3950,6 +4055,17 @@
   - @auto-engineer/message-bus@1.12.1
 
 # @auto-engineer/id
+
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
 
 ## 1.13.0
 
@@ -4567,6 +4683,24 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/ai-gateway@1.14.0
+  - @auto-engineer/message-bus@1.14.0
+  - @auto-engineer/narrative@1.14.0
 
 ## 1.13.0
 
@@ -6008,6 +6142,22 @@
 
 # @auto-engineer/job-graph-processor
 
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/message-bus@1.14.0
+
 ## 1.13.0
 
 ### Minor Changes
@@ -6041,6 +6191,17 @@
   - @auto-engineer/message-bus@1.12.1
 
 # @auto-engineer/message-bus
+
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
 
 ## 1.13.0
 
@@ -6767,6 +6928,22 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/message-bus@1.14.0
 
 ## 1.13.0
 
@@ -7804,6 +7981,23 @@
 
 # @auto-engineer/model-diff
 
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/message-bus@1.14.0
+  - @auto-engineer/narrative@1.14.0
+
 ## 1.13.0
 
 ### Minor Changes
@@ -7855,6 +8049,24 @@
   - @auto-engineer/narrative@1.12.0
 
 # @auto-engineer/flow
+
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/file-store@1.14.0
+  - @auto-engineer/id@1.14.0
+  - @auto-engineer/message-bus@1.14.0
 
 ## 1.13.0
 
@@ -9429,6 +9641,23 @@
 
 # @auto-engineer/pipeline
 
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/file-store@1.14.0
+  - @auto-engineer/message-bus@1.14.0
+
 ## 1.13.0
 
 ### Minor Changes
@@ -10093,6 +10322,22 @@
 
 # @auto-engineer/react-component-implementer
 
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/message-bus@1.14.0
+
 ## 1.13.0
 
 ### Minor Changes
@@ -10126,6 +10371,17 @@
   - @auto-engineer/message-bus@1.12.1
 
 # @auto-engineer/release-automation
+
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
 
 ## 1.13.0
 
@@ -10511,6 +10767,23 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/cli@1.14.0
+  - @auto-engineer/message-bus@1.14.0
 
 ## 1.13.0
 
@@ -11729,6 +12002,24 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/message-bus@1.14.0
+  - @auto-engineer/model-diff@1.14.0
+  - @auto-engineer/narrative@1.14.0
 
 ## 1.13.0
 
@@ -13100,6 +13391,22 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/narrative@1.14.0
+
 ## 1.13.0
 
 ### Minor Changes
@@ -13701,6 +14008,23 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.14.0
+
+### Minor Changes
+
+- [`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c) Thanks [@osamanar](https://github.com/osamanar)! - - Added app implementer to the typical example's auto configuration
+
+- [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: trigger job graph when storybook starts
+  - **examples/typical**: plugin job processor
+  - **global**: version packages
+
+### Patch Changes
+
+- Updated dependencies [[`e510647`](https://github.com/BeOnAuto/auto-engineer/commit/e5106475bdaf045a7b68ed2c0a48557a235ef87c), [`54c4ebf`](https://github.com/BeOnAuto/auto-engineer/commit/54c4ebfa0c6866cee6ea4d2315859b8f4a368f3a)]:
+  - @auto-engineer/ai-gateway@1.14.0
+  - @auto-engineer/message-bus@1.14.0
 
 ## 1.13.0
 
