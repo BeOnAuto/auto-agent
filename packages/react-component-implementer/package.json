@@ -35,5 +35,5 @@
   "devDependencies": {
     "@types/debug": "^4.1.12"
   },
-  "version": "0.1.0"
+  "version": "1.12.1"
 }
