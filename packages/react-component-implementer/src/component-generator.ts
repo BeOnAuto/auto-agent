@@ -242,7 +242,6 @@ export function createComponentGenerator(model: LanguageModel) {
           {
             role: 'system',
             content: system,
-            providerOptions: { anthropic: { cacheControl: { type: 'ephemeral' } } },
           },
           { role: 'user', content: prompt },
         ],
@@ -273,7 +272,6 @@ export function createComponentGenerator(model: LanguageModel) {
           {
             role: 'system',
             content: system,
-            providerOptions: { anthropic: { cacheControl: { type: 'ephemeral' } } },
           },
           ...history.messages,
           { role: 'user', content: feedbackPrompt },

@@ -965,8 +965,14 @@ export const pipeline = define('kanban-todo')
     };
   })
 
-  // After all component jobs complete, run project-wide checks
+  // After all component jobs complete, generate the full app and run project-wide checks
   .on('graph.completed')
+  .emit('ImplementReactApp', () => ({
+    clientDir: resolvePath('./client'),
+    modelPath: resolvePath('./.context/schema.json'),
+  }))
+
+  .on('ReactAppImplemented')
   .emit('CheckTypes', () => ({
     targetDirectory: resolvePath('./client'),
     scope: 'project',

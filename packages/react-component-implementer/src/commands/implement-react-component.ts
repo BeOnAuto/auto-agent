@@ -1,6 +1,6 @@
 import { readdir } from 'node:fs/promises';
 import path from 'node:path';
-import { createAnthropic } from '@ai-sdk/anthropic';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import type { LanguageModel } from 'ai';
 import createDebug from 'debug';
@@ -333,9 +333,23 @@ export const commandHandler = defineCommandHandler({
 
       const context: GenerationContext = { uiBuildingInstructions, existingComponents, fileTree };
 
-      const modelName = process.env.DEFAULT_AI_MODEL ?? 'claude-sonnet-4-20250514';
-      debug('Using AI model: %s', modelName);
-      const model = createAnthropic()(modelName);
+      const providerName = process.env.CUSTOM_PROVIDER_NAME ?? 'custom';
+      const baseURL = process.env.CUSTOM_PROVIDER_BASE_URL;
+      const apiKey = process.env.CUSTOM_PROVIDER_API_KEY;
+      const modelName =
+        process.env.CUSTOM_PROVIDER_DEFAULT_MODEL ?? process.env.DEFAULT_AI_MODEL ?? 'claude-sonnet-4-20250514';
+
+      if (!baseURL) {
+        throw new Error('CUSTOM_PROVIDER_BASE_URL environment variable is required');
+      }
+
+      debug('Using AI provider: %s, model: %s, base URL: %s', providerName, modelName, baseURL);
+      const provider = createOpenAICompatible({
+        name: providerName,
+        baseURL,
+        apiKey,
+      });
+      const model = provider.chatModel(modelName);
 
       debug('Launching browser...');
       browser = await chromium.launch();

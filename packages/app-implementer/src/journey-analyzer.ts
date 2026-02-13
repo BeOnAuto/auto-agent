@@ -90,7 +90,6 @@ export async function analyzeJourney(
       {
         role: 'system',
         content: buildJourneySystemPrompt(),
-        providerOptions: { anthropic: { cacheControl: { type: 'ephemeral' } } },
       },
       { role: 'user', content: buildJourneyUserPrompt(narrative, catalog) },
     ],
