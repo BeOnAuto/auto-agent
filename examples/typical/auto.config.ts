@@ -2,11 +2,6 @@ import * as path from 'node:path';
 import type { Event } from '@auto-engineer/message-bus';
 import { define } from '@auto-engineer/pipeline';
 
-interface Component {
-  type: 'molecule' | 'organism' | 'page';
-  filePath: string;
-}
-
 interface SchemaExportedData {
   directory: string;
   outputPath: string;
@@ -26,11 +21,6 @@ interface SliceGeneratedData {
 
 interface SliceImplementedData {
   slicePath: string;
-}
-
-interface ClientGeneratedData {
-  components: Component[];
-  targetDir: string;
 }
 
 interface CheckEventData {
@@ -91,14 +81,6 @@ function incrementRetryCount(slicePath: string): number {
   return attempts + 1;
 }
 
-function hasValidComponents(e: { data: ClientGeneratedData | null }): boolean {
-  return e.data !== null && Array.isArray(e.data.components) && e.data.components.length > 0;
-}
-
-function hasInvalidComponents(e: { data: ClientGeneratedData | null }): boolean {
-  return !hasValidComponents(e);
-}
-
 function resolvePath(relativePath: string): string {
   if (projectRoot === '') {
     return relativePath;
@@ -117,14 +99,9 @@ export const fileId = 'kanbanNew1';
 export const plugins = [
   '@auto-engineer/model-diff',
   '@auto-engineer/server-checks',
-  '@auto-engineer/design-system-importer',
   '@auto-engineer/server-generator-apollo-emmett',
   '@auto-engineer/narrative',
-  '@auto-engineer/frontend-checks',
-  '@auto-engineer/frontend-implementer',
-  '@auto-engineer/component-implementer',
   '@auto-engineer/information-architect',
-  '@auto-engineer/frontend-generator-react-graphql',
   '@auto-engineer/generate-react-client',
   '@auto-engineer/react-component-implementer',
   '@auto-engineer/server-implementer',
@@ -243,58 +220,6 @@ export const pipeline = define('kanban-todo')
       outputDir: e.data.outputDir,
       previousErrors: errorSummary,
     };
-  })
-
-  .on('IAGenerated')
-  .emit('GenerateClient', () => ({
-    targetDir: resolvePath('./client'),
-    iaSchemaPath: resolvePath('./.context/auto-ia-scheme.json'),
-    gqlSchemaPath: resolvePath('./.context/schema.graphql'),
-    figmaVariablesPath: resolvePath('./.context/figma-file.json'),
-  }))
-
-  .on('ClientGenerated')
-  .when(hasValidComponents)
-  .emit('StartClient', () => ({
-    clientDirectory: resolvePath('./client'),
-  }))
-
-  .on('ClientGenerated')
-  .when(hasInvalidComponents)
-  .emit('ImplementComponent', () => ({
-    projectDir: resolvePath('./client'),
-    iaSchemeDir: resolvePath('./.context'),
-    designSystemPath: resolvePath('./.context/design-system.md'),
-    componentType: 'molecule',
-    filePath: resolvePath('client/src/components/molecules/Example.tsx'),
-    componentName: 'Example.tsx',
-    aiOptions: { maxTokens: 3000 },
-  }))
-
-  .on('ClientGenerated')
-  .when(hasValidComponents)
-
-
-  // build dependency chain
-  // page >> org1 && org 2
-  // org2 >> mol1 && mol2 
-  // process dependency tree
-
-  .forEach((e: { data: ClientGeneratedData }) => e.data.components)
-  .groupInto(['molecule', 'organism', 'page'], (c) => c.type) // group into phased chain
-  .process('ImplementComponent', (c: Component) => ({ // processPhase
-    projectDir: resolvePath('./client'),
-    iaSchemeDir: resolvePath('./.context'),
-    designSystemPath: resolvePath('./.context/design-system.md'),
-    componentType: c.type ?? 'molecule',
-    filePath: resolvePath(c.filePath ?? ''),
-    componentName: (c.filePath ?? '').split('/').pop()?.replace('.tsx', '') ?? '',
-    aiOptions: { maxTokens: 3000 },
-  }))
-  .onComplete({
-    success: { name: 'AllComponentsImplemented', displayName: 'All Components Implemented' },
-    failure: { name: 'ComponentsFailed', displayName: 'Components Failed' },
-    itemKey: (e) => (e.data as { filePath?: string }).filePath ?? '',
   })
 
   .build();

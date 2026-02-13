@@ -6,7 +6,7 @@ Shared design system assets for Auto Engineer examples.
 
 ## Purpose
 
-This directory provides pre-configured design system files that other examples copy into their `.context/` directories. These files are consumed by the `@auto-engineer/design-system-importer` package and frontend generation plugins.
+This directory provides pre-configured design system files that other examples copy into their `.context/` directories. These files are consumed by the `@auto-engineer/generate-react-client` package and frontend generation plugins.
 
 ---
 
@@ -155,7 +155,5 @@ auto import:design-system \
 
 | Package | Relationship |
 |---------|--------------|
-| `@auto-engineer/design-system-importer` | Consumes filter, produces design-system.md |
-| `@auto-engineer/frontend-generator-react-graphql` | Uses figma-file.json for tokens |
-| `@auto-engineer/component-implementer` | Uses design-system.md for constraints |
+| `@auto-engineer/generate-react-client` | Uses design system files for client generation |
 | `@auto-engineer/information-architect` | References component list for IA |

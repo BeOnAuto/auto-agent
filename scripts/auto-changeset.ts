@@ -326,12 +326,11 @@ function createChangesetFile(data: ChangesetData): void {
 "@auto-engineer/cli": ${data.bumpType}
 "@auto-engineer/server-generator-apollo-emmett": ${data.bumpType}
 "@auto-engineer/server-generator-nestjs": ${data.bumpType}
-"@auto-engineer/frontend-generator-react-graphql": ${data.bumpType}
-"@auto-engineer/component-implementer": ${data.bumpType}
 "@auto-engineer/server-implementer": ${data.bumpType}
-"@auto-engineer/frontend-implementer": ${data.bumpType}
 "@auto-engineer/information-architect": ${data.bumpType}
-"@auto-engineer/design-system-importer": ${data.bumpType}
+"@auto-engineer/generate-react-client": ${data.bumpType}
+"@auto-engineer/react-component-implementer": ${data.bumpType}
+"@auto-engineer/app-implementer": ${data.bumpType}
 "@auto-engineer/pipeline": ${data.bumpType}
 "@auto-engineer/message-bus": ${data.bumpType}
 "@auto-engineer/message-store": ${data.bumpType}
@@ -340,7 +339,6 @@ function createChangesetFile(data: ChangesetData): void {
 "@auto-engineer/id": ${data.bumpType}
 "@auto-engineer/dev-server": ${data.bumpType}
 "@auto-engineer/server-checks": ${data.bumpType}
-"@auto-engineer/frontend-checks": ${data.bumpType}
 "@auto-engineer/ai-gateway": ${data.bumpType}
 "create-auto-app": ${data.bumpType}
 ---

@@ -230,10 +230,7 @@ The `.context/design-system.md` constrains AI implementation:
 | `@auto-engineer/server-implementer` | AI server implementation |
 | `@auto-engineer/server-checks` | Server validation |
 | `@auto-engineer/information-architect` | IA schema generation |
-| `@auto-engineer/frontend-generator-react-graphql` | Client scaffolding |
-| `@auto-engineer/frontend-implementer` | AI client implementation |
-| `@auto-engineer/frontend-checks` | Client validation |
-| `@auto-engineer/design-system-importer` | Figma integration |
+| `@auto-engineer/generate-react-client` | React client scaffolding |
 
 ---
 

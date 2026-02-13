@@ -7,13 +7,11 @@ export default {
     '@auto-engineer/narrative',
     '@auto-engineer/server-generator-apollo-emmett',
     '@auto-engineer/server-implementer',
-    '@auto-engineer/frontend-implementer',
-    '@auto-engineer/component-implementer',
-    '@auto-engineer/design-system-importer',
     '@auto-engineer/information-architect',
     '@auto-engineer/server-checks',
-    '@auto-engineer/frontend-checks',
-    '@auto-engineer/frontend-generator-react-graphql',
+    '@auto-engineer/generate-react-client',
+    '@auto-engineer/react-component-implementer',
+    '@auto-engineer/app-implementer',
   ],
 
   // Optional: Override command aliases when there are conflicts between packages
@@ -22,7 +20,7 @@ export default {
   aliases: {
     // Example: If multiple packages register 'check:types':
     // 'check:types': '@auto-engineer/server-checks',
-    // Example: If both frontend-generator-react-graphql and another package register 'generate:client':
-    // 'generate:client': '@auto-engineer/frontend-generator-react-graphql',
+    // Example: If both generate-react-client and another package register 'generate:react-client':
+    // 'generate:react-client': '@auto-engineer/generate-react-client',
   },
 };

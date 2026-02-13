@@ -78,9 +78,8 @@ Narratives define your application as slices of behavior. The pipeline converts 
 | Package                                                                                          | Description                                              |
 | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
 | [`@auto-engineer/server-generator-apollo-emmett`](./packages/server-generator-apollo-emmett)     | Apollo GraphQL + Emmett event-sourced server scaffolding |
-| [`@auto-engineer/frontend-generator-react-graphql`](./packages/frontend-generator-react-graphql) | React + GraphQL frontend scaffolding from schema         |
+| [`@auto-engineer/generate-react-client`](./packages/generate-react-client)                       | React + Vite + Tailwind CSS v4 + shadcn client scaffolding |
 | [`@auto-engineer/information-architect`](./packages/information-architect)                       | AI-driven schema generation for UI/UX architecture       |
-| [`@auto-engineer/design-system-importer`](./packages/design-system-importer)                     | Import and configure design system components            |
 | [`@auto-engineer/create-auto-app`](./packages/create-auto-app)                                   | Project scaffolding CLI with templates                   |
 
 ### Implementers
@@ -88,8 +87,6 @@ Narratives define your application as slices of behavior. The pipeline converts 
 | Package                                                                    | Description                             |
 | -------------------------------------------------------------------------- | --------------------------------------- |
 | [`@auto-engineer/server-implementer`](./packages/server-implementer)       | AI-powered server code implementation   |
-| [`@auto-engineer/frontend-implementer`](./packages/frontend-implementer)   | AI-powered frontend code implementation |
-| [`@auto-engineer/component-implementer`](./packages/component-implementer) | AI-powered UI component implementation  |
 
 ### Utilities
 
@@ -99,7 +96,6 @@ Narratives define your application as slices of behavior. The pipeline converts 
 | [`@auto-engineer/dev-server`](./packages/dev-server)           | Development server with SSE events and pipeline visualization  |
 | [`@auto-engineer/file-store`](./packages/file-store)           | File system operations with caching                            |
 | [`@auto-engineer/server-checks`](./packages/server-checks)     | Server code validation (types, lint, tests)                    |
-| [`@auto-engineer/frontend-checks`](./packages/frontend-checks) | Frontend code validation (types, lint, tests)                  |
 
 ---
 

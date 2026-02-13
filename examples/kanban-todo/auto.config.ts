@@ -117,15 +117,13 @@ export const fileId = 'kanbanNew1';
 export const plugins = [
   '@auto-engineer/model-diff',
   '@auto-engineer/server-checks',
-  '@auto-engineer/design-system-importer',
   '@auto-engineer/server-generator-apollo-emmett',
   '@auto-engineer/narrative',
-  '@auto-engineer/frontend-checks',
-  '@auto-engineer/frontend-implementer',
-  '@auto-engineer/component-implementer',
   '@auto-engineer/information-architect',
-  '@auto-engineer/frontend-generator-react-graphql',
+  '@auto-engineer/generate-react-client',
+  '@auto-engineer/react-component-implementer',
   '@auto-engineer/server-implementer',
+  '@auto-engineer/app-implementer',
   '@auto-engineer/dev-server',
 ];
 

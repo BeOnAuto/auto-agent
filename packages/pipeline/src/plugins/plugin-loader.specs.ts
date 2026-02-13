@@ -284,12 +284,5 @@ describe('PluginLoader', () => {
       const handlerNames = handlers.map((h) => h.name);
       expect(handlerNames).toContain('ExportSchema');
     });
-
-    it('should load GenerateClient from frontend-generator package', async () => {
-      const loader = new PluginLoader();
-      const handlers = await loader.loadPlugin('@auto-engineer/frontend-generator-react-graphql');
-      const handlerNames = handlers.map((h) => h.name);
-      expect(handlerNames).toContain('GenerateClient');
-    });
   });
 });

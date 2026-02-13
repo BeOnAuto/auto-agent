@@ -1,13 +1,9 @@
 ---
 "@auto-engineer/ai-gateway": patch
+"@auto-engineer/app-implementer": patch
 "@auto-engineer/cli": patch
-"@auto-engineer/component-implementer": patch
-"@auto-engineer/design-system-importer": patch
 "@auto-engineer/dev-server": patch
 "@auto-engineer/file-store": patch
-"@auto-engineer/frontend-checks": patch
-"@auto-engineer/frontend-generator-react-graphql": patch
-"@auto-engineer/frontend-implementer": patch
 "@auto-engineer/generate-react-client": patch
 "@auto-engineer/id": patch
 "@auto-engineer/information-architect": patch
@@ -17,6 +13,7 @@
 "@auto-engineer/model-diff": patch
 "@auto-engineer/narrative": patch
 "@auto-engineer/pipeline": patch
+"@auto-engineer/react-component-implementer": patch
 "@auto-engineer/release-automation": patch
 "@auto-engineer/server-checks": patch
 "@auto-engineer/server-generator-apollo-emmett": patch
@@ -25,4 +22,4 @@
 "create-auto-app": patch
 ---
 
-- Fixed null and undefined values being incorrectly formatted as `new Date(null)` in generated server code, now correctly emitting null literals
+- Removed unused packages to keep the project lean and reduce maintenance overhead
