@@ -1,7 +1,8 @@
 import { commandHandler as startClientHandler } from './commands/start-client';
 import { commandHandler as startServerHandler } from './commands/start-server';
+import { commandHandler as startStorybookHandler } from './commands/start-storybook';
 
-export const COMMANDS = [startServerHandler, startClientHandler];
+export const COMMANDS = [startServerHandler, startClientHandler, startStorybookHandler];
 
 export {
   type ClientStartedEvent,
@@ -17,3 +18,10 @@ export {
   type StartServerCommand,
   type StartServerEvents,
 } from './commands/start-server';
+export {
+  commandHandler as startStorybookCommandHandler,
+  type StartStorybookCommand,
+  type StartStorybookEvents,
+  type StorybookStartedEvent,
+  type StorybookStartFailedEvent,
+} from './commands/start-storybook';

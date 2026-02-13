@@ -3,6 +3,7 @@ import path from 'node:path';
 import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
 import { execa } from 'execa';
+import { ensureInstalled } from '../ensure-installed.js';
 
 const debug = createDebug('auto:dev-server:start-client');
 
@@ -80,6 +81,8 @@ export const commandHandler = defineCommandHandler<
 
       await access(path.join(clientDir, 'package.json'));
       debug('package.json found in client directory');
+
+      await ensureInstalled(clientDir, debug);
 
       const cmd = customCommand ?? 'pnpm start';
       const [executable, ...args] = cmd.split(' ');

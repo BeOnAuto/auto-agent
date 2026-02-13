@@ -219,6 +219,15 @@ export const pipeline = define('kanban-todo')
     serverDirectory: resolvePath('./server'),
   }))
 
+  .on('ReactClientGenerated')
+  .emit('StartClient', (e: { data: { targetDir: string } }) => ({
+    clientDirectory: e.data.targetDir,
+    command: 'pnpm dev',
+  }))
+  .emit('StartStorybook', (e: { data: { targetDir: string } }) => ({
+    storybookDirectory: e.data.targetDir,
+  }))
+
   .on('IAValidationFailed')
   .emit('GenerateIA', (e: { data: IAValidationFailedData }) => {
     iaRetryCount += 1;
