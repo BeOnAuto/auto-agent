@@ -915,6 +915,8 @@ export const pipeline = define('kanban-todo')
   .emit('StartStorybook', (e: { data: { targetDir: string } }) => ({
     storybookDirectory: e.data.targetDir,
   }))
+
+  .on('StorybookStarted')
   .emit('TriggerJobGraph', () => ({}))
 
   .on('IAValidationFailed')
