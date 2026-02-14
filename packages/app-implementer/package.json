@@ -25,7 +25,7 @@
     "@auto-engineer/message-bus": "workspace:*",
     "@ai-sdk/openai-compatible": "^0.2.14",
     "@modelcontextprotocol/sdk": "^1.12.1",
-    "ai": "^4.3.16",
+    "ai": "^5.0.87",
     "debug": "^4.4.1"
   },
   "devDependencies": {
