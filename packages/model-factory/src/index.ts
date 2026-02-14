@@ -1,5 +1,9 @@
+import { createAnthropic } from '@ai-sdk/anthropic';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createOpenAI } from '@ai-sdk/openai';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import type { LanguageModelV3 } from '@ai-sdk/provider';
+import { createXai } from '@ai-sdk/xai';
 
 export type Provider = 'openai' | 'anthropic' | 'google' | 'xai' | 'custom';
 
@@ -20,17 +24,26 @@ export function createModelFromEnv(options?: CreateModelOptions): LanguageModelV
   const provider = options?.provider ?? (process.env.DEFAULT_AI_PROVIDER as Provider | undefined) ?? 'custom';
   const modelName = options?.model ?? process.env.DEFAULT_AI_MODEL ?? DEFAULT_MODELS[provider];
 
-  if (provider !== 'custom') {
-    throw new Error(`Provider "${provider}" is not yet supported`);
+  if (provider === 'custom') {
+    const name = process.env.CUSTOM_PROVIDER_NAME ?? 'custom';
+    const baseURL = process.env.CUSTOM_PROVIDER_BASE_URL;
+    const apiKey = process.env.CUSTOM_PROVIDER_API_KEY ?? '';
+
+    if (!baseURL) {
+      throw new Error('CUSTOM_PROVIDER_BASE_URL is required when using the custom provider');
+    }
+
+    return createOpenAICompatible({ name, baseURL, apiKey }).chatModel(modelName);
   }
 
-  const name = process.env.CUSTOM_PROVIDER_NAME ?? 'custom';
-  const baseURL = process.env.CUSTOM_PROVIDER_BASE_URL;
-  const apiKey = process.env.CUSTOM_PROVIDER_API_KEY ?? '';
-
-  if (!baseURL) {
-    throw new Error('CUSTOM_PROVIDER_BASE_URL is required when using the custom provider');
+  switch (provider) {
+    case 'openai':
+      return createOpenAI()(modelName);
+    case 'anthropic':
+      return createAnthropic()(modelName);
+    case 'google':
+      return createGoogleGenerativeAI()(modelName);
+    case 'xai':
+      return createXai()(modelName);
   }
-
-  return createOpenAICompatible({ name, baseURL, apiKey }).chatModel(modelName);
 }

@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+const stubModel = (provider: string) => (model: string) => ({
+  specificationVersion: 'v3',
+  modelId: model,
+  provider,
+});
+
 vi.mock('@ai-sdk/openai-compatible', () => ({
   createOpenAICompatible: ({ name, baseURL, apiKey }: { name: string; baseURL: string; apiKey: string }) => ({
     chatModel: (model: string) => ({
@@ -9,6 +15,11 @@ vi.mock('@ai-sdk/openai-compatible', () => ({
     }),
   }),
 }));
+
+vi.mock('@ai-sdk/openai', () => ({ createOpenAI: () => stubModel('openai') }));
+vi.mock('@ai-sdk/anthropic', () => ({ createAnthropic: () => stubModel('anthropic') }));
+vi.mock('@ai-sdk/google', () => ({ createGoogleGenerativeAI: () => stubModel('google') }));
+vi.mock('@ai-sdk/xai', () => ({ createXai: () => stubModel('xai') }));
 
 const savedEnv = { ...process.env };
 
@@ -87,6 +98,102 @@ describe('createModelFromEnv', () => {
       expect(() => createModelFromEnv()).toThrow(
         'CUSTOM_PROVIDER_BASE_URL is required when using the custom provider',
       );
+    });
+  });
+
+  describe('direct providers', () => {
+    it('creates openai model with default model name', async () => {
+      const { createModelFromEnv, DEFAULT_MODELS } = await import('./index.js');
+      const model = createModelFromEnv({ provider: 'openai' });
+
+      expect(model).toEqual({
+        specificationVersion: 'v3',
+        modelId: DEFAULT_MODELS.openai,
+        provider: 'openai',
+      });
+    });
+
+    it('creates anthropic model with default model name', async () => {
+      const { createModelFromEnv, DEFAULT_MODELS } = await import('./index.js');
+      const model = createModelFromEnv({ provider: 'anthropic' });
+
+      expect(model).toEqual({
+        specificationVersion: 'v3',
+        modelId: DEFAULT_MODELS.anthropic,
+        provider: 'anthropic',
+      });
+    });
+
+    it('creates google model with default model name', async () => {
+      const { createModelFromEnv, DEFAULT_MODELS } = await import('./index.js');
+      const model = createModelFromEnv({ provider: 'google' });
+
+      expect(model).toEqual({
+        specificationVersion: 'v3',
+        modelId: DEFAULT_MODELS.google,
+        provider: 'google',
+      });
+    });
+
+    it('creates xai model with default model name', async () => {
+      const { createModelFromEnv, DEFAULT_MODELS } = await import('./index.js');
+      const model = createModelFromEnv({ provider: 'xai' });
+
+      expect(model).toEqual({
+        specificationVersion: 'v3',
+        modelId: DEFAULT_MODELS.xai,
+        provider: 'xai',
+      });
+    });
+
+    it('reads provider from DEFAULT_AI_PROVIDER env var', async () => {
+      process.env.DEFAULT_AI_PROVIDER = 'anthropic';
+
+      const { createModelFromEnv, DEFAULT_MODELS } = await import('./index.js');
+      const model = createModelFromEnv();
+
+      expect(model).toEqual({
+        specificationVersion: 'v3',
+        modelId: DEFAULT_MODELS.anthropic,
+        provider: 'anthropic',
+      });
+    });
+
+    it('options.provider overrides DEFAULT_AI_PROVIDER env var', async () => {
+      process.env.DEFAULT_AI_PROVIDER = 'openai';
+
+      const { createModelFromEnv, DEFAULT_MODELS } = await import('./index.js');
+      const model = createModelFromEnv({ provider: 'xai' });
+
+      expect(model).toEqual({
+        specificationVersion: 'v3',
+        modelId: DEFAULT_MODELS.xai,
+        provider: 'xai',
+      });
+    });
+
+    it('uses options.model for direct provider', async () => {
+      const { createModelFromEnv } = await import('./index.js');
+      const model = createModelFromEnv({ provider: 'openai', model: 'gpt-4-turbo' });
+
+      expect(model).toEqual({
+        specificationVersion: 'v3',
+        modelId: 'gpt-4-turbo',
+        provider: 'openai',
+      });
+    });
+
+    it('uses DEFAULT_AI_MODEL env var for direct provider', async () => {
+      process.env.DEFAULT_AI_MODEL = 'custom-model-name';
+
+      const { createModelFromEnv } = await import('./index.js');
+      const model = createModelFromEnv({ provider: 'openai' });
+
+      expect(model).toEqual({
+        specificationVersion: 'v3',
+        modelId: 'custom-model-name',
+        provider: 'openai',
+      });
     });
   });
 });
