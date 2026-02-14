@@ -41,14 +41,7 @@ async function main() {
   // Start core packages
   const coreProcess = spawn(
     'npx',
-    [
-      'turbo',
-      'run',
-      'dev:core',
-      '--filter',
-      `@auto-engineer/message-bus`,
-      '--concurrency=2',
-    ],
+    ['turbo', 'run', 'dev:core', '--filter', `@auto-engineer/message-bus`, '--concurrency=2'],
     {
       stdio: 'inherit',
       shell: true,
@@ -59,10 +52,7 @@ async function main() {
   await new Promise((resolve) => setTimeout(resolve, STARTUP_DELAY));
 
   // Check if core packages have built their initial .d.ts files
-  const coreDistFiles = [
-    'packages/message-bus/dist/types.d.ts',
-    'packages/message-bus/dist/index.d.ts',
-  ];
+  const coreDistFiles = ['packages/message-bus/dist/types.d.ts', 'packages/message-bus/dist/index.d.ts'];
 
   log('Waiting for core packages to generate type definitions...');
   const filesReady = await waitForFiles(coreDistFiles);
