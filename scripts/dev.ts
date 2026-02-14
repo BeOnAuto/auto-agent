@@ -3,7 +3,7 @@
 import { spawn } from 'node:child_process';
 import { promises as fs } from 'node:fs';
 
-const _CORE_PACKAGES = ['@auto-engineer/message-bus', '@auto-engineer/ai-gateway'];
+const _CORE_PACKAGES = ['@auto-engineer/message-bus'];
 const STARTUP_DELAY = 3000; // Wait 3 seconds for core packages to start
 
 function log(message: string) {
@@ -47,8 +47,6 @@ async function main() {
       'dev:core',
       '--filter',
       `@auto-engineer/message-bus`,
-      '--filter',
-      `@auto-engineer/ai-gateway`,
       '--concurrency=2',
     ],
     {
@@ -64,8 +62,6 @@ async function main() {
   const coreDistFiles = [
     'packages/message-bus/dist/types.d.ts',
     'packages/message-bus/dist/index.d.ts',
-    'packages/ai-gateway/dist/index.d.ts',
-    'packages/ai-gateway/dist/constants.d.ts',
   ];
 
   log('Waiting for core packages to generate type definitions...');
@@ -91,7 +87,6 @@ async function main() {
       '--filter',
       '!@auto-engineer/message-bus',
       '--filter',
-      '!@auto-engineer/ai-gateway',
       '--concurrency=20',
     ],
     {

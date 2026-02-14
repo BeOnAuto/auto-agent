@@ -31,9 +31,6 @@
   ],
   "references": [
     {
-      "path": "./packages/ai-gateway"
-    },
-    {
       "path": "./packages/cli"
     },
     {

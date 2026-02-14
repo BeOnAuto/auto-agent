@@ -339,7 +339,7 @@ function createChangesetFile(data: ChangesetData): void {
 "@auto-engineer/id": ${data.bumpType}
 "@auto-engineer/dev-server": ${data.bumpType}
 "@auto-engineer/server-checks": ${data.bumpType}
-"@auto-engineer/ai-gateway": ${data.bumpType}
+"@auto-engineer/model-factory": ${data.bumpType}
 "create-auto-app": ${data.bumpType}
 ---
 

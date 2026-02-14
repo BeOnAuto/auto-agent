@@ -1,5 +1,4 @@
 ---
-"@auto-engineer/ai-gateway": patch
 "@auto-engineer/app-implementer": patch
 "@auto-engineer/cli": patch
 "@auto-engineer/dev-server": patch

@@ -1,5 +1,4 @@
 ---
-"@auto-engineer/ai-gateway": minor
 "@auto-engineer/app-implementer": minor
 "@auto-engineer/cli": minor
 "@auto-engineer/dev-server": minor
