@@ -1,9 +1,9 @@
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import { createModelFromEnv } from '@auto-engineer/model-factory';
 import { generateText } from 'ai';
-import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
 import createDebug from 'debug';
 import fg from 'fast-glob';
 
@@ -325,7 +325,11 @@ async function implementFile(
     debugProcess(`Using retry prompt for attempt #${retryContext?.attemptNumber ?? 2}`);
   }
 
-  const { text: aiOutput } = await generateText({ model: createModelFromEnv(), prompt, maxOutputTokens: aiOptions?.maxTokens ?? 2000 });
+  const { text: aiOutput } = await generateText({
+    model: createModelFromEnv(),
+    prompt,
+    maxOutputTokens: aiOptions?.maxTokens ?? 2000,
+  });
   let cleanedCode = extractCodeBlock(aiOutput);
   cleanedCode = addImplementationMarker(cleanedCode);
 
