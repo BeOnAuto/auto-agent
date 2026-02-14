@@ -2,8 +2,8 @@ import { createAnthropic } from '@ai-sdk/anthropic';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
-import type { LanguageModelV3 } from '@ai-sdk/provider';
 import { createXai } from '@ai-sdk/xai';
+import type { LanguageModel } from 'ai';
 
 export type Provider = 'openai' | 'anthropic' | 'google' | 'xai' | 'custom';
 
@@ -20,7 +20,7 @@ interface CreateModelOptions {
   model?: string;
 }
 
-export function createModelFromEnv(options?: CreateModelOptions): LanguageModelV3 {
+export function createModelFromEnv(options?: CreateModelOptions): LanguageModel {
   const provider = options?.provider ?? (process.env.DEFAULT_AI_PROVIDER as Provider | undefined) ?? 'custom';
   const modelName = options?.model ?? process.env.DEFAULT_AI_MODEL ?? DEFAULT_MODELS[provider];
 
@@ -33,17 +33,17 @@ export function createModelFromEnv(options?: CreateModelOptions): LanguageModelV
       throw new Error('CUSTOM_PROVIDER_BASE_URL is required when using the custom provider');
     }
 
-    return createOpenAICompatible({ name, baseURL, apiKey }).chatModel(modelName);
+    return createOpenAICompatible({ name, baseURL, apiKey }).chatModel(modelName) as unknown as LanguageModel;
   }
 
   switch (provider) {
     case 'openai':
-      return createOpenAI()(modelName);
+      return createOpenAI()(modelName) as unknown as LanguageModel;
     case 'anthropic':
-      return createAnthropic()(modelName);
+      return createAnthropic()(modelName) as unknown as LanguageModel;
     case 'google':
-      return createGoogleGenerativeAI()(modelName);
+      return createGoogleGenerativeAI()(modelName) as unknown as LanguageModel;
     case 'xai':
-      return createXai()(modelName);
+      return createXai()(modelName) as unknown as LanguageModel;
   }
 }
