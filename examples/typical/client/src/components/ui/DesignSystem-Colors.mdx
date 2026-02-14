@@ -1,0 +1,68 @@
+import { Meta, Stories } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Colors" />
+
+# Colors
+
+Semantic color tokens used throughout the design system. Each token is defined as a CSS custom property and mapped to a Tailwind CSS utility class via the theme configuration in `index.css`.
+
+## Core
+
+| CSS Variable | Tailwind Class | Usage |
+|---|---|---|
+| `--primary` | `bg-primary` | Primary actions, active states |
+| `--primary-foreground` | `text-primary-foreground` | Text on primary backgrounds |
+| `--secondary` | `bg-secondary` | Secondary actions, less prominent UI |
+| `--secondary-foreground` | `text-secondary-foreground` | Text on secondary backgrounds |
+| `--accent` | `bg-accent` | Highlighted or accented areas |
+| `--accent-foreground` | `text-accent-foreground` | Text on accent backgrounds |
+| `--muted` | `bg-muted` | Subdued backgrounds, disabled states |
+| `--muted-foreground` | `text-muted-foreground` | De-emphasized text, placeholders |
+| `--destructive` | `bg-destructive` | Destructive actions, error states |
+| `--destructive-foreground` | `text-destructive-foreground` | Text on destructive backgrounds |
+| `--background` | `bg-background` | Page background |
+| `--foreground` | `text-foreground` | Default body text |
+
+## Surface
+
+| CSS Variable | Tailwind Class | Usage |
+|---|---|---|
+| `--card` | `bg-card` | Card backgrounds |
+| `--card-foreground` | `text-card-foreground` | Text inside cards |
+| `--popover` | `bg-popover` | Popover and dropdown backgrounds |
+| `--popover-foreground` | `text-popover-foreground` | Text inside popovers |
+
+## UI
+
+| CSS Variable | Tailwind Class | Usage |
+|---|---|---|
+| `--border` | `border-border` | Default border color |
+| `--input` | `border-input` | Input field borders |
+| `--ring` | `ring-ring` | Focus ring color |
+
+## Charts
+
+| CSS Variable | Tailwind Class | Usage |
+|---|---|---|
+| `--chart-1` | `bg-chart-1` | Chart color 1 |
+| `--chart-2` | `bg-chart-2` | Chart color 2 |
+| `--chart-3` | `bg-chart-3` | Chart color 3 |
+| `--chart-4` | `bg-chart-4` | Chart color 4 |
+| `--chart-5` | `bg-chart-5` | Chart color 5 |
+
+## Sidebar
+
+| CSS Variable | Tailwind Class | Usage |
+|---|---|---|
+| `--sidebar` | `bg-sidebar` | Sidebar background |
+| `--sidebar-foreground` | `text-sidebar-foreground` | Sidebar text |
+| `--sidebar-primary` | `bg-sidebar-primary` | Sidebar primary actions |
+| `--sidebar-primary-foreground` | `text-sidebar-primary-foreground` | Text on sidebar primary |
+| `--sidebar-accent` | `bg-sidebar-accent` | Sidebar accented areas |
+| `--sidebar-accent-foreground` | `text-sidebar-accent-foreground` | Text on sidebar accent |
+| `--sidebar-border` | `border-sidebar-border` | Sidebar border color |
+| `--sidebar-ring` | `ring-sidebar-ring` | Sidebar focus ring |
+
+## Swatches
+
+<Stories />

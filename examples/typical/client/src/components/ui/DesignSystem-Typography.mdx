@@ -1,0 +1,31 @@
+import { Meta, Stories } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Typography" />
+
+# Typography
+
+Typography classes used across the design system. All styles are composed from
+Tailwind CSS utility classes -- no custom font-size tokens are needed.
+
+## Reference
+
+| Element | Tailwind Classes | Usage |
+| --- | --- | --- |
+| **H1** | `text-5xl font-extrabold tracking-tight` | Hero or display headings |
+| **H2** | `text-4xl font-bold tracking-tight` | Page-level headings |
+| **H3** | `text-3xl font-bold` | Section headings |
+| **H4** | `text-2xl font-semibold` | Subsection headings |
+| **H5** | `text-xl font-semibold` | Card or widget headings |
+| **Body (lead)** | `text-base leading-relaxed` | Long-form paragraphs where extra line-height aids readability |
+| **Body** | `text-base` | Default body text, UI labels |
+| **Muted** | `text-sm text-muted-foreground` | Descriptions, help text, secondary information |
+| **Small / Caption** | `text-xs text-muted-foreground` | Captions, timestamps, metadata |
+
+## Guidelines
+
+- Prefer semantic heading order (`H1` > `H2` > `H3` ...) for accessibility.
+- Use **lead body** (`leading-relaxed`) only for multi-line content blocks; single-line labels should use the plain **body** style.
+- `text-muted-foreground` maps to the theme's muted colour and automatically adapts between light and dark modes.
+- Avoid mixing heading classes with body classes on the same element.
+
+<Stories />

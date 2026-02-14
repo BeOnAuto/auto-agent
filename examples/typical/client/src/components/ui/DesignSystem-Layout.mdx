@@ -1,0 +1,64 @@
+import { Meta, Stories } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Layout" />
+
+# Layout
+
+Spacing, border radius, and shadow tokens used throughout the design system.
+
+## Spacing
+
+The spacing scale uses Tailwind utility classes. Apply these consistently to maintain visual rhythm.
+
+| Purpose | Classes | When to use |
+| --- | --- | --- |
+| Section gaps | `space-y-16`, `py-16` | Between major page sections |
+| Content gaps | `space-y-6`, `space-y-8` | Between content blocks within a section |
+| Element gaps | `space-y-3`, `gap-3` | Between related elements (form fields, list items) |
+| Padding | `p-4` | Compact containers (cards, popovers) |
+| Padding | `p-6` | Standard containers |
+| Padding | `p-8` | Spacious containers (hero sections, modals) |
+
+### Guidelines
+
+- Use `space-y-*` for vertical stacking of block elements.
+- Use `gap-*` with flex or grid layouts.
+- Prefer consistent padding within a component; avoid mixing `p-4` and `p-8` at the same level.
+
+## Border Radius
+
+Border radius values are derived from the `--radius` CSS custom property (default `0.625rem`).
+
+| Class | CSS Variable | Value |
+| --- | --- | --- |
+| `rounded-sm` | `--radius-sm` | `calc(var(--radius) - 4px)` |
+| `rounded-md` | `--radius-md` | `calc(var(--radius) - 2px)` |
+| `rounded-lg` | `--radius-lg` | `var(--radius)` |
+| `rounded-xl` | `--radius-xl` | `calc(var(--radius) + 4px)` |
+
+### Guidelines
+
+- `rounded-sm` -- Small inline elements (badges, tags).
+- `rounded-md` -- Inputs, buttons, and form controls.
+- `rounded-lg` -- Cards, dialogs, and container surfaces.
+- `rounded-xl` -- Large hero cards or featured sections.
+
+## Shadows
+
+Shadows add depth and elevation. Use the Tailwind shadow utilities.
+
+| Class | Usage |
+| --- | --- |
+| `shadow-sm` | Subtle lift for cards and inputs at rest |
+| `shadow` | Default elevation for interactive surfaces |
+| `shadow-md` | Hover states, dropdown menus |
+| `shadow-lg` | Modals, popovers, floating panels |
+| `shadow-xl` | Prominent overlays, feature highlights |
+
+### Guidelines
+
+- Shadows should increase with elevation: resting surfaces use `shadow-sm`, overlays use `shadow-lg` or `shadow-xl`.
+- Avoid applying shadows to flat, inline elements like text or badges.
+- Combine shadows with border radius for polished container surfaces.
+
+<Stories />

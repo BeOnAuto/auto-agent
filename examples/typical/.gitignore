@@ -1,4 +1,3 @@
 .context
-server*
-client*
-/.context/
+# server*
+# client*
