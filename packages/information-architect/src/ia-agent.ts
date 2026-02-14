@@ -62,20 +62,10 @@ export interface ValidationError {
   message: string;
 }
 
-export function validateCompositionReferences(schema: unknown, designSystemAtoms: string[] = []): ValidationError[] {
-  const s = schema as IASchema;
+function validateMolecules(items: Record<string, ComponentDefinition>, atomNames: Set<string>): ValidationError[] {
   const errors: ValidationError[] = [];
-
-  const schemaAtoms = Object.keys(s.atoms?.items ?? {});
-  const atomNames = new Set([...schemaAtoms, ...designSystemAtoms]);
-  const moleculeNames = new Set(Object.keys(s.molecules?.items ?? {}));
-  const organismNames = new Set(Object.keys(s.organisms?.items ?? {}));
-  const templateNames = new Set(Object.keys(s.templates?.items ?? {}));
-
-  // Validate molecules reference only atoms
-  for (const [name, def] of Object.entries(s.molecules?.items ?? {})) {
-    const referencedAtoms = def.composition?.atoms ?? [];
-    const invalidAtoms = referencedAtoms.filter((atom: string) => !atomNames.has(atom));
+  for (const [name, def] of Object.entries(items)) {
+    const invalidAtoms = (def.composition?.atoms ?? []).filter((atom: string) => !atomNames.has(atom));
     if (invalidAtoms.length > 0) {
       errors.push({
         component: name,
@@ -86,21 +76,26 @@ export function validateCompositionReferences(schema: unknown, designSystemAtoms
       });
     }
   }
+  return errors;
+}
 
-  // Validate organisms reference only molecules
-  for (const [name, def] of Object.entries(s.organisms?.items ?? {})) {
+function validateOrganisms(
+  items: Record<string, ComponentDefinition>,
+  moleculeNames: Set<string>,
+  organismNames: Set<string>,
+): ValidationError[] {
+  const errors: ValidationError[] = [];
+  for (const [name, def] of Object.entries(items)) {
     const referencedMolecules = def.composition?.molecules ?? [];
 
-    const nonExistentMolecules = referencedMolecules.filter(
-      (mol: string) => !moleculeNames.has(mol) && !organismNames.has(mol),
-    );
-    if (nonExistentMolecules.length > 0) {
+    const nonExistent = referencedMolecules.filter((mol: string) => !moleculeNames.has(mol) && !organismNames.has(mol));
+    if (nonExistent.length > 0) {
       errors.push({
         component: name,
         type: 'organism',
         field: 'composition.molecules',
-        invalidReferences: nonExistentMolecules,
-        message: `Organism "${name}" references non-existent molecules: ${nonExistentMolecules.join(', ')}`,
+        invalidReferences: nonExistent,
+        message: `Organism "${name}" references non-existent molecules: ${nonExistent.join(', ')}`,
       });
     }
 
@@ -117,11 +112,13 @@ export function validateCompositionReferences(schema: unknown, designSystemAtoms
       });
     }
   }
+  return errors;
+}
 
-  // Validate templates reference only organisms
-  for (const [name, def] of Object.entries(s.templates?.items ?? {})) {
-    const referencedOrganisms = def.layout?.organisms ?? [];
-    const invalidOrganisms = referencedOrganisms.filter((org: string) => !organismNames.has(org));
+function validateTemplates(items: Record<string, TemplateDefinition>, organismNames: Set<string>): ValidationError[] {
+  const errors: ValidationError[] = [];
+  for (const [name, def] of Object.entries(items)) {
+    const invalidOrganisms = (def.layout?.organisms ?? []).filter((org: string) => !organismNames.has(org));
     if (invalidOrganisms.length > 0) {
       errors.push({
         component: name,
@@ -132,22 +129,40 @@ export function validateCompositionReferences(schema: unknown, designSystemAtoms
       });
     }
   }
+  return errors;
+}
 
-  // Validate pages reference only templates
-  for (const [name, def] of Object.entries(s.pages?.items ?? {})) {
-    const referencedTemplate = def.template;
-    if (referencedTemplate && !templateNames.has(referencedTemplate)) {
+function validatePages(items: Record<string, PageDefinition>, templateNames: Set<string>): ValidationError[] {
+  const errors: ValidationError[] = [];
+  for (const [name, def] of Object.entries(items)) {
+    if (def.template && !templateNames.has(def.template)) {
       errors.push({
         component: name,
         type: 'page',
         field: 'template',
-        invalidReferences: [referencedTemplate],
-        message: `Page "${name}" references non-existent template: ${referencedTemplate}`,
+        invalidReferences: [def.template],
+        message: `Page "${name}" references non-existent template: ${def.template}`,
       });
     }
   }
-
   return errors;
+}
+
+export function validateCompositionReferences(schema: unknown, designSystemAtoms: string[] = []): ValidationError[] {
+  const s = schema as IASchema;
+
+  const schemaAtoms = Object.keys(s.atoms?.items ?? {});
+  const atomNames = new Set([...schemaAtoms, ...designSystemAtoms]);
+  const moleculeNames = new Set(Object.keys(s.molecules?.items ?? {}));
+  const organismNames = new Set(Object.keys(s.organisms?.items ?? {}));
+  const templateNames = new Set(Object.keys(s.templates?.items ?? {}));
+
+  return [
+    ...validateMolecules(s.molecules?.items ?? {}, atomNames),
+    ...validateOrganisms(s.organisms?.items ?? {}, moleculeNames, organismNames),
+    ...validateTemplates(s.templates?.items ?? {}, organismNames),
+    ...validatePages(s.pages?.items ?? {}, templateNames),
+  ];
 }
 
 export class InformationArchitectAgent {
