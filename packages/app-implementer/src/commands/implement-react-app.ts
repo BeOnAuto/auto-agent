@@ -1,7 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { type Command, defineCommandHandler, type Event } from '@auto-engineer/message-bus';
+import { createModelFromEnv } from '@auto-engineer/model-factory';
 import createDebug from 'debug';
 import { generateApp, refineApp } from '../app-generator.js';
 import { writeApp } from '../app-writer.js';
@@ -109,23 +109,7 @@ export const commandHandler = defineCommandHandler({
       debug('Found %d component docs', catalog.componentDocs.length);
 
       // 4. Journey analysis
-      const providerName = process.env.CUSTOM_PROVIDER_NAME ?? 'custom';
-      const baseURL = process.env.CUSTOM_PROVIDER_BASE_URL;
-      const apiKey = process.env.CUSTOM_PROVIDER_API_KEY;
-      const modelName =
-        process.env.CUSTOM_PROVIDER_DEFAULT_MODEL ?? process.env.DEFAULT_AI_MODEL ?? 'claude-sonnet-4-20250514';
-
-      if (!baseURL) {
-        throw new Error('CUSTOM_PROVIDER_BASE_URL environment variable is required');
-      }
-
-      debug('Using AI provider: %s, model: %s, base URL: %s', providerName, modelName, baseURL);
-      const provider = createOpenAICompatible({
-        name: providerName,
-        baseURL,
-        apiKey,
-      });
-      const model = provider.chatModel(modelName);
+      const model = createModelFromEnv();
 
       debug('Analyzing user journey...');
       const { journey } = await analyzeJourney(narrative, catalog, model);
