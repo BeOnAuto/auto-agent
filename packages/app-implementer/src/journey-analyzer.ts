@@ -95,9 +95,9 @@ export async function analyzeJourney(
     ],
   });
   const tokenUsage: TokenUsage = {
-    inputTokens: usage?.inputTokens ?? 0,
-    outputTokens: usage?.outputTokens ?? 0,
-    totalTokens: (usage?.inputTokens ?? 0) + (usage?.outputTokens ?? 0),
+    inputTokens: usage?.promptTokens ?? 0,
+    outputTokens: usage?.completionTokens ?? 0,
+    totalTokens: (usage?.promptTokens ?? 0) + (usage?.completionTokens ?? 0),
   };
   return { journey: parseJourneyResponse(text), usage: tokenUsage };
 }
