@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@auto-engineer/message-bus": "workspace:*",
-    "@ai-sdk/openai-compatible": "^2.0.30",
+    "@auto-engineer/model-factory": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.12.1",
     "ai": "^5.0.87",
     "debug": "^4.4.1",
