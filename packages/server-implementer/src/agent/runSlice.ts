@@ -1,6 +1,7 @@
 import { access, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { generateTextWithAI } from '@auto-engineer/ai-gateway';
+import { createModelFromEnv } from '@auto-engineer/model-factory';
+import { generateText } from 'ai';
 import { execa } from 'execa';
 import fg from 'fast-glob';
 import { SYSTEM_PROMPT } from '../prompts/systemPrompt';
@@ -68,7 +69,7 @@ async function retryFailedFiles(
       const fileName = path.basename(filePath);
       const retryPrompt = buildRetryPrompt(fileName, contextFiles, result.testErrors, result.typecheckErrors);
       console.log(`🔧 Retrying typecheck error in ${fileName} in flow ${flow}...`);
-      const aiOutput = await generateTextWithAI(retryPrompt);
+      const { text: aiOutput } = await generateText({ model: createModelFromEnv(), prompt: retryPrompt });
       const cleanedCode = extractCodeBlock(aiOutput);
       await writeFile(path.join(sliceDir, fileName), cleanedCode, 'utf-8');
       console.log(`♻️ Updated ${fileName} to fix typecheck errors`);
@@ -173,8 +174,7 @@ async function implementFileFromAI(sliceDir: string, targetFile: string, context
   const filePath = path.join(sliceDir, targetFile);
   const prompt = buildInitialPrompt(targetFile, contextFiles);
   console.log(`🔮 Analysing and Implementing ${targetFile}`);
-  const aiOutput = await generateTextWithAI(prompt);
-  //console.log('AI output:', aiOutput);
+  const { text: aiOutput } = await generateText({ model: createModelFromEnv(), prompt });
   const cleanedCode = extractCodeBlock(aiOutput);
   await writeFile(filePath, cleanedCode, 'utf-8');
 
@@ -228,7 +228,7 @@ No commentary or markdown outside the code block.
 `.trim();
 
     console.log('🔮 Asking AI to suggest a fix for test failures...');
-    const aiOutput = await generateTextWithAI(smartPrompt);
+    const { text: aiOutput } = await generateText({ model: createModelFromEnv(), prompt: smartPrompt });
     const cleaned = extractCodeBlock(aiOutput);
     const match = cleaned.match(/^\/\/ File: (.+?)\n([\s\S]*)/m);
     if (!match) {
