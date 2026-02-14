@@ -22,9 +22,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@auto-engineer/ai-gateway": "workspace:*",
+    "@auto-engineer/model-factory": "workspace:*",
     "@auto-engineer/message-bus": "workspace:*",
     "@auto-engineer/narrative": "workspace:*",
+    "ai": "^5.0.87",
     "fast-glob": "^3.3.2"
   },
   "devDependencies": {

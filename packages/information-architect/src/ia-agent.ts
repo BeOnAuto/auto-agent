@@ -1,5 +1,6 @@
-import { type AIProvider, generateTextWithAI } from '@auto-engineer/ai-gateway';
+import { createModelFromEnv } from '@auto-engineer/model-factory';
 import type { Model } from '@auto-engineer/narrative';
+import { generateText } from 'ai';
 import type { AIAgentOutput, UXSchema } from './types.js';
 
 function extractJsonFromMarkdown(text: string): string {
@@ -150,10 +151,10 @@ export function validateCompositionReferences(schema: unknown, designSystemAtoms
 }
 
 export class InformationArchitectAgent {
-  private provider?: AIProvider;
+  private model;
 
-  constructor(provider?: AIProvider) {
-    this.provider = provider;
+  constructor(model = createModelFromEnv()) {
+    this.model = model;
   }
 
   async generateUXComponents(
@@ -165,10 +166,11 @@ export class InformationArchitectAgent {
   ): Promise<AIAgentOutput> {
     const prompt = this.constructPrompt(model, uxSchema, existingSchema, atoms, previousErrors);
     try {
-      const response = await generateTextWithAI(prompt, {
-        provider: this.provider,
+      const { text: response } = await generateText({
+        model: this.model,
+        prompt,
         temperature: 0.7,
-        maxTokens: 4096 * 2,
+        maxOutputTokens: 4096 * 2,
       });
       if (!response) {
         throw new Error('No response from AI agent');
