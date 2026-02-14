@@ -19,88 +19,6 @@ Both repos have 3+ AI client patterns: `@auto-engineer/ai-gateway` (2000-line ab
 
 ## TODO
 
-### Bottle: model-factory (auto-engineer-1)
-
-- [ ] Burst 1: Scaffold model-factory package infra [depends: none]
-  - Create `packages/model-factory/package.json` (name: `@auto-engineer/model-factory`, deps: `@ai-sdk/anthropic`, `@ai-sdk/google`, `@ai-sdk/openai`, `@ai-sdk/openai-compatible`, `@ai-sdk/xai`, peer: `ai@>=5.0.0`)
-  - Create `packages/model-factory/tsconfig.json` (extends `../../tsconfig.base.json`, composite: true)
-  - Add to root `tsconfig.json` references
-  - `pnpm install`
-  - Infra commit, no test needed
-
-- [ ] Burst 2: createModelFromEnv creates custom provider model from env [depends: 1]
-  - `packages/model-factory/src/index.ts`: export `createModelFromEnv(options?)` -- custom provider path using `createOpenAICompatible({ name, baseURL, apiKey })`, reads `CUSTOM_PROVIDER_*` env vars, throws on missing config
-  - `packages/model-factory/src/index.specs.ts`: test custom provider creation with env vars set, test throws when env vars missing
-  - Export `Provider` type, `DEFAULT_MODELS` constant
-
-- [ ] Burst 3: createModelFromEnv supports direct providers and option overrides [depends: 2]
-  - Add openai/anthropic/google/xai branches (delegate to `createOpenAI()`, `createAnthropic()`, `createGoogleGenerativeAI()`, `createXai()`)
-  - Default `DEFAULT_AI_PROVIDER` to `custom` when unset
-  - Support `options.model` and `options.provider` overrides
-  - Use `DEFAULT_AI_MODEL` env var when `options.model` unset
-  - Tests: each provider returns model, defaults to custom, option overrides work
-
-### Bottle: Migrate auto-engineer-1 consumers
-
-- [ ] Burst 4: Migrate information-architect to model-factory + ai [depends: 3]
-  - `packages/information-architect/src/ia-agent.ts`:
-    - Replace `import { type AIProvider, generateTextWithAI } from '@auto-engineer/ai-gateway'`
-    - With `import { createModelFromEnv } from '@auto-engineer/model-factory'` + `import { generateText, type LanguageModel } from 'ai'`
-    - Constructor takes `LanguageModel` param (default `createModelFromEnv()`)
-    - Replace `generateTextWithAI(prompt, { provider, temperature, maxTokens })` -> `generateText({ model: this.model, prompt, temperature, maxTokens }).then(r => r.text)`
-    - Drop `AIProvider` type usage entirely
-  - `packages/information-architect/package.json`: swap `@auto-engineer/ai-gateway` -> `@auto-engineer/model-factory` + `ai`
-  - `packages/information-architect/tsconfig.json`: update reference from ai-gateway -> model-factory
-  - No existing test files for ia-agent.ts
-
-- [ ] Burst 5: Migrate server-implementer to model-factory + ai [depends: 3]
-  - `packages/server-implementer/src/agent/runSlice.ts`:
-    - Replace `import { generateTextWithAI } from '@auto-engineer/ai-gateway'`
-    - With `import { createModelFromEnv } from '@auto-engineer/model-factory'` + `import { generateText } from 'ai'`
-    - Replace 3x `generateTextWithAI(prompt)` -> `generateText({ model: createModelFromEnv(), prompt }).then(r => r.text)`
-  - `packages/server-implementer/src/commands/implement-slice.ts`:
-    - Same import swap
-    - Replace `generateTextWithAI(prompt, { maxTokens })` -> `generateText({ model: createModelFromEnv(), prompt, maxTokens }).then(r => r.text)`
-  - `packages/server-implementer/package.json`: swap `@auto-engineer/ai-gateway` -> `@auto-engineer/model-factory` + `ai`
-  - `packages/server-implementer/tsconfig.json`: update reference from ai-gateway -> model-factory
-
-- [ ] Burst 6: Migrate react-component-implementer to model-factory [depends: 3]
-  - `packages/react-component-implementer/src/commands/implement-react-component.ts`:
-    - Replace inline `createOpenAICompatible()` + env var reading with `createModelFromEnv()`
-    - Remove `@ai-sdk/openai-compatible` import
-  - `packages/react-component-implementer/package.json`: swap `@ai-sdk/openai-compatible` -> `@auto-engineer/model-factory`
-
-- [ ] Burst 7: Migrate app-implementer (auto-engineer) to model-factory [depends: 3]
-  - `packages/app-implementer/src/commands/implement-react-app.ts`: same pattern as Burst 6
-  - `packages/app-implementer/package.json`: swap `@ai-sdk/openai-compatible` -> `@auto-engineer/model-factory`
-
-### Bottle: Delete ai-gateway (auto-engineer-1)
-
-- [ ] Burst 8: Delete packages/ai-gateway and clean all references [depends: 4, 5]
-  - Delete `packages/ai-gateway/` directory entirely
-  - Remove from root `tsconfig.json` references
-  - Verify no remaining imports: `grep -r "ai-gateway" --include="*.ts" packages/`
-  - Run `pnpm install` to clean lockfile
-
-### Bottle: Delete ai-client (on.auto-1)
-
-- [ ] Burst 9: Delete packages/ai-client and clean worker-runtime [depends: none]
-  - Delete `on.auto-1/packages/ai-client/` entirely
-  - `on.auto-1/packages/worker-runtime/src/index.ts`: remove re-exports (`createAIClient`, `createAIClientFromEnv`, `BudgetExceededError`, `ModelNotAllowedError`, `RateLimitError`, `GatewayError`)
-  - `on.auto-1/packages/worker-runtime/package.json`: remove `@on.auto/ai-client` dependency
-  - Verify no remaining imports of `@on.auto/ai-client` anywhere
-  - Run `pnpm test` in on.auto-1
-
-### Bottle: Strip litellm-client (on.auto-1)
-
-- [ ] Burst 10: Remove gateway-model from litellm-client, keep admin API [depends: none]
-  - Delete `on.auto-1/packages/litellm-client/src/gateway-model.ts`
-  - Delete `on.auto-1/packages/litellm-client/src/gateway-model.test.ts`
-  - `on.auto-1/packages/litellm-client/src/index.ts`: remove line `export { createGatewayModel, createGatewayModelFromEnv, DEFAULT_GATEWAY_MODEL } from './gateway-model.js'`
-  - `on.auto-1/packages/litellm-client/package.json`: remove `@ai-sdk/openai` dep, remove `ai` peer dep
-  - Keep `src/client.ts` (admin API) and `src/client.test.ts` untouched
-  - **Cannot run full test suite yet** -- consumers still import removed exports. This burst strips the source only.
-
 ### -- publish model-factory to npm --
 
 ### Bottle: Migrate on.auto-1 consumers
@@ -162,6 +80,32 @@ Both repos have 3+ AI client patterns: `@auto-engineer/ai-gateway` (2000-line ab
 ---
 
 ## DONE
+
+### Bottle: model-factory (auto-engineer-1)
+
+- [x] Burst 1: Scaffold model-factory package infra (9c61c88d)
+- [x] Burst 2: createModelFromEnv custom provider path (1febc560)
+- [x] Burst 3: Add direct providers + overrides (9d8dd337)
+- [x] Refactor: Return LanguageModel from ai SDK (d87a560f)
+
+### Bottle: Migrate auto-engineer-1 consumers
+
+- [x] Burst 4: Migrate information-architect (ed427ed6)
+- [x] Burst 5: Migrate server-implementer (40206ec9)
+- [x] Burst 6: Migrate react-component-implementer (099c11a8)
+- [x] Burst 7: Migrate app-implementer (4f9d95d0)
+
+### Bottle: Delete ai-gateway (auto-engineer-1)
+
+- [x] Burst 8: Delete ai-gateway package + clean references (4e1270a1)
+
+### Bottle: Delete ai-client (on.auto-1)
+
+- [x] Burst 9: Delete ai-client + clean worker-runtime (023ae982)
+
+### Bottle: Strip litellm-client (on.auto-1)
+
+- [x] Burst 10: Strip gateway-model from litellm-client (023ae982)
 
 ---
 
