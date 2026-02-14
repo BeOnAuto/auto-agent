@@ -2129,4 +2129,17 @@ describe('PipelineServer', () => {
       await server.stop();
     });
   });
+
+  describe('PipelineStarted event', () => {
+    it('should emit PipelineStarted event automatically on server start', async () => {
+      const pipeline = define('test').on('PipelineStarted').emit('OnStartup', {}).build();
+      const server = new PipelineServer({ port: 0 });
+      server.registerPipeline(pipeline);
+      await server.start();
+      await new Promise((r) => setTimeout(r, 100));
+      const msgs = await fetchAs<StoredMessage[]>(`http://localhost:${server.port}/messages`);
+      expect(msgs.some((m) => m.message.type === 'OnStartup')).toBe(true);
+      await server.stop();
+    });
+  });
 });

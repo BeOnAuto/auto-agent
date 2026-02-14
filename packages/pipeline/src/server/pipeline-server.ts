@@ -171,6 +171,8 @@ export class PipelineServer {
         resolve();
       });
     });
+
+    await this.emitPipelineStartedEvent();
   }
 
   async stop(): Promise<void> {
@@ -178,6 +180,16 @@ export class PipelineServer {
     await new Promise<void>((resolve) => {
       this.httpServer.close(() => resolve());
     });
+  }
+
+  async emitPipelineStartedEvent(): Promise<void> {
+    const correlationId = `startup-${nanoid()}`;
+    const event = {
+      type: 'PipelineStarted',
+      data: { timestamp: new Date().toISOString() },
+      correlationId,
+    };
+    await this.routeEventToPipelines(event);
   }
 
   private setupRoutes(): void {

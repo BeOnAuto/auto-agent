@@ -201,9 +201,9 @@ export async function generateApp(
     ],
   };
   const tokenUsage: TokenUsage = {
-    inputTokens: usage?.promptTokens ?? 0,
-    outputTokens: usage?.completionTokens ?? 0,
-    totalTokens: (usage?.promptTokens ?? 0) + (usage?.completionTokens ?? 0),
+    inputTokens: usage?.inputTokens ?? 0,
+    outputTokens: usage?.outputTokens ?? 0,
+    totalTokens: (usage?.inputTokens ?? 0) + (usage?.outputTokens ?? 0),
   };
   return { app: { files }, history, usage: tokenUsage };
 }
@@ -238,9 +238,9 @@ export async function refineApp(
     messages: [...history.messages, { role: 'user', content: refinementPrompt }, { role: 'assistant', content: text }],
   };
   const tokenUsage: TokenUsage = {
-    inputTokens: usage?.promptTokens ?? 0,
-    outputTokens: usage?.completionTokens ?? 0,
-    totalTokens: (usage?.promptTokens ?? 0) + (usage?.completionTokens ?? 0),
+    inputTokens: usage?.inputTokens ?? 0,
+    outputTokens: usage?.outputTokens ?? 0,
+    totalTokens: (usage?.inputTokens ?? 0) + (usage?.outputTokens ?? 0),
   };
 
   return { app: { files }, history: newHistory, usage: tokenUsage };

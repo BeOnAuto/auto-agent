@@ -93,6 +93,7 @@ export const commandHandler = defineCommandHandler<
 
       const cmd = customCommand ?? 'pnpm storybook';
       const [executable, ...args] = cmd.split(' ');
+      args.push('--no-open');
 
       debug('Starting Storybook...');
       debug('Executable: %s', executable);

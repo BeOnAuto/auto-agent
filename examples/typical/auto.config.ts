@@ -822,6 +822,18 @@ export const plugins = [
 ];
 
 export const pipeline = define('kanban-todo')
+  .on('PipelineStarted')
+  .emit('StartServer', () => ({
+    serverDirectory: resolvePath('./server'),
+  }))
+  .emit('StartClient', () => ({
+    clientDirectory: resolvePath('./client'),
+    command: 'pnpm dev',
+  }))
+  .emit('StartStorybook', () => ({
+    storybookDirectory: resolvePath('./client'),
+  }))
+
   .on('SchemaExported')
   .emit('DetectChanges', (e: { data: SchemaExportedData }) => {
     projectRoot = e.data.directory;
@@ -903,21 +915,6 @@ export const pipeline = define('kanban-todo')
       outputDir: resolvePath('./.context'),
     };
   })
-  .emit('StartServer', () => ({
-    serverDirectory: resolvePath('./server'),
-  }))
-
-  .on('ReactClientGenerated')
-  .emit('StartClient', (e: { data: { targetDir: string } }) => ({
-    clientDirectory: e.data.targetDir,
-    command: 'pnpm dev',
-  }))
-  .emit('StartStorybook', (e: { data: { targetDir: string } }) => ({
-    storybookDirectory: e.data.targetDir,
-  }))
-
-  .on('StorybookStarted')
-  .emit('TriggerJobGraph', () => ({}))
 
   .on('IAValidationFailed')
   .emit('GenerateIA', (e: { data: IAValidationFailedData }) => {
