@@ -83,10 +83,12 @@ describe('createModelFromEnv', () => {
       const { createModelFromEnv } = await import('./index.js');
       const model = createModelFromEnv();
 
-      expect(model).toEqual(expect.objectContaining({
-        specificationVersion: 'v3',
-        provider: 'custom:https://gw.example.com/v1:',
-      }));
+      expect(model).toEqual(
+        expect.objectContaining({
+          specificationVersion: 'v3',
+          provider: 'custom:https://gw.example.com/v1:',
+        }),
+      );
     });
 
     it('throws when CUSTOM_PROVIDER_BASE_URL is missing', async () => {
@@ -95,9 +97,7 @@ describe('createModelFromEnv', () => {
 
       const { createModelFromEnv } = await import('./index.js');
 
-      expect(() => createModelFromEnv()).toThrow(
-        'CUSTOM_PROVIDER_BASE_URL is required when using the custom provider',
-      );
+      expect(() => createModelFromEnv()).toThrow('CUSTOM_PROVIDER_BASE_URL is required when using the custom provider');
     });
   });
 
