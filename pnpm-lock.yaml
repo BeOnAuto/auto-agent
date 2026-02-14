@@ -506,6 +506,27 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@20.19.11)(jsdom@26.1.0)(terser@5.44.1)
 
+  packages/model-factory:
+    dependencies:
+      '@ai-sdk/anthropic':
+        specifier: ^3.0.44
+        version: 3.0.44(zod@3.25.76)
+      '@ai-sdk/google':
+        specifier: ^3.0.29
+        version: 3.0.29(zod@3.25.76)
+      '@ai-sdk/openai':
+        specifier: ^3.0.29
+        version: 3.0.29(zod@3.25.76)
+      '@ai-sdk/openai-compatible':
+        specifier: ^2.0.10
+        version: 2.0.30(zod@3.25.76)
+      '@ai-sdk/xai':
+        specifier: ^3.0.56
+        version: 3.0.56(zod@3.25.76)
+      ai:
+        specifier: '>=5.0.0'
+        version: 5.0.87(zod@3.25.76)
+
   packages/narrative:
     dependencies:
       '@auto-engineer/file-store':

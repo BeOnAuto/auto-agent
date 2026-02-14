@@ -1,0 +1,32 @@
+{
+  "name": "@auto-engineer/model-factory",
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc && tsx ../../scripts/fix-esm-imports.ts",
+    "test": "vitest run --reporter=dot",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.44",
+    "@ai-sdk/google": "^3.0.29",
+    "@ai-sdk/openai": "^3.0.29",
+    "@ai-sdk/openai-compatible": "^2.0.10",
+    "@ai-sdk/xai": "^3.0.56"
+  },
+  "peerDependencies": {
+    "ai": ">=5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "1.0.0"
+}
