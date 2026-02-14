@@ -7,7 +7,7 @@
     "auto:debug": "DEBUG=auto:* node ../../packages/cli/dist/bin/auto.js",
     "start": "dotenv -e .env -- pnpm --parallel start",
     "clean": "rm -rf server client .context && mkdir .context && cp ../support-files/.context/* ./.context ",
-    "postinstall": "cd client && pnpm install --ignore-workspace && cd ../server && pnpm install --ignore-workspace"
+    "postinstall": "[ -n \"$CI\" ] || (cd client && pnpm install --ignore-workspace && cd ../server && pnpm install --ignore-workspace)"
   },
   "dependencies": {
     "@auto-engineer/cli": "workspace:*",

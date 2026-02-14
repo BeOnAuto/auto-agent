@@ -125,6 +125,7 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.check_changesets.outputs.has_changesets == 'true'
         id: publish
         run: |
+          git checkout -- .
           git pull --rebase
           pnpm release
           echo "published=true" >> $GITHUB_OUTPUT
