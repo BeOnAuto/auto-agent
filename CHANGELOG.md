@@ -2,6 +2,20 @@
 
 # @auto-engineer/ai-gateway
 
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+
 ## 1.14.0
 
 ### Minor Changes
@@ -734,6 +748,22 @@
 
 # @auto-engineer/app-implementer
 
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/message-bus@1.15.0
+
 ## 1.14.0
 
 ### Minor Changes
@@ -783,6 +813,24 @@
   - @auto-engineer/message-bus@1.12.1
 
 # @auto-engineer/cli
+
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/file-store@1.15.0
+  - @auto-engineer/narrative@1.15.0
+  - @auto-engineer/pipeline@1.15.0
 
 ## 1.14.0
 
@@ -1515,6 +1563,22 @@
   - @auto-engineer/pipeline@0.14.0
 
 # create-auto-app
+
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/id@1.15.0
 
 ## 1.14.0
 
@@ -2518,6 +2582,23 @@
 
 # @auto-engineer/dev-server
 
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/cli@1.15.0
+  - @auto-engineer/message-bus@1.15.0
+
 ## 1.14.0
 
 ### Minor Changes
@@ -3316,6 +3397,20 @@
 
 # @auto-engineer/file-store
 
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+
 ## 1.14.0
 
 ### Minor Changes
@@ -4006,6 +4101,22 @@
 
 # @auto-engineer/generate-react-client
 
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/message-bus@1.15.0
+
 ## 1.14.0
 
 ### Minor Changes
@@ -4055,6 +4166,20 @@
   - @auto-engineer/message-bus@1.12.1
 
 # @auto-engineer/id
+
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
 
 ## 1.14.0
 
@@ -4683,6 +4808,24 @@
 ## 0.8.6
 
 # @auto-engineer/information-architect
+
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/ai-gateway@1.15.0
+  - @auto-engineer/message-bus@1.15.0
+  - @auto-engineer/narrative@1.15.0
 
 ## 1.14.0
 
@@ -6142,6 +6285,22 @@
 
 # @auto-engineer/job-graph-processor
 
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/message-bus@1.15.0
+
 ## 1.14.0
 
 ### Minor Changes
@@ -6191,6 +6350,20 @@
   - @auto-engineer/message-bus@1.12.1
 
 # @auto-engineer/message-bus
+
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
 
 ## 1.14.0
 
@@ -6928,6 +7101,22 @@
 - Bump versions to fix npm publish conflicts
 
 # @auto-engineer/message-store
+
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/message-bus@1.15.0
 
 ## 1.14.0
 
@@ -7981,6 +8170,23 @@
 
 # @auto-engineer/model-diff
 
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/message-bus@1.15.0
+  - @auto-engineer/narrative@1.15.0
+
 ## 1.14.0
 
 ### Minor Changes
@@ -8049,6 +8255,24 @@
   - @auto-engineer/narrative@1.12.0
 
 # @auto-engineer/flow
+
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/file-store@1.15.0
+  - @auto-engineer/id@1.15.0
+  - @auto-engineer/message-bus@1.15.0
 
 ## 1.14.0
 
@@ -9641,6 +9865,23 @@
 
 # @auto-engineer/pipeline
 
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/file-store@1.15.0
+  - @auto-engineer/message-bus@1.15.0
+
 ## 1.14.0
 
 ### Minor Changes
@@ -10322,6 +10563,22 @@
 
 # @auto-engineer/react-component-implementer
 
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/message-bus@1.15.0
+
 ## 1.14.0
 
 ### Minor Changes
@@ -10371,6 +10628,20 @@
   - @auto-engineer/message-bus@1.12.1
 
 # @auto-engineer/release-automation
+
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
 
 ## 1.14.0
 
@@ -10767,6 +11038,23 @@
 - [`42ad1e5`](https://github.com/BeOnAuto/auto-engineer/commit/42ad1e5bb31b89b56b920ed84a151a7c68dd2e5b) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where special characters in commit messages could break Slack notifications
 
 # @auto-engineer/server-checks
+
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/cli@1.15.0
+  - @auto-engineer/message-bus@1.15.0
 
 ## 1.14.0
 
@@ -12002,6 +12290,24 @@
   - @auto-engineer/message-bus@0.4.0
 
 # @auto-engineer/server-generator-apollo-emmett
+
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/message-bus@1.15.0
+  - @auto-engineer/model-diff@1.15.0
+  - @auto-engineer/narrative@1.15.0
 
 ## 1.14.0
 
@@ -13391,6 +13697,22 @@
 
 # @auto-engineer/server-generator-nestjs
 
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/narrative@1.15.0
+
 ## 1.14.0
 
 ### Minor Changes
@@ -14008,6 +14330,23 @@
   - @auto-engineer/narrative@0.15.0
 
 # @auto-engineer/server-implementer
+
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/ai-gateway@1.15.0
+  - @auto-engineer/message-bus@1.15.0
 
 ## 1.14.0
 

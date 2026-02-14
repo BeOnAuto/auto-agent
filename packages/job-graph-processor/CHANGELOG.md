@@ -1,5 +1,21 @@
 # @auto-engineer/job-graph-processor
 
+## 1.15.0
+
+### Minor Changes
+
+- [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d) Thanks [@github-actions[bot]](https://github.com/github-actions%5Bbot%5D)! - - **examples/typical**: adds app implementer to auto config
+  - **global**: version packages
+
+- [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Added client and server integration to the typical example for improved loading speed
+
+### Patch Changes
+
+- [`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f) Thanks [@SamHatoum](https://github.com/SamHatoum)! - - Fixed an issue where the postinstall script could dirty the git tree in CI environments
+  - Improved publish reliability by resetting the working tree before pulling latest changes
+- Updated dependencies [[`08b53d0`](https://github.com/BeOnAuto/auto-engineer/commit/08b53d0063263fca60d781ded67b50cfbcb1974f), [`c94c72e`](https://github.com/BeOnAuto/auto-engineer/commit/c94c72ea47ee902caff8e41e6fdeee6d514fff5d), [`a8a75f0`](https://github.com/BeOnAuto/auto-engineer/commit/a8a75f058bc9f640294c46a4e62f24de28e90d2f)]:
+  - @auto-engineer/message-bus@1.15.0
+
 ## 1.14.0
 
 ### Minor Changes

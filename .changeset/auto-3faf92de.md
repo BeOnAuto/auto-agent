@@ -22,4 +22,6 @@
 "create-auto-app": minor
 ---
 
-- Added client and server integration to the typical example for improved loading speed
+- **examples/typical**: add client and server into typical example for improved loading speed
+- **global**: prevent postinstall from dirtying tree in CI
+- **global**: version packages
