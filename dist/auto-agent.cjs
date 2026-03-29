@@ -7136,6 +7136,9 @@ var init_zod = __esm({
 function setConfigDir(dir) {
   configDir = dir;
 }
+function getConfigDir() {
+  return configDir;
+}
 function getConfigPath() {
   return (0, import_node_path.join)(configDir, "config.json");
 }
@@ -10898,8 +10901,6 @@ var init_connection = __esm({
       }
       ws = null;
       connected = false;
-      model = null;
-      changes = [];
       async connect(timeoutMs = 1e4) {
         const WebSocket2 = (await Promise.resolve().then(() => (init_wrapper(), wrapper_exports))).default;
         const wsUrl = this.options.serverUrl.replace(/^http/, "ws");
@@ -10942,32 +10943,22 @@ var init_connection = __esm({
           this.ws = null;
         }
         this.connected = false;
-        this.model = null;
+        this.options.persistence.destroy();
       }
       isConnected() {
         return this.connected;
       }
-      getModel() {
-        return this.model;
-      }
-      getChanges() {
-        const result = [...this.changes];
-        this.changes = [];
-        return result;
-      }
       processMessage(msg) {
         if (msg.type === "full" && msg.model) {
-          this.model = msg.model;
-          this.options.onModel?.(this.model);
-          this.emit("model-updated", this.model);
+          this.options.persistence.update(msg.model);
+          this.emit("model-updated", msg.model);
           if (!this.connected) {
             this.connected = true;
             this.emit("connected");
           }
         } else if (msg.type === "changes" && msg.changes) {
           for (const change of msg.changes) {
-            this.changes.push(change);
-            this.options.onChange?.(change);
+            this.options.persistence.appendChange(change);
           }
         }
       }
@@ -10986,13 +10977,32 @@ var init_persistence = __esm({
       constructor(modelPath, debounceMs = 1e3) {
         this.modelPath = modelPath;
         this.debounceMs = debounceMs;
+        this.changesPath = modelPath.replace(/model\.json$/, "changes.json");
       }
       debounceTimer = void 0;
       pendingModel = null;
+      changesPath;
       update(model) {
         this.pendingModel = model;
         clearTimeout(this.debounceTimer);
         this.debounceTimer = setTimeout(() => this.flush(), this.debounceMs);
+      }
+      appendChange(change) {
+        const dir = (0, import_node_path2.dirname)(this.changesPath);
+        if (!(0, import_node_fs3.existsSync)(dir)) (0, import_node_fs3.mkdirSync)(dir, { recursive: true });
+        (0, import_node_fs3.appendFileSync)(this.changesPath, JSON.stringify(change) + "\n", "utf-8");
+      }
+      readAndClearChanges() {
+        if (!(0, import_node_fs3.existsSync)(this.changesPath)) return [];
+        const raw = (0, import_node_fs3.readFileSync)(this.changesPath, "utf-8").trim();
+        if (!raw) return [];
+        (0, import_node_fs3.writeFileSync)(this.changesPath, "", "utf-8");
+        return raw.split("\n").map((line) => JSON.parse(line));
+      }
+      readModel() {
+        if (!(0, import_node_fs3.existsSync)(this.modelPath)) return null;
+        const raw = (0, import_node_fs3.readFileSync)(this.modelPath, "utf-8");
+        return JSON.parse(raw);
       }
       flush() {
         if (this.pendingModel === null) return;
@@ -11010,6 +11020,31 @@ var init_persistence = __esm({
         this.flush();
       }
     };
+  }
+});
+
+// src/mcp/daemon.ts
+async function startDaemon(config2) {
+  const configDir2 = getConfigDir();
+  const modelPath = (0, import_node_path3.join)(configDir2, "model.json");
+  const persistence = new ModelPersistence(modelPath);
+  const connection = new ConnectionManager({
+    serverUrl: config2.serverUrl,
+    apiKey: config2.apiKey,
+    workspaceId: config2.workspaceId,
+    persistence
+  });
+  await connection.connect();
+  return { connection, persistence };
+}
+var import_node_path3;
+var init_daemon = __esm({
+  "src/mcp/daemon.ts"() {
+    "use strict";
+    import_node_path3 = require("node:path");
+    init_connection();
+    init_persistence();
+    init_config();
   }
 });
 
@@ -28605,24 +28640,30 @@ var init_stdio2 = __esm({
 function registerTools(server, deps = {}) {
   server.tool(
     "auto_configure",
-    "Configure the Auto agent CLI with an API key",
+    "Configure the Auto agent CLI with an API key and start the sync daemon",
     {
       key: external_exports.string().describe("API key in format ak_<workspaceId>_<random>"),
       server: external_exports.string().optional().describe("Server URL (defaults to production)")
     },
-    async ({ key, server: server2 }) => {
+    async ({ key, server: serverUrl }) => {
       const result = parseApiKey(key);
       if (!result) {
         return { content: [{ type: "text", text: "Invalid key format. Expected: ak_<workspaceId>_<random>" }] };
       }
       const { workspaceId } = result;
-      const serverUrl = server2 || "https://collaboration-server.on-auto.workers.dev";
-      writeConfig({
-        apiKey: key,
-        serverUrl,
-        workspaceId
-      });
-      return { content: [{ type: "text", text: `Configured for workspace ${workspaceId} (server: ${serverUrl})` }] };
+      const url = serverUrl || "https://collaboration-server.on-auto.workers.dev";
+      writeConfig({ apiKey: key, serverUrl: url, workspaceId });
+      if (deps.daemon) {
+        deps.daemon.connection.disconnect();
+      }
+      try {
+        const daemon = await startDaemon({ apiKey: key, serverUrl: url, workspaceId });
+        deps.daemon = daemon;
+        deps.onDaemonStarted?.(daemon);
+        return { content: [{ type: "text", text: `Connected to workspace ${workspaceId} (server: ${url})` }] };
+      } catch (err) {
+        return { content: [{ type: "text", text: `Configured for workspace ${workspaceId} but connection failed: ${err instanceof Error ? err.message : "Unknown error"}. Tools will use HTTP fallback.` }] };
+      }
     }
   );
   server.tool(
@@ -28630,19 +28671,15 @@ function registerTools(server, deps = {}) {
     "Fetch the workspace model as JSON",
     {},
     async () => {
-      if (deps.connection?.isConnected()) {
-        try {
-          const model = deps.connection.getModel();
-          if (model) {
-            return { content: [{ type: "text", text: JSON.stringify(model, null, 2) }] };
-          }
-        } catch (err) {
-          return { content: [{ type: "text", text: `Error fetching model: ${err instanceof Error ? err.message : "Unknown error"}` }] };
+      if (deps.daemon) {
+        const model = deps.daemon.persistence.readModel();
+        if (model) {
+          return { content: [{ type: "text", text: JSON.stringify(model, null, 2) }] };
         }
       }
       const config2 = readConfig();
       if (!config2) {
-        return { content: [{ type: "text", text: "Not configured. Call auto_configure first." }] };
+        return { content: [{ type: "text", text: "Not configured. Run /auto-agent:connect first." }] };
       }
       try {
         const client = new AgentClient(config2.serverUrl, config2.apiKey);
@@ -28660,7 +28697,7 @@ function registerTools(server, deps = {}) {
     async ({ model }) => {
       const config2 = readConfig();
       if (!config2) {
-        return { content: [{ type: "text", text: "Not configured. Call auto_configure first." }] };
+        return { content: [{ type: "text", text: "Not configured. Run /auto-agent:connect first." }] };
       }
       let parsed;
       try {
@@ -28683,22 +28720,22 @@ ${result.corrections.map((c) => `- ${c}`).join("\n")}
   );
   server.tool(
     "auto_get_changes",
-    "Get model changes since last check. Returns structural diffs (added/removed/updated scenes, messages, moments).",
+    "Get model changes since last check. Returns structural diffs (added/removed/updated scenes, messages, moments). Clears the list after reading.",
     {},
     async () => {
-      if (!deps.connection?.isConnected()) {
+      if (deps.daemon) {
+        const changes = deps.daemon.persistence.readAndClearChanges();
         return {
           content: [{
             type: "text",
-            text: JSON.stringify({ changes: [], message: "No active connection." })
+            text: JSON.stringify({ changes, count: changes.length })
           }]
         };
       }
-      const changes = deps.connection.getChanges();
       return {
         content: [{
           type: "text",
-          text: JSON.stringify({ changes, count: changes.length })
+          text: JSON.stringify({ changes: [], message: "No active connection. Run /auto-agent:connect first." })
         }]
       };
     }
@@ -28711,6 +28748,7 @@ var init_tools = __esm({
     init_config();
     init_client();
     init_utils();
+    init_daemon();
   }
 });
 
@@ -28724,17 +28762,8 @@ async function startMcpServer() {
   const deps = {};
   const config2 = readConfig();
   if (config2) {
-    const modelPath = (0, import_node_path4.join)(process.cwd(), ".auto-agent", "model.json");
-    const persistence = new ModelPersistence(modelPath);
-    const connection = new ConnectionManager({
-      serverUrl: config2.serverUrl,
-      apiKey: config2.apiKey,
-      workspaceId: config2.workspaceId,
-      onModel: (model) => persistence.update(model)
-    });
-    deps.connection = connection;
     try {
-      await connection.connect();
+      deps.daemon = await startDaemon(config2);
     } catch {
     }
   }
@@ -28750,17 +28779,14 @@ function createMcpServer(deps = {}) {
   registerTools(server, deps);
   return server;
 }
-var import_node_path4;
 var init_server3 = __esm({
   "src/mcp/server.ts"() {
     "use strict";
     init_mcp();
     init_stdio2();
-    import_node_path4 = require("node:path");
     init_config();
-    init_connection();
-    init_persistence();
     init_tools();
+    init_daemon();
   }
 });
 
@@ -28789,7 +28815,7 @@ var {
 } = import_index.default;
 
 // src/index.ts
-var import_node_path5 = require("node:path");
+var import_node_path4 = require("node:path");
 init_config();
 
 // src/commands/configure.ts
@@ -28874,57 +28900,32 @@ function registerSendModelCommand(program2) {
 }
 
 // src/commands/connect.ts
-var import_node_path3 = require("node:path");
 init_config();
-init_connection();
-init_persistence();
+init_daemon();
 function registerConnectCommand(program2) {
-  program2.command("connect").description("Connect to the collaboration server and sync model in real-time").option("--dir <path>", "Directory for model files", ".auto-agent").action(async (options) => {
+  program2.command("connect").description("Connect to the collaboration server and sync model in real-time").action(async () => {
     const config2 = readConfig();
     if (!config2) {
       process.stderr.write('No configuration found. Run "auto-agent configure --key <api-key>" first.\n');
       process.exitCode = 1;
       return;
     }
-    const modelPath = (0, import_node_path3.join)(options.dir, "model.json");
-    const persistence = new ModelPersistence(modelPath);
-    const manager = new ConnectionManager({
-      serverUrl: config2.serverUrl,
-      apiKey: config2.apiKey,
-      workspaceId: config2.workspaceId,
-      onModel: (model) => persistence.update(model),
-      onChange: (change) => {
-        process.stderr.write(`[${change.action}] ${change.entityType}: ${change.name}
-`);
-      }
-    });
-    manager.on("connected", () => {
-      process.stderr.write("Connected to collaboration server.\n");
-      persistence.update(manager.getModel());
-    });
-    manager.on("disconnected", () => {
-      process.stderr.write("Disconnected from collaboration server. Reconnecting...\n");
-    });
-    process.on("SIGINT", () => {
-      manager.disconnect();
-      persistence.destroy();
-      process.exit(0);
-    });
-    process.on("SIGTERM", () => {
-      manager.disconnect();
-      persistence.destroy();
-      process.exit(0);
-    });
     process.stderr.write(`Connecting to ${config2.serverUrl} for workspace ${config2.workspaceId}...
 `);
-    process.stderr.write(`Model will be written to ${modelPath}
-`);
     try {
-      await manager.connect();
+      const daemon = await startDaemon(config2);
+      process.stderr.write("Connected. Syncing model to disk. Press Ctrl+C to stop.\n");
+      process.on("SIGINT", () => {
+        daemon.connection.disconnect();
+        process.exit(0);
+      });
+      process.on("SIGTERM", () => {
+        daemon.connection.disconnect();
+        process.exit(0);
+      });
     } catch (err) {
       process.stderr.write(`Error: ${err instanceof Error ? err.message : "Connection failed"}
 `);
-      persistence.destroy();
       process.exitCode = 1;
     }
   });
@@ -28936,7 +28937,7 @@ function createProgram() {
   program2.name("auto-agent").description("CLI for connecting coding agents to the Auto collaboration server").version("0.1.0").option("--config <dir>", "Configuration directory", ".auto-agent").hook("preAction", (thisCommand) => {
     const opts = thisCommand.opts();
     if (opts.config) {
-      setConfigDir((0, import_node_path5.resolve)(opts.config));
+      setConfigDir((0, import_node_path4.resolve)(opts.config));
     }
   });
   registerConfigureCommand(program2);
