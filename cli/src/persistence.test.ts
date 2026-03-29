@@ -51,6 +51,30 @@ describe('ModelPersistence', () => {
     }
   });
 
+  it('flush is a no-op when no model is pending', () => {
+    const persistence = new ModelPersistence(modelPath);
+    persistence.flush();
+    expect(existsSync(modelPath)).toBe(false);
+  });
+
+  it('flush skips mkdir when directory already exists', () => {
+    const persistence = new ModelPersistence(modelPath);
+    persistence.update({ first: true });
+    persistence.flush();
+    expect(existsSync(modelPath)).toBe(true);
+
+    persistence.update({ second: true });
+    persistence.flush();
+    const written = JSON.parse(readFileSync(modelPath, 'utf-8'));
+    expect(written).toEqual({ second: true });
+  });
+
+  it('destroy is safe when no timer is active', () => {
+    const persistence = new ModelPersistence(modelPath);
+    persistence.destroy();
+    expect(existsSync(modelPath)).toBe(false);
+  });
+
   it('destroy flushes pending model', () => {
     const persistence = new ModelPersistence(modelPath);
     const model = { narratives: ['happy-path'] };
