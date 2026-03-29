@@ -2,7 +2,7 @@
   "mcpServers": {
     "auto-agent": {
       "command": "node",
-      "args": ["$CLAUDE_PLUGIN_ROOT/cli/dist/bin/agent.js", "mcp"]
+      "args": ["${CLAUDE_PLUGIN_ROOT}/dist/mcp-entry.mjs"]
     }
   }
 }
