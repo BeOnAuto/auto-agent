@@ -83,6 +83,14 @@ describe('config', () => {
     expect(result).toEqual(newConfig);
   });
 
+  it('writeConfig overwrites existing config when directory already exists', () => {
+    const first = { apiKey: 'key-1', serverUrl: 'https://one.com', workspaceId: 'ws-1' };
+    const second = { apiKey: 'key-2', serverUrl: 'https://two.com', workspaceId: 'ws-2' };
+    writeConfig(first);
+    writeConfig(second);
+    expect(readConfig()).toEqual(second);
+  });
+
   it('readConfig returns null when legacy config contains invalid JSON', () => {
     writeFileSync(join(tempDir, '.auto-agent.json'), 'not valid json', 'utf-8');
     expect(readConfig()).toBeNull();
