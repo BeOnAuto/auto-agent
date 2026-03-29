@@ -1,4 +1,5 @@
 import { EventEmitter } from 'node:events';
+import type { ModelPersistence } from './persistence.js';
 
 export interface ModelChange {
   action: 'added' | 'removed' | 'updated';
@@ -12,15 +13,12 @@ export interface ConnectionManagerOptions {
   serverUrl: string;
   apiKey: string;
   workspaceId: string;
-  onModel?: (model: unknown) => void;
-  onChange?: (change: ModelChange) => void;
+  persistence: ModelPersistence;
 }
 
 export class ConnectionManager extends EventEmitter {
   private ws: import('ws').WebSocket | null = null;
   private connected = false;
-  private model: unknown = null;
-  private changes: ModelChange[] = [];
 
   constructor(private options: ConnectionManagerOptions) {
     super();
@@ -48,7 +46,6 @@ export class ConnectionManager extends EventEmitter {
         try {
           const msg = JSON.parse(data.toString());
           this.processMessage(msg);
-          // Resolve on first full model received
           if (msg.type === 'full') {
             clearTimeout(timeout);
             resolve();
@@ -77,36 +74,24 @@ export class ConnectionManager extends EventEmitter {
       this.ws = null;
     }
     this.connected = false;
-    this.model = null;
+    this.options.persistence.destroy();
   }
 
   isConnected(): boolean {
     return this.connected;
   }
 
-  getModel(): unknown {
-    return this.model;
-  }
-
-  getChanges(): ModelChange[] {
-    const result = [...this.changes];
-    this.changes = [];
-    return result;
-  }
-
   processMessage(msg: { type: string; model?: unknown; changes?: ModelChange[] }): void {
     if (msg.type === 'full' && msg.model) {
-      this.model = msg.model;
-      this.options.onModel?.(this.model);
-      this.emit('model-updated', this.model);
+      this.options.persistence.update(msg.model);
+      this.emit('model-updated', msg.model);
       if (!this.connected) {
         this.connected = true;
         this.emit('connected');
       }
     } else if (msg.type === 'changes' && msg.changes) {
       for (const change of msg.changes) {
-        this.changes.push(change);
-        this.options.onChange?.(change);
+        this.options.persistence.appendChange(change);
       }
     }
   }
