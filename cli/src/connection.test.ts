@@ -171,10 +171,48 @@ describe('ConnectionManager', () => {
     });
   });
 
-  it('updateEndpoints does nothing when not connected', () => {
+  it('updateEndpoints stores endpoints even when not connected', () => {
     const manager = createManager();
     manager.updateEndpoints([{ label: 'Frontend', url: 'http://localhost:5173' }]);
-    expect(lastFakeWs).toBeUndefined;
+    expect(manager.getEndpoints()).toEqual([{ label: 'Frontend', url: 'http://localhost:5173' }]);
+  });
+
+  it('getEndpoints returns current endpoints', async () => {
+    const manager = createManager();
+    expect(manager.getEndpoints()).toEqual([]);
+
+    const connectPromise = manager.connect(5000);
+    await tick();
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
+
+    manager.updateEndpoints([
+      { label: 'Frontend', url: 'http://localhost:5173' },
+      { label: 'Backend', url: 'http://localhost:3000' },
+    ]);
+    expect(manager.getEndpoints()).toEqual([
+      { label: 'Frontend', url: 'http://localhost:5173' },
+      { label: 'Backend', url: 'http://localhost:3000' },
+    ]);
+  });
+
+  it('re-sends endpoints on reconnect', async () => {
+    const manager = createManager();
+    manager.updateEndpoints([{ label: 'Frontend', url: 'http://localhost:5173' }]);
+
+    const connectPromise = manager.connect(5000);
+    await tick();
+    lastFakeWs.emit('open');
+
+    const openSendCalls = lastFakeWs.send.mock.calls.map((c: unknown[]) => JSON.parse(c[0] as string));
+    expect(openSendCalls).toEqual([
+      { type: 'hello', sessionId: manager.sessionId, name: manager.name },
+      { type: 'update', endpoints: [{ label: 'Frontend', url: 'http://localhost:5173' }] },
+    ]);
+
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
   });
 
   it('disconnect closes WebSocket and flushes persistence', async () => {

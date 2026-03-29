@@ -26,6 +26,7 @@ export interface AgentEndpoint {
 export class ConnectionManager extends EventEmitter {
   private ws: import('ws').WebSocket | null = null;
   private connected = false;
+  private endpoints: AgentEndpoint[] = [];
   readonly sessionId = randomBytes(12).toString('hex');
   readonly name: string;
 
@@ -51,6 +52,9 @@ export class ConnectionManager extends EventEmitter {
       this.ws!.on('open', () => {
         this.connected = true;
         this.ws!.send(JSON.stringify({ type: 'hello', sessionId: this.sessionId, name: this.name }));
+        if (this.endpoints.length > 0) {
+          this.sendEndpoints();
+        }
       });
 
       this.ws!.on('message', (data: Buffer) => {
@@ -92,9 +96,18 @@ export class ConnectionManager extends EventEmitter {
     return this.connected;
   }
 
+  getEndpoints(): AgentEndpoint[] {
+    return this.endpoints;
+  }
+
   updateEndpoints(endpoints: AgentEndpoint[]): void {
+    this.endpoints = endpoints;
+    this.sendEndpoints();
+  }
+
+  private sendEndpoints(): void {
     if (this.connected && this.ws) {
-      this.ws.send(JSON.stringify({ type: 'update', endpoints }));
+      this.ws.send(JSON.stringify({ type: 'update', endpoints: this.endpoints }));
     }
   }
 
