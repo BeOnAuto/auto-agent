@@ -83,6 +83,11 @@ describe('config', () => {
     expect(result).toEqual(newConfig);
   });
 
+  it('readConfig returns null when legacy config contains invalid JSON', () => {
+    writeFileSync(join(tempDir, '.auto-agent.json'), 'not valid json', 'utf-8');
+    expect(readConfig()).toBeNull();
+  });
+
   it('writeConfig creates the directory if it does not exist', () => {
     const customDir = join(tempDir, 'deep', 'nested', 'config');
     setConfigDir(customDir);
