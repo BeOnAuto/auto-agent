@@ -4,6 +4,7 @@ import { readConfig, writeConfig, getConfigDir } from '../config.js';
 import { AgentClient } from '../client.js';
 import { parseApiKey } from '../utils.js';
 import { startDaemon, type Daemon } from './daemon.js';
+import type { AgentEndpoint } from '../connection.js';
 
 export interface ToolDependencies {
   daemon?: Daemon;
@@ -115,6 +116,28 @@ export function registerTools(server: McpServer, deps: ToolDependencies = {}): v
           text: JSON.stringify({ changes: [], message: 'No active connection. Run /auto-agent:connect first.' }),
         }],
       };
+    }
+  );
+
+  server.tool(
+    'auto_update_endpoints',
+    'Register endpoints (services, dev servers) that this agent exposes. Updates are sent to the collaboration server for sidebar rendering.',
+    {
+      endpoints: z.array(z.object({
+        label: z.string().describe('Display label for the endpoint (e.g. "Frontend", "Backend")'),
+        url: z.string().describe('URL of the endpoint (e.g. "http://localhost:5173")'),
+      })).describe('List of endpoints this agent currently exposes'),
+    },
+    async ({ endpoints }) => {
+      if (!deps.daemon) {
+        return { content: [{ type: 'text' as const, text: 'Not connected. Run auto_configure first.' }] };
+      }
+      if (!deps.daemon.connection.isConnected()) {
+        return { content: [{ type: 'text' as const, text: 'WebSocket not connected. Endpoint update not sent.' }] };
+      }
+      const typedEndpoints: AgentEndpoint[] = endpoints;
+      deps.daemon.connection.updateEndpoints(typedEndpoints);
+      return { content: [{ type: 'text' as const, text: `Updated ${endpoints.length} endpoint(s).` }] };
     }
   );
 }

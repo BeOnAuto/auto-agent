@@ -45,7 +45,7 @@ describe('MCP server', () => {
     await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
     const tools = await client.listTools();
     const toolNames = tools.tools.map((t) => t.name).sort();
-    expect(toolNames).toEqual(['auto_configure', 'auto_get_changes', 'auto_get_model', 'auto_send_model']);
+    expect(toolNames).toEqual(['auto_configure', 'auto_get_changes', 'auto_get_model', 'auto_send_model', 'auto_update_endpoints']);
     await client.close();
   });
 

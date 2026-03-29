@@ -58,7 +58,7 @@ describe('MCP tools', () => {
     await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
     const tools = await client.listTools();
     const toolNames = tools.tools.map((t) => t.name).sort();
-    expect(toolNames).toEqual(['auto_configure', 'auto_get_changes', 'auto_get_model', 'auto_send_model']);
+    expect(toolNames).toEqual(['auto_configure', 'auto_get_changes', 'auto_get_model', 'auto_send_model', 'auto_update_endpoints']);
     await client.close();
   });
 
@@ -137,5 +137,37 @@ describe('MCP tools', () => {
     const server = createMcpServer();
     const result = await callTool(server, 'auto_send_model', { model: 'bad json' });
     expect(getText(result)).toBe('Error: Invalid JSON in model parameter');
+  });
+
+  it('auto_update_endpoints returns not-connected when no daemon', async () => {
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_update_endpoints', {
+      endpoints: [{ label: 'Frontend', url: 'http://localhost:5173' }],
+    });
+    expect(getText(result)).toBe('Not connected. Run auto_configure first.');
+  });
+
+  it('auto_update_endpoints returns error when websocket disconnected', async () => {
+    const deps = createDepsWithPersistence();
+    (deps.daemon!.connection as Record<string, unknown>).isConnected = () => false;
+    const server = createMcpServer(deps);
+    const result = await callTool(server, 'auto_update_endpoints', {
+      endpoints: [{ label: 'Frontend', url: 'http://localhost:5173' }],
+    });
+    expect(getText(result)).toBe('WebSocket not connected. Endpoint update not sent.');
+  });
+
+  it('auto_update_endpoints calls updateEndpoints on daemon connection', async () => {
+    const deps = createDepsWithPersistence();
+    const updateEndpointsFn = vi.fn();
+    (deps.daemon!.connection as Record<string, unknown>).updateEndpoints = updateEndpointsFn;
+    const server = createMcpServer(deps);
+    const endpoints = [
+      { label: 'Frontend', url: 'http://localhost:5173' },
+      { label: 'Backend', url: 'http://localhost:3000' },
+    ];
+    const result = await callTool(server, 'auto_update_endpoints', { endpoints });
+    expect(getText(result)).toBe('Updated 2 endpoint(s).');
+    expect(updateEndpointsFn).toHaveBeenCalledWith(endpoints);
   });
 });
