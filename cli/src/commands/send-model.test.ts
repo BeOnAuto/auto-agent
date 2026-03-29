@@ -76,6 +76,31 @@ describe('send-model command', () => {
     expect(stdoutOutput).toBe(JSON.stringify(correctedModel, null, 2) + '\n');
   });
 
+  it('send-model errors when no config exists', async () => {
+    const program = createProgram();
+    await program.parseAsync(['node', 'auto-agent', 'send-model', 'model.json']);
+    expect(stderrOutput).toContain('No configuration found');
+    expect(process.exitCode).toBe(1);
+  });
+
+  it('send-model errors when file does not exist', async () => {
+    writeConfigFile();
+    const program = createProgram();
+    await program.parseAsync(['node', 'auto-agent', 'send-model', '/tmp/nonexistent-file.json']);
+    expect(stderrOutput).toContain('Could not read file');
+    expect(process.exitCode).toBe(1);
+  });
+
+  it('send-model errors when file contains invalid JSON', async () => {
+    writeConfigFile();
+    const modelFile = join(tempDir, 'bad.json');
+    writeFileSync(modelFile, 'not valid json');
+    const program = createProgram();
+    await program.parseAsync(['node', 'auto-agent', 'send-model', modelFile]);
+    expect(stderrOutput).toContain('invalid JSON');
+    expect(process.exitCode).toBe(1);
+  });
+
   it('send-model shows corrections on stderr', async () => {
     writeConfigFile();
     const modelFile = join(tempDir, 'model.json');
