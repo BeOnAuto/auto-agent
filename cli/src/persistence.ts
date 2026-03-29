@@ -2,14 +2,14 @@ import { writeFileSync, mkdirSync, existsSync, renameSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 export class ModelPersistence {
-  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private debounceTimer: ReturnType<typeof setTimeout> | undefined = undefined;
   private pendingModel: unknown = null;
 
   constructor(private modelPath: string, private debounceMs = 1000) {}
 
   update(model: unknown): void {
     this.pendingModel = model;
-    if (this.debounceTimer) clearTimeout(this.debounceTimer);
+    clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => this.flush(), this.debounceMs);
   }
 
@@ -21,14 +21,12 @@ export class ModelPersistence {
     writeFileSync(tmpPath, JSON.stringify(this.pendingModel, null, 2) + '\n', 'utf-8');
     renameSync(tmpPath, this.modelPath);
     this.pendingModel = null;
-    if (this.debounceTimer) {
-      clearTimeout(this.debounceTimer);
-      this.debounceTimer = null;
-    }
+    clearTimeout(this.debounceTimer);
+    this.debounceTimer = undefined;
   }
 
   destroy(): void {
-    if (this.debounceTimer) clearTimeout(this.debounceTimer);
+    clearTimeout(this.debounceTimer);
     this.flush();
   }
 }
