@@ -1,4 +1,6 @@
+import { randomBytes } from 'node:crypto';
 import { EventEmitter } from 'node:events';
+import { hostname } from 'node:os';
 import type { ModelPersistence } from './persistence.js';
 
 export interface ModelChange {
@@ -16,12 +18,20 @@ export interface ConnectionManagerOptions {
   persistence: ModelPersistence;
 }
 
+export interface AgentEndpoint {
+  label: string;
+  url: string;
+}
+
 export class ConnectionManager extends EventEmitter {
   private ws: import('ws').WebSocket | null = null;
   private connected = false;
+  readonly sessionId = randomBytes(12).toString('hex');
+  readonly name: string;
 
   constructor(private options: ConnectionManagerOptions) {
     super();
+    this.name = hostname();
   }
 
   async connect(timeoutMs = 10000): Promise<void> {
@@ -40,6 +50,7 @@ export class ConnectionManager extends EventEmitter {
 
       this.ws!.on('open', () => {
         this.connected = true;
+        this.ws!.send(JSON.stringify({ type: 'hello', sessionId: this.sessionId, name: this.name }));
       });
 
       this.ws!.on('message', (data: Buffer) => {
@@ -79,6 +90,12 @@ export class ConnectionManager extends EventEmitter {
 
   isConnected(): boolean {
     return this.connected;
+  }
+
+  updateEndpoints(endpoints: AgentEndpoint[]): void {
+    if (this.connected && this.ws) {
+      this.ws.send(JSON.stringify({ type: 'update', endpoints }));
+    }
   }
 
   processMessage(msg: { type: string; model?: unknown; changes?: ModelChange[] }): void {

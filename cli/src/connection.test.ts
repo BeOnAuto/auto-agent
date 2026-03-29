@@ -6,11 +6,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ConnectionManager } from './connection.js';
 import { ModelPersistence } from './persistence.js';
 
-let lastFakeWs: EventEmitter & { close: ReturnType<typeof vi.fn> };
+let lastFakeWs: EventEmitter & { close: ReturnType<typeof vi.fn>; send: ReturnType<typeof vi.fn> };
 
 vi.mock('ws', () => ({
   default: class extends EventEmitter {
     close = vi.fn();
+    send = vi.fn();
     constructor(_url: string) {
       super();
       lastFakeWs = this as unknown as typeof lastFakeWs;
@@ -122,6 +123,58 @@ describe('ConnectionManager', () => {
     lastFakeWs.emit('error', new Error('ECONNREFUSED'));
 
     await expect(connectPromise).rejects.toThrow('ECONNREFUSED');
+  });
+
+  it('sends hello message with sessionId and name on open', async () => {
+    const manager = createManager();
+    const connectPromise = manager.connect(5000);
+    await tick();
+
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
+
+    const sent = JSON.parse(lastFakeWs.send.mock.calls[0][0] as string);
+    expect(sent.type).toBe('hello');
+    expect(sent.sessionId).toBe(manager.sessionId);
+    expect(sent.name).toBe(manager.name);
+  });
+
+  it('has a stable sessionId per instance', () => {
+    const manager = createManager();
+    expect(manager.sessionId).toMatch(/^[0-9a-f]{24}$/);
+    expect(manager.sessionId).toBe(manager.sessionId);
+  });
+
+  it('generates unique sessionIds across instances', () => {
+    const a = createManager();
+    const b = createManager();
+    expect(a.sessionId).not.toBe(b.sessionId);
+  });
+
+  it('updateEndpoints sends update message when connected', async () => {
+    const manager = createManager();
+    const connectPromise = manager.connect(5000);
+    await tick();
+
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
+
+    lastFakeWs.send.mockClear();
+    manager.updateEndpoints([{ label: 'Frontend', url: 'http://localhost:5173' }]);
+
+    const sent = JSON.parse(lastFakeWs.send.mock.calls[0][0] as string);
+    expect(sent).toEqual({
+      type: 'update',
+      endpoints: [{ label: 'Frontend', url: 'http://localhost:5173' }],
+    });
+  });
+
+  it('updateEndpoints does nothing when not connected', () => {
+    const manager = createManager();
+    manager.updateEndpoints([{ label: 'Frontend', url: 'http://localhost:5173' }]);
+    expect(lastFakeWs).toBeUndefined;
   });
 
   it('disconnect closes WebSocket and flushes persistence', async () => {
