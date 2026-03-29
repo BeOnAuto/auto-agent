@@ -7,8 +7,9 @@ export function registerConfigureCommand(program: Command): void {
     .command('configure')
     .description('Configure the agent CLI with an API key')
     .requiredOption('--key <api-key>', 'API key (format: ak_<workspaceId>_<secret>)')
-    .action((opts: { key: string }) => {
-      const { key } = opts;
+    .option('--server <url>', 'Server URL', 'https://collaboration-server.on-auto.workers.dev')
+    .action((opts: { key: string; server: string }) => {
+      const { key, server } = opts;
       const result = parseApiKey(key);
 
       if (!result) {
@@ -19,10 +20,10 @@ export function registerConfigureCommand(program: Command): void {
 
       writeConfig({
         apiKey: key,
-        serverUrl: 'https://collaboration-server.on-auto.workers.dev',
+        serverUrl: server,
         workspaceId,
       });
 
-      console.log(`Configuration saved. Workspace: ${workspaceId}`);
+      console.log(`Configuration saved. Workspace: ${workspaceId}, Server: ${server}`);
     });
 }

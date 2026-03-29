@@ -13,19 +13,23 @@ export function registerTools(server: McpServer, deps: ToolDependencies = {}): v
   server.tool(
     'auto_configure',
     'Configure the Auto agent CLI with an API key',
-    { key: z.string().describe('API key in format ak_<workspaceId>_<random>') },
-    async ({ key }) => {
+    {
+      key: z.string().describe('API key in format ak_<workspaceId>_<random>'),
+      server: z.string().optional().describe('Server URL (defaults to production)'),
+    },
+    async ({ key, server }) => {
       const result = parseApiKey(key);
       if (!result) {
         return { content: [{ type: 'text' as const, text: 'Invalid key format. Expected: ak_<workspaceId>_<random>' }] };
       }
       const { workspaceId } = result;
+      const serverUrl = server || 'https://collaboration-server.on-auto.workers.dev';
       writeConfig({
         apiKey: key,
-        serverUrl: 'https://collaboration-server.on-auto.workers.dev',
+        serverUrl,
         workspaceId,
       });
-      return { content: [{ type: 'text' as const, text: `Configured for workspace ${workspaceId}` }] };
+      return { content: [{ type: 'text' as const, text: `Configured for workspace ${workspaceId} (server: ${serverUrl})` }] };
     }
   );
 
