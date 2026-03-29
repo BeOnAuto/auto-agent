@@ -80,11 +80,44 @@ describe('ModelPersistence', () => {
     const model = { narratives: ['happy-path'] };
 
     persistence.update(model);
-    // destroy immediately without waiting for debounce
     persistence.destroy();
 
     expect(existsSync(modelPath)).toBe(true);
     const written = JSON.parse(readFileSync(modelPath, 'utf-8'));
     expect(written).toEqual(model);
+  });
+
+  it('appendChange writes change as JSONL and readAndClearChanges returns and truncates', () => {
+    const persistence = new ModelPersistence(modelPath);
+
+    persistence.appendChange({ action: 'added', entityType: 'scene', id: 's1', name: 'Login' });
+    persistence.appendChange({ action: 'updated', entityType: 'message', id: 'm1', name: 'CreateUser' });
+
+    const changes = persistence.readAndClearChanges();
+    expect(changes).toEqual([
+      { action: 'added', entityType: 'scene', id: 's1', name: 'Login' },
+      { action: 'updated', entityType: 'message', id: 'm1', name: 'CreateUser' },
+    ]);
+
+    expect(persistence.readAndClearChanges()).toEqual([]);
+  });
+
+  it('readAndClearChanges returns empty array when no changes file exists', () => {
+    const persistence = new ModelPersistence(modelPath);
+    expect(persistence.readAndClearChanges()).toEqual([]);
+  });
+
+  it('readModel returns parsed model from disk', () => {
+    const persistence = new ModelPersistence(modelPath);
+    const model = { scenes: [{ id: 's1' }] };
+    persistence.update(model);
+    persistence.flush();
+
+    expect(persistence.readModel()).toEqual(model);
+  });
+
+  it('readModel returns null when no file exists', () => {
+    const persistence = new ModelPersistence(modelPath);
+    expect(persistence.readModel()).toEqual(null);
   });
 });
