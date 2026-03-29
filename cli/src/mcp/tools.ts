@@ -121,7 +121,7 @@ export function registerTools(server: McpServer, deps: ToolDependencies = {}): v
 
   server.tool(
     'auto_update_endpoints',
-    'Register endpoints (services, dev servers) that this agent exposes. Updates are sent to the collaboration server for sidebar rendering.',
+    'Report dev server endpoints (Frontend, Backend, Storybook, etc.) to the collaboration server. Call this after starting a dev server. Each call replaces all previous endpoints.',
     {
       endpoints: z.array(z.object({
         label: z.string().describe('Display label for the endpoint (e.g. "Frontend", "Backend")'),
@@ -137,7 +137,8 @@ export function registerTools(server: McpServer, deps: ToolDependencies = {}): v
       }
       const typedEndpoints: AgentEndpoint[] = endpoints;
       deps.daemon.connection.updateEndpoints(typedEndpoints);
-      return { content: [{ type: 'text' as const, text: `Updated ${endpoints.length} endpoint(s).` }] };
+      const summary = endpoints.map((e: AgentEndpoint) => `${e.label}: ${e.url}`).join(', ');
+      return { content: [{ type: 'text' as const, text: `Updated ${endpoints.length} endpoint(s): ${summary}` }] };
     }
   );
 }

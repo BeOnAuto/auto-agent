@@ -167,7 +167,7 @@ describe('MCP tools', () => {
       { label: 'Backend', url: 'http://localhost:3000' },
     ];
     const result = await callTool(server, 'auto_update_endpoints', { endpoints });
-    expect(getText(result)).toBe('Updated 2 endpoint(s).');
+    expect(getText(result)).toBe('Updated 2 endpoint(s): Frontend: http://localhost:5173, Backend: http://localhost:3000');
     expect(updateEndpointsFn).toHaveBeenCalledWith(endpoints);
   });
 });
