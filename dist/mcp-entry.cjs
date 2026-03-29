@@ -1,3 +1,3 @@
-import { createProgram } from './auto-agent.mjs';
+const { createProgram } = require('./auto-agent.cjs');
 const program = createProgram();
 program.parse(['node', 'auto-agent', 'mcp']);
