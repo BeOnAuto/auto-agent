@@ -1,0 +1,9 @@
+{
+  "name": "auto-agent",
+  "private": true,
+  "scripts": {
+    "build": "cd cli && pnpm build",
+    "test": "cd cli && pnpm test",
+    "prepare": "cd cli && pnpm install && pnpm build"
+  }
+}
