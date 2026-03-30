@@ -227,4 +227,38 @@ describe('ConnectionManager', () => {
     expect(manager.isConnected()).toBe(false);
     expect(lastFakeWs.close).toHaveBeenCalled();
   });
+
+  it('emits error on malformed message data', async () => {
+    const manager = createManager();
+    const errors: Error[] = [];
+    manager.on('error', (err: Error) => errors.push(err));
+    const connectPromise = manager.connect(5000);
+    await tick();
+
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from('not json'));
+
+    // Send valid full message so connect resolves
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
+
+    expect(errors.length).toBe(1);
+  });
+
+  it('emits disconnected on WebSocket close', async () => {
+    const manager = createManager();
+    const events: string[] = [];
+    manager.on('disconnected', () => events.push('disconnected'));
+    const connectPromise = manager.connect(5000);
+    await tick();
+
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
+
+    expect(manager.isConnected()).toBe(true);
+    lastFakeWs.emit('close');
+    expect(manager.isConnected()).toBe(false);
+    expect(events).toEqual(['disconnected']);
+  });
 });

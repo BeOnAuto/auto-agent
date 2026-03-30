@@ -26,5 +26,6 @@ Parse "$ARGUMENTS" to determine build scope:
 5. Run all tests for the affected scope
 6. If any model inconsistencies are found, correct them and validate via `auto_send_model`
 7. If dev servers are running, report their URLs via `auto_update_endpoints`
-8. Summarize: slices generated/updated, tests passing/failing, any model corrections made
-9. Celebrate with a virtual high-five 🖐️
+8. Show the **loopback URLs** returned by `auto_update_endpoints` to the user — these are the URLs that open the running app inside Auto (e.g. `https://app.on.auto/{workspaceId}/agent/{sessionId}/{label}`). Always show these instead of raw localhost URLs. For frontend apps, show the web application URL. For GraphQL APIs, show the playground. For REST APIs, show Swagger or the base API URL.
+9. Summarize: slices generated/updated, tests passing/failing, any model corrections made
+10. Celebrate with a virtual high-five 🖐️

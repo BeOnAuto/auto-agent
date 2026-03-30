@@ -9,6 +9,11 @@ import { readConfig, setConfigDir, writeConfig } from '../config.js';
 import { ModelPersistence } from '../persistence.js';
 import type { ToolDependencies } from './tools.js';
 
+const mockStartDaemon = vi.fn();
+vi.mock('./daemon.js', () => ({
+  startDaemon: (...args: unknown[]) => mockStartDaemon(...args),
+}));
+
 async function callTool(server: ReturnType<typeof createMcpServer>, toolName: string, args: Record<string, unknown> = {}) {
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   const client = new Client({ name: 'test-client', version: '0.1.0' });
@@ -33,6 +38,7 @@ describe('MCP tools', () => {
     process.chdir(tempDir);
     setConfigDir(join(tempDir, '.auto-agent'));
     originalFetch = globalThis.fetch;
+    mockStartDaemon.mockReset();
   });
 
   afterEach(() => {
@@ -158,16 +164,165 @@ describe('MCP tools', () => {
   });
 
   it('auto_update_endpoints calls updateEndpoints on daemon connection', async () => {
+    writeConfig({ apiKey: 'ak_ws123_secret', serverUrl: 'http://localhost:8787', workspaceId: 'ws123' });
     const deps = createDepsWithPersistence();
     const updateEndpointsFn = vi.fn();
     (deps.daemon!.connection as Record<string, unknown>).updateEndpoints = updateEndpointsFn;
+    (deps.daemon!.connection as Record<string, unknown>).sessionId = 'abc123def456';
     const server = createMcpServer(deps);
     const endpoints = [
       { label: 'Frontend', url: 'http://localhost:5173' },
       { label: 'Backend', url: 'http://localhost:3000' },
     ];
     const result = await callTool(server, 'auto_update_endpoints', { endpoints });
-    expect(getText(result)).toBe('Updated 2 endpoint(s): Frontend: http://localhost:5173, Backend: http://localhost:3000');
+    expect(getText(result)).toBe(
+      'Updated 2 endpoint(s):\n' +
+      'Frontend: https://app.on.auto/ws123/agent/abc123def456/Frontend\n' +
+      'Backend: https://app.on.auto/ws123/agent/abc123def456/Backend'
+    );
     expect(updateEndpointsFn).toHaveBeenCalledWith(endpoints);
+  });
+
+  it('auto_configure uses default server URL when none provided', async () => {
+    const fakeDaemon = {
+      persistence: new ModelPersistence(join(tempDir, '.auto-agent', 'model2.json')),
+      connection: { disconnect: vi.fn(), isConnected: () => true } as any,
+    };
+    mockStartDaemon.mockResolvedValue(fakeDaemon);
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_configure', { key: 'ak_ws1_secret123' });
+    expect(getText(result)).toBe('Connected to workspace ws1 (server: https://collaboration-server.on-auto.workers.dev)');
+    const config = readConfig();
+    expect(config!.serverUrl).toBe('https://collaboration-server.on-auto.workers.dev');
+  });
+
+  it('auto_configure disconnects existing daemon and calls onDaemonStarted', async () => {
+    const oldDisconnect = vi.fn();
+    const onDaemonStarted = vi.fn();
+    const existingDeps: ToolDependencies = {
+      daemon: {
+        persistence: new ModelPersistence(join(tempDir, '.auto-agent', 'model3.json')),
+        connection: { disconnect: oldDisconnect, isConnected: () => true } as any,
+      },
+      onDaemonStarted,
+    };
+    const newDaemon = {
+      persistence: new ModelPersistence(join(tempDir, '.auto-agent', 'model4.json')),
+      connection: { disconnect: vi.fn(), isConnected: () => true } as any,
+    };
+    mockStartDaemon.mockResolvedValue(newDaemon);
+    const server = createMcpServer(existingDeps);
+    const result = await callTool(server, 'auto_configure', {
+      key: 'ak_ws2_secret456',
+      server: 'https://custom.server.com',
+    });
+    expect(oldDisconnect).toHaveBeenCalled();
+    expect(onDaemonStarted).toHaveBeenCalledWith(newDaemon);
+    expect(getText(result)).toBe('Connected to workspace ws2 (server: https://custom.server.com)');
+  });
+
+  it('auto_configure returns fallback message on connection failure', async () => {
+    mockStartDaemon.mockRejectedValue(new Error('Connection refused'));
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_configure', {
+      key: 'ak_ws3_secret789',
+      server: 'https://bad.server.com',
+    });
+    expect(getText(result)).toBe('Configured for workspace ws3 but connection failed: Connection refused. Tools will use HTTP fallback.');
+  });
+
+  it('auto_get_model returns error when HTTP fallback fails', async () => {
+    writeConfig({ apiKey: 'ak_ws1_abc', serverUrl: 'https://example.com', workspaceId: 'ws1' });
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_get_model');
+    expect(getText(result)).toBe('Error fetching model: Network error');
+  });
+
+  it('auto_send_model succeeds with no corrections', async () => {
+    writeConfig({ apiKey: 'ak_ws1_abc', serverUrl: 'https://example.com', workspaceId: 'ws1' });
+    const responseModel = { scenes: [] };
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ model: responseModel, correctionCount: 0, corrections: [] }),
+    });
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_send_model', { model: '{"scenes":[]}' });
+    expect(getText(result)).toContain('No corrections needed.');
+    expect(getText(result)).toContain(JSON.stringify(responseModel, null, 2));
+  });
+
+  it('auto_send_model succeeds with corrections', async () => {
+    writeConfig({ apiKey: 'ak_ws1_abc', serverUrl: 'https://example.com', workspaceId: 'ws1' });
+    const responseModel = { scenes: [{ id: 's1' }] };
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ model: responseModel, correctionCount: 2, corrections: ['Fixed ID', 'Added name'] }),
+    });
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_send_model', { model: '{"scenes":[]}' });
+    expect(getText(result)).toContain('Applied 2 corrections:');
+    expect(getText(result)).toContain('- Fixed ID');
+    expect(getText(result)).toContain('- Added name');
+  });
+
+  it('auto_send_model returns error when HTTP request fails', async () => {
+    writeConfig({ apiKey: 'ak_ws1_abc', serverUrl: 'https://example.com', workspaceId: 'ws1' });
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error('Server error'));
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_send_model', { model: '{}' });
+    expect(getText(result)).toBe('Error sending model: Server error');
+  });
+
+  it('auto_configure handles non-Error throw with Unknown error', async () => {
+    mockStartDaemon.mockRejectedValue('string-error');
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_configure', {
+      key: 'ak_ws4_secret',
+      server: 'https://bad.server.com',
+    });
+    expect(getText(result)).toContain('Unknown error');
+  });
+
+  it('auto_get_model falls through to HTTP when daemon has no model', async () => {
+    writeConfig({ apiKey: 'ak_ws1_abc', serverUrl: 'https://example.com', workspaceId: 'ws1' });
+    const deps = createDepsWithPersistence();
+    // persistence has no model written, so readModel() returns null
+    const httpModel = { scenes: [{ id: 's2' }] };
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ model: httpModel }),
+    });
+    const server = createMcpServer(deps);
+    const result = await callTool(server, 'auto_get_model');
+    expect(JSON.parse(getText(result))).toEqual(httpModel);
+  });
+
+  it('auto_get_model returns Unknown error for non-Error throw', async () => {
+    writeConfig({ apiKey: 'ak_ws1_abc', serverUrl: 'https://example.com', workspaceId: 'ws1' });
+    globalThis.fetch = vi.fn().mockRejectedValue('string-error');
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_get_model');
+    expect(getText(result)).toBe('Error fetching model: Unknown error');
+  });
+
+  it('auto_send_model returns Unknown error for non-Error throw', async () => {
+    writeConfig({ apiKey: 'ak_ws1_abc', serverUrl: 'https://example.com', workspaceId: 'ws1' });
+    globalThis.fetch = vi.fn().mockRejectedValue('string-error');
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_send_model', { model: '{}' });
+    expect(getText(result)).toBe('Error sending model: Unknown error');
+  });
+
+  it('auto_update_endpoints uses empty workspaceId when no config', async () => {
+    // No config written, but daemon exists
+    const deps = createDepsWithPersistence();
+    const updateEndpointsFn = vi.fn();
+    (deps.daemon!.connection as Record<string, unknown>).updateEndpoints = updateEndpointsFn;
+    (deps.daemon!.connection as Record<string, unknown>).sessionId = 'abc123def456';
+    const server = createMcpServer(deps);
+    const endpoints = [{ label: 'Frontend', url: 'http://localhost:5173' }];
+    const result = await callTool(server, 'auto_update_endpoints', { endpoints });
+    expect(getText(result)).toContain('https://app.on.auto//agent/abc123def456/Frontend');
   });
 });

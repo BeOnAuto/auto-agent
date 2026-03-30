@@ -137,8 +137,17 @@ export function registerTools(server: McpServer, deps: ToolDependencies = {}): v
       }
       const typedEndpoints: AgentEndpoint[] = endpoints;
       deps.daemon.connection.updateEndpoints(typedEndpoints);
-      const summary = endpoints.map((e: AgentEndpoint) => `${e.label}: ${e.url}`).join(', ');
-      return { content: [{ type: 'text' as const, text: `Updated ${endpoints.length} endpoint(s): ${summary}` }] };
+
+      const config = readConfig();
+      const workspaceId = config?.workspaceId ?? '';
+      const sessionId = deps.daemon.connection.sessionId;
+      const baseAppUrl = 'https://app.on.auto';
+
+      const lines = endpoints.map((e: AgentEndpoint) => {
+        const loopbackUrl = `${baseAppUrl}/${workspaceId}/agent/${sessionId}/${encodeURIComponent(e.label)}`;
+        return `${e.label}: ${loopbackUrl}`;
+      });
+      return { content: [{ type: 'text' as const, text: `Updated ${endpoints.length} endpoint(s):\n${lines.join('\n')}` }] };
     }
   );
 }

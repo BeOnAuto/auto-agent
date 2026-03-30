@@ -94,12 +94,32 @@ describe('connect command', () => {
     expect(process.exitCode).toBe(1);
   });
 
+  it('catches non-Error throw with fallback message', async () => {
+    writeConfigFile();
+    mockConnectFn.mockRejectedValue('string-error');
+    const program = createProgram();
+    await program.parseAsync(['node', 'auto-agent', 'connect']);
+    expect(stderrOutput).toContain('Error: Connection failed');
+    expect(process.exitCode).toBe(1);
+  });
+
   it('SIGINT handler disconnects', async () => {
     writeConfigFile();
     const program = createProgram();
     await program.parseAsync(['node', 'auto-agent', 'connect']);
     const exitMock = vi.spyOn(process, 'exit').mockImplementation((() => {}) as never);
     process.emit('SIGINT');
+    expect(mockDisconnectFn).toHaveBeenCalled();
+    expect(exitMock).toHaveBeenCalledWith(0);
+    exitMock.mockRestore();
+  });
+
+  it('SIGTERM handler disconnects', async () => {
+    writeConfigFile();
+    const program = createProgram();
+    await program.parseAsync(['node', 'auto-agent', 'connect']);
+    const exitMock = vi.spyOn(process, 'exit').mockImplementation((() => {}) as never);
+    process.emit('SIGTERM');
     expect(mockDisconnectFn).toHaveBeenCalled();
     expect(exitMock).toHaveBeenCalledWith(0);
     exitMock.mockRestore();
