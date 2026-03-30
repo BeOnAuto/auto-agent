@@ -5,7 +5,7 @@ const GetModelResponseSchema = z.object({
 });
 
 const SendModelResponseSchema = z.object({
-  model: z.unknown(),
+  model: z.any(),
   corrections: z.array(z.string()),
   correctionCount: z.number(),
 });
@@ -30,7 +30,7 @@ export class AgentClient {
   async sendModel(
     workspaceId: string,
     model: unknown,
-  ): Promise<{ model: unknown; corrections: string[]; correctionCount: number }> {
+  ): Promise<z.infer<typeof SendModelResponseSchema>> {
     const response = await fetch(`${this.serverUrl}/api/agent/model/${workspaceId}`, {
       method: 'POST',
       headers: {
