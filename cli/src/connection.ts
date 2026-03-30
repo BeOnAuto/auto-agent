@@ -1,7 +1,37 @@
 import { randomBytes } from 'node:crypto';
 import { EventEmitter } from 'node:events';
-import { hostname } from 'node:os';
+import { hostname, userInfo, platform } from 'node:os';
+import { execSync } from 'node:child_process';
 import type { ModelPersistence } from './persistence.js';
+
+function gitUserName(): string | null {
+  try {
+    return execSync('git config user.name', { encoding: 'utf8', timeout: 2000 }).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+function buildAgentName(sessionId: string): string {
+  const gitName = gitUserName();
+  const raw = gitName
+    ? gitName.split(/\s+/)[0]
+    : userInfo().username;
+  const firstName = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+  const shortId = sessionId.slice(0, 4);
+  return `${firstName}·${shortId}`;
+}
+
+function buildAgentStatus(): Record<string, string> {
+  const status: Record<string, string> = {};
+  const git = gitUserName();
+  if (git) status.user = git;
+  status.username = userInfo().username;
+  status.hostname = hostname().replace(/\.local$/, '');
+  status.platform = platform();
+  status.cwd = process.cwd();
+  return status;
+}
 
 export interface ModelChange {
   action: 'added' | 'removed' | 'updated';
@@ -29,10 +59,12 @@ export class ConnectionManager extends EventEmitter {
   private endpoints: AgentEndpoint[] = [];
   readonly sessionId = randomBytes(12).toString('hex');
   readonly name: string;
+  readonly status: Record<string, string>;
 
   constructor(private options: ConnectionManagerOptions) {
     super();
-    this.name = hostname();
+    this.name = buildAgentName(this.sessionId);
+    this.status = buildAgentStatus();
   }
 
   async connect(timeoutMs = 10000): Promise<void> {
@@ -51,7 +83,7 @@ export class ConnectionManager extends EventEmitter {
 
       this.ws!.on('open', () => {
         this.connected = true;
-        this.ws!.send(JSON.stringify({ type: 'hello', sessionId: this.sessionId, name: this.name }));
+        this.ws!.send(JSON.stringify({ type: 'hello', sessionId: this.sessionId, name: this.name, status: this.status }));
         if (this.endpoints.length > 0) {
           this.sendEndpoints();
         }

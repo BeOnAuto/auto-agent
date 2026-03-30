@@ -207,7 +207,7 @@ describe('ConnectionManager', () => {
 
     const openSendCalls = lastFakeWs.send.mock.calls.map((c: unknown[]) => JSON.parse(c[0] as string));
     expect(openSendCalls).toEqual([
-      { type: 'hello', sessionId: manager.sessionId, name: manager.name },
+      { type: 'hello', sessionId: manager.sessionId, name: manager.name, status: manager.status },
       { type: 'update', endpoints: [{ label: 'Frontend', url: 'http://localhost:5173' }] },
     ]);
 
