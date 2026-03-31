@@ -25,7 +25,7 @@ Parse "$ARGUMENTS" to determine build scope:
    - For each scene: create acceptance tests
 5. Run all tests for the affected scope
 6. If any model inconsistencies are found, correct them and validate via `auto_send_model`
-7. If dev servers are running, report their URLs via `auto_update_endpoints`
-8. Show the **loopback URLs** returned by `auto_update_endpoints` to the user — these are the URLs that open the running app inside Auto (e.g. `https://app.on.auto/{workspaceId}/agent/{sessionId}/{label}`). Always show these instead of raw localhost URLs. For frontend apps, show the web application URL. For GraphQL APIs, show the playground. For REST APIs, show Swagger or the base API URL.
+7. If dev servers are running, report their URLs via `auto_update_endpoints`. If the call fails due to a disconnected WebSocket, note which endpoints need to be reported — once the user reconnects (via `/auto-agent:connect`), immediately re-call `auto_update_endpoints` with those endpoints.
+8. Show the **loopback URLs** returned by `auto_update_endpoints` to the user — these are the URLs that open the running app inside Auto (e.g. `https://app.on.auto/{workspaceId}/agent/{sessionId}/{label}`). Always show these instead of raw localhost URLs. The tool response contains the loopback URLs — parse and display them verbatim. For frontend apps, show the web application URL. For GraphQL APIs, show the playground. For REST APIs, show Swagger or the base API URL. If the initial call failed and you re-called after reconnection, show the loopback URLs from the successful call at that point.
 9. Summarize: slices generated/updated, tests passing/failing, any model corrections made
 10. Celebrate with a virtual high-five 🖐️
