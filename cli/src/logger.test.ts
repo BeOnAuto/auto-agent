@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { rmSync } from 'node:fs';
-import { createLogger } from './logger.js';
+import { createLogger, getLogger, resetLogger } from './logger.js';
+import { setConfigDir } from './config.js';
 
 const FIXED_DATE = new Date('2026-01-15T10:30:00.000Z');
 const FIXED_NOW = () => FIXED_DATE;
@@ -86,5 +87,44 @@ describe('createLogger', () => {
 
     const content = readFileSync(join(dir, 'test.log'), 'utf-8');
     expect(content).toEqual(`${TS} [INFO] [tools] called {"key":"ak_123_abc"}\n`);
+  });
+});
+
+describe('getLogger', () => {
+  let dir: string;
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), 'logger-shared-'));
+    setConfigDir(join(dir, '.auto-agent'));
+    resetLogger();
+  });
+
+  afterEach(() => {
+    resetLogger();
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('writes to auto-agent.log inside the config directory', () => {
+    const logger = getLogger();
+
+    logger.info('test', 'hello');
+
+    const logPath = join(dir, '.auto-agent', 'auto-agent.log');
+    expect(existsSync(logPath)).toBe(true);
+  });
+
+  it('returns the same instance on repeated calls', () => {
+    const first = getLogger();
+    const second = getLogger();
+
+    expect(first).toBe(second);
+  });
+
+  it('returns a fresh instance after resetLogger', () => {
+    const first = getLogger();
+    resetLogger();
+    const second = getLogger();
+
+    expect(first).not.toBe(second);
   });
 });

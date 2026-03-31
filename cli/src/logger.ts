@@ -1,5 +1,6 @@
 import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path';
+import { getConfigDir } from './config.js';
 
 export interface Logger {
   info(tag: string, message: string, extra?: unknown): void;
@@ -12,6 +13,19 @@ function formatExtra(extra: unknown): string {
     return `: ${extra.message}\n${extra.stack}`;
   }
   return ` ${JSON.stringify(extra)}`;
+}
+
+let sharedLogger: Logger | null = null;
+
+export function getLogger(): Logger {
+  if (!sharedLogger) {
+    sharedLogger = createLogger(join(getConfigDir(), 'auto-agent.log'));
+  }
+  return sharedLogger;
+}
+
+export function resetLogger(): void {
+  sharedLogger = null;
 }
 
 export function createLogger(logPath: string, now: () => Date = () => new Date()): Logger {
