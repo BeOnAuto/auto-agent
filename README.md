@@ -58,14 +58,52 @@ Build your app:
 
 Your coding agent does the implementation. Auto keeps it honest.
 
-## Structure
+## Transparency
+
+This plugin is fully open source. Here's exactly what it does and what it doesn't do.
+
+### What the plugin accesses
+
+| What | Direction | Purpose |
+|------|-----------|---------|
+| Your narrative model | Auto → your machine | Syncs your specifications so your agent can build from them |
+| Model corrections | Your machine → Auto | Sends structural fixes back so your model stays valid |
+| Dev server URLs | Your machine → Auto | Reports `localhost` endpoints so you can preview your app inside Auto |
+| API key | Stored locally | Authenticates your agent to your workspace |
+
+### What it does NOT do
+
+- **No code is uploaded.** Your source code never leaves your machine.
+- **No telemetry.** No usage tracking, no analytics, no phone-home.
+- **No filesystem scanning.** The plugin only reads/writes inside `.auto-agent/` in your project.
+- **No network calls beyond your Auto workspace.** All communication goes to the Auto API you connected to — nothing else.
+
+### Source files
+
+The entire plugin logic lives in a handful of files:
+
+| File | What it does |
+|------|-------------|
+| [`cli/src/mcp/tools.ts`](cli/src/mcp/tools.ts) | The 5 MCP tools — the only interface between your agent and Auto |
+| [`cli/src/connection.ts`](cli/src/connection.ts) | WebSocket sync — how model updates flow in real time |
+| [`cli/src/client.ts`](cli/src/client.ts) | HTTP client — every network call the plugin makes |
+| [`cli/src/persistence.ts`](cli/src/persistence.ts) | Local file cache — what gets written to disk |
+| [`commands/`](commands/) | Slash commands (`connect` and `build`) |
+| [`skills/`](skills/) | Build instructions — how your agent turns specs into code |
+| [`hooks/`](hooks/) | Session-start hook that provides workspace context |
+
+### How the data flows
 
 ```
-cli/          CLI and MCP tools (configure, connect, get-model, send-model)
-commands/     Slash commands for your coding agent (connect, build)
-skills/       Skills that teach your agent how to build from narratives
-hooks/        Event hooks for the plugin lifecycle
+Auto Workspace (cloud)
+    ↕ WebSocket (model sync)
+Plugin (your machine)
+    ↕ MCP tools (local only)
+Your Coding Agent (Claude Code)
+    → builds code locally
 ```
+
+The plugin is a bridge between your Auto workspace and your local coding agent. It never touches your source code — it only passes the narrative model and build instructions.
 
 ## Part of the ecosystem
 
