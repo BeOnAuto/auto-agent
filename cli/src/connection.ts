@@ -3,6 +3,7 @@ import { EventEmitter } from 'node:events';
 import { hostname, userInfo, platform } from 'node:os';
 import { execSync } from 'node:child_process';
 import type { ModelPersistence } from './persistence.js';
+import { getLogger } from './logger.js';
 
 function gitUserName(): string | null {
   try {
@@ -79,15 +80,18 @@ export class ConnectionManager extends EventEmitter {
   }
 
   private async doConnect(timeoutMs: number, rejectOnError: boolean): Promise<void> {
+    const log = getLogger();
     const WebSocket = (await import('ws')).default;
 
     const wsUrl = this.options.serverUrl.replace(/^http/, 'ws');
     const url = `${wsUrl}/api/agent/model/${this.options.workspaceId}/stream?key=${this.options.apiKey}`;
 
+    log.info('connection', `connecting to ${wsUrl}`, { workspaceId: this.options.workspaceId, sessionId: this.sessionId });
     this.ws = new WebSocket(url);
 
     return new Promise<void>((resolve, reject) => {
       const timeout = setTimeout(() => {
+        log.error('connection', `timeout after ${timeoutMs}ms`);
         this.ws?.close();
         this.ws = null;
         if (rejectOnError) {
@@ -99,6 +103,7 @@ export class ConnectionManager extends EventEmitter {
       }, timeoutMs);
 
       this.ws!.on('open', () => {
+        log.info('connection', 'websocket open, sending hello');
         this.connected = true;
         this.ws!.send(JSON.stringify({ type: 'hello', sessionId: this.sessionId, name: this.name, status: this.status }));
         if (this.endpoints.length > 0) {
@@ -109,6 +114,7 @@ export class ConnectionManager extends EventEmitter {
       this.ws!.on('message', (data: Buffer) => {
         try {
           const msg = JSON.parse(data.toString());
+          log.info('connection', `received message type=${msg.type}`);
           this.processMessage(msg);
           if (msg.type === 'full') {
             clearTimeout(timeout);
@@ -116,17 +122,20 @@ export class ConnectionManager extends EventEmitter {
             resolve();
           }
         } catch (err) {
+          log.error('connection', 'failed to process message', err instanceof Error ? err : new Error(String(err)));
           this.emit('error', err);
         }
       });
 
       this.ws!.on('close', () => {
+        log.warn('connection', 'websocket closed');
         this.connected = false;
         this.emit('disconnected');
         this.scheduleReconnect();
       });
 
       this.ws!.on('error', (err: Error) => {
+        log.error('connection', 'websocket error', err);
         clearTimeout(timeout);
         if (rejectOnError) {
           reject(err);
@@ -138,17 +147,24 @@ export class ConnectionManager extends EventEmitter {
 
   private scheduleReconnect(): void {
     if (this.disposed) return;
+    const log = getLogger();
     const delay = Math.min(BASE_RECONNECT_MS * Math.pow(2, this.reconnectAttempts), MAX_RECONNECT_MS);
     this.reconnectAttempts++;
+    log.info('connection', `scheduling reconnect attempt ${this.reconnectAttempts} in ${delay}ms`);
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
       if (!this.disposed) {
-        this.doConnect(10000, false).catch(() => {});
+        log.info('connection', 'attempting reconnect');
+        this.doConnect(10000, false).catch((err) => {
+          log.error('connection', 'reconnect failed', err instanceof Error ? err : new Error(String(err)));
+        });
       }
     }, delay);
   }
 
   disconnect(): void {
+    const log = getLogger();
+    log.info('connection', 'disconnecting');
     this.disposed = true;
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
