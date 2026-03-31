@@ -53,9 +53,15 @@ export interface AgentEndpoint {
   url: string;
 }
 
+const BASE_RECONNECT_MS = 3000;
+const MAX_RECONNECT_MS = 30000;
+
 export class ConnectionManager extends EventEmitter {
   private ws: import('ws').WebSocket | null = null;
   private connected = false;
+  private disposed = false;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private reconnectAttempts = 0;
   private endpoints: AgentEndpoint[] = [];
   readonly sessionId = randomBytes(12).toString('hex');
   readonly name: string;
@@ -68,6 +74,11 @@ export class ConnectionManager extends EventEmitter {
   }
 
   async connect(timeoutMs = 10000): Promise<void> {
+    this.disposed = false;
+    await this.doConnect(timeoutMs, true);
+  }
+
+  private async doConnect(timeoutMs: number, rejectOnError: boolean): Promise<void> {
     const WebSocket = (await import('ws')).default;
 
     const wsUrl = this.options.serverUrl.replace(/^http/, 'ws');
@@ -77,8 +88,14 @@ export class ConnectionManager extends EventEmitter {
 
     return new Promise<void>((resolve, reject) => {
       const timeout = setTimeout(() => {
-        this.disconnect();
-        reject(new Error(`Connection timeout after ${timeoutMs}ms`));
+        this.ws?.close();
+        this.ws = null;
+        if (rejectOnError) {
+          this.disposed = true;
+          reject(new Error(`Connection timeout after ${timeoutMs}ms`));
+        } else {
+          this.scheduleReconnect();
+        }
       }, timeoutMs);
 
       this.ws!.on('open', () => {
@@ -95,6 +112,7 @@ export class ConnectionManager extends EventEmitter {
           this.processMessage(msg);
           if (msg.type === 'full') {
             clearTimeout(timeout);
+            this.reconnectAttempts = 0;
             resolve();
           }
         } catch (err) {
@@ -105,17 +123,37 @@ export class ConnectionManager extends EventEmitter {
       this.ws!.on('close', () => {
         this.connected = false;
         this.emit('disconnected');
+        this.scheduleReconnect();
       });
 
       this.ws!.on('error', (err: Error) => {
         clearTimeout(timeout);
-        reject(err);
+        if (rejectOnError) {
+          reject(err);
+        }
         this.emit('error', err);
       });
     });
   }
 
+  private scheduleReconnect(): void {
+    if (this.disposed) return;
+    const delay = Math.min(BASE_RECONNECT_MS * Math.pow(2, this.reconnectAttempts), MAX_RECONNECT_MS);
+    this.reconnectAttempts++;
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      if (!this.disposed) {
+        this.doConnect(10000, false).catch(() => {});
+      }
+    }, delay);
+  }
+
   disconnect(): void {
+    this.disposed = true;
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
     if (this.ws) {
       this.ws.close();
       this.ws = null;

@@ -10917,7 +10917,7 @@ function buildAgentStatus() {
   status.cwd = process.cwd();
   return status;
 }
-var import_node_crypto, import_node_events, import_node_os, import_node_child_process, ConnectionManager;
+var import_node_crypto, import_node_events, import_node_os, import_node_child_process, BASE_RECONNECT_MS, MAX_RECONNECT_MS, ConnectionManager;
 var init_connection = __esm({
   "cli/dist/src/connection.js"() {
     "use strict";
@@ -10925,10 +10925,15 @@ var init_connection = __esm({
     import_node_events = require("node:events");
     import_node_os = require("node:os");
     import_node_child_process = require("node:child_process");
+    BASE_RECONNECT_MS = 3e3;
+    MAX_RECONNECT_MS = 3e4;
     ConnectionManager = class extends import_node_events.EventEmitter {
       options;
       ws = null;
       connected = false;
+      disposed = false;
+      reconnectTimer = null;
+      reconnectAttempts = 0;
       endpoints = [];
       sessionId = (0, import_node_crypto.randomBytes)(12).toString("hex");
       name;
@@ -10940,14 +10945,24 @@ var init_connection = __esm({
         this.status = buildAgentStatus();
       }
       async connect(timeoutMs = 1e4) {
+        this.disposed = false;
+        await this.doConnect(timeoutMs, true);
+      }
+      async doConnect(timeoutMs, rejectOnError) {
         const WebSocket2 = (await Promise.resolve().then(() => (init_wrapper(), wrapper_exports))).default;
         const wsUrl = this.options.serverUrl.replace(/^http/, "ws");
         const url = `${wsUrl}/api/agent/model/${this.options.workspaceId}/stream?key=${this.options.apiKey}`;
         this.ws = new WebSocket2(url);
         return new Promise((resolve2, reject) => {
           const timeout = setTimeout(() => {
-            this.disconnect();
-            reject(new Error(`Connection timeout after ${timeoutMs}ms`));
+            this.ws?.close();
+            this.ws = null;
+            if (rejectOnError) {
+              this.disposed = true;
+              reject(new Error(`Connection timeout after ${timeoutMs}ms`));
+            } else {
+              this.scheduleReconnect();
+            }
           }, timeoutMs);
           this.ws.on("open", () => {
             this.connected = true;
@@ -10962,6 +10977,7 @@ var init_connection = __esm({
               this.processMessage(msg);
               if (msg.type === "full") {
                 clearTimeout(timeout);
+                this.reconnectAttempts = 0;
                 resolve2();
               }
             } catch (err) {
@@ -10971,15 +10987,36 @@ var init_connection = __esm({
           this.ws.on("close", () => {
             this.connected = false;
             this.emit("disconnected");
+            this.scheduleReconnect();
           });
           this.ws.on("error", (err) => {
             clearTimeout(timeout);
-            reject(err);
+            if (rejectOnError) {
+              reject(err);
+            }
             this.emit("error", err);
           });
         });
       }
+      scheduleReconnect() {
+        if (this.disposed)
+          return;
+        const delay = Math.min(BASE_RECONNECT_MS * Math.pow(2, this.reconnectAttempts), MAX_RECONNECT_MS);
+        this.reconnectAttempts++;
+        this.reconnectTimer = setTimeout(() => {
+          this.reconnectTimer = null;
+          if (!this.disposed) {
+            this.doConnect(1e4, false).catch(() => {
+            });
+          }
+        }, delay);
+      }
       disconnect() {
+        this.disposed = true;
+        if (this.reconnectTimer) {
+          clearTimeout(this.reconnectTimer);
+          this.reconnectTimer = null;
+        }
         if (this.ws) {
           this.ws.close();
           this.ws = null;

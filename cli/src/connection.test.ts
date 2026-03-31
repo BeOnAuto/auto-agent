@@ -261,4 +261,140 @@ describe('ConnectionManager', () => {
     expect(manager.isConnected()).toBe(false);
     expect(events).toEqual(['disconnected']);
   });
+
+  it('auto-reconnects after WebSocket close', async () => {
+    const manager = createManager();
+    const connectPromise = manager.connect(5000);
+    await tick();
+
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
+
+    // Drop the connection
+    const firstWs = lastFakeWs;
+    firstWs.emit('close');
+    expect(manager.isConnected()).toBe(false);
+
+    // Wait for reconnect (base delay is 3s)
+    await new Promise((r) => setTimeout(r, 3500));
+
+    // A new WebSocket should have been created
+    expect(lastFakeWs).not.toBe(firstWs);
+
+    // Simulate successful reconnection
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: { reconnected: true } })));
+    await tick();
+
+    expect(manager.isConnected()).toBe(true);
+
+    manager.disconnect();
+  }, 10000);
+
+  it('re-sends hello and endpoints on reconnect', async () => {
+    const manager = createManager();
+    const connectPromise = manager.connect(5000);
+    await tick();
+
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
+
+    manager.updateEndpoints([{ label: 'Frontend', url: 'http://localhost:5173' }]);
+
+    // Drop the connection
+    lastFakeWs.emit('close');
+
+    // Wait for reconnect
+    await new Promise((r) => setTimeout(r, 3500));
+
+    // Check what's sent on reconnect open
+    lastFakeWs.send.mockClear();
+    lastFakeWs.emit('open');
+
+    const sent = lastFakeWs.send.mock.calls.map((c: unknown[]) => JSON.parse(c[0] as string));
+    expect(sent).toEqual([
+      { type: 'hello', sessionId: manager.sessionId, name: manager.name, status: manager.status },
+      { type: 'update', endpoints: [{ label: 'Frontend', url: 'http://localhost:5173' }] },
+    ]);
+
+    manager.disconnect();
+  }, 10000);
+
+  it('does not reconnect after explicit disconnect()', async () => {
+    const manager = createManager();
+    const connectPromise = manager.connect(5000);
+    await tick();
+
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
+
+    const wsBeforeDisconnect = lastFakeWs;
+    manager.disconnect();
+
+    // Wait longer than reconnect delay
+    await new Promise((r) => setTimeout(r, 4000));
+
+    // Should NOT have created a new WebSocket
+    expect(lastFakeWs).toBe(wsBeforeDisconnect);
+    expect(manager.isConnected()).toBe(false);
+  }, 10000);
+
+  it('uses exponential backoff on repeated failures', async () => {
+    const manager = createManager();
+    const connectPromise = manager.connect(5000);
+    await tick();
+
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
+
+    // First disconnect — should reconnect after ~3s
+    const firstWs = lastFakeWs;
+    firstWs.emit('close');
+    await new Promise((r) => setTimeout(r, 3500));
+    const secondWs = lastFakeWs;
+    expect(secondWs).not.toBe(firstWs);
+
+    // Second disconnect without successful reconnection — should wait ~6s
+    secondWs.emit('close');
+    const wsAfterSecondClose = lastFakeWs;
+
+    // At 3.5s should NOT have reconnected yet
+    await new Promise((r) => setTimeout(r, 3500));
+    expect(lastFakeWs).toBe(wsAfterSecondClose);
+
+    // At 6.5s total should have reconnected
+    await new Promise((r) => setTimeout(r, 3000));
+    expect(lastFakeWs).not.toBe(wsAfterSecondClose);
+
+    manager.disconnect();
+  }, 15000);
+
+  it('resets backoff after successful reconnection', async () => {
+    const manager = createManager();
+    const connectPromise = manager.connect(5000);
+    await tick();
+
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
+
+    // First disconnect + reconnect
+    lastFakeWs.emit('close');
+    await new Promise((r) => setTimeout(r, 3500));
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await tick();
+
+    // Second disconnect — backoff should be reset to base (3s)
+    const wsBeforeClose = lastFakeWs;
+    lastFakeWs.emit('close');
+    await new Promise((r) => setTimeout(r, 3500));
+    expect(lastFakeWs).not.toBe(wsBeforeClose);
+
+    manager.disconnect();
+  }, 15000);
 });
