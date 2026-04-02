@@ -25,6 +25,12 @@ if (fs.existsSync(configPath)) {
     }
   }
 
+  let stackSummary = 'Default stack: React + GraphQL + Apollo with json-render.dev for UI rendering.';
+  if (config.stack) {
+    const s = config.stack;
+    stackSummary = `Configured stack: ${s.frontend || 'react-vite'} frontend in ${s.clientDir || 'client'}/, ${s.backend || 'apollo-graphql'} backend in ${s.serverDir || 'server'}/.`;
+  }
+
   const additionalContext = [
     `You are connected to Auto workspace "${config.workspaceId}".`,
     'The narrative model at .auto-agent/model.json is a specification medium that expresses application intent through narratives, scenes, and moments.',
@@ -32,7 +38,8 @@ if (fs.existsSync(configPath)) {
     modelSummary,
     '',
     'Available tools: auto_get_model (fetch model), auto_send_model (validate and correct model), auto_get_changes (get recent deltas), auto_update_endpoints (report dev server URLs).',
-    'Default stack: React + GraphQL + Apollo with json-render.dev for UI rendering.',
+    stackSummary,
+    'Use /auto-agent:scaffold to set up and start dev servers immediately.',
     'Use /auto-agent:build to generate application code from this model.',
   ]
     .filter(Boolean)

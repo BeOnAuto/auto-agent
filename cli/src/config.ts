@@ -2,10 +2,27 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { z } from 'zod';
 
+const StackConfigSchema = z.object({
+  frontend: z.string().default('react-vite'),
+  backend: z.string().default('apollo-graphql'),
+  clientDir: z.string().default('client'),
+  serverDir: z.string().default('server'),
+});
+
+export type StackConfig = z.infer<typeof StackConfigSchema>;
+
+const DEFAULT_STACK: StackConfig = {
+  frontend: 'react-vite',
+  backend: 'apollo-graphql',
+  clientDir: 'client',
+  serverDir: 'server',
+};
+
 const AgentConfigSchema = z.object({
   apiKey: z.string(),
   serverUrl: z.string(),
   workspaceId: z.string(),
+  stack: StackConfigSchema.optional(),
 });
 
 export type AgentConfig = z.infer<typeof AgentConfigSchema>;
@@ -50,6 +67,11 @@ export function readConfig(): AgentConfig | null {
     }
     return null;
   }
+}
+
+export function getStackConfig(): StackConfig {
+  const config = readConfig();
+  return config?.stack ?? DEFAULT_STACK;
 }
 
 export function writeConfig(config: AgentConfig): void {

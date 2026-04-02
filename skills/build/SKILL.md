@@ -89,6 +89,19 @@ The model's `client.ui.spec` is directly compatible with [json-render.dev](https
 
 See `references/frontend-patterns.md` for json-render setup, Apollo wiring, and Storybook patterns.
 
+### Design Quality
+
+All generated UI must follow the premium design patterns in `references/design-patterns.md`. Key rules:
+- Use `Geist`, `Satoshi`, or `Outfit` fonts — never Inter or Roboto
+- Neutral Zinc/Slate palette with max 1 accent color (saturation < 80%)
+- Double-Bezel (Doppelrand) pattern for major cards and containers
+- Custom cubic-bezier transitions — no `linear` or `ease-in-out`
+- Scroll entry animations, skeleton loaders, proper empty/error states
+- Responsive: collapse to single-column below 768px
+- No AI aesthetic cliches (neon glows, pure black, oversaturated gradients)
+
+Apply these patterns while preserving the structural intent of the model's `client.ui.spec`. The spec provides layout and data binding; the design patterns provide visual polish.
+
 ## Testing Strategy
 
 Three levels of testing ensure both individual slice correctness and cross-slice cohesion.
@@ -109,6 +122,32 @@ After all moments in a scene are built, test the full flow by executing moments 
 After generating code, run the full test suite and fix any failures before moving on.
 
 See `references/testing-patterns.md` for concrete test templates and the gherkin-to-test translation rules.
+
+### 4. Browser Verification (after each scene)
+
+After completing all moments in a scene, verify the running application works end-to-end:
+
+**If browser MCP tools are available** (e.g., `chrome-devtools`):
+1. Navigate to the frontend URL: `mcp__chrome-devtools__navigate_page` to `http://localhost:5173`
+2. Take a screenshot: `mcp__chrome-devtools__take_screenshot` to visually verify the page rendered correctly
+3. Check for console errors: `mcp__chrome-devtools__list_console_messages`
+4. If the scene involves user interaction, use `mcp__chrome-devtools__click`, `mcp__chrome-devtools__fill`, etc. to walk through the flow
+
+**If browser tools are NOT available**, fall back to:
+1. `curl` the frontend URL to verify it returns HTML
+2. Query the GraphQL endpoint directly to verify resolvers work:
+   ```bash
+   curl -s http://localhost:4000/graphql \
+     -H 'Content-Type: application/json' \
+     -d '{"query":"{ <queryFromMoment> }"}'
+   ```
+3. For mutations, send test data and verify the response
+4. Suggest to the developer: "Install a browser MCP server (e.g., chrome-devtools) for visual verification of the running app."
+
+**GraphQL endpoint testing** (always, regardless of browser availability):
+- After building each scene's backend, send the actual GraphQL operations from each moment's `request` field against the running server
+- Verify the responses match expected shapes from the gherkin specs
+- This catches schema mismatches, resolver errors, and data flow issues early
 
 ## Build Process
 

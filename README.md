@@ -22,8 +22,11 @@ Works with Claude Code today. More agents coming soon.
 
 ## What it does
 
+- **Instant dev servers** — scaffolds and starts React + Apollo GraphQL servers immediately, so you see a live preview in the Auto app from the start
 - **Syncs the narrative model** from your Auto workspace to your coding agent
 - **Teaches your agent how to build** from structured specs, not vague prompts
+- **Premium design** — generates beautiful, non-generic UIs using curated design patterns (based on [Payoss/UIUX-high-taste-skill](https://github.com/Payoss/UIUX-high-taste-skill))
+- **Browser verification** — tests the running app visually after each scene (via browser MCP tools or curl fallback)
 - **Validates changes** — if your agent modifies the model, Auto checks it against 50+ structural rules and corrects anything off-spec
 - **Incremental builds** — change the narrative, rebuild only what's affected
 
@@ -43,7 +46,13 @@ Then connect with your API key (find it in the Auto app under **Agents** in the 
 /auto-agent:connect <your-api-key>
 ```
 
-Build your app:
+Scaffold and start dev servers (React frontend + Apollo GraphQL backend):
+
+```
+/auto-agent:scaffold
+```
+
+Build your app from the narrative model:
 
 ```
 /auto-agent:build
@@ -53,10 +62,55 @@ Build your app:
 
 1. **Model on Auto** — describe your app, Auto generates a structured narrative with scenes, moments, UI specs, and business rules
 2. **Connect your agent** — install the plugin, connect with your API key
-3. **Build** — your agent receives the validated model and builds the application locally
-4. **Iterate** — modify the narrative on Auto, the model syncs instantly, rebuild what changed
+3. **Scaffold** — dev servers start immediately with a welcome page and health check — you see a live preview in Auto right away
+4. **Build** — your agent generates code from the validated model into the running servers with hot-reload
+5. **Verify** — after each scene, the agent tests the running app via browser tools or GraphQL queries
+6. **Iterate** — modify the narrative on Auto, the model syncs instantly, rebuild what changed
 
 Your coding agent does the implementation. Auto keeps it honest.
+
+## Stack configuration
+
+The default stack is React + Vite (frontend) and Apollo GraphQL (backend). You can customize this in `.auto-agent/config.json`:
+
+```json
+{
+  "apiKey": "ak_...",
+  "serverUrl": "https://collaboration-server.on-auto.workers.dev",
+  "workspaceId": "...",
+  "stack": {
+    "frontend": "react-vite",
+    "backend": "apollo-graphql",
+    "clientDir": "client",
+    "serverDir": "server"
+  }
+}
+```
+
+The `stack` field is optional — defaults are applied when absent. The scaffold and build skills read this configuration to determine where to generate code and what frameworks to use.
+
+## Design quality
+
+Generated UIs follow premium design patterns adapted from [Payoss/UIUX-high-taste-skill](https://github.com/Payoss/UIUX-high-taste-skill). This includes:
+
+- Premium typography (Geist, Satoshi, Outfit — never Inter or Roboto)
+- Neutral palettes with restrained accent colors
+- Double-Bezel (Doppelrand) card architecture
+- Spring-physics animations and scroll-triggered reveals
+- Responsive layouts that collapse gracefully on mobile
+- Skeleton loaders, empty states, and error states
+
+The design patterns are in [`skills/build/references/design-patterns.md`](skills/build/references/design-patterns.md). You can customize them to match your brand.
+
+## Browser verification
+
+After building each scene, the agent attempts to verify the running application:
+
+1. **Browser MCP tools** (preferred) — if a browser MCP server like `chrome-devtools` is installed, the agent navigates the app, takes screenshots, checks for console errors, and walks through interaction flows
+2. **GraphQL testing** (always) — sends each moment's GraphQL operations against the running server to verify resolvers and data flow
+3. **Curl fallback** — if no browser tools are available, verifies the frontend returns HTML and the GraphQL endpoint responds
+
+For the best experience, install a browser MCP server so the agent can visually verify what it's building.
 
 ## Transparency
 
@@ -88,8 +142,9 @@ The entire plugin logic lives in a handful of files:
 | [`cli/src/connection.ts`](cli/src/connection.ts) | WebSocket sync — how model updates flow in real time |
 | [`cli/src/client.ts`](cli/src/client.ts) | HTTP client — every network call the plugin makes |
 | [`cli/src/persistence.ts`](cli/src/persistence.ts) | Local file cache — what gets written to disk |
-| [`commands/`](commands/) | Slash commands (`connect` and `build`) |
-| [`skills/`](skills/) | Build instructions — how your agent turns specs into code |
+| [`commands/`](commands/) | Slash commands (`connect`, `scaffold`, and `build`) |
+| [`skills/`](skills/) | Build, scaffold, and workspace skills — how your agent turns specs into code |
+| [`skills/build/references/design-patterns.md`](skills/build/references/design-patterns.md) | Premium UI/UX design guidelines |
 | [`hooks/`](hooks/) | Session-start hook that provides workspace context |
 
 ### How the data flows

@@ -7132,7 +7132,7 @@ var init_zod = __esm({
   }
 });
 
-// cli/dist/src/config.js
+// cli/src/config.ts
 function setConfigDir(dir) {
   configDir = dir;
 }
@@ -7168,42 +7168,92 @@ function writeConfig(config2) {
   }
   (0, import_node_fs.writeFileSync)(getConfigPath(), JSON.stringify(config2, null, 2), "utf-8");
 }
-var import_node_fs, import_node_path, AgentConfigSchema, configDir, LEGACY_CONFIG_FILENAME;
+var import_node_fs, import_node_path, StackConfigSchema, AgentConfigSchema, configDir, LEGACY_CONFIG_FILENAME;
 var init_config = __esm({
-  "cli/dist/src/config.js"() {
+  "cli/src/config.ts"() {
     "use strict";
     import_node_fs = require("node:fs");
     import_node_path = require("node:path");
     init_zod();
+    StackConfigSchema = external_exports.object({
+      frontend: external_exports.string().default("react-vite"),
+      backend: external_exports.string().default("apollo-graphql"),
+      clientDir: external_exports.string().default("client"),
+      serverDir: external_exports.string().default("server")
+    });
     AgentConfigSchema = external_exports.object({
       apiKey: external_exports.string(),
       serverUrl: external_exports.string(),
-      workspaceId: external_exports.string()
+      workspaceId: external_exports.string(),
+      stack: StackConfigSchema.optional()
     });
     configDir = (0, import_node_path.join)(process.cwd(), ".auto-agent");
     LEGACY_CONFIG_FILENAME = ".auto-agent.json";
   }
 });
 
-// cli/dist/src/utils.js
+// cli/src/logger.ts
+function formatExtra(extra) {
+  if (extra instanceof Error) {
+    return `: ${extra.message}
+${extra.stack}`;
+  }
+  return ` ${JSON.stringify(extra)}`;
+}
+function getLogger() {
+  if (!sharedLogger) {
+    sharedLogger = createLogger((0, import_node_path2.join)(getConfigDir(), "auto-agent.log"));
+  }
+  return sharedLogger;
+}
+function createLogger(logPath, now = () => /* @__PURE__ */ new Date()) {
+  function write(level, tag, message, extra) {
+    const dir = (0, import_node_path2.dirname)(logPath);
+    if (!(0, import_node_fs2.existsSync)(dir)) {
+      (0, import_node_fs2.mkdirSync)(dir, { recursive: true });
+    }
+    const timestamp = now().toISOString();
+    const suffix = extra !== void 0 ? formatExtra(extra) : "";
+    const line = `${timestamp} [${level}] [${tag}] ${message}${suffix}
+`;
+    (0, import_node_fs2.appendFileSync)(logPath, line, "utf-8");
+  }
+  return {
+    info: (tag, message, extra) => write("INFO", tag, message, extra),
+    warn: (tag, message, extra) => write("WARN", tag, message, extra),
+    error: (tag, message, extra) => write("ERROR", tag, message, extra)
+  };
+}
+var import_node_fs2, import_node_path2, sharedLogger;
+var init_logger = __esm({
+  "cli/src/logger.ts"() {
+    "use strict";
+    import_node_fs2 = require("node:fs");
+    import_node_path2 = require("node:path");
+    init_config();
+    sharedLogger = null;
+  }
+});
+
+// cli/src/utils.ts
 function parseApiKey(key) {
   const parts = key.split("_");
-  if (parts.length < 3 || parts[0] !== "ak")
-    return null;
+  if (parts.length < 3 || parts[0] !== "ak") return null;
   return { workspaceId: parts[1] };
 }
 var init_utils = __esm({
-  "cli/dist/src/utils.js"() {
+  "cli/src/utils.ts"() {
     "use strict";
   }
 });
 
-// cli/dist/src/client.js
+// cli/src/client.ts
 var GetModelResponseSchema, SendModelResponseSchema, AgentClient;
 var init_client = __esm({
-  "cli/dist/src/client.js"() {
+  "cli/src/client.ts"() {
     "use strict";
     init_zod();
+    init_logger();
     GetModelResponseSchema = external_exports.object({
       model: external_exports.unknown()
     });
@@ -7213,23 +7263,29 @@ var init_client = __esm({
       correctionCount: external_exports.number()
     });
     AgentClient = class {
-      serverUrl;
-      apiKey;
       constructor(serverUrl, apiKey) {
         this.serverUrl = serverUrl;
         this.apiKey = apiKey;
       }
+      serverUrl;
+      apiKey;
       async getModel(workspaceId) {
+        const log = getLogger();
+        log.info("client", `GET model for workspace ${workspaceId}`);
         const response = await fetch(`${this.serverUrl}/api/agent/model/${workspaceId}`, {
           headers: { Authorization: `Bearer ${this.apiKey}` }
         });
         if (!response.ok) {
+          log.error("client", `GET model failed: ${response.status} ${response.statusText}`);
           throw new Error(`Failed to get model: ${response.status} ${response.statusText}`);
         }
         const data = GetModelResponseSchema.parse(await response.json());
+        log.info("client", "GET model success");
         return data.model;
       }
       async sendModel(workspaceId, model) {
+        const log = getLogger();
+        log.info("client", `POST model for workspace ${workspaceId}`);
         const response = await fetch(`${this.serverUrl}/api/agent/model/${workspaceId}`, {
           method: "POST",
           headers: {
@@ -7239,9 +7295,12 @@ var init_client = __esm({
           body: JSON.stringify({ model })
         });
         if (!response.ok) {
+          log.error("client", `POST model failed: ${response.status} ${response.statusText}`);
           throw new Error(`Failed to send model: ${response.status} ${response.statusText}`);
         }
-        return SendModelResponseSchema.parse(await response.json());
+        const result = SendModelResponseSchema.parse(await response.json());
+        log.info("client", `POST model success, ${result.correctionCount} corrections`);
+        return result;
       }
     };
   }
@@ -10891,7 +10950,7 @@ var init_wrapper = __esm({
   }
 });
 
-// cli/dist/src/connection.js
+// cli/src/connection.ts
 function gitUserName() {
   try {
     return (0, import_node_child_process.execSync)("git config user.name", { encoding: "utf8", timeout: 2e3 }).trim() || null;
@@ -10909,8 +10968,7 @@ function buildAgentName(sessionId) {
 function buildAgentStatus() {
   const status = {};
   const git = gitUserName();
-  if (git)
-    status.user = git;
+  if (git) status.user = git;
   status.username = (0, import_node_os.userInfo)().username;
   status.hostname = (0, import_node_os.hostname)().replace(/\.local$/, "");
   status.platform = (0, import_node_os.platform)();
@@ -10919,15 +10977,22 @@ function buildAgentStatus() {
 }
 var import_node_crypto, import_node_events, import_node_os, import_node_child_process, BASE_RECONNECT_MS, MAX_RECONNECT_MS, ConnectionManager;
 var init_connection = __esm({
-  "cli/dist/src/connection.js"() {
+  "cli/src/connection.ts"() {
     "use strict";
     import_node_crypto = require("node:crypto");
     import_node_events = require("node:events");
     import_node_os = require("node:os");
     import_node_child_process = require("node:child_process");
+    init_logger();
     BASE_RECONNECT_MS = 3e3;
     MAX_RECONNECT_MS = 3e4;
     ConnectionManager = class extends import_node_events.EventEmitter {
+      constructor(options) {
+        super();
+        this.options = options;
+        this.name = buildAgentName(this.sessionId);
+        this.status = buildAgentStatus();
+      }
       options;
       ws = null;
       connected = false;
@@ -10938,23 +11003,20 @@ var init_connection = __esm({
       sessionId = (0, import_node_crypto.randomBytes)(12).toString("hex");
       name;
       status;
-      constructor(options) {
-        super();
-        this.options = options;
-        this.name = buildAgentName(this.sessionId);
-        this.status = buildAgentStatus();
-      }
       async connect(timeoutMs = 1e4) {
         this.disposed = false;
         await this.doConnect(timeoutMs, true);
       }
       async doConnect(timeoutMs, rejectOnError) {
+        const log = getLogger();
         const WebSocket2 = (await Promise.resolve().then(() => (init_wrapper(), wrapper_exports))).default;
         const wsUrl = this.options.serverUrl.replace(/^http/, "ws");
         const url = `${wsUrl}/api/agent/model/${this.options.workspaceId}/stream?key=${this.options.apiKey}`;
+        log.info("connection", `connecting to ${wsUrl}`, { workspaceId: this.options.workspaceId, sessionId: this.sessionId });
         this.ws = new WebSocket2(url);
         return new Promise((resolve2, reject) => {
           const timeout = setTimeout(() => {
+            log.error("connection", `timeout after ${timeoutMs}ms`);
             this.ws?.close();
             this.ws = null;
             if (rejectOnError) {
@@ -10965,6 +11027,7 @@ var init_connection = __esm({
             }
           }, timeoutMs);
           this.ws.on("open", () => {
+            log.info("connection", "websocket open, sending hello");
             this.connected = true;
             this.ws.send(JSON.stringify({ type: "hello", sessionId: this.sessionId, name: this.name, status: this.status }));
             if (this.endpoints.length > 0) {
@@ -10974,6 +11037,7 @@ var init_connection = __esm({
           this.ws.on("message", (data) => {
             try {
               const msg = JSON.parse(data.toString());
+              log.info("connection", `received message type=${msg.type}`);
               this.processMessage(msg);
               if (msg.type === "full") {
                 clearTimeout(timeout);
@@ -10981,15 +11045,18 @@ var init_connection = __esm({
                 resolve2();
               }
             } catch (err) {
+              log.error("connection", "failed to process message", err instanceof Error ? err : new Error(String(err)));
               this.emit("error", err);
             }
           });
           this.ws.on("close", () => {
+            log.warn("connection", "websocket closed");
             this.connected = false;
             this.emit("disconnected");
             this.scheduleReconnect();
           });
           this.ws.on("error", (err) => {
+            log.error("connection", "websocket error", err);
             clearTimeout(timeout);
             if (rejectOnError) {
               reject(err);
@@ -10999,19 +11066,24 @@ var init_connection = __esm({
         });
       }
       scheduleReconnect() {
-        if (this.disposed)
-          return;
+        if (this.disposed) return;
+        const log = getLogger();
         const delay = Math.min(BASE_RECONNECT_MS * Math.pow(2, this.reconnectAttempts), MAX_RECONNECT_MS);
         this.reconnectAttempts++;
+        log.info("connection", `scheduling reconnect attempt ${this.reconnectAttempts} in ${delay}ms`);
         this.reconnectTimer = setTimeout(() => {
           this.reconnectTimer = null;
           if (!this.disposed) {
-            this.doConnect(1e4, false).catch(() => {
+            log.info("connection", "attempting reconnect");
+            this.doConnect(1e4, false).catch((err) => {
+              log.error("connection", "reconnect failed", err instanceof Error ? err : new Error(String(err)));
             });
           }
         }, delay);
       }
       disconnect() {
+        const log = getLogger();
+        log.info("connection", "disconnecting");
         this.disposed = true;
         if (this.reconnectTimer) {
           clearTimeout(this.reconnectTimer);
@@ -11057,59 +11129,53 @@ var init_connection = __esm({
   }
 });
 
-// cli/dist/src/persistence.js
-var import_node_fs3, import_node_path2, ModelPersistence;
+// cli/src/persistence.ts
+var import_node_fs4, import_node_path3, ModelPersistence;
 var init_persistence = __esm({
-  "cli/dist/src/persistence.js"() {
+  "cli/src/persistence.ts"() {
     "use strict";
-    import_node_fs3 = require("node:fs");
-    import_node_path2 = require("node:path");
+    import_node_fs4 = require("node:fs");
+    import_node_path3 = require("node:path");
     ModelPersistence = class {
-      modelPath;
-      debounceMs;
-      debounceTimer = void 0;
-      pendingModel = null;
-      changesPath;
       constructor(modelPath, debounceMs = 1e3) {
         this.modelPath = modelPath;
         this.debounceMs = debounceMs;
         this.changesPath = modelPath.replace(/model\.json$/, "changes.json");
       }
+      modelPath;
+      debounceMs;
+      debounceTimer = void 0;
+      pendingModel = null;
+      changesPath;
       update(model) {
         this.pendingModel = model;
         clearTimeout(this.debounceTimer);
         this.debounceTimer = setTimeout(() => this.flush(), this.debounceMs);
       }
       appendChange(change) {
-        const dir = (0, import_node_path2.dirname)(this.changesPath);
-        if (!(0, import_node_fs3.existsSync)(dir))
-          (0, import_node_fs3.mkdirSync)(dir, { recursive: true });
-        (0, import_node_fs3.appendFileSync)(this.changesPath, JSON.stringify(change) + "\n", "utf-8");
+        const dir = (0, import_node_path3.dirname)(this.changesPath);
+        if (!(0, import_node_fs4.existsSync)(dir)) (0, import_node_fs4.mkdirSync)(dir, { recursive: true });
+        (0, import_node_fs4.appendFileSync)(this.changesPath, JSON.stringify(change) + "\n", "utf-8");
       }
       readAndClearChanges() {
-        if (!(0, import_node_fs3.existsSync)(this.changesPath))
-          return [];
-        const raw = (0, import_node_fs3.readFileSync)(this.changesPath, "utf-8").trim();
-        if (!raw)
-          return [];
-        (0, import_node_fs3.writeFileSync)(this.changesPath, "", "utf-8");
+        if (!(0, import_node_fs4.existsSync)(this.changesPath)) return [];
+        const raw = (0, import_node_fs4.readFileSync)(this.changesPath, "utf-8").trim();
+        if (!raw) return [];
+        (0, import_node_fs4.writeFileSync)(this.changesPath, "", "utf-8");
         return raw.split("\n").map((line) => JSON.parse(line));
       }
       readModel() {
-        if (!(0, import_node_fs3.existsSync)(this.modelPath))
-          return null;
-        const raw = (0, import_node_fs3.readFileSync)(this.modelPath, "utf-8");
+        if (!(0, import_node_fs4.existsSync)(this.modelPath)) return null;
+        const raw = (0, import_node_fs4.readFileSync)(this.modelPath, "utf-8");
         return JSON.parse(raw);
       }
       flush() {
-        if (this.pendingModel === null)
-          return;
-        const dir = (0, import_node_path2.dirname)(this.modelPath);
-        if (!(0, import_node_fs3.existsSync)(dir))
-          (0, import_node_fs3.mkdirSync)(dir, { recursive: true });
+        if (this.pendingModel === null) return;
+        const dir = (0, import_node_path3.dirname)(this.modelPath);
+        if (!(0, import_node_fs4.existsSync)(dir)) (0, import_node_fs4.mkdirSync)(dir, { recursive: true });
         const tmpPath = this.modelPath + ".tmp";
-        (0, import_node_fs3.writeFileSync)(tmpPath, JSON.stringify(this.pendingModel, null, 2) + "\n", "utf-8");
-        (0, import_node_fs3.renameSync)(tmpPath, this.modelPath);
+        (0, import_node_fs4.writeFileSync)(tmpPath, JSON.stringify(this.pendingModel, null, 2) + "\n", "utf-8");
+        (0, import_node_fs4.renameSync)(tmpPath, this.modelPath);
         this.pendingModel = null;
         clearTimeout(this.debounceTimer);
         this.debounceTimer = void 0;
@@ -11122,10 +11188,12 @@ var init_persistence = __esm({
   }
 });
 
-// cli/dist/src/mcp/daemon.js
+// cli/src/mcp/daemon.ts
 async function startDaemon(config2) {
+  const log = getLogger();
+  log.info("daemon", "starting", { workspaceId: config2.workspaceId, serverUrl: config2.serverUrl });
   const configDir2 = getConfigDir();
-  const modelPath = (0, import_node_path3.join)(configDir2, "model.json");
+  const modelPath = (0, import_node_path4.join)(configDir2, "model.json");
   const persistence = new ModelPersistence(modelPath);
   const connection = new ConnectionManager({
     serverUrl: config2.serverUrl,
@@ -11133,17 +11201,20 @@ async function startDaemon(config2) {
     workspaceId: config2.workspaceId,
     persistence
   });
+  log.info("daemon", "connecting to server");
   await connection.connect();
+  log.info("daemon", "connected");
   return { connection, persistence };
 }
-var import_node_path3;
+var import_node_path4;
 var init_daemon = __esm({
-  "cli/dist/src/mcp/daemon.js"() {
+  "cli/src/mcp/daemon.ts"() {
     "use strict";
-    import_node_path3 = require("node:path");
+    import_node_path4 = require("node:path");
     init_connection();
     init_persistence();
     init_config();
+    init_logger();
   }
 });
 
@@ -24151,7 +24222,7 @@ var require_core = __commonJS({
         opts = this.opts = { ...opts, ...requiredOptions(opts) };
         const { es5, lines } = this.opts.code;
         this.scope = new codegen_2.ValueScope({ scope: {}, prefixes: EXT_SCOPE_NAMES, es5, lines });
-        this.logger = getLogger(opts.logger);
+        this.logger = getLogger2(opts.logger);
         const formatOpt = opts.validateFormats;
         opts.validateFormats = false;
         this.RULES = (0, rules_1.getRules)();
@@ -24564,7 +24635,7 @@ var require_core = __commonJS({
     }, warn() {
     }, error() {
     } };
-    function getLogger(logger) {
+    function getLogger2(logger) {
       if (logger === false)
         return noLogs;
       if (logger === void 0)
@@ -28735,145 +28806,210 @@ var init_stdio2 = __esm({
   }
 });
 
-// cli/dist/src/mcp/tools.js
+// cli/src/mcp/tools.ts
 function registerTools(server, deps = {}) {
-  server.tool("auto_configure", "Configure the Auto agent CLI with an API key and start the sync daemon", {
-    key: external_exports.string().describe("API key in format ak_<workspaceId>_<random>"),
-    server: external_exports.string().optional().describe("Server URL (defaults to production)")
-  }, async ({ key, server: serverUrl }) => {
-    const result = parseApiKey(key);
-    if (!result) {
-      return { content: [{ type: "text", text: "Invalid key format. Expected: ak_<workspaceId>_<random>" }] };
-    }
-    const { workspaceId } = result;
-    const url = serverUrl || "https://collaboration-server.on-auto.workers.dev";
-    writeConfig({ apiKey: key, serverUrl: url, workspaceId });
-    if (deps.daemon) {
-      deps.daemon.connection.disconnect();
-    }
-    try {
-      const daemon = await startDaemon({ apiKey: key, serverUrl: url, workspaceId });
-      deps.daemon = daemon;
-      deps.onDaemonStarted?.(daemon);
-      return { content: [{ type: "text", text: `Connected to workspace ${workspaceId} (server: ${url})` }] };
-    } catch (err) {
-      return { content: [{ type: "text", text: `Configured for workspace ${workspaceId} but connection failed: ${err instanceof Error ? err.message : "Unknown error"}. Tools will use HTTP fallback.` }] };
-    }
-  });
-  server.tool("auto_get_model", "Fetch the workspace model as JSON", {}, async () => {
-    if (deps.daemon) {
-      const model = deps.daemon.persistence.readModel();
-      if (model) {
-        return { content: [{ type: "text", text: JSON.stringify(model, null, 2) }] };
+  server.tool(
+    "auto_configure",
+    "Configure the Auto agent CLI with an API key and start the sync daemon",
+    {
+      key: external_exports.string().describe("API key in format ak_<workspaceId>_<random>"),
+      server: external_exports.string().optional().describe("Server URL (defaults to production)")
+    },
+    async ({ key, server: serverUrl }) => {
+      const log = getLogger();
+      log.info("tools", "auto_configure called");
+      const result = parseApiKey(key);
+      if (!result) {
+        log.warn("tools", "auto_configure: invalid key format");
+        return { content: [{ type: "text", text: "Invalid key format. Expected: ak_<workspaceId>_<random>" }] };
+      }
+      const { workspaceId } = result;
+      const url = serverUrl || "https://collaboration-server.on-auto.workers.dev";
+      writeConfig({ apiKey: key, serverUrl: url, workspaceId });
+      if (deps.daemon) {
+        deps.daemon.connection.disconnect();
+      }
+      try {
+        const daemon = await startDaemon({ apiKey: key, serverUrl: url, workspaceId });
+        deps.daemon = daemon;
+        deps.onDaemonStarted?.(daemon);
+        log.info("tools", `auto_configure: connected to workspace ${workspaceId}`);
+        return { content: [{ type: "text", text: `Connected to workspace ${workspaceId} (server: ${url})` }] };
+      } catch (err) {
+        log.error("tools", "auto_configure: connection failed", err instanceof Error ? err : new Error(String(err)));
+        return { content: [{ type: "text", text: `Configured for workspace ${workspaceId} but connection failed: ${err instanceof Error ? err.message : "Unknown error"}. Tools will use HTTP fallback.` }] };
       }
     }
-    const config2 = readConfig();
-    if (!config2) {
-      return { content: [{ type: "text", text: "Not configured. Run /auto-agent:connect first." }] };
+  );
+  server.tool(
+    "auto_get_model",
+    "Fetch the workspace model as JSON",
+    {},
+    async () => {
+      const log = getLogger();
+      log.info("tools", "auto_get_model called");
+      if (deps.daemon) {
+        const model = deps.daemon.persistence.readModel();
+        if (model) {
+          log.info("tools", "auto_get_model: returning cached model");
+          return { content: [{ type: "text", text: JSON.stringify(model, null, 2) }] };
+        }
+      }
+      const config2 = readConfig();
+      if (!config2) {
+        log.warn("tools", "auto_get_model: not configured");
+        return { content: [{ type: "text", text: "Not configured. Run /auto-agent:connect first." }] };
+      }
+      try {
+        log.info("tools", "auto_get_model: fetching via HTTP");
+        const client = new AgentClient(config2.serverUrl, config2.apiKey);
+        const model = await client.getModel(config2.workspaceId);
+        return { content: [{ type: "text", text: JSON.stringify(model, null, 2) }] };
+      } catch (err) {
+        log.error("tools", "auto_get_model: HTTP fetch failed", err instanceof Error ? err : new Error(String(err)));
+        return { content: [{ type: "text", text: `Error fetching model: ${err instanceof Error ? err.message : "Unknown error"}` }] };
+      }
     }
-    try {
-      const client = new AgentClient(config2.serverUrl, config2.apiKey);
-      const model = await client.getModel(config2.workspaceId);
-      return { content: [{ type: "text", text: JSON.stringify(model, null, 2) }] };
-    } catch (err) {
-      return { content: [{ type: "text", text: `Error fetching model: ${err instanceof Error ? err.message : "Unknown error"}` }] };
-    }
-  });
-  server.tool("auto_send_model", "Send a model to the server for correction and sync", { model: external_exports.string().describe("Model as JSON string") }, async ({ model }) => {
-    const config2 = readConfig();
-    if (!config2) {
-      return { content: [{ type: "text", text: "Not configured. Run /auto-agent:connect first." }] };
-    }
-    let parsed;
-    try {
-      parsed = JSON.parse(model);
-    } catch {
-      return { content: [{ type: "text", text: "Error: Invalid JSON in model parameter" }] };
-    }
-    try {
-      const client = new AgentClient(config2.serverUrl, config2.apiKey);
-      const result = await client.sendModel(config2.workspaceId, parsed);
-      const summary = result.correctionCount > 0 ? `Applied ${result.correctionCount} corrections:
+  );
+  server.tool(
+    "auto_send_model",
+    "Send a model to the server for correction and sync",
+    { model: external_exports.string().describe("Model as JSON string") },
+    async ({ model }) => {
+      const log = getLogger();
+      log.info("tools", "auto_send_model called");
+      const config2 = readConfig();
+      if (!config2) {
+        log.warn("tools", "auto_send_model: not configured");
+        return { content: [{ type: "text", text: "Not configured. Run /auto-agent:connect first." }] };
+      }
+      let parsed;
+      try {
+        parsed = JSON.parse(model);
+      } catch {
+        log.warn("tools", "auto_send_model: invalid JSON");
+        return { content: [{ type: "text", text: "Error: Invalid JSON in model parameter" }] };
+      }
+      try {
+        const client = new AgentClient(config2.serverUrl, config2.apiKey);
+        const result = await client.sendModel(config2.workspaceId, parsed);
+        log.info("tools", `auto_send_model: success, ${result.correctionCount} corrections`);
+        const summary = result.correctionCount > 0 ? `Applied ${result.correctionCount} corrections:
 ${result.corrections.map((c) => `- ${c}`).join("\n")}
 
 ` : "No corrections needed.\n\n";
-      return { content: [{ type: "text", text: summary + JSON.stringify(result.model, null, 2) }] };
-    } catch (err) {
-      return { content: [{ type: "text", text: `Error sending model: ${err instanceof Error ? err.message : "Unknown error"}` }] };
+        return { content: [{ type: "text", text: summary + JSON.stringify(result.model, null, 2) }] };
+      } catch (err) {
+        log.error("tools", "auto_send_model: failed", err instanceof Error ? err : new Error(String(err)));
+        return { content: [{ type: "text", text: `Error sending model: ${err instanceof Error ? err.message : "Unknown error"}` }] };
+      }
     }
-  });
-  server.tool("auto_get_changes", "Get model changes since last check. Returns structural diffs (added/removed/updated scenes, messages, moments). Clears the list after reading.", {}, async () => {
-    if (deps.daemon) {
-      const changes = deps.daemon.persistence.readAndClearChanges();
+  );
+  server.tool(
+    "auto_get_changes",
+    "Get model changes since last check. Returns structural diffs (added/removed/updated scenes, messages, moments). Clears the list after reading.",
+    {},
+    async () => {
+      const log = getLogger();
+      log.info("tools", "auto_get_changes called");
+      if (deps.daemon) {
+        const changes = deps.daemon.persistence.readAndClearChanges();
+        log.info("tools", `auto_get_changes: returning ${changes.length} changes`);
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({ changes, count: changes.length })
+          }]
+        };
+      }
+      log.warn("tools", "auto_get_changes: no active connection");
       return {
         content: [{
           type: "text",
-          text: JSON.stringify({ changes, count: changes.length })
+          text: JSON.stringify({ changes: [], message: "No active connection. Run /auto-agent:connect first." })
         }]
       };
     }
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify({ changes: [], message: "No active connection. Run /auto-agent:connect first." })
-      }]
-    };
-  });
-  server.tool("auto_update_endpoints", "Report dev server endpoints (Frontend, Backend, Storybook, etc.) to the collaboration server. Call this after starting a dev server. Each call replaces all previous endpoints.", {
-    endpoints: external_exports.array(external_exports.object({
-      label: external_exports.string().describe('Display label for the endpoint (e.g. "Frontend", "Backend")'),
-      url: external_exports.string().describe('URL of the endpoint (e.g. "http://localhost:5173")')
-    })).describe("List of endpoints this agent currently exposes")
-  }, async ({ endpoints }) => {
-    if (!deps.daemon) {
-      return { content: [{ type: "text", text: "Not connected. Run auto_configure first." }] };
-    }
-    if (!deps.daemon.connection.isConnected()) {
-      return { content: [{ type: "text", text: "WebSocket not connected. Endpoint update not sent." }] };
-    }
-    const typedEndpoints = endpoints;
-    deps.daemon.connection.updateEndpoints(typedEndpoints);
-    const config2 = readConfig();
-    const workspaceId = config2?.workspaceId ?? "";
-    const sessionId = deps.daemon.connection.sessionId;
-    const baseAppUrl = "https://app.on.auto";
-    const lines = endpoints.map((e) => {
-      const loopbackUrl = `${baseAppUrl}/${workspaceId}/agent/${sessionId}/${encodeURIComponent(e.label)}`;
-      return `${e.label}: ${loopbackUrl}`;
-    });
-    return { content: [{ type: "text", text: `Updated ${endpoints.length} endpoint(s):
+  );
+  server.tool(
+    "auto_update_endpoints",
+    "Report dev server endpoints (Frontend, Backend, Storybook, etc.) to the collaboration server. Call this after starting a dev server. Each call replaces all previous endpoints.",
+    {
+      endpoints: external_exports.array(external_exports.object({
+        label: external_exports.string().describe('Display label for the endpoint (e.g. "Frontend", "Backend")'),
+        url: external_exports.string().describe('URL of the endpoint (e.g. "http://localhost:5173")')
+      })).describe("List of endpoints this agent currently exposes")
+    },
+    async ({ endpoints }) => {
+      const log = getLogger();
+      log.info("tools", "auto_update_endpoints called", { count: endpoints.length });
+      if (!deps.daemon) {
+        log.warn("tools", "auto_update_endpoints: no daemon");
+        return { content: [{ type: "text", text: "Not connected. Run auto_configure first." }] };
+      }
+      if (!deps.daemon.connection.isConnected()) {
+        log.warn("tools", "auto_update_endpoints: websocket disconnected");
+        return { content: [{ type: "text", text: "WebSocket not connected. Endpoint update not sent." }] };
+      }
+      const typedEndpoints = endpoints;
+      deps.daemon.connection.updateEndpoints(typedEndpoints);
+      const config2 = readConfig();
+      const workspaceId = config2?.workspaceId ?? "";
+      const sessionId = deps.daemon.connection.sessionId;
+      const baseAppUrl = "https://app.on.auto";
+      const lines = endpoints.map((e) => {
+        const loopbackUrl = `${baseAppUrl}/${workspaceId}/agent/${sessionId}/${encodeURIComponent(e.label)}`;
+        return `${e.label}: ${loopbackUrl}`;
+      });
+      return { content: [{ type: "text", text: `Updated ${endpoints.length} endpoint(s):
 ${lines.join("\n")}` }] };
-  });
+    }
+  );
 }
 var init_tools = __esm({
-  "cli/dist/src/mcp/tools.js"() {
+  "cli/src/mcp/tools.ts"() {
     "use strict";
     init_zod();
     init_config();
     init_client();
     init_utils();
+    init_logger();
     init_daemon();
   }
 });
 
-// cli/dist/src/mcp/server.js
+// cli/src/mcp/server.ts
 var server_exports = {};
 __export(server_exports, {
   createMcpServer: () => createMcpServer,
   startMcpServer: () => startMcpServer
 });
 async function startMcpServer() {
+  const log = getLogger();
+  log.info("server", "MCP server starting");
+  process.on("uncaughtException", (err) => {
+    log.error("server", "uncaught exception", err);
+  });
+  process.on("unhandledRejection", (reason) => {
+    log.error("server", "unhandled rejection", reason instanceof Error ? reason : new Error(String(reason)));
+  });
   const deps = {};
   const config2 = readConfig();
   if (config2) {
+    log.info("server", "config found, starting daemon", { workspaceId: config2.workspaceId, serverUrl: config2.serverUrl });
     try {
       deps.daemon = await startDaemon(config2);
-    } catch {
+      log.info("server", "daemon started");
+    } catch (err) {
+      log.error("server", "daemon startup failed", err instanceof Error ? err : new Error(String(err)));
     }
+  } else {
+    log.info("server", "no config found, skipping daemon");
   }
   const server = createMcpServer(deps);
   const transport = new StdioServerTransport();
   await server.connect(transport);
+  log.info("server", "MCP server connected to transport");
 }
 function createMcpServer(deps = {}) {
   const server = new McpServer({
@@ -28884,17 +29020,18 @@ function createMcpServer(deps = {}) {
   return server;
 }
 var init_server3 = __esm({
-  "cli/dist/src/mcp/server.js"() {
+  "cli/src/mcp/server.ts"() {
     "use strict";
     init_mcp();
     init_stdio2();
     init_config();
+    init_logger();
     init_tools();
     init_daemon();
   }
 });
 
-// cli/dist/src/index.js
+// cli/src/index.ts
 var index_exports = {};
 __export(index_exports, {
   createProgram: () => createProgram
@@ -28918,18 +29055,22 @@ var {
   Help
 } = import_index.default;
 
-// cli/dist/src/index.js
-var import_node_path4 = require("node:path");
+// cli/src/index.ts
+var import_node_path5 = require("node:path");
 init_config();
 
-// cli/dist/src/commands/configure.js
+// cli/src/commands/configure.ts
 init_config();
+init_logger();
 init_utils();
 function registerConfigureCommand(program2) {
   program2.command("configure").description("Configure the agent CLI with an API key").requiredOption("--key <api-key>", "API key (format: ak_<workspaceId>_<secret>)").option("--server <url>", "Server URL", "https://collaboration-server.on-auto.workers.dev").action((opts) => {
+    const log = getLogger();
+    log.info("cli", "configure command invoked");
     const { key, server } = opts;
     const result = parseApiKey(key);
     if (!result) {
+      log.error("cli", "configure: invalid API key format");
       throw new Error("Invalid API key format. Expected format: ak_<workspaceId>_<secret>");
     }
     const { workspaceId } = result;
@@ -28938,11 +29079,12 @@ function registerConfigureCommand(program2) {
       serverUrl: server,
       workspaceId
     });
+    log.info("cli", `configure: saved config for workspace ${workspaceId}`);
     console.log(`Configuration saved. Workspace: ${workspaceId}, Server: ${server}`);
   });
 }
 
-// cli/dist/src/commands/get-model.js
+// cli/src/commands/get-model.ts
 init_client();
 init_config();
 function registerGetModelCommand(program2) {
@@ -28959,8 +29101,8 @@ function registerGetModelCommand(program2) {
   });
 }
 
-// cli/dist/src/commands/send-model.js
-var import_node_fs2 = require("node:fs");
+// cli/src/commands/send-model.ts
+var import_node_fs3 = require("node:fs");
 init_config();
 init_client();
 function registerSendModelCommand(program2) {
@@ -28973,7 +29115,7 @@ function registerSendModelCommand(program2) {
     }
     let modelJson;
     try {
-      modelJson = (0, import_node_fs2.readFileSync)(file, "utf-8");
+      modelJson = (0, import_node_fs3.readFileSync)(file, "utf-8");
     } catch {
       process.stderr.write(`Error: Could not read file "${file}"
 `);
@@ -29003,31 +29145,40 @@ function registerSendModelCommand(program2) {
   });
 }
 
-// cli/dist/src/commands/connect.js
+// cli/src/commands/connect.ts
 init_config();
+init_logger();
 init_daemon();
 function registerConnectCommand(program2) {
   program2.command("connect").description("Connect to the collaboration server and sync model in real-time").action(async () => {
+    const log = getLogger();
+    log.info("cli", "connect command invoked");
     const config2 = readConfig();
     if (!config2) {
+      log.warn("cli", "connect: no configuration found");
       process.stderr.write('No configuration found. Run "auto-agent configure --key <api-key>" first.\n');
       process.exitCode = 1;
       return;
     }
+    log.info("cli", `connect: connecting to ${config2.serverUrl} for workspace ${config2.workspaceId}`);
     process.stderr.write(`Connecting to ${config2.serverUrl} for workspace ${config2.workspaceId}...
 `);
     try {
       const daemon = await startDaemon(config2);
+      log.info("cli", "connect: daemon started successfully");
       process.stderr.write("Connected. Syncing model to disk. Press Ctrl+C to stop.\n");
       process.on("SIGINT", () => {
+        log.info("cli", "connect: received SIGINT, disconnecting");
         daemon.connection.disconnect();
         process.exit(0);
       });
       process.on("SIGTERM", () => {
+        log.info("cli", "connect: received SIGTERM, disconnecting");
         daemon.connection.disconnect();
         process.exit(0);
       });
     } catch (err) {
+      log.error("cli", "connect: failed", err instanceof Error ? err : new Error(String(err)));
       process.stderr.write(`Error: ${err instanceof Error ? err.message : "Connection failed"}
 `);
       process.exitCode = 1;
@@ -29035,13 +29186,13 @@ function registerConnectCommand(program2) {
   });
 }
 
-// cli/dist/src/index.js
+// cli/src/index.ts
 function createProgram() {
   const program2 = new Command();
   program2.name("auto-agent").description("CLI for connecting coding agents to the Auto collaboration server").version("0.1.0").option("--config <dir>", "Configuration directory", ".auto-agent").hook("preAction", (thisCommand) => {
     const opts = thisCommand.opts();
     if (opts.config) {
-      setConfigDir((0, import_node_path4.resolve)(opts.config));
+      setConfigDir((0, import_node_path5.resolve)(opts.config));
     }
   });
   registerConfigureCommand(program2);
