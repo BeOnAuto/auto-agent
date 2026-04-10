@@ -49,6 +49,13 @@ describe('ConnectionManager', () => {
     expect(createManager().isConnected()).toBe(false);
   });
 
+  it('has a default error listener that prevents uncaught exceptions', () => {
+    const manager = createManager();
+    expect(manager.listenerCount('error')).toBeGreaterThanOrEqual(1);
+    // Should not throw
+    manager.emit('error', new Error('test'));
+  });
+
   it('processMessage writes model to disk on full message', () => {
     const manager = createManager();
     const model = { scenes: [{ id: 's1', name: 'Login' }] };
@@ -116,7 +123,6 @@ describe('ConnectionManager', () => {
 
   it('connect rejects on WebSocket error', async () => {
     const manager = createManager();
-    manager.on('error', () => {});
     const connectPromise = manager.connect(5000);
     await tick();
 

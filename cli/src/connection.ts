@@ -72,6 +72,7 @@ export class ConnectionManager extends EventEmitter {
     super();
     this.name = buildAgentName(this.sessionId);
     this.status = buildAgentStatus();
+    this.on('error', () => {});
   }
 
   async connect(timeoutMs = 10000): Promise<void> {
