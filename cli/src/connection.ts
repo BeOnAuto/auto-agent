@@ -140,8 +140,9 @@ export class ConnectionManager extends EventEmitter {
         clearTimeout(timeout);
         if (rejectOnError) {
           reject(err);
+        } else {
+          this.emit('error', err);
         }
-        this.emit('error', err);
       });
     });
   }

@@ -131,6 +131,42 @@ describe('ConnectionManager', () => {
     await expect(connectPromise).rejects.toThrow('ECONNREFUSED');
   });
 
+  it('does not emit error event during initial connect failure', async () => {
+    const manager = createManager();
+    const errors: Error[] = [];
+    manager.on('error', (err: Error) => errors.push(err));
+    const connectPromise = manager.connect(5000);
+    await tick();
+
+    lastFakeWs.emit('error', new Error('ECONNREFUSED'));
+
+    await expect(connectPromise).rejects.toThrow('ECONNREFUSED');
+    expect(errors).toEqual([]);
+  });
+
+  it('emits error event on WebSocket error during reconnect', async () => {
+    const manager = createManager();
+    const errors: Error[] = [];
+    manager.on('error', (err: Error) => errors.push(err));
+    const connectPromise = manager.connect(5000);
+    await tick();
+
+    lastFakeWs.emit('open');
+    lastFakeWs.emit('message', Buffer.from(JSON.stringify({ type: 'full', model: {} })));
+    await connectPromise;
+
+    // Drop connection to trigger reconnect
+    lastFakeWs.emit('close');
+    await new Promise((r) => setTimeout(r, 3500));
+
+    // Reconnect WebSocket errors should emit on the manager
+    lastFakeWs.emit('error', new Error('ECONNRESET'));
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe('ECONNRESET');
+
+    manager.disconnect();
+  }, 10000);
+
   it('sends hello message with sessionId and name on open', async () => {
     const manager = createManager();
     const connectPromise = manager.connect(5000);
