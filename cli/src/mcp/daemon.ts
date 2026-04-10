@@ -28,6 +28,10 @@ export async function startDaemon(config: {
     persistence,
   });
 
+  connection.on('error', (err: unknown) => {
+    log.error('daemon', 'connection error', err instanceof Error ? err : new Error(String(err)));
+  });
+
   log.info('daemon', 'connecting to server');
   await connection.connect();
   log.info('daemon', 'connected');

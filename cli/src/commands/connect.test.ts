@@ -12,6 +12,7 @@ vi.mock('../connection.js', () => ({
   ConnectionManager: class {
     connect = mockConnectFn;
     disconnect = mockDisconnectFn;
+    on = vi.fn();
     isConnected = () => true;
   },
 }));
