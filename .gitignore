@@ -1,5 +1,7 @@
 node_modules/
 cli/dist/
 cli/node_modules/
+cli/coverage
 .auto-agent/
 .turbo/
+.claude-auto
