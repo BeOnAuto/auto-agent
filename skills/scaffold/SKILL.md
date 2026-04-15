@@ -36,7 +36,7 @@ cd <clientDir> && npm install
 
 Install additional dependencies:
 ```bash
-npm install @apollo/client graphql
+npm install @apollo/client graphql @json-render/core @json-render/react @on.auto/ui-components
 npm install -D tailwindcss @tailwindcss/vite
 ```
 
@@ -120,9 +120,19 @@ Tell the developer:
 - Show the Auto app preview URLs (loopback URLs from step 6)
 - The build skill will now generate code into these running servers
 
+### 7.5. Generate theme CSS from model
+
+Call `auto_get_design` and generate a `theme.css` file in the frontend `src/` directory with CSS custom properties from:
+- `theme.colors.light` → `--surface-page`, `--primary`, `--fg`, etc.
+- `theme.radius` → `--radius-sm`, `--radius-md`, etc.
+- `theme.shadow` → `--shadow-sm`, `--shadow-card`, etc.
+- `theme.font` → `--font-sans`, `--font-mono`
+
+Import this CSS in the app entry point (`main.tsx`). The model's theme is authoritative for all styling.
+
 ## Design Guidelines
 
-When creating the welcome page, follow the design patterns from `references/design-patterns.md`:
+When the model has a `design.theme`, use it as the authoritative style source (see `references/design-patterns.md` section 0). When no model theme exists, fall back to:
 
 - Use `Geist` or `Satoshi` font (install via Google Fonts or Fontsource)
 - Neutral Zinc/Slate palette with one accent color

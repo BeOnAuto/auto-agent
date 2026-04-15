@@ -6,6 +6,7 @@ import { parseApiKey } from '../utils.js';
 import { getLogger } from '../logger.js';
 import { startDaemon, type Daemon } from './daemon.js';
 import type { AgentEndpoint } from '../connection.js';
+import { extractOverview, extractSceneDetail, extractDesign } from './model-extract.js';
 
 export interface ToolDependencies {
   daemon?: Daemon;
@@ -174,6 +175,65 @@ export function registerTools(server: McpServer, deps: ToolDependencies = {}): v
         return `${e.label}: ${loopbackUrl}`;
       });
       return { content: [{ type: 'text' as const, text: `Updated ${endpoints.length} endpoint(s):\n${lines.join('\n')}` }] };
+    }
+  );
+
+  function getModelOrError(): { model: unknown } | { error: string } {
+    if (deps.daemon) {
+      const model = deps.daemon.persistence.readModel();
+      if (model) return { model };
+    }
+    return { error: 'No model available. Run /auto-agent:connect first.' };
+  }
+
+  server.tool(
+    'auto_get_model_overview',
+    'Get a compact overview of the model (~10K chars): requirements, narratives, scenes, moments, actors, entities, messages, and app shell. Does NOT include UI specs, server specs, or theme tokens. Use this first to understand what to build.',
+    {},
+    async () => {
+      const log = getLogger();
+      log.info('tools', 'auto_get_model_overview called');
+      const result = getModelOrError();
+      if ('error' in result) {
+        return { content: [{ type: 'text' as const, text: result.error }] };
+      }
+      return { content: [{ type: 'text' as const, text: JSON.stringify(extractOverview(result.model), null, 2) }] };
+    }
+  );
+
+  server.tool(
+    'auto_get_scene_detail',
+    'Get full detail for one scene: all moments with UI specs, server specs, BDD specs, and related messages. Use after auto_get_model_overview to drill into a specific scene.',
+    {
+      scene: z.string().describe('Scene name or ID'),
+    },
+    async ({ scene }) => {
+      const log = getLogger();
+      log.info('tools', `auto_get_scene_detail called for "${scene}"`);
+      const result = getModelOrError();
+      if ('error' in result) {
+        return { content: [{ type: 'text' as const, text: result.error }] };
+      }
+      const detail = extractSceneDetail(result.model, scene);
+      if (!detail) {
+        return { content: [{ type: 'text' as const, text: `Scene "${scene}" not found in model.` }] };
+      }
+      return { content: [{ type: 'text' as const, text: JSON.stringify(detail, null, 2) }] };
+    }
+  );
+
+  server.tool(
+    'auto_get_design',
+    'Get the complete design object: theme tokens (colors, radius, shadows, fonts, animations), design brief, and app shell layout spec. Use this to generate theme.css and understand the visual direction.',
+    {},
+    async () => {
+      const log = getLogger();
+      log.info('tools', 'auto_get_design called');
+      const result = getModelOrError();
+      if ('error' in result) {
+        return { content: [{ type: 'text' as const, text: result.error }] };
+      }
+      return { content: [{ type: 'text' as const, text: JSON.stringify(extractDesign(result.model), null, 2) }] };
     }
   );
 }

@@ -64,7 +64,7 @@ describe('MCP tools', () => {
     await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
     const tools = await client.listTools();
     const toolNames = tools.tools.map((t) => t.name).sort();
-    expect(toolNames).toEqual(['auto_configure', 'auto_get_changes', 'auto_get_model', 'auto_send_model', 'auto_update_endpoints']);
+    expect(toolNames).toEqual(['auto_configure', 'auto_get_changes', 'auto_get_design', 'auto_get_model', 'auto_get_model_overview', 'auto_get_scene_detail', 'auto_send_model', 'auto_update_endpoints']);
     await client.close();
   });
 
@@ -324,5 +324,86 @@ describe('MCP tools', () => {
     const endpoints = [{ label: 'Frontend', url: 'http://localhost:5173' }];
     const result = await callTool(server, 'auto_update_endpoints', { endpoints });
     expect(getText(result)).toContain('https://app.on.auto//agent/abc123def456/Frontend');
+  });
+
+  it('auto_get_model_overview returns compact overview from daemon model', async () => {
+    const deps = createDepsWithPersistence();
+    const model = {
+      requirements: 'Build a timesheet app',
+      actors: [{ name: 'Submitter', kind: 'person' }],
+      scenes: [{ id: 's1', name: 'Login', moments: [{ id: 'm1', name: 'Enter Creds', type: 'experience', client: { ui: { spec: { root: 'r', elements: {} } } } }] }],
+      messages: [{ id: 'msg1', type: 'command', name: 'Login', fields: [{ name: 'email', type: 'string' }] }],
+    };
+    deps.daemon!.persistence.update(model);
+    deps.daemon!.persistence.flush();
+
+    const server = createMcpServer(deps);
+    const result = await callTool(server, 'auto_get_model_overview');
+    const parsed = JSON.parse(getText(result));
+    expect(parsed.requirements).toBe('Build a timesheet app');
+    expect(parsed.scenes[0].moments[0].name).toBe('Enter Creds');
+    expect(parsed.scenes[0].moments[0]).not.toHaveProperty('client');
+    expect(parsed.messages[0].fields).toEqual(['email']);
+  });
+
+  it('auto_get_model_overview returns error when no model', async () => {
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_get_model_overview');
+    expect(getText(result)).toBe('No model available. Run /auto-agent:connect first.');
+  });
+
+  it('auto_get_scene_detail returns full scene with UI specs', async () => {
+    const deps = createDepsWithPersistence();
+    const model = {
+      scenes: [{
+        id: 's1', name: 'Login',
+        moments: [{ id: 'm1', name: 'Enter Creds', type: 'experience', client: { ui: { spec: { root: 'r', elements: {} } } } }],
+      }],
+      messages: [],
+    };
+    deps.daemon!.persistence.update(model);
+    deps.daemon!.persistence.flush();
+
+    const server = createMcpServer(deps);
+    const result = await callTool(server, 'auto_get_scene_detail', { scene: 'Login' });
+    const parsed = JSON.parse(getText(result));
+    expect(parsed.scene.name).toBe('Login');
+    expect(parsed.scene.moments[0].client.ui).toBeDefined();
+  });
+
+  it('auto_get_scene_detail returns not found for unknown scene', async () => {
+    const deps = createDepsWithPersistence();
+    deps.daemon!.persistence.update({ scenes: [] });
+    deps.daemon!.persistence.flush();
+
+    const server = createMcpServer(deps);
+    const result = await callTool(server, 'auto_get_scene_detail', { scene: 'Unknown' });
+    expect(getText(result)).toBe('Scene "Unknown" not found in model.');
+  });
+
+  it('auto_get_design returns theme and appShell', async () => {
+    const deps = createDepsWithPersistence();
+    const model = {
+      design: {
+        theme: { colors: { light: { primary: '#000' } } },
+        appShell: { name: 'sidebar' },
+        brief: 'A dashboard',
+      },
+    };
+    deps.daemon!.persistence.update(model);
+    deps.daemon!.persistence.flush();
+
+    const server = createMcpServer(deps);
+    const result = await callTool(server, 'auto_get_design');
+    const parsed = JSON.parse(getText(result));
+    expect(parsed.theme.colors.light.primary).toBe('#000');
+    expect(parsed.appShell.name).toBe('sidebar');
+    expect(parsed.brief).toBe('A dashboard');
+  });
+
+  it('auto_get_design returns error when no model', async () => {
+    const server = createMcpServer();
+    const result = await callTool(server, 'auto_get_design');
+    expect(getText(result)).toBe('No model available. Run /auto-agent:connect first.');
   });
 });

@@ -1,6 +1,6 @@
 ---
 description: Scaffold and start skeleton dev servers for immediate preview
-allowed-tools: Bash, auto_get_model, auto_update_endpoints
+allowed-tools: Bash, auto_get_model, auto_get_model_overview, auto_get_design, auto_update_endpoints
 ---
 
 Scaffold a running application skeleton with dev servers so the developer gets immediate preview in the Auto app.
@@ -29,6 +29,8 @@ Scaffold a running application skeleton with dev servers so the developer gets i
 
 7. Show the loopback URLs returned by `auto_update_endpoints` — these preview inside the Auto app
 
-8. Optionally, call `auto_get_model` to peek at the workspace name for the welcome page title
+8. Optionally, call `auto_get_model_overview` to peek at the workspace name for the welcome page title
+
+9. Call `auto_get_design` and generate a `theme.css` file with CSS custom properties from `design.theme`. Import it in the app entry point. The model's theme is authoritative for all styling.
 
 If "$ARGUMENTS" contains `--skip-frontend` or `--skip-backend`, only scaffold the specified side.

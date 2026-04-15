@@ -4,10 +4,14 @@
 
 The model's `client.ui.spec` uses the [json-render](https://json-render.dev) spec format. Key packages:
 
-- `@json-render/core` — schema definition, catalog, prompt generation
-- `@json-render/react` — React renderer, StateProvider, ActionProvider, ValidationProvider
-- `@json-render/shadcn` — 39 pre-built shadcn/ui components (Card, Button, Input, Text, Stack, Grid, Tabs, Table, Charts, etc.)
-- `@json-render/code-generation` — export standalone React components with zero runtime dependency
+- `@json-render/core` — schema definition, catalog, prompt generation, state store, prop expressions
+- `@json-render/react` — React renderer, StateProvider, ActionProvider, VisibilityProvider, ValidationProvider
+- `@on.auto/ui-components` — 60+ shadcn/ui-backed components with json-render adapters (catalog + component implementations). This is the component registry that maps spec types to real React components.
+
+### Installing the component stack
+```bash
+npm install @json-render/core @json-render/react @on.auto/ui-components
+```
 
 ## Spec Format
 
@@ -78,15 +82,20 @@ export function CreateBouquetDraft() {
 
 ### Step 2: Set up the component registry
 
-Use `@json-render/shadcn` for the pre-built components:
+Use `@on.auto/ui-components` for the pre-built shadcn/ui component adapters:
 
 ```tsx
-import { createShadcnRegistry } from '@json-render/shadcn'
+import { catalog } from '@on.auto/ui-components'
+import { components } from '@on.auto/ui-components/components'
+import { defineCatalog } from '@json-render/core'
+import { schema } from '@json-render/react/schema'
+import { defineRegistry } from '@json-render/react'
 
-export const registry = createShadcnRegistry()
+const jrCatalog = defineCatalog(schema, { components: catalog, actions: {} })
+export const { registry } = defineRegistry(jrCatalog, { components })
 ```
 
-This maps component types (Stack, Input, Button, Text, Heading, Badge, Avatar, etc.) to real shadcn/ui React components.
+This maps 60+ component types (Stack, Card, Input, Button, Text, Heading, Badge, Avatar, DataTable, KPICard, Sidebar, Callout, etc.) to real shadcn/ui React components with full state binding support.
 
 ### Step 3: Wire event handlers via ActionProvider
 

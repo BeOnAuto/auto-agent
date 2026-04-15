@@ -49,19 +49,46 @@ src/
 
 Slug derivation: `"Place Order"` → `place-order`, `"CreateBouquetDraft"` → `create-bouquet-draft`.
 
-## Reading the Model
+## Reading the Model (staged extraction)
 
-Fetch the model using `auto_get_model`. Key paths:
+**Do NOT call `auto_get_model`** — it returns the full model (often >100K chars) which overwhelms context. Instead use targeted extraction tools:
 
-- `model.narratives[]` — top-level journeys with `sceneIds`
-- `model.scenes[]` — each has `moments[]`
-- `model.messages[]` — data contracts (type: command/event/state/query)
-- `moment.type` — `"command"` or `"query"`
-- `moment.request` — the GraphQL operation string (mutation or query)
-- `moment.server.specs` — gherkin test scenarios
-- `moment.server.data.items` — event targets and stream patterns
-- `moment.client.ui.spec` — json-render compatible UI specification
-- `moment.mappings` — field derivations between request and messages
+### Step 1: Get the overview (~10K chars)
+Call `auto_get_model_overview` to understand the full scope:
+- Requirements, assumptions, actors, entities
+- Narratives with descriptions, outcomes, and scene IDs
+- Scenes with moment names, types, descriptions (no UI specs)
+- Message names and field names (no full types)
+- App shell description and design brief
+
+This tells you WHAT to build — the complete structure in one compact call.
+
+### Step 2: Get design tokens
+Call `auto_get_design` to get the theme and app shell:
+- `theme.colors` (light/dark mode with oklch values)
+- `theme.font`, `theme.radius`, `theme.shadow`, `theme.animation`
+- `appShell` (layout name, chrome, navigation, brand placement)
+- `brief` (visual direction description)
+
+Generate `theme.css` with CSS custom properties immediately. The model's theme is authoritative — use it for all styling decisions.
+
+### Step 3: Build scene by scene
+For each scene, call `auto_get_scene_detail(sceneName)` to get:
+- Full scene object with all moments expanded
+- Each moment's `client.ui.spec` (json-render wireframe)
+- Each moment's `client.specs` (BDD test specs)
+- Each moment's `server.specs` and `server.data`
+- Related messages (data contracts referenced by the scene's moments)
+
+Build one scene at a time, keeping context focused.
+
+### Key paths within a scene detail
+- `scene.moments[].type` — `"command"`, `"query"`, `"experience"`, or `"react"`
+- `scene.moments[].client.ui.spec` — json-render flat element map (`root`, `elements`, `state`)
+- `scene.moments[].client.specs` — BDD `describe`/`it` test specs
+- `scene.moments[].server.specs` — gherkin Given/When/Then scenarios
+- `scene.moments[].server.data.items` — event targets and stream patterns
+- `relatedMessages` — data contracts (command/event/state/query messages with full field types)
 
 ## Backend: Event-Driven with CQRS
 

@@ -38,6 +38,7 @@ if (fs.existsSync(configPath)) {
     modelSummary,
     '',
     'Available tools: auto_get_model (fetch model), auto_send_model (validate and correct model), auto_get_changes (get recent deltas), auto_update_endpoints (report dev server URLs).',
+    'Extraction tools for efficient context: auto_get_model_overview (compact ~10K overview of requirements, scenes, moments), auto_get_scene_detail (full UI/server specs for one scene), auto_get_design (theme tokens, app shell spec). Prefer these over auto_get_model.',
     stackSummary,
     'Use /auto-agent:scaffold to set up and start dev servers immediately.',
     'Use /auto-agent:build to generate application code from this model.',

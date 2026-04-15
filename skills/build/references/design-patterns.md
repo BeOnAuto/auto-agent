@@ -6,6 +6,27 @@ Apply these patterns when generating any user-facing UI from the model's `client
 
 ---
 
+## 0. Model Theme Takes Precedence
+
+When the model includes a `design.theme` (fetched via `auto_get_design`), it is the **authoritative source** for:
+
+- **Colors**: Use the model's color tokens (often oklch) as CSS custom properties. Do NOT override with Zinc/Slate defaults.
+- **Fonts**: Use `theme.font` values. If the model specifies Inter, use Inter.
+- **Radius, shadows**: Use `theme.radius` and `theme.shadow` values directly.
+- **Animations**: Use `theme.animation` keyframes and easings.
+- **App shell**: Follow `design.appShell` for layout structure (sidebar width, chrome, navigation grouping, brand placement).
+
+The patterns below apply as **enhancement on top of the model theme**:
+- Component architecture (Double-Bezel, CTA pills) — apply using the model's color tokens
+- Motion/animation principles — extend the model's animation definitions
+- Interactive states (loading, empty, error) — use model's accent colors
+- Spatial rhythm — apply model's spacing approach
+- Content quality rules — always apply regardless of theme
+
+**When no model theme exists**, the defaults in sections 3-4 below (Geist fonts, Zinc/Slate palette) serve as the fallback.
+
+---
+
 ## 1. Baseline Configuration
 
 * DESIGN_VARIANCE: 8 (1=Symmetric, 10=Artsy Chaos)
@@ -24,14 +45,17 @@ Adapt dynamically based on the application domain. A dashboard skews toward high
 
 ## 3. Typography
 
-* **Headlines:** `text-4xl md:text-6xl tracking-tighter leading-none`. Use `Geist`, `Outfit`, `Cabinet Grotesk`, or `Satoshi` — never `Inter`, `Roboto`, `Arial`, or `Open Sans`.
+* **When model theme provides fonts**: Use `theme.font.sans` and `theme.font.mono` — these override all defaults below.
+* **When no model theme**: Use `Geist`, `Outfit`, `Cabinet Grotesk`, or `Satoshi` — avoid `Inter`, `Roboto`, `Arial`, or `Open Sans`.
+* **Headlines:** `text-4xl md:text-6xl tracking-tighter leading-none`.
 * **Body:** `text-base text-gray-600 leading-relaxed max-w-[65ch]`.
-* **Dashboard rule:** Serif fonts are banned for software UIs. Use `Geist` + `Geist Mono` or `Satoshi` + `JetBrains Mono`.
+* **Dashboard rule:** Serif fonts are banned for software UIs.
 
 ## 4. Color
 
-* Max 1 accent color. Saturation < 80%.
-* No "AI purple/blue" neon gradients. Use neutral bases (Zinc/Slate) with singular high-contrast accents (Emerald, Electric Blue, Deep Rose).
+* **When model theme provides colors**: Generate CSS custom properties from `theme.colors.light` and `theme.colors.dark`. Reference these variables everywhere (`var(--primary)`, `var(--surface-base)`, etc.). Do NOT introduce Zinc/Slate overrides.
+* **When no model theme**: Use neutral bases (Zinc/Slate) with max 1 accent color. Saturation < 80%.
+* No "AI purple/blue" neon gradients.
 * Stick to one palette for the entire project. No warm/cool gray mixing.
 * Never use pure `#000000` — use Off-Black, Zinc-950, or Charcoal.
 
