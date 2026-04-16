@@ -5,3 +5,6 @@ cli/coverage
 .auto-agent/
 .turbo/
 .claude-auto
+# Ketchup plans
+ketchup-plan.md
+.ketchup/
