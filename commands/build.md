@@ -3,7 +3,7 @@ description: Build application code from the current Auto narrative model
 allowed-tools: Bash, auto_get_model, auto_get_model_overview, auto_get_scene_detail, auto_get_design, auto_send_model, auto_get_changes, auto_update_endpoints, mcp__chrome-devtools__navigate_page, mcp__chrome-devtools__take_screenshot, mcp__chrome-devtools__list_console_messages, mcp__chrome-devtools__click, mcp__chrome-devtools__fill, mcp__chrome-devtools__evaluate_script
 ---
 
-Build the application from the narrative model using vertical slice architecture.
+Build the application from the narrative model using vertical slice architecture. The model expresses a four-level hierarchy: **Domain → Narrative → Scene → Moment** — the workspace itself is the domain. Read `auto-build/references/ndd-structure.md` if you need the canonical definitions, generation procedure, or anti-patterns.
 
 Parse "$ARGUMENTS" to determine build scope:
 - No arguments: auto-detect (incremental if changes exist, full otherwise)

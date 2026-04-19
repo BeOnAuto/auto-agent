@@ -8,13 +8,26 @@ version: 0.1.0
 
 The narrative model (`.auto-agent/model.json`) is the single source of truth for your application. It expresses **what** the application does; you translate it to **how**.
 
+> **Read [`references/ndd-structure.md`](references/ndd-structure.md) first.** It is the canonical structural reference for Domain → Narrative → Scene → Moment, including how each level maps to model fields, how to handle transitions between scenes, and the anti-patterns you must reject.
+
 ## Core Concepts
 
-**Narratives** group scenes into complete user journeys (e.g., "Flower Shop Order Fulfillment").
+NDD organises every system into four levels:
 
-**Scenes** group moments into coherent interaction sequences (e.g., "Browse and Select Flowers"). A scene represents a unit of business value — all moments within it must work together.
+```
+Domain (business capability)
+└── Narrative (goal thread)
+    └── Scene (single outcome)
+        └── Moment (single step toward that outcome)
+```
 
-**Moments** are the atomic units. Each moment is either a `command` (state change via mutation) or a `query` (data retrieval). Each moment becomes **one vertical slice** in the codebase.
+**Domain** — The top-level model **is** the domain. The workspace's `capability`, `actors`, and `entities` describe a coherent business capability area (e.g., "Concert Booking"). Every narrative below reuses these.
+
+**Narratives** are goal threads — cohesive groups of related scene outcomes that fulfil a broader user or business goal (e.g., "Getting Tickets").
+
+**Scenes** are outcomes — each scene is a single self-contained outcome that becomes true (e.g., "Tickets reserved," "Fan added to waitlist"). All moments within a scene work together to deliver that outcome.
+
+**Moments** are the atomic units — each moment is one step toward the scene's outcome. Each moment is one of `command` (state change via mutation), `query` (data retrieval), `react` (system responds to event), or `experience` (UI-only). Command, query, and react moments each become **one vertical slice** in the codebase.
 
 **Messages** define data contracts: `command` (input), `event` (output), `state` (persisted), `query` (lookup params). Their `fields` arrays define the schema.
 

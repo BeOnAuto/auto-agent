@@ -16,7 +16,7 @@
 
 ---
 
-The Auto Agent plugin connects your coding agent to the [Auto](https://on.auto) platform. Model your software as [narratives](https://narrativedriven.org/what-is-ndd) on Auto, then let your coding agent build from the structured model on your machine.
+The Auto Agent plugin connects your coding agent to the [Auto](https://on.auto) platform. Model your software on Auto as a four-level [Narrative-Driven Development](https://narrativedriven.org/what-is-ndd) hierarchy — Domain → Narrative → Scene → Moment — then let your coding agent build from the structured model on your machine.
 
 Works with Claude Code today. More agents coming soon.
 
