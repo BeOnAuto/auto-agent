@@ -20,7 +20,7 @@ describe('session-start hook', () => {
     rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('outputs connected message when config exists', () => {
+  it('emits SessionStart additionalContext that teaches the four-level NDD hierarchy', () => {
     const configDir = join(tmpDir, '.auto-agent');
     mkdirSync(configDir, { recursive: true });
     writeFileSync(
@@ -29,10 +29,18 @@ describe('session-start hook', () => {
     );
 
     const result = execFileSync('node', [scriptPath], { cwd: tmpDir, encoding: 'utf-8' });
+    const parsed = JSON.parse(result);
 
-    expect(JSON.parse(result)).toEqual({
-      message: 'Auto Agent: Connected to workspace ws1. Use auto_get_model to fetch the current model.',
-    });
+    expect(parsed.hookSpecificOutput?.hookEventName).toBe('SessionStart');
+    const ctx: string = parsed.hookSpecificOutput?.additionalContext ?? '';
+
+    expect(ctx).toContain('ws1');
+    expect(ctx).toContain('Domain');
+    expect(ctx).toContain('Narrative');
+    expect(ctx).toContain('Scene');
+    expect(ctx).toContain('Moment');
+    expect(ctx).toContain('workspace itself is the domain');
+    expect(ctx).toContain('auto_get_model');
   });
 
   it('outputs empty message when no config exists', () => {

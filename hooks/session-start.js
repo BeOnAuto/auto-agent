@@ -33,12 +33,13 @@ if (fs.existsSync(configPath)) {
 
   const additionalContext = [
     `You are connected to Auto workspace "${config.workspaceId}".`,
-    'The narrative model at .auto-agent/model.json is a specification medium that expresses application intent through narratives, scenes, and moments.',
+    'The narrative model at .auto-agent/model.json expresses application intent as a four-level Narrative-Driven Development hierarchy: Domain → Narrative → Scene → Moment (business capability → goal thread → single outcome → single step toward that outcome). The workspace itself is the domain — capability, actors, and entities live at the top of the model and are reused by every narrative below.',
+    'See auto-build/references/ndd-structure.md for canonical definitions, the generation procedure, and anti-patterns. Reason top-down: domain → narrative → scene → moment.',
     'The model is live-synced from the collaboration server via WebSocket.',
     modelSummary,
     '',
     'Available tools: auto_get_model (fetch model), auto_send_model (validate and correct model), auto_get_changes (get recent deltas), auto_update_endpoints (report dev server URLs).',
-    'Extraction tools for efficient context: auto_get_model_overview (compact ~10K overview of requirements, scenes, moments), auto_get_scene_detail (full UI/server specs for one scene), auto_get_design (theme tokens, app shell spec). Prefer these over auto_get_model.',
+    'Extraction tools for efficient context: auto_get_model_overview (compact ~10K overview of capability, narratives, scenes, moments), auto_get_scene_detail (full UI/server specs for one scene), auto_get_design (theme tokens, app shell spec). Prefer these over auto_get_model.',
     stackSummary,
     'Use /auto-agent:scaffold to set up and start dev servers immediately.',
     'Use /auto-agent:build to generate application code from this model.',
